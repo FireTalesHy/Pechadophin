@@ -1,4 +1,4 @@
-# 🎣 pechadophin
+# 🎣 Canne & Dauphins
 
 Un jeu de plateforme en pixel art, jouable directement dans le navigateur : tu es un pêcheur qui affronte des dauphins, un démon requin et un poulpe géant, dans un monde généré aléatoirement à chaque partie.
 
@@ -6,7 +6,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 
 ## ▶️ Jouer
 
-- En ligne : [Jouer à Pechadophin](https://FireTalesHy.github.io/Pechadophin/)
+- En ligne : *(ajoute ici le lien GitHub Pages, voir plus bas)*
 - En local : télécharge le dépôt et ouvre `index.html` dans ton navigateur.
 
 ## 🎮 Commandes

@@ -80,12 +80,15 @@ body{
 .row{display:flex;gap:calc(var(--u)*6px);flex-wrap:wrap;justify-content:center}
 .go.alt{background:var(--on);color:var(--on-ink)}
 
-#shop,#dev{
+.go.sm{font-size:max(7px,calc(var(--u)*5px));padding:calc(var(--u)*4px) calc(var(--u)*8px);opacity:.85}
+#shop,#dev,#rst{
   position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
   background:rgba(4,12,20,.74);font-family:var(--pf);
   padding:max(10px,env(safe-area-inset-top,0px)) 10px max(10px,env(safe-area-inset-bottom,0px));
 }
-#shop[hidden],#dev[hidden]{display:none}
+#shop[hidden],#dev[hidden],#rst[hidden]{display:none}
+#rst{z-index:30}
+#rst .row{justify-content:center;gap:12px}
 .shop-panel{
   background:var(--panel);color:var(--panel-ink);border:3px solid var(--panel-line);
   box-shadow:5px 5px 0 rgba(0,0,0,.45);width:min(640px,100%);max-height:100%;
@@ -125,6 +128,8 @@ body{
 #dev-god{width:100%;padding:10px}
 #dev-god.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .shop-panel.dev-panel{width:min(520px,100%)}
+#rst .shop-note{font-size:10px;line-height:1.9;opacity:1;text-align:center}
+#rst .row .go{font:400 10px/1 var(--pf);padding:10px 14px}
 
 .bals{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
 #soul-ic{width:18px;height:20px}
@@ -185,6 +190,12 @@ body{
   background:var(--btn);color:var(--ink);font-size:18px;cursor:pointer;padding:0;
   touch-action:manipulation;
 }
+@media (max-width:480px){
+  #controls{gap:6px;padding:6px 8px 12px}
+  .grp{gap:6px}
+  .pad.wide{width:62px}
+  #mute,#pausebtn{width:36px;height:36px;font-size:15px}
+}
 @media (max-height:430px){
   #joy{--s:72px}
   .pad{height:48px}
@@ -205,6 +216,8 @@ body{
         </div>
         <div class="row"><button class="go" id="ov-btn">JOUER</button><button class="go alt" id="shop-btn">BOUTIQUE</button><button class="go alt" id="ov-restart" hidden>RECOMMENCER</button></div>
         <p class="hint" id="ov-hint">Q/D ou ←/→ : bouger · Z/↑/Espace : sauter · Souris : viser · Clic gauche : pêcher · Échap ou P : pause</p>
+        <p class="hint" id="ov-cp" hidden>★ CHECKPOINT : LA PLAGE ★</p>
+        <button class="go alt sm" id="rst-btn" type="button">RÉINITIALISER LA SAVE</button>
         <p class="credits" id="credits">dev : L'taleshy et cocobat<br>testeurs : moustik, ofodile et wyzan</p>
       </div>
     </div>
@@ -230,6 +243,17 @@ body{
     <p class="shop-note" id="shop-note"></p>
     <div id="shop-list"></div>
     <button class="go" id="shop-close">RETOUR</button>
+  </div>
+</div>
+
+<div id="rst" hidden role="alertdialog" aria-modal="true" aria-labelledby="rst-title" aria-describedby="rst-text">
+  <div class="shop-panel dev-panel">
+    <div class="shop-head"><h2 id="rst-title">RÉINITIALISER ?</h2></div>
+    <p class="shop-note" id="rst-text"></p>
+    <div class="row">
+      <button class="go alt" id="rst-no" type="button">ANNULER</button>
+      <button class="go" id="rst-yes" type="button">CONTINUER</button>
+    </div>
   </div>
 </div>
 
@@ -272,7 +296,8 @@ const WATER_ROW=31;
 const HOOK_V=340, HOOK_BACK=520, HOOK_SPREAD=0.2;
 const COMBO_TIME=10, HEAL_EVERY=15;
 const OCTO_HP=300, ARENA_START=27, ARENA_EVERY=36, WALL_H=14;   // arène du poulpe : 1re à 27 écrans, puis tous les 36 écrans, des deux côtés
-const BOSS_EVERY=18*VW, BOSS_HP=100, BOSS_SPEED=38, BOSS_FIRE_CD=6.5;   // un boss tous les 18 écrans (environ 1 minute de marche)
+const JELLY_HP=300, JELLY_SCREENS=37, JELLY_BEAM_L=480;   // méduse : 300 PV, apparaît ~37 écrans après l'entrée de la plage
+const BOSS_EVERY=18*VW, BOSS_HP=100, BOSS_SPEED=38, BOSS_FIRE_CD=5, LASER_CHARGE=0.65;   // un boss tous les 18 écrans (environ 1 minute de marche)
 const LASER_L=480, LASER_T=2, NIGHT_SPEED=1.15;   // laser du requin : longueur (tout l'écran) et durée ; vitesse des dauphins la nuit rouge
 const BEST_KEY='canne-dauphins-meilleur-score';
 
@@ -293,6 +318,11 @@ function noise1(x,salt){const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return hash2(i
 /* ================= Monde procédural ================= */
 const colCache=new Map();
 const arenas=new Map();
+const tunnels=new Map();
+/* ---------- Zone plage : débloquée à la sortie de l'arène du poulpe ---------- */
+const BEACH_TX=ARENA_START*(VW/T)+13;                 // 1re case de sable : juste après le mur extérieur de la 1re arène
+const inBeach=tx=>Math.abs(tx)>=BEACH_TX;
+const TCELL=56, TFLAT=8;                              // un tunnel possible par cellule de 56 cases, 8 cases de raccord avec le relief
 const plat=new Set();      // plateformes traversables par le dessous
 const chunks=new Set();
 
@@ -311,14 +341,65 @@ function pitInfo(cell){
   const w=2+Math.floor(hash2(cell,79)*2);
   const hl=Math.round(spawnBlend(s-3)), hr=Math.round(spawnBlend(s+w+2));
   if(Math.abs(hl-hr)>2) return null;
+  if(inBeach(s)){   // pas de trou à côté d'un tunnel
+    for(let c=Math.floor((s-12)/TCELL);c<=Math.floor((s+w+12)/TCELL);c++){
+      const t=tunnelInfo(c);
+      if(t&&s+w+3>=t.a-2-TFLAT-1&&s-3<=t.a+t.W+2+TFLAT+1)return null;
+    }
+  }
   return {s,w,hl,hr};
+}
+/* Tunnel de sable en U : rampe qui plonge (1 case par case), galerie au fond, rampe qui remonte.
+   Optionnellement un puits à 4 cases de large avec des paliers en quinconce pour remonter à la verticale. */
+function tunnelInfo(cell){
+  if(tunnels.has(cell))return tunnels.get(cell);
+  let info=null;
+  const cs=cell*TCELL;
+  if(hash2(cell,201)<0.7){
+    const D0=6+Math.floor(hash2(cell,202)*5),L=4+Math.floor(hash2(cell,203)*5),W0=2*D0+L;
+    const a=cs+10+Math.floor(hash2(cell,204)*(TCELL-20-W0)),b0=a+W0,e0=a-2,e1=b0+2;
+    if(e0*e1>0&&Math.min(Math.abs(e0),Math.abs(e1))-TFLAT>=BEACH_TX&&!arenaAt(e0-12)&&!arenaAt(e1+12)){
+      const G=Math.round((spawnBlend(e0-TFLAT)+spawnBlend(e1+TFLAT)+spawnBlend((a+b0)>>1)*2)/4);
+      const D=Math.min(D0,29-G);   // reste au-dessus de l'eau
+      if(D>=5){
+        const W=2*D+L;
+        if(Math.abs(G-spawnBlend(a-2-TFLAT))<=4&&Math.abs(G-spawnBlend(a+W+2+TFLAT))<=4){
+          info={a,W,D,L,G,fB:G-1+D,ch:hash2(cell,205)<0.6?a+D+Math.floor(hash2(cell,206)*(L-3)):-99};
+        }
+      }
+    }
+  }
+  tunnels.set(cell,info);
+  return info;
+}
+const tunFloor=(t,k)=>k<=t.D?t.G-1+k:k<=t.D+t.L?t.fB:t.G-1+(t.W-k);   // dernière rangée d'air (les pieds) à la colonne a+k
+/* 0 = rien de spécial, 1 = creusé (air), 2 = palier de puits (plein) */
+function tunCarve(t,tx,ty){
+  const k=tx-t.a;
+  if(k<0||k>t.W)return 0;
+  if(t.ch>=0&&tx>=t.ch&&tx<=t.ch+3&&ty>=t.G&&ty<=t.fB){
+    if(ty>=t.G+1&&ty<=t.fB-2&&(t.fB-2-ty)%3===0){
+      const left=((t.fB-2-ty)/3)%2===0;
+      if(left?tx<=t.ch+1:tx>=t.ch+2)return 2;
+    }
+    return 1;
+  }
+  const f=tunFloor(t,k);
+  return(ty>=f-3&&ty<=f)?1:0;
+}
+function beachGround(tx){
+  const base=spawnBlend(tx),t=tunnelInfo(Math.floor(tx/TCELL));
+  if(!t)return{g:Math.round(base),tun:null};
+  const e0=t.a-2,e1=t.a+t.W+2,d=tx<e0?e0-tx:tx>e1?tx-e1:0;
+  if(d>=TFLAT)return{g:Math.round(base),tun:null};
+  return{g:Math.round(lerp(base,t.G,1-d/TFLAT)),tun:d===0?t:null};
 }
 /* Arène : 22 cases de large, murs de 2 cases, 2 portes (une de chaque côté), esplanade plate de 6 cases autour */
 function arenaAt(tx){
   const s=tx/(VW/T),a=Math.abs(s);
   if(a<ARENA_START-2)return null;
   const j=Math.round((a-ARENA_START)/ARENA_EVERY);
-  if(j<0)return null;
+  if(j!==0)return null;   // une seule arène par côté : plus de poulpe (ni d'arène) dans la plage
   const sg=s<0?-1:1,cx=sg*(ARENA_START+ARENA_EVERY*j)*(VW/T);
   if(Math.abs(tx-cx)>39)return null;
   const id=sg*(j+1);
@@ -331,19 +412,22 @@ function column(tx){
   const ar=arenaAt(tx);
   if(ar){
     const dx=tx-ar.cx,w=clamp(1-(Math.abs(dx)-19)/20,0,1);
-    c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12)};
+    c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12),beach:inBeach(tx)};
     colCache.set(tx,c);return c;
   }
   const p=pitInfo(Math.floor(tx/22));
-  let g,pit=false;
+  const beach=inBeach(tx);
+  let g,pit=false,tun=null;
   if(p&&tx>=p.s-2&&tx<p.s) g=p.hl;
   else if(p&&tx>=p.s&&tx<p.s+p.w){g=p.hl;pit=true;}
   else if(p&&tx>=p.s+p.w&&tx<=p.s+p.w+1) g=p.hr;
+  else if(beach){const bg=beachGround(tx);g=bg.g;tun=bg.tun;}
   else g=Math.round(spawnBlend(tx));
-  c={g,pit}; colCache.set(tx,c); return c;
+  c={g,pit,beach,tun}; colCache.set(tx,c); return c;
 }
 function solidTile(tx,ty){
   const c=column(tx);
+  if(c.tun){const r=tunCarve(c.tun,tx,ty);if(r===1)return false;if(r===2)return true;}
   if(!c.pit&&ty>=c.g)return true;
   if(c.wall&&ty>=c.g-WALL_H&&ty<c.g){
     if(ty>=c.g-4)return c.dx<0?c.ar.gateL:c.ar.gateR;   // porte : pleine si fermée
@@ -351,7 +435,7 @@ function solidTile(tx,ty){
   }
   return false;
 }
-const oneWay=(tx,ty)=>plat.has(tx*512+ty+200)&&!column(tx).ar;
+const oneWay=(tx,ty)=>plat.has(tx*512+ty+200)&&!column(tx).ar&&!inBeach(tx);   // plus de plateformes sur la plage
 const solidAt=(x,y)=>solidTile(Math.floor(x/T),Math.floor(y/T));
 const supportAt=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T);return solidTile(tx,ty)||oneWay(tx,ty);};
 
@@ -361,7 +445,9 @@ function genChunk(cx){
   const x0=cx*16, myPlats=[];
   const ca=arenaAt(x0+8);
   if(ca&&Math.abs(x0+8-ca.cx)<=30)return;   // rien à l'intérieur ni autour de l'arène
+  const beachC=inBeach(x0+8);   // zone plage : pas de plateformes, pas de dauphins bleus ni volants
   let nChains=rng()<0.72?1:0; if(rng()<0.25) nChains++;
+  if(beachC)nChains=0;
   for(let c=0;c<nChains;c++){
     let px=x0+Math.floor(rng()*16), dir=rng()<0.5?1:-1;
     const len=1+Math.floor(rng()*5)+(rng()<0.2?2:0);
@@ -384,6 +470,7 @@ function genChunk(cx){
   for(let i=0;i<ne;i++){
     const tx=x0+1+Math.floor(rng()*14);
     if(Math.abs(tx)<14) continue;
+    if(beachC){const col=column(tx);if(col.pit||col.tun||col.ar)continue;enemies.push(mkEnemy('shoot',tx*T,col.g*T-9.01));continue;}   // sur le sable : seulement les dauphins rouges
     const r=rng();
     if(r<0.3){
       const col=column(tx);
@@ -394,6 +481,20 @@ function genChunk(cx){
     } else {
       const col=column(tx); if(col.pit) continue;
       enemies.push(mkEnemy(rng()<0.3?'shoot':'hop',tx*T,col.g*T-9.01));
+    }
+  }
+  if(beachC){   // vers dans les tunnels : un ou deux dans la galerie du fond, parfois un sur les rampes
+    const c0=Math.floor(x0/TCELL),c1=Math.floor((x0+15)/TCELL);
+    for(let c=c0;c<=c1;c++){
+      const t=tunnelInfo(c);if(!t)continue;
+      const gl=Math.max(x0,t.a+t.D),gr=Math.min(x0+15,t.a+t.D+t.L);
+      if(gl<=gr&&rng()<0.9){const tx=gl+Math.floor(rng()*(gr-gl+1));enemies.push(mkEnemy('worm',tx*T,(t.fB+1)*T-8.01));}
+      if(gl<=gr&&gr-gl>=6&&rng()<0.5){const tx=gl+Math.floor(rng()*(gr-gl+1));enemies.push(mkEnemy('worm',tx*T,(t.fB+1)*T-8.01));}
+      const rl=Math.max(x0,t.a+2),rr=Math.min(x0+15,t.a+t.W-2);
+      if(rl<=rr&&rng()<0.3){
+        const tx=rl+Math.floor(rng()*(rr-rl+1)),k=tx-t.a;
+        if(k<t.D||k>t.D+t.L)enemies.push(mkEnemy('worm',tx*T,(tunFloor(t,k)+1)*T-8.01));
+      }
     }
   }
   // perle : une tous les 7 écrans (7 x 384 px = 168 cases), dans les deux sens depuis le départ
@@ -420,7 +521,7 @@ function genChunk(cx){
       }
     }
     if(pxp===undefined){
-      let tx=st;while(column(tx).pit)tx++;
+      let tx=st;while(column(tx).pit||column(tx).tun)tx++;
       pxp=tx*T+T/2;pyp=column(tx).g*T-(rng()<0.5?16:36);
     }
     worldPearls.push({x:pxp-7,y:pyp,w:14,h:12,ph:rng()*6});
@@ -564,6 +665,30 @@ function sharkRows(){
 const SHARK_PAL={R:'#c8141f',D:'#7d0b13',L:'#f08a78',w:'#ffffff',y:'#ffe14d',e:'#14182c',h:'#4a0a10',H:'#ff6a3d',k:'#2a0408'};
 const SHARK=spr(sharkRows(),SHARK_PAL,true);
 const SHARK_W=tint(SHARK,'#ffffff');
+function jellyRows(){
+  const W=32,rows=[];
+  for(let y=0;y<12;y++){
+    const t=(y+0.5-12)/12,hw=Math.round(15.5*Math.sqrt(1-t*t));let r='';
+    for(let x=0;x<W;x++){
+      const d=Math.abs(x+0.5-W/2);
+      if(d>hw){r+='.';continue;}
+      let c=y>=8?'l':'w';
+      if(d>=hw-1&&y>2)c='l';
+      if(y===2&&d>5&&d<10)c='h';
+      if(y>=3&&y<=4&&d>8&&d<12)c='h';
+      if(y>=5&&y<=6&&(x===8||x===23||x===15||x===16))c='p';
+      if(y===8&&(x===11||x===20))c='k';
+      r+=c;
+    }
+    rows.push(r);
+  }
+  let r12='';for(let x=0;x<W;x++)r12+=(Math.abs(x+0.5-W/2)<=14.5)?'l':'.';
+  rows.push(r12);
+  for(let y=13;y<=16;y++){let r='';for(let x=0;x<W;x++)r+=(x>=3&&x<=28&&((x+(y%2)*2)%4<2))?(y>14?'p':'l'):'.';rows.push(r);}
+  return rows;
+}
+const JELLY=spr(jellyRows(),{w:'#f6f0ff',l:'#cdbcff',h:'#ffffff',p:'#ff9ad8',k:'#4a3a8c'},true);
+const JELLY_W=tint(JELLY,'#ffffff');
 ICONS.pierce=spr(["......x..",".......x.","xxxxxxxxx",".......x.","......x.."],{x:'#ff6a6a'},true);
 ICONS.trident=spr(["x..x..x","x..x..x","x..x..x","xxxxxxx","...y...","...y...","...y...","...y..."],{x:'#ff5a4a',y:'#e0a93b'},true);
 ICONS.multi=spr(["...x...","...x...","...x...","xxx.xxx","...x...","...x...","...x..."],{x:'#ff6a6a'},true);
@@ -649,6 +774,53 @@ function makeGrass(dec,v){
   return c;
 }
 const GRASS=[];for(let d=0;d<6;d++){GRASS.push([0,1,2].map(v=>makeGrass(d,v)));}
+/* ---------- Sable (zone plage) ---------- */
+function makeSand(shade,v){
+  const c=mk(T,T),g=c.getContext('2d');
+  const base=['#ecd194','#d9ba7a','#bf9d62'][shade],dark=['#d6b777','#c4a363','#a98650'][shade],light=['#f6e0aa','#e6c98a','#d0ae72'][shade];
+  g.fillStyle=base;g.fillRect(0,0,T,T);
+  const r=mulberry32(v*911+shade*37+3);
+  for(let i=0;i<8;i++){g.fillStyle=r()<0.55?dark:light;g.fillRect(Math.floor(r()*15),Math.floor(r()*15),1+Math.floor(r()*2),1);}
+  return c;
+}
+const SAND=[0,1,2].map(s=>[0,1,2].map(v=>makeSand(s,v)));
+function makeSandTop(dec,v){
+  const c=mk(T,T+6),g=c.getContext('2d');
+  g.drawImage(SAND[0][v],0,6);
+  const r=mulberry32(v*29+dec*5+2);
+  g.fillStyle='#f7e4ae';g.fillRect(0,6,T,2);
+  g.fillStyle='#fff3c8';g.fillRect(0,6,T,1);
+  g.fillStyle='#d6b777';
+  for(let x=0;x<T;x++)if(r()<0.35)g.fillRect(x,9+(r()<0.5?1:0),1,1);   // petites rides de sable
+  if(dec===1){g.fillStyle='#ff8a3d';g.fillRect(7,2,2,5);g.fillRect(5,4,6,1);g.fillRect(6,3,1,1);g.fillRect(9,3,1,1);g.fillRect(6,6,1,1);g.fillRect(9,6,1,1);g.fillStyle='#ffd0a0';g.fillRect(8,4,1,1);}   // étoile de mer
+  if(dec===2){g.fillStyle='#f4c9d4';g.fillRect(5,4,6,3);g.fillRect(6,3,4,1);g.fillStyle='#fff0f4';g.fillRect(7,4,2,2);g.fillStyle='#d89aa8';g.fillRect(5,6,6,1);}   // coquillage
+  if(dec===3){g.fillStyle='#9aa83a';g.fillRect(5,2,1,4);g.fillRect(8,0,1,6);g.fillRect(11,3,1,3);g.fillStyle='#6f7d28';g.fillRect(6,3,1,3);g.fillRect(9,2,1,4);}   // herbe sèche
+  if(dec===4){g.fillStyle='#8d8f9c';g.fillRect(4,4,4,3);g.fillRect(9,5,3,2);g.fillStyle='#b8bac6';g.fillRect(4,4,3,1);g.fillRect(9,5,2,1);}   // galets
+  if(dec===5){g.fillStyle='#e0463a';g.fillRect(5,3,6,3);g.fillRect(4,2,1,2);g.fillRect(11,2,1,2);g.fillRect(5,6,1,1);g.fillRect(7,6,1,1);g.fillRect(9,6,1,1);g.fillStyle='#ffffff';g.fillRect(6,2,1,1);g.fillRect(9,2,1,1);g.fillStyle='#14182c';g.fillRect(6,3,1,1);g.fillRect(9,3,1,1);}   // crabe
+  return c;
+}
+const SANDTOP=[];for(let d=0;d<6;d++){SANDTOP.push([0,1,2].map(v=>makeSandTop(d,v)));}
+const PALM=(()=>{
+  const W=44,H=64,c=mk(W,H),g=c.getContext('2d');
+  const trunk=[];
+  for(let i=0;i<=34;i++){const x=20+Math.sin(i/34*1.4)*5,y=H-1-i;trunk.push([x,y]);}
+  for(const [x,y] of trunk){g.fillStyle='#8a5a2b';g.fillRect(Math.round(x)-1,y,3,1);g.fillStyle='#5a3a1e';g.fillRect(Math.round(x)+1,y,1,1);}
+  for(let i=3;i<trunk.length;i+=4){g.fillStyle='#5a3a1e';g.fillRect(Math.round(trunk[i][0])-1,trunk[i][1],3,1);}
+  const top=trunk[trunk.length-1],tx=Math.round(top[0]),ty=top[1];
+  const frond=(ang,len,col,dk)=>{
+    for(let i=0;i<=len;i++){
+      const t=i/len,x=tx+Math.cos(ang)*i,y=ty+Math.sin(ang)*i*0.5+t*t*len*0.55-2;
+      g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),2,2);
+      if(i%3===0){g.fillStyle=dk;g.fillRect(Math.round(x),Math.round(y)+2,1,2);g.fillRect(Math.round(x),Math.round(y)-1,1,1);}
+    }
+  };
+  for(const [a,l] of [[Math.PI,16],[Math.PI*0.82,15],[Math.PI*1.18,14],[0,16],[Math.PI*0.18,15],[-Math.PI*0.18,14],[Math.PI*1.5,9]])frond(a,l,'#3fae4a','#2a8038');
+  g.fillStyle='#6b4a22';g.fillRect(tx-2,ty+1,2,2);g.fillRect(tx+1,ty+2,2,2);
+  const d=g.getImageData(0,0,W,H).data,sol=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&d[(y*W+x)*4+3]>0;
+  g.fillStyle='#14182c';
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(!sol(x,y)&&(sol(x-1,y)||sol(x+1,y)||sol(x,y-1)||sol(x,y+1)))g.fillRect(x,y,1,1);
+  return c;
+})();
 const PLANK=(()=>{
   const c=mk(T,T),g=c.getContext('2d');
   g.fillStyle='#6b3f1c';g.fillRect(0,0,T,7);
@@ -663,7 +835,7 @@ const PLANK=(()=>{
 /* ================= État ================= */
 let state='title';  // title | play | dying | over
 let score=0,lives=3,kills=0,best=0,newRecord=false;
-let enemies=[],pickups=[],parts=[],texts=[],worldPearls=[],boss=null,bossShots=[],soulFx=[],bossDone=new Set(),bossWins=0,octo=null,tents=[];
+let enemies=[],pickups=[],parts=[],texts=[],worldPearls=[],boss=null,bossShots=[],soulFx=[],bossDone=new Set(),bossWins=0,octo=null,tents=[],jelly=null,jellySpawned=false;
 let devOpen=false,godMode=false,devClicks=0,devLast=0,paused=false;
 let shake=0,time=0,dyingT=0,jumpBuf=0,fireBuf=0,muted=false,overlayVisible=true,shopOpen=false;
 let night=false,nightA=0,bossSpawned=false;   // nuit rouge sang : de l'apparition du requin jusqu'au poulpe ; le requin n'apparaît qu'une fois par partie
@@ -689,7 +861,8 @@ const UP={
 const TRIDENT_COST=3, TRIDENT_V=420;   // coût en âmes rouges
 const T_KEYS=['dmg','pierce','rate','range'];
 const TM_DIRS={1:[0],2:[0,180],3:[0,-90,180],4:[0,-45,-135,180]};   // angles en degrés autour du pêcheur (0 = devant, négatif = vers le haut) : jamais vers le sol
-const TMULTI={vals:[1,2,3,4],cost:10,fmt:v=>v+(v>1?' tridents':' trident')};   // coût en âmes rouges, par niveau
+const WORM_UNLOCK=10;   // vers à tuer pour débloquer l'amélioration « tridents multiples »
+const TMULTI={vals:[1,2,3,4],cost:[60,140,260],fmt:v=>v+(v>1?' tridents':' trident')};   // coût en or, par niveau (une fois la mission des vers accomplie)
 const TUP={
  dmg:{name:'Dégâts',vals:[6,8,10,13,17,22],cost:[40,90,150,240,360],fmt:v=>v+' dégâts'},
  pierce:{name:'Perforation',vals:[2,3,4,5,6,8],cost:[45,95,160,250,380],fmt:v=>v+' cibles'},
@@ -699,7 +872,7 @@ const TUP={
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={pearls:0,gold:0,souls:0,hp:0,weapon:'rod',tridentOwned:false,tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={pearls:0,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -707,9 +880,11 @@ function loadShop(){
       d.gold=Math.max(0,Math.floor(Number(j.gold))||0);
       d.souls=Math.max(0,Math.floor(Number(j.souls))||0);
       d.hp=clamp(Math.floor(Number(j.hp))||0,0,5);
-      d.tridentOwned=j.tridentOwned===true;
+      d.beach=(j.beach===1||j.beach===-1)?j.beach:0;   // checkpoint : côté de la plage atteinte (0 = pas encore)
+      d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
+      d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
-      d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
+      d.weapon=(d.tridentOwned&&(j.weapon==='trident'||d.beach!==0))?'trident':'rod';   // plage atteinte : la canne n'est plus utilisable
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
       if(Array.isArray(j.owned))for(const id of j.owned)if(SKINS.some(x=>x.id===id)&&!d.owned.includes(id))d.owned.push(id);
@@ -790,6 +965,7 @@ function mkEnemy(kind,x,y){
   const dir=Math.random()<0.5?1:-1;
   const tier=Math.min(8,Math.floor(Math.abs(x)/2400));
   if(kind==='hop') return {kind,x,y,w:14,h:9,vx:0,vy:0,dir,hp:1+tier,maxHp:1+tier,tier,speed:30+Math.random()*14,state:'alive',t:0,flash:0,onGround:false,hopT:0.4+Math.random(),turnT:0};
+  if(kind==='worm') return {kind,x,y,w:16,h:8,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:22+Math.random()*10,state:'alive',t:Math.random()*6,flash:0,onGround:false,turnT:0};
   if(kind==='shoot') return {kind,x,y,w:14,h:9,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:13+Math.random()*7,state:'alive',t:0,flash:0,onGround:false,hopT:1.2+Math.random()*1.5,turnT:0,fireCd:1.5+Math.random()*2,charge:0};
   return {kind:'fly',x,y,baseY:y,w:16,h:9,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:34+Math.random()*10,state:'alive',t:Math.random()*5,ph:Math.random()*6,flash:0,lock:0,onGround:false};
 }
@@ -811,8 +987,14 @@ function hitEnemy(e,dmg){
   if(e.hp<=0){
     e.state='dead';e.t=0;e.vy=-170;e.vx=-e.dir*30;
     kills++; shake=Math.max(shake,0.08); sfx.kill();
-    const gold=(e.kind==='fly'?5:e.kind==='shoot'?4:2)+(e.tier||0);
-    shop.gold+=gold;saveShop();
+    const gold=(e.kind==='fly'?5:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
+    shop.gold+=gold;
+    if(e.kind==='worm'){   // les vers débloquent les tridents multiples
+      const was=shop.wormKills;shop.wormKills++;
+      if(was<WORM_UNLOCK&&shop.wormKills>=WORM_UNLOCK){floatText(e.x+e.w/2,e.y-22,'TRIDENTS MULTIPLES !','#ff6a7a');sfx.heal();}
+      else if(shop.wormKills<WORM_UNLOCK)floatText(e.x+e.w/2,e.y-22,'VER '+shop.wormKills+'/'+WORM_UNLOCK,'#ffb0a0');
+    }
+    saveShop();
     floatText(e.x+e.w/2,e.y+8,'+'+gold+' OR','#ffd23f');
     burst(e.x+e.w/2,e.y+e.h/2,'#ffd23f',6,70);
     if(kills%HEAL_EVERY===0){
@@ -867,7 +1049,13 @@ function stepPlayer(dt){
   if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV;p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
   if(!inp.jump&&p.vy<-140&&p.stun<=0)p.vy=-140;
   p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
-  moveX(p,p.vx*dt);
+  {
+    const vx0=p.vx,x0=p.x,y0=p.y;
+    if(moveX(p,vx0*dt)&&p.onGround&&p.stun<=0&&d!==0&&column(Math.floor((x0+5)/T)).beach){   // plage : on monte seul les marches d'une case (rampes des tunnels)
+      const nx=p.x;p.x=x0;p.y=y0-T;
+      if(moveX(p,vx0*dt)){p.x=nx;p.y=y0;p.vx=0;}else{p.vx=vx0;p.vy=0;}
+    }
+  }
   moveY(p,p.vy*dt);
   if(p.onGround){
     const yb=p.y+p.h+1;
@@ -885,6 +1073,8 @@ function hookHit(h,dmg,R){
   for(const e of enemies)if(e.state==='alive')targets.push({r:[e.x,e.y,e.w,e.h],hit:d=>hitEnemy(e,d)});
   const b=boss;
   if(b&&b.state==='alive'&&b.spawnT<=0)targets.push({r:[b.x,b.y,b.w,b.h],hit:d=>hitBoss(b,d)});
+  const jf=jelly;
+  if(jf&&jf.state==='alive'&&jf.spawnT<=0)targets.push({r:[jf.x,jf.y,jf.w,jf.h],hit:d=>hitJelly(jf,d)});
   if(octo&&octo.state==='fight')for(const t of tents){
     if(t.state==='warn')continue;
     targets.push({r:tentRect(t),hit:d=>hitOcto(t,d)});
@@ -927,6 +1117,8 @@ function stepTrident(dt){
     }
     const b=boss;
     if(h.n<pierce&&b&&b.state==='alive'&&b.spawnT<=0&&!h.hit.has(b)&&rectsOverlap(h.x-5,h.y-5,10,10,b.x,b.y,b.w,b.h)){h.hit.add(b);hitBoss(b,dmg);h.n++;}
+    const jf=jelly;
+    if(h.n<pierce&&jf&&jf.state==='alive'&&jf.spawnT<=0&&!h.hit.has(jf)&&rectsOverlap(h.x-5,h.y-5,10,10,jf.x,jf.y,jf.w,jf.h)){h.hit.add(jf);hitJelly(jf,dmg);h.n++;}
     if(h.n<pierce&&octo&&octo.state==='fight')for(const t of tents){
       if(t.state==='warn'||h.hit.has(t))continue;
       const r=tentRect(t);
@@ -1003,6 +1195,24 @@ function aiHop(e,dt){
   }
   if(e.y>WATER_ROW*T+10){e.state='dead';e.t=9;}
 }
+function aiWorm(e,dt){   // ver de sable : rampe sur les marches d'une case, fait demi-tour aux murs et aux vides
+  const p=player;
+  e.turnT-=dt;
+  const near=Math.abs(p.x-e.x)<120&&Math.abs(p.y-e.y)<50;
+  if(near&&e.turnT<=0){e.dir=p.x>e.x?1:-1;e.turnT=0.8;}
+  e.vy=Math.min(e.vy+GRAV*dt,MAXFALL);
+  const ox=e.x,oy=e.y,dx=e.dir*e.speed*(near?1.5:1)*dt;
+  if(moveX(e,dx)){
+    e.x=ox;e.y=oy-T-1;
+    if(moveX(e,dx)){e.x=ox;e.y=oy;e.dir=-e.dir;}else e.vy=0;
+  }
+  moveY(e,e.vy*dt);
+  if(e.onGround){
+    const fx=e.dir>0?e.x+e.w+1:e.x-1;
+    if(!supportAt(fx,e.y+e.h+2)&&!supportAt(fx,e.y+e.h+T+2))e.dir=-e.dir;
+  }
+  if(e.y>WATER_ROW*T+10){e.state='dead';e.t=9;}
+}
 function aiFly(e,dt){
   const p=player;
   e.lock-=dt;
@@ -1020,7 +1230,7 @@ function stepEnemies(dt){
     if(e.state==='dead'){e.t+=dt;e.vy+=GRAV*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;continue;}
     if(Math.abs(e.x-p.x)>380||Math.abs(e.y-p.y)>320)continue;
     e.t+=dt; if(e.flash>0)e.flash-=dt;
-    if(e.kind==='fly')aiFly(e,dt);else aiHop(e,dt);
+    if(e.kind==='fly')aiFly(e,dt);else if(e.kind==='worm')aiWorm(e,dt);else aiHop(e,dt);
     if(state==='play'&&p.invuln<=0&&e.state==='alive'&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,e.x,e.y,e.w,e.h)) hurtPlayer(e.x+e.w/2);
   }
   enemies=enemies.filter(e=>!(e.state==='dead'&&(e.y>(WATER_ROW+4)*T||e.t>3))&&Math.abs(e.x-p.x)<2400);
@@ -1072,7 +1282,7 @@ function maybeSpawnBoss(){
   let by=p.y-64;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
   const bhp=Math.round(BOSS_HP*Math.pow(1.5,bossWins));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
-  boss={kind:'boss',k,x:bx,y:by,w,h,vx:0,vy:0,dir:p.x>sx?1:-1,hp:bhp,maxHp:bhp,state:'alive',spawnT:1.4,t:0,flash:0,fireCd:3.5,charge:0,laser:0,la:0,upT:0,onGround:false};
+  boss={kind:'boss',k,x:bx,y:by,w,h,vx:0,vy:0,dir:p.x>sx?1:-1,hp:bhp,maxHp:bhp,state:'alive',spawnT:1.4,t:0,flash:0,fireCd:3,charge:0,laser:0,la:0,upT:0,onGround:false};
   bossSpawned=true;night=true;   // la nuit tombe, rouge sang, jusqu'au poulpe
   shake=0.6;sfx.bossSpawn();
 }
@@ -1202,11 +1412,111 @@ function stepBoss(dt){
       if(b.charge>0.3)b.la=Math.atan2(p.y+7-oy,p.x+5-ox);   // la visée suit le joueur, puis se verrouille 0,3 s avant le tir
       if(b.charge<=0){b.charge=0;b.laser=LASER_T;sfx.laser();shake=Math.max(shake,0.25);}
     } else if(b.fireCd<=0&&Math.abs(dx)<300&&Math.abs(dy)<200){
-      b.charge=0.8;
+      b.charge=LASER_CHARGE;
       const ox=cx+b.dir*21,oy=cy+1;b.la=Math.atan2(p.y+7-oy,p.x+5-ox);
     }
   }
   if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x,b.y,b.w,b.h))hurtPlayer(cx);
+}
+
+/* ---------- Méduse (boss de la plage) : vole, lasers blancs, tentacules qui tournent ---------- */
+function jellyArm(b,i,na){   // points d'un tentacule (spirale souple), du corps vers l'extérieur
+  const a0=b.rot+i*Math.PI*2/na,cx=b.x+b.w/2,cy=b.y+b.h/2+2,pts=[];
+  for(let k=1;k<=8;k++){
+    const r=10+k*6,a=a0-k*0.075+Math.sin(b.t*3+i+k*0.5)*0.05;
+    pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);
+  }
+  return pts;
+}
+function jellyBeams(b){   // angles des faisceaux
+  const n=3,out=[];
+  for(let i=0;i<n;i++)out.push(b.baseA+(i-(n-1)/2)*0.42);
+  return out;
+}
+function hitJelly(b,dmg){
+  const removed=Math.min(dmg,b.hp);
+  b.hp-=dmg;b.flash=0.12;
+  combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;
+  score+=pts;
+  floatText(b.x+b.w/2,b.y-10,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  burst(b.x+b.w/2,b.y+b.h/2,'#e9d8ff',10,100);
+  if(b.hp<=0)killJelly(b);else sfx.hit();
+}
+function killJelly(b){
+  b.hp=0;b.state='dead';b.t=0;b.vy=-90;b.charge=0;b.fire=0;
+  kills++;shake=0.7;sfx.bossDie();
+  const cx=b.x+b.w/2,cy=b.y+b.h/2;
+  shop.souls+=2;shop.gold+=80;saveShop();
+  floatText(cx,cy-22,'+2 ÂMES ROUGES','#ff6a7a');
+  floatText(cx,cy-11,'+80 OR','#ffd23f');
+  soulFx.push({x:cx-10,y:cy,t:0});soulFx.push({x:cx+10,y:cy,t:0.15});
+  burst(cx,cy,'#f6f0ff',30,160);burst(cx,cy,'#ff9ad8',18,110);
+  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
+}
+function maybeSpawnJelly(){
+  if(jelly||jellySpawned||octo)return;
+  const p=player;
+  if(Math.abs(Math.floor((p.x+5)/T))<BEACH_TX+JELLY_SCREENS*(VW/T))return;
+  const w=30,h=20,bx=p.x+5+p.face*150-w/2;
+  let by=p.y-72;
+  for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
+  jelly={kind:'jelly',x:bx,y:by,w,h,vx:0,vy:0,hp:JELLY_HP,maxHp:JELLY_HP,state:'alive',spawnT:1.6,t:0,flash:0,rot:0,fireCd:3,charge:0,fire:0,baseA:0,sweep:0,upT:0,onGround:false};
+  jellySpawned=true;shake=0.6;sfx.bossSpawn();
+  floatText(p.x+5,p.y-34,'LA MÉDUSE !','#f6f0ff');
+}
+function stepJelly(dt){
+  maybeSpawnJelly();
+  const b=jelly;if(!b)return;
+  const p=player;
+  if(b.state==='dead'){
+    b.t+=dt;b.vy+=GRAV*0.4*dt;b.y+=b.vy*dt;
+    if(Math.random()<0.8)parts.push({x:b.x+Math.random()*b.w,y:b.y+Math.random()*b.h,vx:(Math.random()-0.5)*14,vy:-10,g:10,life:0.7,col:Math.random()<0.5?'#f6f0ff':'#ff9ad8',sz:1+((Math.random()*2)|0)});
+    if(b.t>1.8||b.y>(WATER_ROW+4)*T)jelly=null;
+    return;
+  }
+  b.t+=dt;if(b.flash>0)b.flash-=dt;
+  b.rot+=dt*1.5;
+  if(b.spawnT>0){b.spawnT-=dt;return;}
+  const cx=b.x+b.w/2,cy=b.y+b.h/2+2,dx=p.x+5-cx,dy=p.y+7-cy;
+  if(b.fire>0){   // pendant les lasers, la méduse est immobile et le faisceau balaie lentement
+    b.fire-=dt;b.vx=0;b.vy=0;b.baseA+=b.sweep*dt;
+    if(state==='play'&&p.invuln<=0){
+      const qx=p.x+5-cx,qy=p.y+7-cy;
+      for(const a of jellyBeams(b)){
+        const ca=Math.cos(a),sa=Math.sin(a),al=qx*ca+qy*sa,pe=-qx*sa+qy*ca;
+        if(al>-6&&al<JELLY_BEAM_L&&Math.abs(pe)<6.5){hurtPlayer(cx);break;}
+      }
+    }
+    if(b.fire<=0){b.fire=0;b.fireCd=3.8;}
+  } else {
+    // balade : plane au-dessus du joueur en dérivant de gauche à droite ; rattrape vite si elle est distante
+    const far=Math.hypot(dx,dy),tx=p.x+5+Math.sin(b.t*0.45)*120,ty=p.y-64+Math.sin(b.t*0.8)*16;
+    const ddx=tx-cx,ddy=ty-cy;
+    const sp=36*(b.charge>0?0.3:1)*(1+clamp((far-220)/80,0,3));
+    const vx=Math.abs(ddx)>6?Math.sign(ddx)*sp:0;
+    let vy=(Math.abs(ddy)>6?Math.sign(ddy)*sp*0.8:0)+Math.sin(b.t*2.4)*10;
+    if(b.upT>0){b.upT-=dt;vy=-70;}
+    if(moveX(b,vx*dt))b.upT=0.5;
+    b.vy=vy;moveY(b,vy*dt);
+    if(b.y>(WATER_ROW-3)*T)b.y=(WATER_ROW-3)*T;
+    b.fireCd-=dt;
+    if(b.charge>0){
+      b.charge-=dt;
+      if(b.charge>0.3)b.baseA=Math.atan2(dy,dx);   // la visée suit le joueur puis se verrouille 0,3 s avant le tir
+      if(b.charge<=0){b.charge=0;b.fire=1.1;b.sweep=(Math.random()<0.5?-1:1)*0.28;sfx.laser();shake=Math.max(shake,0.25);}
+    } else if(b.fireCd<=0&&Math.abs(dx)<320&&Math.abs(dy)<230){
+      b.charge=0.85;b.baseA=Math.atan2(dy,dx);
+    }
+  }
+  if(state==='play'&&p.invuln<=0){
+    if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x,b.y,b.w,b.h))hurtPlayer(cx);
+    else{   // tentacules qui tournent
+      const na=4;
+      outer:for(let i=0;i<na;i++)for(const q of jellyArm(b,i,na))
+        if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,q[0]-3,q[1]-3,6,6)){hurtPlayer(q[0]);break outer;}
+    }
+  }
 }
 function stepBossShots(dt){
   const p=player;
@@ -1286,9 +1596,17 @@ function update(dt){
   ensureChunks();
   stepPlayer(dt);
   if(state!=='play')return;
+  if(!shop.beach&&inBeach(Math.floor((player.x+5)/T))){   // la plage est atteinte : checkpoint débloqué
+    shop.beach=player.x<0?-1:1;shop.tridentOwned=true;shop.weapon='trident';saveShop();sfx.heal();shake=Math.max(shake,0.3);   // le trident est débloqué et équipé, la canne ne s'améliore plus
+    floatText(player.x+5,player.y-32,'CHECKPOINT !','#7ff0e8');
+    floatText(player.x+5,player.y-22,'LA PLAGE','#ffe14d');
+    floatText(player.x+5,player.y-12,'TRIDENT DÉBLOQUÉ !','#ff9a5a');
+    refreshCp();
+  }
   stepHook(dt);
   stepEnemies(dt);
   stepBoss(dt);
+  stepJelly(dt);
   stepOcto(dt);
   stepBossShots(dt);
   stepSoulFx(dt);
@@ -1324,9 +1642,12 @@ function cloud(x,y,u){
 const SKY=['#3f8fe8','#4a9aec','#57a6f0','#66b2f3','#78bff5','#8dcbf7','#a3d7f9','#bce3fb'];
 const clouds=[{x:40,y:30,s:1,par:.10},{x:200,y:52,s:2,par:.16},{x:330,y:24,s:1,par:.08},{x:480,y:60,s:2,par:.20},{x:120,y:78,s:1,par:.14},{x:560,y:36,s:1,par:.12}];
 
-function drawBackground(cx,cy){
-  const bh=Math.ceil(VH/SKY.length);
-  for(let i=0;i<SKY.length;i++){ctx.fillStyle=SKY[i];ctx.fillRect(0,i*bh,VW,bh+1);}
+const BG_GRASS={sky:SKY,sea:'#46a0e4',seaTop:'#78c4f4',spark:'#bfe6ff',h1:'#6fa7a0',h1t:'#8cc2b6',h2:'#3f9a5c',h2t:'#63bd72'};
+const BG_BEACH={sky:['#4db3ee','#5fc3f2','#76d0f5','#92dcf6','#b0e7f7','#cff1f6','#ecf8ef','#fdf6d8'],sea:'#2ec6cf',seaTop:'#9ff4ee',spark:'#d6fffb',h1:'#e6c987',h1t:'#f3deaa',h2:'#d9b877',h2t:'#f0d9a0'};
+let bzView=0;   // 0 = herbe, 1 = plage (fondu progressif à la sortie de l'arène)
+function drawBackground(cx,cy,P){
+  const bh=Math.ceil(VH/P.sky.length);
+  for(let i=0;i<P.sky.length;i++){ctx.fillStyle=P.sky[i];ctx.fillRect(0,i*bh,VW,bh+1);}
   ctx.fillStyle='#fff6c2';disc(316,38,17);
   ctx.fillStyle='#ffe97a';disc(316,38,13);
   for(const c of clouds){
@@ -1335,13 +1656,13 @@ function drawBackground(cx,cy){
   const seaTop=Math.round(VH*0.6-(cy-200)*0.10);
   if(seaTop<VH){
     const st=Math.max(0,seaTop);
-    ctx.fillStyle='#46a0e4';ctx.fillRect(0,st,VW,VH-st);
-    ctx.fillStyle='#78c4f4';ctx.fillRect(0,seaTop,VW,1);
+    ctx.fillStyle=P.sea;ctx.fillRect(0,st,VW,VH-st);
+    ctx.fillStyle=P.seaTop;ctx.fillRect(0,seaTop,VW,1);
     const span=Math.max(8,Math.min(60,VH-seaTop-4));
     for(let i=0;i<24;i++){
       if(Math.sin(time*2+i*1.7)>0.3){
         const x=mod(i*83-cx*0.12+Math.sin(time*0.6+i)*6,VW+20)-10;
-        ctx.fillStyle='#bfe6ff';ctx.fillRect(Math.round(x),seaTop+4+((i*37)%span),3,1);
+        ctx.fillStyle=P.spark;ctx.fillRect(Math.round(x),seaTop+4+((i*37)%span),3,1);
       }
     }
   }
@@ -1349,32 +1670,58 @@ function drawBackground(cx,cy){
   if(base1>0){
     for(let x=0;x<VW;x++){
       const wx=x+cx*0.22,h=noise1(wx/52,11)*34+noise1(wx/19,12)*8-14;
-      if(h>0){const top=Math.round(base1-h);ctx.fillStyle='#6fa7a0';ctx.fillRect(x,top,1,base1-top);ctx.fillStyle='#8cc2b6';ctx.fillRect(x,top,1,1);}
+      if(h>0){const top=Math.round(base1-h);ctx.fillStyle=P.h1;ctx.fillRect(x,top,1,base1-top);ctx.fillStyle=P.h1t;ctx.fillRect(x,top,1,1);}
     }
   }
   const base2=seaTop+46-(cy-200)*0.08;
   for(let x=0;x<VW;x++){
     const wx=x+cx*0.45,h=noise1(wx/40,13)*46+noise1(wx/15,14)*10,top=Math.round(base2-h);
-    if(top<VH){ctx.fillStyle='#3f9a5c';ctx.fillRect(x,top,1,VH-top);ctx.fillStyle='#63bd72';ctx.fillRect(x,top,1,2);}
+    if(top<VH){ctx.fillStyle=P.h2;ctx.fillRect(x,top,1,VH-top);ctx.fillStyle=P.h2t;ctx.fillRect(x,top,1,2);}
   }
 }
 function drawWater(cx,cy){
   const wy=WATER_ROW*T;
   if(wy>cy+VH+4)return;
-  ctx.fillStyle='#2b78cf';ctx.fillRect(cx-8,wy+3,VW+16,Math.max(0,cy+VH-wy));
-  ctx.fillStyle='#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
+  ctx.fillStyle=bzView>0.5?'#1fb3bd':'#2b78cf';ctx.fillRect(cx-8,wy+3,VW+16,Math.max(0,cy+VH-wy));
+  ctx.fillStyle=bzView>0.5?'#4fd4d6':'#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
   ctx.fillStyle='#d8f1ff';
   for(let x=Math.floor(cx/4)*4;x<cx+VW+4;x+=4){ctx.fillRect(x,wy+(Math.sin(time*3+x*0.15)>0?0:1),4,2);}
+}
+function drawPalms(cx,cy){
+  const tx0=Math.floor(cx/T)-3,tx1=Math.floor((cx+VW)/T)+3;
+  for(let tx=tx0;tx<=tx1;tx++){
+    if(!inBeach(tx))continue;
+    const col=column(tx);
+    if(col.pit||col.tun||col.ar||hash2(tx,31)>=0.045)continue;
+    if(column(tx-1).tun||column(tx+1).tun)continue;
+    const flip=hash2(tx,32)<0.5;
+    ctx.save();ctx.translate(tx*T+8,col.g*T+2);if(flip)ctx.scale(-1,1);
+    ctx.drawImage(PALM,-20,-PALM.height);
+    ctx.restore();
+  }
 }
 function drawTiles(cx,cy){
   const tx0=Math.floor(cx/T),tx1=Math.floor((cx+VW)/T),ty0=Math.floor(cy/T)-1,ty1=Math.floor((cy+VH)/T)+1;
   for(let tx=tx0;tx<=tx1;tx++){
     const col=column(tx);
     if(!col.pit){
-      const v=Math.floor(hash2(tx,10)*3),dec=Math.floor(hash2(tx,9)*10);
+      const v=Math.floor(hash2(tx,10)*3),dec=Math.floor(hash2(tx,9)*10),sand=col.beach,tun=col.tun;
       for(let ty=Math.max(col.g,ty0);ty<=ty1;ty++){
-        if(ty===col.g){if(col.ar&&col.dx>=-13&&col.dx<=12)ctx.drawImage(STONE_TOP,tx*T,ty*T);else ctx.drawImage(GRASS[dec<5?0:dec-4][v],tx*T,ty*T-6);}
-        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2;ctx.drawImage(DIRT[sh][mod(tx*7+ty*3,3)],tx*T,ty*T);}
+        if(tun&&!solidTile(tx,ty)){   // intérieur du tunnel : fond sombre
+          ctx.fillStyle=ty-col.g<3?'#4a3622':'#2e2014';ctx.fillRect(tx*T,ty*T,T,T);
+          if(hash2(tx*3+1,ty+500)<0.18){ctx.fillStyle='#3d2c1c';ctx.fillRect(tx*T+4,ty*T+6,3,2);}
+          continue;
+        }
+        if(ty===col.g){
+          if(col.ar&&col.dx>=-13&&col.dx<=12)ctx.drawImage(STONE_TOP,tx*T,ty*T);
+          else if(sand)ctx.drawImage(SANDTOP[dec<5?0:dec-4][v],tx*T,ty*T-6);
+          else ctx.drawImage(GRASS[dec<5?0:dec-4][v],tx*T,ty*T-6);
+        }
+        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2;ctx.drawImage((sand?SAND:DIRT)[sh][mod(tx*7+ty*3,3)],tx*T,ty*T);}
+        if(tun&&ty>col.g){   // bords éclairés / ombrés des parois de sable
+          if(!solidTile(tx,ty-1)){ctx.fillStyle='#f6e2ac';ctx.fillRect(tx*T,ty*T,T,2);}
+          if(!solidTile(tx,ty+1)){ctx.fillStyle='#6e5026';ctx.fillRect(tx*T,ty*T+T-2,T,2);}
+        }
       }
       const y0=Math.max(col.g,ty0)*T,hh=(ty1+1)*T-y0;
       ctx.fillStyle='rgba(0,0,0,.28)';
@@ -1393,7 +1740,32 @@ function drawTiles(cx,cy){
     for(let ty=ty0;ty<=ty1;ty++) if(oneWay(tx,ty)) ctx.drawImage(PLANK,tx*T,ty*T);
   }
 }
+function drawWorm(e){
+  const dead=e.state==='dead',dir=e.dir,N=6;
+  const cx=Math.round(e.x+e.w/2),by=Math.round(e.y+e.h),cyc=Math.round(e.y+e.h/2);
+  const body=e.flash>0?'#ffffff':'#ec9f8e',band=e.flash>0?'#e8e8ff':'#c4695e',out='#3a1a1a';
+  const seg=[];
+  for(let i=0;i<N;i++){
+    const sx=cx+dir*(6.5-i*3.2),wob=Math.sin(e.t*9-i*1.1)*(dead?0:1.7)*(i>0?1:0.6);
+    seg.push([Math.round(sx),Math.round(by-4+wob),i===0?4:Math.max(2,Math.round(3.4-i*0.18))]);
+  }
+  ctx.save();
+  if(dead){ctx.translate(0,cyc*2);ctx.scale(1,-1);}
+  ctx.fillStyle=out;for(const s of seg)disc(s[0],s[1],s[2]+1);
+  for(let i=N-1;i>=0;i--){ctx.fillStyle=i%2?band:body;disc(seg[i][0],seg[i][1],seg[i][2]);}
+  const h=seg[0];
+  ctx.fillStyle='#ffffff';ctx.fillRect(h[0]+dir*1-1,h[1]-2,2,2);
+  ctx.fillStyle='#14182c';ctx.fillRect(h[0]+dir*2-(dir>0?0:1),h[1]-2,1,2);
+  ctx.fillStyle='#7a2a2a';ctx.fillRect(h[0]+dir*3-(dir>0?0:1),h[1]+1,2,1);
+  ctx.restore();
+  if(!dead&&e.maxHp>1){
+    const w=Math.min(18,e.maxHp*3+2),bx=cx-Math.floor(w/2),byy=cyc-14;
+    ctx.fillStyle='#14182c';ctx.fillRect(bx-1,byy-1,w+2,4);
+    ctx.fillStyle='#ff5a5a';ctx.fillRect(bx,byy,Math.max(1,Math.round(w*e.hp/e.maxHp)),2);
+  }
+}
 function drawEnemy(e){
+  if(e.kind==='worm'){drawWorm(e);return;}
   const dead=e.state==='dead';
   const img=e.kind==='hop'?(e.flash>0?DOLB_W:DOLB):e.kind==='shoot'?(e.flash>0?DOLR_W:DOLR):(e.flash>0?DOLP_W:DOLP);
   const cx=Math.round(e.x+e.w/2),cy=Math.round(e.y+e.h/2);
@@ -1542,8 +1914,49 @@ function drawBoss(){
   ctx.drawImage(b.flash>0?SHARK_W:SHARK,-25,-16);
   ctx.restore();
   if((b.charge>0||b.laser>0)&&b.state==='alive'){
-    const mx=cx+b.dir*21,my=cy+1,r=b.laser>0?7:Math.round(2+(1-b.charge/0.8)*4);
+    const mx=cx+b.dir*21,my=cy+1,r=b.laser>0?7:Math.round(2+(1-b.charge/LASER_CHARGE)*4);
     ctx.fillStyle='#ff3b2f';disc(mx,my,r);ctx.fillStyle='#ffe14d';disc(mx,my,Math.max(1,r-2));
+  }
+}
+function drawJelly(){
+  const b=jelly;if(!b)return;
+  const cx=Math.round(b.x+b.w/2),cy=Math.round(b.y+b.h/2+2);
+  const pulse=Math.sin(time*4)*0.5+0.5,alive=b.state==='alive'&&b.spawnT<=0;
+  ctx.fillStyle='rgba(235,225,255,'+(0.10+pulse*0.06).toFixed(2)+')';disc(cx,cy,34);
+  ctx.fillStyle='rgba(255,170,230,0.10)';disc(cx,cy,22);
+  if(alive&&(b.charge>0||b.fire>0)){   // lasers blancs (même géométrie que la collision)
+    ctx.save();ctx.translate(cx,cy);
+    for(const a of jellyBeams(b)){
+      ctx.save();ctx.rotate(a);
+      if(b.fire>0){
+        const fl=Math.sin(time*60)*1,fade=Math.min(1,b.fire/0.2);
+        ctx.globalAlpha=fade;
+        ctx.fillStyle='rgba(215,230,255,.35)';ctx.fillRect(0,-4-fl,JELLY_BEAM_L,8+fl*2);
+        ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(0,-2,JELLY_BEAM_L,4);
+        ctx.fillStyle='#ffffff';ctx.fillRect(0,-1,JELLY_BEAM_L,2);
+      } else if(b.charge>0.3){ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,JELLY_BEAM_L,1);}
+      else{ctx.fillStyle='rgba(255,255,255,'+(0.18+0.18*Math.abs(Math.sin(b.charge*40))).toFixed(2)+')';ctx.fillRect(0,-3,JELLY_BEAM_L,6);ctx.fillStyle='rgba(255,255,255,.8)';ctx.fillRect(0,0,JELLY_BEAM_L,1);}
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  const na=4;
+  ctx.save();
+  if(b.spawnT>0)ctx.globalAlpha=clamp(1-b.spawnT/1.6,0.15,1)*(Math.floor(time*22)%2?1:0.65);
+  if(b.state==='dead')ctx.globalAlpha=Math.max(0.2,1-b.t/1.8);
+  for(let i=0;i<na;i++){   // tentacules : chaînes de perles roses
+    const pts=jellyArm(b,i,na);
+    for(let k=0;k<pts.length;k++){
+      const x=Math.round(pts[k][0]),y=Math.round(pts[k][1]),r=k>=pts.length-2?1:2;
+      ctx.fillStyle='#4a3a8c';ctx.fillRect(x-r-1,y-r-1,2*r+2,2*r+2);
+      ctx.fillStyle=k%2?'#ff9ad8':'#f6f0ff';ctx.fillRect(x-r,y-r,2*r,2*r);
+    }
+  }
+  ctx.drawImage(b.flash>0?JELLY_W:JELLY,cx-17,cy-14+Math.round(Math.sin(time*5)*1));
+  ctx.restore();
+  if(alive&&(b.charge>0||b.fire>0)){
+    const r=b.fire>0?5:Math.round(2+(1-b.charge/0.85)*3);
+    ctx.fillStyle='#ffffff';disc(cx,cy,r);
   }
 }
 function drawReticle(){
@@ -1627,6 +2040,7 @@ function drawHUD(){
   ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),52);
   const bb=octo&&octo.state!=='dying'
     ?{name:'POULPE GÉANT',hp:octo.hp,max:octo.maxHp,ticks:[0.5],name_c:octo.rage?'#ff6a6a':'#c9a8ff',col:octo.rage?'#ff3b4a':'#9a6bff',dark:octo.rage?'#4a0a14':'#2a1650',hi:octo.rage?'#ff8a8a':'#c9a8ff'}
+    :jelly&&jelly.state==='alive'?{name:'MÉDUSE',hp:jelly.hp,max:jelly.maxHp,ticks:[0.5],name_c:'#f6f0ff',col:'#d9b8ff',dark:'#2a1650',hi:'#ffffff'}
     :boss?{name:'DÉMON REQUIN',hp:boss.hp,max:boss.maxHp,ticks:[0.2,0.4,0.6,0.8],name_c:'#ff6a6a',col:'#e0202c',dark:'#4a0a10',hi:'#ff6a5a'}:null;
   if(bb){
     const bw=240,bx=Math.round((VW-bw)/2),by=VH-16,fr=clamp(bb.hp/bb.max,0,1);
@@ -1643,7 +2057,9 @@ function drawHUD(){
 function render(){
   ctx.imageSmoothingEnabled=false;
   const cx=Math.round(cam.x),cy=Math.round(cam.y);
-  drawBackground(cx,cy);
+  bzView=clamp((Math.abs(cx+VW/2)/T-(BEACH_TX-8))/16,0,1);
+  if(bzView<1)drawBackground(cx,cy,BG_GRASS);
+  if(bzView>0){ctx.globalAlpha=bzView;drawBackground(cx,cy,BG_BEACH);ctx.globalAlpha=1;}
   if(nightA>0.01){ctx.fillStyle='rgba(70,0,12,'+(0.62*nightA).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel rouge sang
   if(octo){ctx.fillStyle=octo.rage?'rgba(110,10,25,'+(0.22+0.08*Math.sin(time*6)).toFixed(2)+')':'rgba(25,8,50,0.38)';ctx.fillRect(0,0,VW,VH);}
   let sx=0,sy=0;
@@ -1651,6 +2067,7 @@ function render(){
   ctx.save();ctx.translate(-cx+sx,-cy+sy);
   drawWater(cx,cy);
   drawOcto();
+  drawPalms(cx,cy);
   drawTiles(cx,cy);
   drawTents();
   drawPickups();
@@ -1660,6 +2077,7 @@ function render(){
     drawEnemy(e);
   }
   drawBoss();
+  drawJelly();
   drawBossShots();
   drawTridents();
   drawPlayer();
@@ -1679,16 +2097,24 @@ function render(){
 
 /* ================= Parties & écrans ================= */
 const ov=$('overlay'),ovTitle=$('ov-title'),ovText=$('ov-text'),ovStats=$('ov-stats'),ovBtn=$('ov-btn'),ovHint=$('ov-hint'),ovRestart=$('ov-restart'),ovCredits=$('credits');
-const OV_TEXT0=ovText.textContent;
+const OV_TEXT0=ovText.textContent,OV_TITLE0=ovTitle.textContent,ovCp=$('ov-cp');
+function refreshCp(){ovCp.hidden=!shop.beach;}
+function showTitle(){   // retour à l'écran titre (après un reset de la save par exemple)
+  paused=false;initTitle();
+  overlayVisible=true;ov.classList.add('show');
+  ovTitle.textContent=OV_TITLE0;ovText.textContent=OV_TEXT0;ovText.hidden=false;ovHint.hidden=false;ovStats.hidden=true;
+  ovBtn.textContent='JOUER';ovRestart.hidden=true;refreshCp();
+  try{ovBtn.focus({preventScroll:true});}catch(e){}
+}
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
-  colCache.clear();plat.clear();chunks.clear();arenas.clear();
-  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];
+  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();
+  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;
   night=false;nightA=0;bossSpawned=false;
 }
-function placePlayer(){
-  const g=column(0).g;
-  Object.assign(player,{x:-5,y:g*T-14,vx:0,vy:0,face:1,onGround:true,coyote:0,invuln:0,stun:0});
+function placePlayer(sx){
+  const cp=sx!==undefined,g=cp?column(Math.floor((sx+5)/T)).g:column(0).g;
+  Object.assign(player,{x:cp?sx:-5,y:g*T-14,vx:0,vy:0,face:cp?(sx<0?-1:1):1,onGround:true,coyote:0,invuln:0,stun:0});
   player.safe={x:player.x,y:player.y};
   hooks=[];tridents=[];castCd=0;throwAnim=0;
   ensureChunks();snapCamera();
@@ -1702,7 +2128,13 @@ function startGame(){
   ensureAudio();
   resetWorld();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
-  placePlayer();
+  if(shop.beach&&shop.weapon!=='trident'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
+  if(shop.beach){   // checkpoint : on repart de la plage, l'arène du poulpe derrière soi est considérée comme vaincue
+    const ar=arenaAt(shop.beach*ARENA_START*(VW/T));
+    if(ar)ar.state='won';
+    bossSpawned=true;
+    placePlayer(shop.beach*(BEACH_TX+10)*T);
+  } else placePlayer();
   state='play';
   paused=false;ovRestart.hidden=true;
   overlayVisible=false;ov.classList.remove('show');
@@ -1714,7 +2146,7 @@ function pauseGame(){
   paused=true;clearInputs();
   overlayVisible=true;ov.classList.add('show');
   ovTitle.textContent='PAUSE';ovText.textContent=OV_TEXT0;ovText.hidden=false;ovHint.hidden=false;ovStats.hidden=true;
-  ovBtn.textContent='REPRENDRE';ovRestart.hidden=false;
+  ovBtn.textContent='REPRENDRE';ovRestart.hidden=false;refreshCp();
   try{ovBtn.focus({preventScroll:true});}catch(e){}
 }
 function resumeGame(){
@@ -1737,9 +2169,43 @@ function showOver(){
   $('st-gold').textContent='OR '+shop.gold;
   $('st-souls').textContent='ÂMES ROUGES '+shop.souls;
   $('st-rec').textContent=newRecord?'NOUVEAU RECORD !':'';
-  ovBtn.textContent='REJOUER';
+  ovBtn.textContent='REJOUER';refreshCp();
   try{ovBtn.focus({preventScroll:true});}catch(e){}
 }
+/* ---- Réinitialisation de la save : double confirmation ---- */
+const rstEl=$('rst');
+let rstOpen=false,rstStep=0;
+function renderRst(){
+  if(rstStep===1){
+    $('rst-title').textContent='RÉINITIALISER LA SAVE ?';
+    $('rst-text').textContent='Toute ta progression sera perdue : perles, or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.';
+    $('rst-yes').textContent='CONTINUER';
+  } else {
+    $('rst-title').textContent='DERNIÈRE CONFIRMATION';
+    $('rst-text').textContent="C'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?";
+    $('rst-yes').textContent='TOUT EFFACER';
+  }
+}
+function openRst(){
+  clearInputs();rstOpen=true;rstStep=1;rstEl.hidden=false;renderRst();
+  try{$('rst-no').focus({preventScroll:true});}catch(e){}
+}
+function closeRst(){
+  rstOpen=false;rstStep=0;rstEl.hidden=true;
+  try{$('rst-btn').focus({preventScroll:true});}catch(e){}
+}
+function resetSave(){
+  try{localStorage.removeItem(SHOP_KEY);localStorage.removeItem(BEST_KEY);}catch(e){}
+  shop=loadShop();best=0;newRecord=false;score=0;
+  closeRst();showTitle();
+}
+$('rst-btn').addEventListener('click',openRst);
+$('rst-no').addEventListener('click',closeRst);
+$('rst-yes').addEventListener('click',()=>{
+  if(rstStep===1){rstStep=2;renderRst();try{$('rst-no').focus({preventScroll:true});}catch(e){}}
+  else if(rstStep===2)resetSave();
+});
+rstEl.addEventListener('pointerdown',e=>{if(e.target===rstEl)closeRst();});
 
 /* ================= Entrées ================= */
 function press(k){
@@ -1808,6 +2274,7 @@ document.querySelectorAll('.pad').forEach(b=>{
 });
 const KEYMAP={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump'};
 addEventListener('keydown',e=>{
+  if(rstOpen){if(e.code==='Escape'){e.preventDefault();closeRst();}return;}
   if(devOpen){if(e.code==='Escape'){e.preventDefault();closeDev();}return;}
   if(shopOpen){if(e.code==='Escape'){e.preventDefault();closeShop();}return;}
   if(overlayVisible&&(e.code==='Enter'||e.code==='NumpadEnter'||(state==='over'&&e.code==='KeyR'))){e.preventDefault();if(paused)resumeGame();else startGame();return;}
@@ -1840,8 +2307,8 @@ function renderShop(){
   $('shop-gold').textContent=shop.gold;
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
-  const notes={skins:"Une perle se cache tous les 7 écrans : sur une plateforme, au-dessus d'un trou ou près du sol. Elles se gardent d'une partie à l'autre.",rod:"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Le Démon requin (un seul par partie) donne 1 âme rouge s'il est vaincu. Elles renforcent ton pêcheur et débloquent de nouvelles armes.",
-    trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Ses améliorations coûtent de l'or, sauf les tridents multiples (âmes rouges).":"Débloque d'abord le trident infernal dans l'onglet ÂMES. Ses améliorations coûtent de l'or."};
+  const notes={skins:"Une perle se cache tous les 7 écrans : sur une plateforme, au-dessus d'un trou ou près du sol. Elles se gardent d'une partie à l'autre.",rod:shop.beach?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Le Démon requin (un seul par partie) donne 1 âme rouge s'il est vaincu. Elles renforcent ton pêcheur et débloquent de nouvelles armes.",
+    trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or. Les tridents multiples se débloquent en tuant "+WORM_UNLOCK+" vers de la plage ("+Math.min(shop.wormKills,WORM_UNLOCK)+"/"+WORM_UNLOCK+").":"Débloque d'abord le trident infernal dans l'onglet ÂMES. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=notes[shopTab];
   if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
 }
@@ -1864,7 +2331,8 @@ function renderRod(){
     else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
     card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
-    if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
+    if(shop.beach){b.textContent='INDISPONIBLE';b.disabled=true;}   // plage atteinte : plus d'amélioration de canne
+    else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
     else if(shop.gold>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyUp(key));}
     else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.gold);b.disabled=true;}
     b.setAttribute('aria-label',u.name+' : '+b.textContent);
@@ -1922,9 +2390,9 @@ function renderSouls(){
   tb.setAttribute('aria-label','Trident infernal : '+tb.textContent);
   tc.appendChild(tb);shopList.appendChild(tc);
   if(shop.tridentOwned){
-    const rc=mkCard('Canne à pêche','Arme de départ',ICONS.range,!triEq);
-    const rp=document.createElement('div');rp.className='pr';rp.textContent='OFFERTE';rc.appendChild(rp);
-    const rb=!triEq?mkBtn('ÉQUIPÉE',true):mkBtn('ÉQUIPER',false,()=>{shop.weapon='rod';saveShop();renderShop();},'equip');
+    const rc=mkCard('Canne à pêche',shop.beach?'Remplacée par le trident':'Arme de départ',ICONS.range,!triEq&&!shop.beach);
+    const rp=document.createElement('div');rp.className='pr';rp.textContent=shop.beach?'NIVEAUX CONSERVÉS':'OFFERTE';rc.appendChild(rp);
+    const rb=shop.beach?mkBtn('INDISPONIBLE',true):!triEq?mkBtn('ÉQUIPÉE',true):mkBtn('ÉQUIPER',false,()=>{shop.weapon='rod';saveShop();renderShop();},'equip');
     rb.setAttribute('aria-label','Canne à pêche : '+rb.textContent);
     rc.appendChild(rb);shopList.appendChild(rc);
   }
@@ -1978,21 +2446,22 @@ function renderMulti(locked){
   card.appendChild(val);
   const pr=document.createElement('div');pr.className='pr';
   if(max){pr.textContent='NIVEAU 3/3';}
-  else{const si=document.createElement('canvas');si.className='soulic';si.width=9;si.height=10;drawIcon(si,SOUL);pr.appendChild(si);const sp=document.createElement('span');sp.textContent=TMULTI.cost;pr.appendChild(sp);}
+  else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=TMULTI.cost[lv];pr.appendChild(sp);}
   card.appendChild(pr);
   const b=document.createElement('button');b.className='sbtn';b.type='button';
   if(locked){b.textContent='TRIDENT REQUIS';b.disabled=true;}
   else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
-  else if(shop.souls>=TMULTI.cost){b.textContent='AMÉLIORER';b.addEventListener('click',buyMulti);}
-  else{b.textContent='IL MANQUE '+(TMULTI.cost-shop.souls);b.disabled=true;}
+  else if(shop.wormKills<WORM_UNLOCK){b.textContent='VERS : '+shop.wormKills+'/'+WORM_UNLOCK;b.disabled=true;}   // se débloque en tuant des vers
+  else if(shop.gold>=TMULTI.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',buyMulti);}
+  else{b.textContent='IL MANQUE '+(TMULTI.cost[lv]-shop.gold);b.disabled=true;}
   b.setAttribute('aria-label','Tridents multiples : '+b.textContent);
   card.appendChild(b);
   shopList.appendChild(card);
 }
 function buyMulti(){
   const lv=shop.tmulti;
-  if(!shop.tridentOwned||lv>=3||shop.souls<TMULTI.cost)return;
-  shop.souls-=TMULTI.cost;shop.tmulti=lv+1;
+  if(!shop.tridentOwned||shop.wormKills<WORM_UNLOCK||lv>=3||shop.gold<TMULTI.cost[lv])return;
+  shop.gold-=TMULTI.cost[lv];shop.tmulti=lv+1;
   saveShop();sfx.heal();renderShop();
   const nb=shopList.querySelectorAll('.sbtn')[T_KEYS.length];
   if(nb&&!nb.disabled)try{nb.focus({preventScroll:true});}catch(e){}
@@ -2014,7 +2483,7 @@ function buySoulUp(){
 }
 function buyUp(key){
   const u=UP[key],lv=shop.up[key];
-  if(lv>=5||shop.gold<u.cost[lv])return;
+  if(shop.beach||lv>=5||shop.gold<u.cost[lv])return;
   shop.gold-=u.cost[lv];shop.up[key]=lv+1;
   saveShop();sfx.heal();renderShop();
   const nb=shopList.querySelectorAll('.sbtn')[UP_KEYS.indexOf(key)];
@@ -2150,7 +2619,7 @@ addEventListener('resize',resize);
 resize();
 if(document.fonts&&document.fonts.load){document.fonts.load("8px 'Press Start 2P'").then(resize).catch(()=>{});}
 
-initTitle();
+initTitle();refreshCp();
 let last=performance.now(),acc=0;
 function frame(now){
   const dt=Math.min(0.1,(now-last)/1000);last=now;acc+=dt;
