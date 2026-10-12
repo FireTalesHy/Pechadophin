@@ -1,12 +1,12 @@
 # 🎣 Canne & Dauphins
 
-Un jeu de plateforme en pixel art, jouable directement dans le navigateur : tu es un pêcheur qui affronte des dauphins, un démon requin et un poulpe géant, dans un monde généré aléatoirement à chaque partie.
+Un jeu de plateforme en pixel art, [jouable directement dans le navigateur](https://firetaleshy.github.io/Pechadophin/) : tu es un pêcheur qui affronte des dauphins, un démon requin et un poulpe géant, dans un monde généré aléatoirement à chaque partie.
 
 Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (hormis la police Google Fonts « Press Start 2P »).
 
 ## ▶️ Jouer
 
-- En ligne : *(ajoute ici le lien GitHub Pages, voir plus bas)*
+- En ligne : **[https://firetaleshy.github.io/Pechadophin/](https://firetaleshy.github.io/Pechadophin/)**
 - En local : télécharge le dépôt et ouvre `index.html` dans ton navigateur.
 
 ## 🎮 Commandes
