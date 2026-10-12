@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="refresh" content="0; url=https://firetaleshy.github.io/Pechadophin/">
-    <title>Pechadophin</title>
+   Pechadophin
 </head>
 <body>
-    <p>Redirection vers <a href="https://firetaleshy.github.io/Pechadophin/">Pechadophin</a>...</p>
+    <p> <a href="https://firetaleshy.github.io/Pechadophin/">LANCER LE JEU</a></p>
 </body>
 </html>
 # Canne & Dauphins
