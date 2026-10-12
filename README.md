@@ -26,10 +26,6 @@ Tu incarnes un pêcheur qui affronte des dauphins dans un monde infini généré
 - Boss : le Démon requin et le Poulpe géant (dans une arène fermée).
 - Le meilleur score, les monnaies et les achats sont enregistrés dans le navigateur (`localStorage`).
 
-## Menu développeur
-
-Cliquer 13 fois sur le personnage pendant une partie ouvre un menu de test (monnaies, invincibilité, téléportation à l'arène).
-Pour le retirer, supprime le bloc « Menu dev » dans `index.html`.
 
 ## Remarque
 
