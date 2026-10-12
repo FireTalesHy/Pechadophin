@@ -858,7 +858,7 @@ const UP={
  rate:{name:'Vitesse de tir',vals:[0.46,0.38,0.31,0.25,0.20,0.16],cost:[25,55,95,150,230],fmt:v=>fr1(1/v)+' tirs/s'},
  dmg:{name:'Dégâts',vals:[1,2,3,4,5,6],cost:[30,65,110,170,260],fmt:v=>v+(v>1?' dégâts':' dégât')}
 };
-const TRIDENT_COST=3, TRIDENT_V=420;   // coût en âmes rouges
+const TRIDENT_V=420;   // le trident se débloque en atteignant la plage (plus d'achat)
 const T_KEYS=['dmg','pierce','rate','range'];
 const TM_DIRS={1:[0],2:[0,180],3:[0,-90,180],4:[0,-45,-135,180]};   // angles en degrés autour du pêcheur (0 = devant, négatif = vers le haut) : jamais vers le sol
 const WORM_UNLOCK=10;   // vers à tuer pour débloquer l'amélioration « tridents multiples »
@@ -872,7 +872,7 @@ const TUP={
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={pearls:0,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={pearls:0,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -882,6 +882,7 @@ function loadShop(){
       d.hp=clamp(Math.floor(Number(j.hp))||0,0,5);
       d.beach=(j.beach===1||j.beach===-1)?j.beach:0;   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
+      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&(j.weapon==='trident'||d.beach!==0))?'trident':'rod';   // plage atteinte : la canne n'est plus utilisable
@@ -894,6 +895,11 @@ function loadShop(){
   return d;
 }
 let shop=loadShop();
+/* Les âmes rouges ne sont données qu'à la première mort de chaque boss (ensuite : de l'or seulement) */
+function soulReward(key,n){
+  if(shop.bossSouls[key])return false;
+  shop.bossSouls[key]=true;shop.souls+=n;return true;
+}
 function saveShop(){try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}}
 const maxLives=()=>SOUL_UP.hp.vals[shop.hp];
 const curSkin=()=>SKINS.find(x=>x.id===shop.equipped)||SKINS[0];
@@ -1265,10 +1271,9 @@ function killBoss(b){
   bossDone.add(b.k);bossWins++;bossShots=[];
   kills++;shake=0.6;sfx.bossDie();
   const cx=b.x+b.w/2,cy=b.y+b.h/2;
-  shop.souls++;shop.gold+=40;saveShop();
-  floatText(cx,cy-22,'+1 ÂME ROUGE','#ff6a7a');
+  const gs=soulReward('shark',1);shop.gold+=40;saveShop();
+  if(gs){floatText(cx,cy-22,'+1 ÂME ROUGE','#ff6a7a');soulFx.push({x:cx,y:cy,t:0});}
   floatText(cx,cy+2,'+40 OR','#ffd23f');
-  soulFx.push({x:cx,y:cy,t:0});
   burst(cx,cy,'#ff3b2f',30,160);burst(cx,cy,'#ffb347',18,110);
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
@@ -1305,12 +1310,12 @@ function killOcto(){
   ar.state='won';ar.gateL=false;ar.gateR=false;
   for(const t of tents){t.state='retract';t.t=0;}
   kills++;shake=0.7;sfx.bossDie();sfx.gate();
-  shop.souls+=2;shop.gold+=100;saveShop();
+  const gs=soulReward('octo',2);shop.gold+=100;saveShop();
   const cx=ar.cx*T+8,cy=ar.floor*T-110;
-  floatText(cx,cy,'+2 ÂMES ROUGES','#ff6a7a');
+  if(gs)floatText(cx,cy,'+2 ÂMES ROUGES','#ff6a7a');
   floatText(cx,cy+11,'+100 OR','#ffd23f');
   floatText(cx,cy+22,"LES PORTES S'OUVRENT !",'#7ff0e8');
-  soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});
+  if(gs){soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});}
   burst(cx,cy+20,'#c9a0ff',30,170);burst(cx,cy+20,'#ff6a6a',18,120);
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
 }
@@ -1447,10 +1452,9 @@ function killJelly(b){
   b.hp=0;b.state='dead';b.t=0;b.vy=-90;b.charge=0;b.fire=0;
   kills++;shake=0.7;sfx.bossDie();
   const cx=b.x+b.w/2,cy=b.y+b.h/2;
-  shop.souls+=2;shop.gold+=80;saveShop();
-  floatText(cx,cy-22,'+2 ÂMES ROUGES','#ff6a7a');
+  const gs=soulReward('jelly',2);shop.gold+=80;saveShop();
+  if(gs){floatText(cx,cy-22,'+2 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy,t:0});soulFx.push({x:cx+10,y:cy,t:0.15});}
   floatText(cx,cy-11,'+80 OR','#ffd23f');
-  soulFx.push({x:cx-10,y:cy,t:0});soulFx.push({x:cx+10,y:cy,t:0.15});
   burst(cx,cy,'#f6f0ff',30,160);burst(cx,cy,'#ff9ad8',18,110);
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
@@ -2307,8 +2311,8 @@ function renderShop(){
   $('shop-gold').textContent=shop.gold;
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
-  const notes={skins:"Une perle se cache tous les 7 écrans : sur une plateforme, au-dessus d'un trou ou près du sol. Elles se gardent d'une partie à l'autre.",rod:shop.beach?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Le Démon requin (un seul par partie) donne 1 âme rouge s'il est vaincu. Elles renforcent ton pêcheur et débloquent de nouvelles armes.",
-    trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or. Les tridents multiples se débloquent en tuant "+WORM_UNLOCK+" vers de la plage ("+Math.min(shop.wormKills,WORM_UNLOCK)+"/"+WORM_UNLOCK+").":"Débloque d'abord le trident infernal dans l'onglet ÂMES. Ses améliorations coûtent de l'or."};
+  const notes={skins:"Une perle se cache tous les 7 écrans : sur une plateforme, au-dessus d'un trou ou près du sol. Elles se gardent d'une partie à l'autre.",rod:shop.beach?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s'achète plus : il se débloque en atteignant la plage.",
+    trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or. Les tridents multiples se débloquent en tuant "+WORM_UNLOCK+" vers de la plage ("+Math.min(shop.wormKills,WORM_UNLOCK)+"/"+WORM_UNLOCK+").":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=notes[shopTab];
   if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
 }
@@ -2381,10 +2385,10 @@ function renderSouls(){
   const tc=mkCard('Trident infernal','Perce les ennemis',ICONS.trident,triEq);
   const tp=document.createElement('div');tp.className='pr';
   if(shop.tridentOwned)tp.textContent='POSSÉDÉ';
-  else{const si=document.createElement('canvas');si.className='soulic';si.width=9;si.height=10;drawIcon(si,SOUL);tp.appendChild(si);const sp=document.createElement('span');sp.textContent=TRIDENT_COST;tp.appendChild(sp);}
+  else tp.textContent='DÉBLOQUÉ À LA PLAGE';
   tc.appendChild(tp);
   let tb;
-  if(!shop.tridentOwned)tb=shop.souls>=TRIDENT_COST?mkBtn('ACHETER',false,buyTrident):mkBtn('IL MANQUE '+(TRIDENT_COST-shop.souls),true);
+  if(!shop.tridentOwned)tb=mkBtn('VERROUILLÉ',true);
   else if(triEq)tb=mkBtn('ÉQUIPÉ',true);
   else tb=mkBtn('ÉQUIPER',false,()=>{shop.weapon='trident';saveShop();renderShop();},'equip');
   tb.setAttribute('aria-label','Trident infernal : '+tb.textContent);
@@ -2396,11 +2400,6 @@ function renderSouls(){
     rb.setAttribute('aria-label','Canne à pêche : '+rb.textContent);
     rc.appendChild(rb);shopList.appendChild(rc);
   }
-}
-function buyTrident(){
-  if(shop.tridentOwned||shop.souls<TRIDENT_COST)return;
-  shop.souls-=TRIDENT_COST;shop.tridentOwned=true;shop.weapon='trident';
-  saveShop();sfx.heal();renderShop();
 }
 function renderTrident(){
   shopList.textContent='';
