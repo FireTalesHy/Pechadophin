@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -10,7 +10,6 @@
     <p>Redirection vers <a href="https://firetaleshy.github.io/Pechadophin/">Pechadophin</a>...</p>
 </body>
 </html>
-```
 # Canne & Dauphins
 
 Jeu de plateforme 2D en pixel art, en un seul fichier HTML (aucune dépendance à installer).
