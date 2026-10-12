@@ -26,7 +26,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 - Un démon requin à laser, accompagné d'une nuit rouge sang
 - Une arène avec un poulpe géant, de chaque côté du départ
 - La plage : une zone en sable avec des tunnels, des vers, un checkpoint et un boss volant, la méduse (lasers blancs et tentacules rotatives)
-- Une boutique : skins (perles), améliorations (or) et âmes rouges
+- Une boutique : 18 skins (perles), améliorations (or) et âmes rouges
 - Menu pause, sauvegarde locale du meilleur score et de la boutique, bouton de réinitialisation de la save (double confirmation)
 
 ## 📝 Historique

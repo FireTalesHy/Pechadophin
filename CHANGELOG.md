@@ -20,7 +20,8 @@ Toutes les modifications notables de **Canne & Dauphins** (`pechadofin.html`).
 - **Démon requin** : il n'apparaît plus qu'une seule fois par partie, et tire un peu plus vite qu'avant.
 - **Poulpe géant** : il n'y a plus qu'une seule arène par côté (celle avant la plage) ; plus d'arène ni de poulpe dans la plage.
 - **Canne à pêche** : ses améliorations sont bloquées dès que la plage est atteinte. Les niveaux sont conservés, mais la canne devient indisponible (le trident la remplace).
-- **Trident** : débloqué automatiquement à l'arrivée sur la plage. Toutes ses améliorations coûtent de l'or.
+- **Trident** : il ne s'achète plus, il est débloqué automatiquement à l'arrivée sur la plage. Toutes ses améliorations coûtent de l'or.
+- **Âmes rouges** : chaque boss (requin, poulpe, méduse) n'en donne que la première fois qu'il est vaincu ; ensuite il ne donne plus que de l'or.
 
 ### Ajouté
 - **Dauphin tireur** (rouge-orange) : lent, il charge puis crache les boules de feu que le requin lançait auparavant (vitesse réduite).
@@ -48,3 +49,4 @@ Toutes les modifications notables de **Canne & Dauphins** (`pechadofin.html`).
   - Lasers blancs : charge de 0,85 s avec visée qui se verrouille 0,3 s avant le tir, puis 3 faisceaux en éventail pendant 1,1 s qui balaient lentement.
   - 4 tentacules qui tournent en permanence autour d'elle et blessent au contact.
   - Récompense : 2 âmes rouges et 80 or.
+- **10 nouveaux skins** : zombie, plombier, cuisinier, viking, robot, clown, fantôme, pharaon, costume de dino et roi (de 3 à 60 perles).

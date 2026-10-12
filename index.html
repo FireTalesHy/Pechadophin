@@ -126,7 +126,7 @@ body{
 .dev-btns{display:flex;gap:6px;flex-wrap:wrap}
 .dev-btns .sbtn{width:auto;padding:7px 9px}
 #dev-god{width:100%;padding:10px}
-#dev-god.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
+#dev-god.on,#dev-ana.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .shop-panel.dev-panel{width:min(520px,100%)}
 #rst .shop-note{font-size:10px;line-height:1.9;opacity:1;text-align:center}
 #rst .row .go{font:400 10px/1 var(--pf);padding:10px 14px}
@@ -263,6 +263,7 @@ body{
     <p class="shop-note">Outil de test : donne-toi des monnaies (enregistrées) et active l'invincibilité. Le jeu est en pause tant que ce menu est ouvert.</p>
     <div id="dev-list"></div>
     <button class="sbtn equip" id="dev-arena" type="button" style="width:100%;padding:10px">ALLER À L'ARÈNE DU POULPE</button>
+    <button class="sbtn" id="dev-ana" type="button" aria-pressed="false" style="width:100%;padding:10px">ANARCHIE : NON</button>
     <button class="sbtn" id="dev-god" type="button" aria-pressed="false">INVINCIBLE : NON</button>
     <button class="go" id="dev-close" type="button">FERMER</button>
   </div>
@@ -399,7 +400,7 @@ function arenaAt(tx){
   const s=tx/(VW/T),a=Math.abs(s);
   if(a<ARENA_START-2)return null;
   const j=Math.round((a-ARENA_START)/ARENA_EVERY);
-  if(j!==0)return null;   // une seule arène par côté : plus de poulpe (ni d'arène) dans la plage
+  if(j!==0&&!anarchyOn)return null;   // une seule arène par côté : plus de poulpe (ni d'arène) dans la plage
   const sg=s<0?-1:1,cx=sg*(ARENA_START+ARENA_EVERY*j)*(VW/T);
   if(Math.abs(tx-cx)>39)return null;
   const id=sg*(j+1);
@@ -600,8 +601,59 @@ const SKINS=[
   pal:{w:'#eef2fa',g:'#f2b630',y:'#fff2a8',r:'#e0383a',B:'#7a8aa3',p:'#eef2fa',n:'#6b7a90'},
   hat:["................",".....kkkkkk.....","....kwwwwwwk....","...kwwwwwwwwk...","..kwwwwwwwwwwk.."],
   face:["..kwwwwwwwwwwk..","..kwkyggggggwk..","..kwkgggggggwk..","...kkwwwwwwkk..."],
-  torso:["...kwwrwwwwwk...","...kwwwwwwwwwwk.","...kBBBBBBBBk..."]}
+  torso:["...kwwrwwwwwk...","...kwwwwwwwwwwk.","...kBBBBBBBBk..."]},
+ {id:'zombie',name:'Zombie',price:3,rod:'#6a5a3a',
+  pal:{H:'#4a4a52',h:'#6a6a74',s:'#8fc46a',S:'#6b9a4a',b:'#6a7a86',B:'#46525c',p:'#4a5a6a',n:'#2a2a34'},
+  hat:["................","................",".....kkkkkk.....","....kHhHhHHk....","...kHHhHHhHHk..."],
+  face:["...kssssssssk...","...ksrsssskrsk..","...kssskkkksSk..","....kksssskk...."],
+  torso:["...kbbbbbbbbk...","...kbBbbbbbssk..","...kBBBBBBBBk..."]},
+ {id:'plumber',name:'Plombier',price:5,rod:'#8a5a2b',
+  pal:{h:'#d92b3a',H:'#9a1a24',b:'#d92b3a',B:'#2f5bd0',g:'#ffd23f',p:'#2f5bd0',n:'#6b4a2a'},
+  hat:["................",".....kkkkkk.....","....khhhhhhk....","...khhhwhhhhk...",".kHHHHHHHHHHHHk."],
+  face:["...kssssssssk...","...kssssskssk...","...kssnnnnnSk...","....kkssssskk..."],
+  torso:["...kbbbbbbbbk...","...kbBbbbbBssk..","...kBBgBBgBBk..."]},
+ {id:'chef',name:'Cuisinier',price:6,rod:'#c9c9d4',
+  pal:{b:'#f4f4f4',B:'#c9c9d4',r:'#d63a3a',p:'#3a3f66',n:'#2a2a34'},
+  hat:[".....kwwwwk.....","....kwwwwwwk....","....kwwwwwwk....","...kkwwwwwwkk...","...kwwwwwwwwk..."],
+  face:["...kssssssssk...","...kssssskssk...","...ksssssssSk...","....kkssssskk..."],
+  torso:["...kbbrrrrbbk...","...kbbbbbbbbssk.","...kBBBBBBBBk..."]},
+ {id:'viking',name:'Viking',price:9,rod:'#8a5a2b',
+  pal:{H:'#8a93a6',g:'#d9731e',b:'#7a5230',B:'#4a2f18',p:'#5a4a3a',n:'#3a2a18'},
+  hat:["w..............w","wk....kkkk....kw","wkk..kHHHHk..kkw","..kkkHHHHHHkkk..","..kHHHHHHHHHHk.."],
+  face:["...kssssssssk...","...kssssskssk...","..kggggggggggk..","..kkggggggggkk.."],
+  torso:["...kbbbbbbbbk...","...kbbbbbbbbssk.","...kBBBBBBBBk..."]},
+ {id:'robot',name:'Robot',price:13,rod:'#5ee6ff',glow:'#d6fbff',
+  pal:{h:'#c3ccd8',H:'#8a96a8',r:'#ff3b3b',y:'#ffe14d',b:'#aab4c4',B:'#6a768a',p:'#6a768a',n:'#3a4254'},
+  hat:["................",".......kk.......","......krrk......","...kkkkkkkkkk...","...khhhhhhhhk..."],
+  face:["...khHHHHHHhk...","...kHrrHHrrHk...","...kHHkkkkHHk...","....kkHHHHkk...."],
+  torso:["...kbbbbbbbbk...","...kbbyybbbbHk..","...kBBBBBBBBk..."]},
+ {id:'clown',name:'Clown',price:18,rod:'#d92b3a',
+  pal:{h:'#ff8a2a',g:'#ffe14d',r:'#e0262e',s:'#fff6ee',S:'#e6d8cc',b:'#7a4ad8',B:'#4a2a98',p:'#f2b630',n:'#d92b3a'},
+  hat:["................","...h.g.r.g.h....","..hhhgrrrghhh...","..hhhhgggrrhh...","...khhhhhhhhk..."],
+  face:["...kssssssssk...","...kskssskssk...","...ksssrrsssk...","....kkssssskk..."],
+  torso:["...kbbbbbbbbk...","...kbbgbbbbssk..","...kBBBBBBBBk..."]},
+ {id:'ghost',name:'Fantôme',price:25,rod:'#c9d4ff',glow:'#eef2ff',
+  pal:{w:'#f2f4ff',B:'#c3c9e6',p:'#f2f4ff',n:'#c3c9e6'},
+  hat:["................",".....kkkkkk.....","....kwwwwwwk....","...kwwwwwwwwk...","..kwwwwwwwwwwk.."],
+  face:["..kwwwwwwwwwwk..","..kwkkwwwwkkwk..","..kwkkwwwkkkwk..","...kwwwkkwwwk..."],
+  torso:["..kwwwwwwwwwwk..","..kwwwwwwwwwwwk.","..kBBBBBBBBBBk.."]},
+ {id:'pharaoh',name:'Pharaon',price:35,rod:'#ffd23f',glow:'#fff2a8',
+  pal:{g:'#ffd23f',b:'#2f6fd0',B:'#e0a010',p:'#f4ecd0',n:'#c8a050'},
+  hat:["................",".....kkkkkk.....","....kgbgbgbk....","...kgbgbgbgbk...","..kgbgbgbgbgbk.."],
+  face:["..kgssssssssgk..","..kgsskssksgbk..","..kbssssssSsgk..","...kkbsssskbk..."],
+  torso:["...kgggggggk....","...kbbbbbbbbssk.","...kBBBBBBBBk..."]},
+ {id:'dino',name:'Costume de dino',price:45,rod:'#5fbf5a',
+  pal:{h:'#5fbf5a',H:'#3e8f3c',y:'#ffd23f',b:'#5fbf5a',B:'#3e8f3c',p:'#5fbf5a',n:'#3e8f3c'},
+  hat:[".....y..y.......","....kyyyyyyk....","...khhhhhhhhk...","..khhhhhhhhhhk..","..kHhhhhhhhhHk.."],
+  face:["..kHssssssssHk..","..kHsskssksHk...","..kHsssswwsHk...","...kkHHHHHHkk..."],
+  torso:["...kbbbbbbbbk...","...kbbyyyybssk..","...kBBBBBBBBk..."]},
+ {id:'king',name:'Roi',price:60,rod:'#ffd23f',glow:'#fff2a8',
+  pal:{g:'#ffd23f',r:'#d63a3a',b:'#6a2fa8',B:'#3e1a6e',p:'#3e1a6e',n:'#ffd23f'},
+  hat:["....g..g..g.....",".....gggggg.....","....kgrgrgrk....","...kgggggggk....","..kkkkkkkkkkk..."],
+  face:["...kssssssssk...","...kssssskssk...","..kwwssssswwk...","..kwwwwwwwwk...."],
+  torso:["..kwwwwwwwwwwk..","...kbbbbbbbbssk.","...kBBBBBBBBk..."]}
 ];
+SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
 for(const sk of SKINS){
   sk.spr={};
   const pal=Object.assign({},PAL_P,sk.pal);
@@ -836,6 +888,13 @@ const PLANK=(()=>{
 let state='title';  // title | play | dying | over
 let score=0,lives=3,kills=0,best=0,newRecord=false;
 let enemies=[],pickups=[],parts=[],texts=[],worldPearls=[],boss=null,bossShots=[],soulFx=[],bossDone=new Set(),bossWins=0,octo=null,tents=[],jelly=null,jellySpawned=false;
+/* Mode anarchie (menu dev) : les boss reviennent selon leur distance, partout (plage ou non), PV x1,5 à chaque rencontre de la run.
+   anarchyWant = choix du menu (sauvegardé) ; anarchyOn = actif pour la run en cours (pris en compte au lancement de la partie, car il change la génération des arènes). */
+const ANA_KEY='canne-dauphins-anarchie';
+let anarchyWant=false,anarchyOn=false,anaEnc=0,jellyDone=new Set();
+try{anarchyWant=localStorage.getItem(ANA_KEY)==='1';}catch(e){}
+anarchyOn=anarchyWant;
+const encHp=base=>Math.round(base*Math.pow(1.5,anaEnc++));
 let devOpen=false,godMode=false,devClicks=0,devLast=0,paused=false;
 let shake=0,time=0,dyingT=0,jumpBuf=0,fireBuf=0,muted=false,overlayVisible=true,shopOpen=false;
 let night=false,nightA=0,bossSpawned=false;   // nuit rouge sang : de l'apparition du requin jusqu'au poulpe ; le requin n'apparaît qu'une fois par partie
@@ -1269,6 +1328,7 @@ function hitBoss(b,dmg){
 function killBoss(b){
   b.hp=0;b.state='dead';b.t=0;b.vy=-120;b.charge=0;b.laser=0;
   bossDone.add(b.k);bossWins++;bossShots=[];
+  if(anarchyOn)night=false;   // anarchie : la nuit s'arrête avec le requin
   kills++;shake=0.6;sfx.bossDie();
   const cx=b.x+b.w/2,cy=b.y+b.h/2;
   const gs=soulReward('shark',1);shop.gold+=40;saveShop();
@@ -1278,7 +1338,7 @@ function killBoss(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnBoss(){
-  if(boss||octo||bossSpawned)return;   // un seul requin par partie
+  if(boss||octo||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
   const p=player,k=Math.round(p.x/BOSS_EVERY);
   if(k===0||bossDone.has(k))return;
   const sx=k*BOSS_EVERY;
@@ -1286,7 +1346,7 @@ function maybeSpawnBoss(){
   const w=38,h=18,bx=sx-w/2;
   let by=p.y-64;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
-  const bhp=Math.round(BOSS_HP*Math.pow(1.5,bossWins));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
+  const bhp=anarchyOn?encHp(BOSS_HP):Math.round(BOSS_HP*Math.pow(1.5,bossWins));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
   boss={kind:'boss',k,x:bx,y:by,w,h,vx:0,vy:0,dir:p.x>sx?1:-1,hp:bhp,maxHp:bhp,state:'alive',spawnT:1.4,t:0,flash:0,fireCd:3,charge:0,laser:0,la:0,upT:0,onGround:false};
   bossSpawned=true;night=true;   // la nuit tombe, rouge sang, jusqu'au poulpe
   shake=0.6;sfx.bossSpawn();
@@ -1329,8 +1389,9 @@ function maybeStartArena(){
   night=false;   // le poulpe met fin à la nuit rouge
   ar.state='active';ar.gateL=true;ar.gateR=true;      // les portes se referment : plus de sortie possible
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
-  boss=null;bossShots=[];tents=[];
-  octo={ar,hp:OCTO_HP,maxHp:OCTO_HP,state:'intro',t:0,intro:2.2,rage:false,flash:0,nextT:1,sway:0,dieT:0};
+  boss=null;bossShots=[];tents=[];jelly=null;
+  const oh=anarchyOn?encHp(OCTO_HP):OCTO_HP;
+  octo={ar,hp:oh,maxHp:oh,state:'intro',t:0,intro:2.2,rage:false,flash:0,nextT:1,sway:0,dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
 function spawnTentacle(mode){
@@ -1459,14 +1520,23 @@ function killJelly(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnJelly(){
-  if(jelly||jellySpawned||octo)return;
-  const p=player;
-  if(Math.abs(Math.floor((p.x+5)/T))<BEACH_TX+JELLY_SCREENS*(VW/T))return;
-  const w=30,h=20,bx=p.x+5+p.face*150-w/2;
+  if(jelly||octo)return;
+  const p=player,tx=Math.floor((p.x+5)/T),side=tx<0?-1:1,per=JELLY_SCREENS*(VW/T);
+  let key;
+  if(anarchyOn){   // anarchie : une méduse tous les 37 écrans après l'entrée de la plage, tant qu'aucun autre boss n'est là
+    if(boss)return;
+    const k=Math.floor((Math.abs(tx)-BEACH_TX)/per);
+    if(k<1||jellyDone.has(side*k))return;
+    key=side*k;
+  } else {
+    if(jellySpawned)return;
+    if(Math.abs(tx)<BEACH_TX+per)return;
+  }
+  const w=30,h=20,bx=p.x+5+p.face*150-w/2,jh=anarchyOn?encHp(JELLY_HP):JELLY_HP;
   let by=p.y-72;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
-  jelly={kind:'jelly',x:bx,y:by,w,h,vx:0,vy:0,hp:JELLY_HP,maxHp:JELLY_HP,state:'alive',spawnT:1.6,t:0,flash:0,rot:0,fireCd:3,charge:0,fire:0,baseA:0,sweep:0,upT:0,onGround:false};
-  jellySpawned=true;shake=0.6;sfx.bossSpawn();
+  jelly={kind:'jelly',x:bx,y:by,w,h,vx:0,vy:0,hp:jh,maxHp:jh,state:'alive',spawnT:1.6,t:0,flash:0,rot:0,fireCd:3,charge:0,fire:0,baseA:0,sweep:0,upT:0,onGround:false};
+  jellySpawned=true;if(key!==undefined)jellyDone.add(key);shake=0.6;sfx.bossSpawn();
   floatText(p.x+5,p.y-34,'LA MÉDUSE !','#f6f0ff');
 }
 function stepJelly(dt){
@@ -2114,6 +2184,7 @@ function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();
   enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;
+  anarchyOn=anarchyWant;anaEnc=0;jellyDone=new Set();
   night=false;nightA=0;bossSpawned=false;
 }
 function placePlayer(sx){
@@ -2140,6 +2211,7 @@ function startGame(){
     placePlayer(shop.beach*(BEACH_TX+10)*T);
   } else placePlayer();
   state='play';
+  if(anarchyOn)floatText(player.x+5,player.y-30,'ANARCHIE !','#ff4a4a');
   paused=false;ovRestart.hidden=true;
   overlayVisible=false;ov.classList.remove('show');
   if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
@@ -2565,6 +2637,10 @@ function updateDev(){
   g.textContent='INVINCIBLE : '+(godMode?'OUI':'NON');
   g.setAttribute('aria-pressed',String(godMode));
   g.classList.toggle('on',godMode);
+  const a=$('dev-ana');
+  a.textContent='ANARCHIE : '+(anarchyWant?'OUI':'NON')+(anarchyWant!==anarchyOn?' (PROCHAINE PARTIE)':'');
+  a.setAttribute('aria-pressed',String(anarchyWant));
+  a.classList.toggle('on',anarchyWant);
 }
 function devGive(key,n){shop[key]+=n;saveShop();sfx.heal();updateDev();}
 function openDev(){
@@ -2582,11 +2658,18 @@ $('dev-close').addEventListener('click',closeDev);
 $('dev-arena').addEventListener('click',()=>{   // se place devant la porte de la prochaine arène
   const p=player,sg=p.x<-200?-1:1,esp=19*T;   // près du départ : vers la droite
   let j=0;
-  while(Math.abs((ARENA_START+ARENA_EVERY*j)*VW)-esp<=Math.abs(p.x)+8)j++;
+  if(anarchyOn)while(Math.abs((ARENA_START+ARENA_EVERY*j)*VW)-esp<=Math.abs(p.x)+8)j++;
   const cx=sg*(ARENA_START+ARENA_EVERY*j)*VW,x=cx-sg*esp;
   p.x=x;p.y=column(Math.floor(x/T)).g*T-p.h;p.vx=0;p.vy=0;p.face=sg;
   hooks=[];tridents=[];enemies=enemies.filter(e=>Math.abs(e.x-x)>500);
   ensureChunks();snapCamera();closeDev();
+});
+$('dev-ana').addEventListener('click',()=>{
+  anarchyWant=!anarchyWant;
+  try{localStorage.setItem(ANA_KEY,anarchyWant?'1':'0');}catch(e){}
+  if(state!=='play')anarchyOn=anarchyWant;   // sur le menu : actif tout de suite ; en partie : à la prochaine partie
+  if(state!=='play')resetWorld(),placePlayer(),enemies=[];
+  updateDev();
 });
 $('dev-god').addEventListener('click',()=>{godMode=!godMode;updateDev();});
 devEl.addEventListener('pointerdown',e=>{if(e.target===devEl)closeDev();});
