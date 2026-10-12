@@ -1,4 +1,4 @@
-# 🎣 PechaDofin
+# 🎣 PechaDophin
 
 Un jeu de plateforme en pixel art, jouable directement dans le navigateur : tu es un pêcheur qui affronte des dauphins, un démon requin et un poulpe géant, dans un monde généré aléatoirement à chaque partie.
 
