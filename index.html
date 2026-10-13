@@ -445,7 +445,11 @@ const tunnels=new Map();
 const BEACH_TX=ARENA_START*(VW/T)+13;                 // 1re case de sable : juste après le mur extérieur de la 1re arène
 const ZONE_W=ARENA_EVERY*(VW/T);                       // largeur d'une zone en anarchie : de la sortie d'une arène à la sortie de la suivante
 const zoneK=tx=>{const a=Math.abs(tx);return a<BEACH_TX?0:Math.floor((a-BEACH_TX)/ZONE_W)+1;};
-const inBeach=tx=>Math.abs(tx)>=BEACH_TX&&(!anarchyOn||(zoneK(tx)&1)===1);   // anarchie : plage / herbe en alternance à chaque arène du poulpe
+/* Pool de zones (anarchie) : la partie commence dans la 1re (plaines), puis chaque boss d'arène change de zone, tirée au hasard dans tout le pool.
+   Pour ajouter une zone : ajouter une entrée ici (beach = style sable ; boss = boss d'arène de cette zone : 'octo' ou 'castle'). */
+const ZONES=[{id:'plain',beach:false,boss:'octo'},{id:'beach',beach:true,boss:'castle'}];
+const zoneDefK=k=>k<=0?ZONES[0]:ZONES[Math.min(ZONES.length-1,Math.floor(hash2(k,401)*ZONES.length))];
+const inBeach=tx=>Math.abs(tx)>=BEACH_TX&&(!anarchyOn||zoneDefK(zoneK(tx)).beach);
 const TCELL=56, TFLAT=8;                              // un tunnel possible par cellule de 56 cases, 8 cases de raccord avec le relief
 const plat=new Set();      // plateformes traversables par le dessous
 const chunks=new Set();
@@ -525,16 +529,13 @@ function arenaAt(tx){
   const sg=s<0?-1:1;
   let cx=null,id=0,type='octo';
   const j=Math.round((a-ARENA_START)/ARENA_EVERY);
-  if(j===0||anarchyOn){   // poulpe : une seule arène par côté (anarchie : une à chaque zone)
+  if(j===0||anarchyOn){   // classique : une seule arène de poulpe par côté ; anarchie : une arène au bout de chaque zone, avec le boss de cette zone
     const c0=sg*(ARENA_START+ARENA_EVERY*j)*(VW/T);
-    if(Math.abs(tx-c0)<=39){cx=c0;id=sg*(j+1);}
+    if(Math.abs(tx-c0)<=39){cx=c0;id=sg*(j+1);if(anarchyOn)type=zoneDefK(j).boss;}
   }
-  if(cx===null){   // château de sable : au milieu de chaque zone plage
-    const m=Math.round((a-CASTLE_SCREEN)/(2*ARENA_EVERY));
-    if(m>=0&&(m===0||anarchyOn)){
-      const c1=(m===0&&!anarchyOn)?sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)):sg*(CASTLE_SCREEN+2*ARENA_EVERY*m)*(VW/T);
-      if(Math.abs(tx-c1)<=39){cx=c1;id=sg*(100+m+1);type='castle';}
-    }
+  if(cx===null&&!anarchyOn){   // classique : château de sable, 22 écrans après la méduse
+    const c1=sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T));
+    if(Math.abs(tx-c1)<=39){cx=c1;id=sg*101;type='castle';}
   }
   if(cx===null)return null;
   let ar=arenas.get(id);
@@ -1673,17 +1674,23 @@ function relocBucket(c){
   for(let i=0;i<14;i++){const nx=lo+Math.random()*(hi-lo);if(Math.abs(nx-c.bx)>80){c.bx=nx;return;}}
   c.bx=c.bx>ar.cx*T?lo+10:hi-10;
 }
-function hitCastle(dmg){
+function hitCastle(dmg){   // le seau doit être touché 2 fois (peu importe les dégâts) pour s'activer et se vider sur le château
   const c=castle;if(!c||c.state!=='fight'||c.hitCd>0)return;
-  const removed=Math.min(dmg,c.hp);
-  c.hp-=dmg;c.flash=0.15;c.bf=0.3;c.hitCd=0.3;
+  const fl=c.ar.floor*T;
+  c.hitCd=0.3;c.bf=0.3;c.acc=(c.acc||0)+dmg;c.bh=(c.bh||0)+1;
+  if(c.bh<2){
+    floatText(c.bx,fl-28,'SEAU 1/2','#9fe3ff');burst(c.bx,fl-14,'#7fd4ff',8,80);sfx.hit();
+    return;
+  }
+  const d=c.acc;c.acc=0;c.bh=0;
+  const removed=Math.min(d,c.hp);
+  c.hp-=d;c.flash=0.3;
   combo.n++;combo.t=COMBO_TIME;
   const mult=Math.min(combo.n,10),pts=100*mult*removed;
   score+=pts;
-  const fl=c.ar.floor*T;
-  floatText(c.bx,fl-26,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
-  burst(c.bx,fl-14,'#7fd4ff',14,110);burst(c.bx,fl-10,'#e4c882',8,80);
-  if(c.hp<=0)killCastle();else{relocBucket(c);sfx.hit();}
+  floatText(c.bx,fl-28,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  burst(c.bx,fl-14,'#7fd4ff',16,120);burst(c.bx,fl-10,'#e4c882',8,80);shake=Math.max(shake,0.15);
+  if(c.hp<=0)killCastle();else{relocBucket(c);sfx.slam();}
 }
 function killCastle(){
   const c=castle,ar=c.ar;
@@ -2424,6 +2431,7 @@ function drawCastleFx(){
     if(c.state==='fight'){
       ctx.fillStyle='#14182c';ctx.fillRect(Math.round(c.bx)-4,r[1]-12+bob,9,6);ctx.fillRect(Math.round(c.bx)-2,r[1]-7+bob,5,3);
       ctx.fillStyle='#4fc3ff';ctx.fillRect(Math.round(c.bx)-3,r[1]-11+bob,7,4);ctx.fillRect(Math.round(c.bx)-1,r[1]-7+bob,3,2);
+      for(let i=0;i<2;i++){ctx.fillStyle='#14182c';ctx.fillRect(Math.round(c.bx)-6+i*7,r[1]-19,6,5);ctx.fillStyle=i<(c.bh||0)?'#4fc3ff':'#5a6a80';ctx.fillRect(Math.round(c.bx)-5+i*7,r[1]-18,4,3);}
     }
   }
 }
@@ -2704,7 +2712,7 @@ function startGame(){
   resetWorld();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
   if(rodLocked()&&shop.weapon!=='trident'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
-  if(shop.beach){   // checkpoint : on repart de la plage, l'arène du poulpe derrière soi est considérée comme vaincue
+  if(shop.beach&&!anarchyOn){   // checkpoint : on repart de la plage (anarchie : on commence toujours dans les plaines), l'arène du poulpe derrière soi est considérée comme vaincue
     const ar=arenaAt(shop.beach*ARENA_START*(VW/T));
     if(ar)ar.state='won';
     bossSpawned=true;octoRun=true;
