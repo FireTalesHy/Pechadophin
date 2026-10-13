@@ -416,9 +416,9 @@ const GRAV=900, JUMPV=345, MAXV=112, MAXFALL=480, HOPV=200;
 const WATER_ROW=31;
 const HOOK_V=340, HOOK_BACK=520, HOOK_SPREAD=0.2;
 const COMBO_TIME=10, HEAL_EVERY=15;
-const CASTLE_HP=500;   // château de sable : arène au milieu de la zone plage (45 écrans), seau d'eau à viser
+const CASTLE_HP=500;   // château de sable : seau d'eau à viser ; classique : 22 écrans après la méduse (elle-même à 26 écrans du début du sable) ; anarchie : au milieu de chaque zone plage
 const OCTO_HP=300, ARENA_START=27, ARENA_EVERY=36, WALL_H=14, CASTLE_SCREEN=ARENA_START+18;   // arène du poulpe : 1re à 27 écrans, puis tous les 36 écrans, des deux côtés
-const JELLY_HP=420, JELLY_SCREENS=37, JELLY_BEAM_L=480;   // méduse : 420 PV, apparaît ~37 écrans après l'entrée de la plage
+const JELLY_HP=420, JELLY_SCREENS=37, JELLY_SCREENS_C=26, CASTLE_AFTER_JELLY=22, JELLY_BEAM_L=480;   // méduse : 420 PV, apparaît ~37 écrans après l'entrée de la plage
 const BOSS_EVERY=18*VW, BOSS_HP=100, BOSS_SPEED=38, BOSS_FIRE_CD=5, LASER_CHARGE=0.65;   // un boss tous les 18 écrans (environ 1 minute de marche)
 const LASER_L=480, LASER_T=2, NIGHT_SPEED=1.15;   // laser du requin : longueur (tout l'écran) et durée ; vitesse des dauphins la nuit rouge
 const BEST_KEY='canne-dauphins-meilleur-score';
@@ -532,7 +532,7 @@ function arenaAt(tx){
   if(cx===null){   // château de sable : au milieu de chaque zone plage
     const m=Math.round((a-CASTLE_SCREEN)/(2*ARENA_EVERY));
     if(m>=0&&(m===0||anarchyOn)){
-      const c1=sg*(CASTLE_SCREEN+2*ARENA_EVERY*m)*(VW/T);
+      const c1=(m===0&&!anarchyOn)?sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)):sg*(CASTLE_SCREEN+2*ARENA_EVERY*m)*(VW/T);
       if(Math.abs(tx-c1)<=39){cx=c1;id=sg*(100+m+1);type='castle';}
     }
   }
@@ -1879,7 +1879,7 @@ function maybeSpawnJelly(){
     key=side*k;
   } else {
     if(jellySpawned)return;
-    if(Math.abs(tx)<BEACH_TX+per)return;
+    if(Math.abs(tx)<BEACH_TX+JELLY_SCREENS_C*(VW/T))return;   // classique : 26 écrans après le début du sable (ou du checkpoint)
     if(!inBeach(tx))return;
   }
   const w=30,h=20,bx=p.x+5+p.face*150-w/2,jh=anarchyOn?encHp(JELLY_HP):JELLY_HP;
