@@ -2,7 +2,38 @@
 
 Toutes les modifications notables de **Canne & Dauphins** (`pechadofin.html`).
 
-## [Non publié] - 2026-10-12
+## [V0.2.11] - 2026-10-13
+
+### Ajouté
+- **Nouveau menu principal** : disposition inspirée des jeux de course sans fin, reprise pour le menu principal, le menu pause et l'écran de mort.
+  - Gros bouton de lancement au centre avec le pêcheur, MISSIONS et réglages (⚙) en haut, bouton MODE à gauche et BOUTIQUE à droite.
+  - Les commandes sont maintenant dans les réglages.
+- **Choix du mode** (bouton MODE) : deux boutons, **Classique** (l'aventure habituelle) et **Anarchie**. Le choix est sauvegardé.
+- **Mode Anarchie** :
+  - Les boss reviennent sans fin selon leur distance et leur zone, avec des PV qui montent à chaque rencontre dans la même partie.
+  - Les ennemis deviennent de plus en plus nombreux, rapides et résistants, sans plafond, et la canne à pêche reste utilisable partout.
+  - La zone change à chaque rencontre avec le poulpe : plage et herbe en alternance, avec décor, cocotiers, tunnels et ennemis adaptés.
+  - Le ciel change à chaque rencontre avec le requin : jour, nuit rouge, crépuscule, nuit bleue, aube, puis le cycle recommence.
+  - Impossible de revenir en arrière dans la zone précédente : seul le château de sable permet de retourner dans la première zone.
+- **Château de sable** : nouveau boss de la plage, 500 PV.
+  - Arène en sable au milieu de la plage, avec le château dessiné en arrière-plan (ses yeux suivent le joueur).
+  - Il ne prend pas de dégâts directement : il faut viser le seau d'eau, qui change de place à chaque coup.
+  - Il attaque avec des vagues de sable annoncées par un avertissement, et fait apparaître quelques mouettes.
+  - Enragé à 50 % de PV : vagues plus rapides et plus nombreuses.
+  - Récompense : 2 âmes rouges (première victoire seulement) et 120 or. Nouvelle mission associée.
+- **Mouette** : ennemi de la plage, elle plane en altitude, se cabre puis fond en piqué sur le joueur avant de remonter. 2 PV de base, rapporte 5 or.
+- **Cocotiers-plateformes** : la couronne de feuilles des cocotiers de la plage sert de plateforme traversable par le dessous.
+- **Second joystick** (tablette) : il contrôle la caméra et la visée, avec une aide à la visée vers la cible la plus proche.
+- **Marchands en cours de partie** : un marchand à côté de son tuk-tuk tous les 18 écrans, pour améliorer l'arme équipée sans toucher au score.
+
+### Modifié
+- **Méduse** : 420 PV (au lieu de 300) et déplacement 1,15 fois plus rapide.
+- **Vers de sable** : sprite simplifié.
+- **Boutique** : l'onglet « ÂMES » devient « ARMES ».
+- **Menu pause** : le bouton « Boutique » devient « Retour au menu principal » et le bouton « Recommencer » disparaît.
+- **Mode Classique** : le poulpe et le château de sable ne se déclenchent qu'une seule fois par partie (quel que soit le côté), et le requin reste dans la zone d'herbe.
+
+## Versions précédentes (jusqu'au 2026-10-12)
 
 ### Modifié
 - **Canne à pêche (nerf)** : l'amélioration « Grappins tirés » devient « Zone de dégâts ».
