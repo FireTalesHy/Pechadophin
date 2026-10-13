@@ -188,7 +188,7 @@ body{
 .dev-btns{display:flex;gap:6px;flex-wrap:wrap}
 .dev-btns .sbtn{width:auto;padding:7px 9px}
 #dev-god{width:100%;padding:10px}
-#dev-god.on,#dev-ana.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
+#dev-god.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .shop-panel.dev-panel{width:min(520px,100%)}
 #rst .shop-note{font-size:10px;line-height:1.9;opacity:1;text-align:center}
 #rst .row .go{font:400 10px/1 var(--pf);padding:10px 14px}
@@ -379,7 +379,6 @@ body{
     <p class="shop-note">Outil de test : donne-toi des monnaies (enregistrées) et active l'invincibilité. Le jeu est en pause tant que ce menu est ouvert.</p>
     <div id="dev-list"></div>
     <button class="sbtn equip" id="dev-arena" type="button" style="width:100%;padding:10px">ALLER À L'ARÈNE DU POULPE</button>
-    <button class="sbtn" id="dev-ana" type="button" aria-pressed="false" style="width:100%;padding:10px">ANARCHIE : NON</button>
     <button class="sbtn" id="dev-god" type="button" aria-pressed="false">INVINCIBLE : NON</button>
     <button class="go" id="dev-close" type="button">FERMER</button>
   </div>
@@ -3273,10 +3272,6 @@ function updateDev(){
   g.textContent='INVINCIBLE : '+(godMode?'OUI':'NON');
   g.setAttribute('aria-pressed',String(godMode));
   g.classList.toggle('on',godMode);
-  const a=$('dev-ana');
-  a.textContent='ANARCHIE : '+(anarchyWant?'OUI':'NON')+(anarchyWant!==anarchyOn?' (PROCHAINE PARTIE)':'');
-  a.setAttribute('aria-pressed',String(anarchyWant));
-  a.classList.toggle('on',anarchyWant);
 }
 function devGive(key,n){shop[key]+=n;saveShop();sfx.heal();updateDev();}
 function openDev(){
@@ -3300,7 +3295,6 @@ $('dev-arena').addEventListener('click',()=>{   // se place devant la porte de l
   hooks=[];tridents=[];enemies=enemies.filter(e=>Math.abs(e.x-x)>500);
   ensureChunks();snapCamera();closeDev();
 });
-$('dev-ana').addEventListener('click',()=>setMode(!anarchyWant));
 $('dev-god').addEventListener('click',()=>{godMode=!godMode;updateDev();});
 devEl.addEventListener('pointerdown',e=>{if(e.target===devEl)closeDev();});
 cv.addEventListener('pointerdown',e=>{
