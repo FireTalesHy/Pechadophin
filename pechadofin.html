@@ -1409,7 +1409,7 @@ const TUP={
 const D_KEYS=['dmg','dist','jump','parry'];
 const DUP={   // améliorations des dagues (or)
  dmg:{name:'Dégâts',vals:[8,11,14,18,23,30],cost:[40,90,150,240,360],fmt:v=>v+' dégâts'},
- dist:{name:'Longueur du dash',vals:[84,100,116,134,152,172],cost:[35,75,130,200,300],fmt:v=>fr1(v/16)+' cases'},
+ dist:{name:'Longueur du dash',vals:[64,72,80,88,98,108],cost:[35,75,130,200,300],fmt:v=>fr1(v/16)+' cases'},
  jump:{name:'Hauteur de saut',vals:[1.2,1.36,1.52,1.68,1.84,2],cost:[30,65,110,170,260],fmt:v=>'x'+fr1(v)},   // jusqu'à 2 fois plus haut
  parry:{name:'Chance de parade',vals:[0,25,34,43,52,60],cost:[80,140,210,300,420],fmt:v=>v?v+' %':'Aucune'}   // juste après un dash : chance d'annuler un coup au corps à corps
 };
