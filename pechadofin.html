@@ -1447,13 +1447,13 @@ function stepPlayer(dt){
   if(jumpBuf>0)jumpBuf-=dt;
   const ax=inp.axis||0,d=ax!==0?ax:(inp.right?1:0)-(inp.left?1:0);
   if(p.stun<=0){
-    if(d!==0){const sg=d>0?1:-1,lim=MAXV*Math.abs(d);p.vx+=sg*(p.onGround?1500:900)*dt;p.vx=clamp(p.vx,-lim,lim);p.face=sg;}
+    if(d!==0){const sg=d>0?1:-1,lim=MAXV*Math.abs(d)*(p.boost?2:1);p.vx+=sg*(p.onGround?1500:900)*dt;p.vx=clamp(p.vx,-lim,lim);p.face=sg;}
     else{const f=(p.onGround?1400:350)*dt;p.vx=Math.abs(p.vx)<=f?0:p.vx-Math.sign(p.vx)*f;}
   }
   if(aim.active&&Math.abs(aim.x)>0.25&&p.stun<=0)p.face=aim.x>0?1:-1;   // le pêcheur regarde du côté où il vise
   if(p.onGround)p.coyote=0.1;else p.coyote-=dt;
   if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV;p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
-  if(!inp.jump&&p.vy<-140&&p.stun<=0)p.vy=-140;
+  if(!inp.jump&&p.vy<-140&&p.stun<=0&&!p.boost)p.vy=-140;
   p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
   {
     const vx0=p.vx,x0=p.x,y0=p.y;
@@ -1463,6 +1463,7 @@ function stepPlayer(dt){
     }
   }
   moveY(p,p.vy*dt);
+  if(p.onGround&&p.boost&&p.vy>=0)p.boost=false;
   if(p.onGround){
     const yb=p.y+p.h+1;
     if(supportAt(p.x-10,yb)&&supportAt(p.x+p.w+10,yb)){p.safe.x=p.x;p.safe.y=p.y;}
@@ -1506,6 +1507,7 @@ function stepTrident(dt){
     if(glockOn){   // Akimbo Glock 18 (menu de test) : deux pistolets, 25 dégâts par balle
       const cx=p.x+5,cy=p.y+6,len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len;
       castCd=GLOCK.rate;throwAnim=0.08;
+      if(uy>0.7&&p.onGround){p.vy=-JUMPV*Math.SQRT2;p.onGround=false;p.coyote=0;p.boost=true;burst(cx,p.y+p.h,'#ffe14d',10,90);}   // tir sous les pieds : propulsion (2 sauts de haut) et vitesse x2 jusqu'à l'atterrissage
       for(const o of[-3,3])tridents.push({x:cx+ux*10-uy*o,y:cy+uy*10+ux*o,ux,uy,d:0,hit:new Set(),n:0,g:true});   // akimbo : une balle par pistolet
       sfx.hit();
     } else {
