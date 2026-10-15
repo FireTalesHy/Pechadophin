@@ -201,7 +201,7 @@ body{
 .dev-btns{display:flex;gap:6px;flex-wrap:wrap}
 .dev-btns .sbtn{width:auto;padding:7px 9px}
 #dev-god{width:100%;padding:10px}
-#dev-god.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
+#dev-god.on,#dev-glock.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .shop-panel.dev-panel{width:min(520px,100%)}
 #rst .shop-note{font-size:10px;line-height:1.9;opacity:1;text-align:center}
 #rst .row .go{font:400 10px/1 var(--pf);padding:10px 14px}
@@ -404,6 +404,7 @@ body{
     <div class="shop-head"><h2 id="dev-title">MENU DEV</h2></div>
     <p class="shop-note">Outil de test : donne-toi des monnaies (enregistrées) et active l'invincibilité. Le jeu est en pause tant que ce menu est ouvert.</p>
     <div id="dev-list"></div>
+    <button class="sbtn" id="dev-glock" type="button" aria-pressed="false" style="width:100%;padding:10px">GLOCK 18 : NON</button>
     <button class="sbtn equip" id="dev-arena" type="button" style="width:100%;padding:10px">ALLER À L'ARÈNE DU POULPE</button>
     <button class="sbtn" id="dev-god" type="button" aria-pressed="false">INVINCIBLE : NON</button>
     <button class="go" id="dev-close" type="button">FERMER</button>
@@ -484,6 +485,7 @@ const EN={
 const EN_RULES=[
  [/^SON : (OUI|NON)$/,m=>'SOUND: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^INVINCIBLE : (OUI|NON)$/,m=>'INVINCIBLE: '+(m[1]==='OUI'?'YES':'NO')],
+ [/^GLOCK 18 : (OUI|NON)$/,m=>'GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^Niveau (\d+) sur (\d+)$/,m=>'Level '+m[1]+' of '+m[2]],
  [/^MAX : (.+)$/,m=>'MAX: '+trStr(m[1])],
  [/^IL MANQUE (\d+)$/,m=>'NEED '+m[1]+' MORE'],
@@ -1501,6 +1503,12 @@ function stepTrident(dt){
   if(throwAnim>0)throwAnim-=dt;
   if((fireBuf>0||inp.fire||aim.auto)&&castCd<=0&&p.stun<=0&&state==='play'){
     fireBuf=0;
+    if(glockOn){   // Glock 18 (menu de test) : une balle rapide, 25 dégâts
+      const cx=p.x+5,cy=p.y+6,len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len;
+      castCd=GLOCK.rate;throwAnim=0.08;
+      tridents.push({x:cx+ux*10,y:cy+uy*10,ux,uy,d:0,hit:new Set(),n:0,g:true});
+      sfx.hit();
+    } else {
     const n=TMULTI.vals[shop.tmulti],cx=p.x+5,cy=p.y+6;
     castCd=TUP.rate.vals[shop.tup.rate];throwAnim=0.16;
     const base=Math.atan2(aim.y,aim.x),sg=aim.x>=0?1:-1;
@@ -1509,11 +1517,13 @@ function stepTrident(dt){
       tridents.push({x:cx+ux*14,y:cy+uy*14,ux,uy,d:0,hit:new Set(),n:0});
     }
     sfx.trident();
+    }
   }
   if(!tridents.length)return;
-  const range=TUP.range.vals[shop.tup.range],dmg=TUP.dmg.vals[shop.tup.dmg],pierce=TUP.pierce.vals[shop.tup.pierce];
+  const range0=TUP.range.vals[shop.tup.range],dmg0=TUP.dmg.vals[shop.tup.dmg],pierce0=TUP.pierce.vals[shop.tup.pierce];
   for(const h of tridents){
-    const st=TRIDENT_V*dt;
+    const range=h.g?GLOCK.range:range0,dmg=h.g?GLOCK.dmg:dmg0,pierce=h.g?1:pierce0;
+    const st=(h.g?GLOCK.speed:TRIDENT_V)*dt;
     h.x+=h.ux*st;h.y+=h.uy*st;h.d+=st;
     if(solidAt(h.x+h.ux*6,h.y+h.uy*6)||h.d>=range){h.done=true;burst(h.x,h.y,'#ff6a3d',6,70);continue;}
     for(const e of enemies){
@@ -1536,7 +1546,7 @@ function stepTrident(dt){
   tridents=tridents.filter(h=>!h.done);
 }
 function stepHook(dt){
-  if(shop.weapon==='trident'){stepTrident(dt);return;}
+  if(shop.weapon==='trident'||glockOn){stepTrident(dt);return;}
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
   if(castCd>0)castCd-=dt;
@@ -2420,7 +2430,13 @@ function drawPlayer(){
   ctx.restore();
   if(state==='dying')return;
   const isTri=shop.weapon==='trident',tip=rodTip(isTri?throwAnim>0:hooks.length>0),hx=p.x+5+p.face*5,hy=p.y+8;
-  if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
+  if(glockOn){   // pistolet tenu dans la direction de la visée
+    const a=Math.atan2(aim.y,aim.x);ctx.save();ctx.translate(Math.round(hx),Math.round(hy-1));ctx.rotate(a);if(aim.x<0)ctx.scale(1,-1);
+    ctx.fillStyle='#14182c';ctx.fillRect(-1,-2,9,4);ctx.fillRect(-1,1,3,4);ctx.fillStyle='#4a5068';ctx.fillRect(0,-1,7,2);ctx.fillRect(0,1,1,3);
+    if(throwAnim>0){ctx.fillStyle='#ffe14d';ctx.fillRect(8,-2,3,3);}
+    ctx.restore();
+  }
+  else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
     const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
     ctx.fillStyle='#ffe0a0';ctx.fillRect(Math.round(tip.x),Math.round(tip.y),1,1);
@@ -2651,6 +2667,7 @@ function drawTridentHeld(hx,hy,tx,ty){
 function drawTridents(){
   for(const h of tridents){
     const x=Math.round(h.x),y=Math.round(h.y);
+    if(h.g){ctx.fillStyle='rgba(255,220,120,.35)';ctx.fillRect(x-Math.round(h.ux*6),y-Math.round(h.uy*6),2,2);ctx.fillStyle='#ffe14d';ctx.fillRect(x-1,y-1,3,2);ctx.fillStyle='#fff';ctx.fillRect(x,y-1,1,1);continue;}
     ctx.fillStyle='rgba(255,70,50,.28)';disc(x,y,8);
     ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(h.uy,h.ux));ctx.drawImage(TRIDENT_P,-6,-3);ctx.restore();
   }
@@ -3385,6 +3402,7 @@ function updateDev(){
   g.textContent='INVINCIBLE : '+(godMode?'OUI':'NON');
   g.setAttribute('aria-pressed',String(godMode));
   g.classList.toggle('on',godMode);
+  const gl=$('dev-glock');gl.textContent='GLOCK 18 : '+(glockOn?'OUI':'NON');gl.setAttribute('aria-pressed',String(glockOn));gl.classList.toggle('on',glockOn);
 }
 function devGive(key,n){shop[key]+=n;saveShop();sfx.heal();updateDev();}
 function openDev(){
@@ -3410,6 +3428,7 @@ $('dev-arena').addEventListener('click',()=>{   // se place devant la porte de l
   ensureChunks();snapCamera();closeDev();
 });
 $('dev-god').addEventListener('click',()=>{godMode=!godMode;updateDev();});
+$('dev-glock').addEventListener('click',()=>{glockOn=!glockOn;hooks=[];tridents=[];updateDev();});
 devEl.addEventListener('pointerdown',e=>{if(e.target===devEl)closeDev();});
 cv.addEventListener('pointerdown',e=>{
   if(state!=='play'||devOpen||shopOpen)return;
@@ -3464,6 +3483,8 @@ function gDecode(tok){
 /* Menu de test : réservé aux comptes Google dont l'empreinte SHA-256 de l'email est listée (les emails n'apparaissent pas en clair) */
 const DEV_HASHES=['e25b16544775982eeb8ea2148661d8046bfc4e0eded6e98f6f27dc69fae69eb7','859183087dc35fabb8678f375619b54dcf4a6d7debc07857c1473d58642abd66','dc43a5c5b584cc5a1df067c1001867aa89f419433a6d7b27cc9add46674c87be','0a396f3832c858e95864aa6ad5572dd6b22caa6e3755c4552bde2713fdb5008f'];
 let devOk=false;
+var glockOn=false;   // Glock 18 : arme du menu de test, non sauvegardée
+const GLOCK={dmg:25,rate:0.12,range:340,speed:560};
 async function gCheckDev(){
   devOk=false;
   if(!gUser||!gUser.email||!(window.crypto&&crypto.subtle))return;
