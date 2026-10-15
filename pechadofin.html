@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<!-- Connexion Google : colle ici ton identifiant client OAuth (Google Cloud Console > Identifiants > ID client OAuth > Application Web, origine JavaScript autorisée = l'URL vercel.app du jeu) -->
+<meta name="google-client-id" content="613987510700-0gp3rfu2tmcm32uu0aun7q1lmubl8vav.apps.googleusercontent.com">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>pechadofin</title>
+<title>Pechadophin</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 <style>
 :root{
@@ -63,6 +65,9 @@ body{
   border-radius:calc(var(--p)*4);box-shadow:0 calc(var(--p)*2) 0 #0b2556;
   padding:calc(var(--p)*5) calc(var(--p)*10);
 }
+.ov-right{display:flex;gap:calc(var(--p)*5);align-items:flex-start}
+.ov-lang{overflow:hidden}
+.ov-lang svg{width:100%;height:100%;display:block}
 .ov-gear{width:calc(var(--p)*20);height:calc(var(--p)*20);padding:0;border-radius:50%;font-size:max(10px,calc(var(--p)*11));display:flex;align-items:center;justify-content:center}
 .ov-chip:active,.ov-gear:active,.ov-big:active{transform:translateY(calc(var(--p)*1.5))}
 .ov-chip:focus-visible,.ov-gear:focus-visible,.ov-big:focus-visible,#ov-btn:focus-visible{outline:3px solid var(--on);outline-offset:3px}
@@ -108,7 +113,15 @@ body{
 .mis-bar i{display:block;height:100%;background:#ff8a3d}
 .mis-row.done .mis-bar i{background:var(--on)}
 #set .sbtn{width:100%;padding:10px}
-#mode .sbtn{width:100%;padding:10px}
+#mode .sbtn,#acc .sbtn{width:100%;padding:10px}
+.ov-acc{overflow:hidden}
+.ov-acc svg,.ov-acc img{width:100%;height:100%;display:block;object-fit:cover}
+.acc-row{display:flex;align-items:center;gap:10px;padding:6px;border:2px solid var(--btn-line);background:var(--btn)}
+.acc-row img{width:36px;height:36px;border-radius:50%;flex:none}
+.acc-row div{min-width:0;font:400 9px/1.6 var(--pf);overflow-wrap:anywhere}
+.acc-row small{display:block;font-size:7px;opacity:.75}
+#g-btn{display:flex;justify-content:center;min-height:44px}
+#acc .shop-note{font-size:8px;line-height:1.9;opacity:.85}
 .mode-card{text-align:center;font-size:11px}
 .mode-card.on{border-color:var(--on);box-shadow:0 0 0 2px var(--on) inset}
 #mode .shop-note{font-size:8px;line-height:1.9;opacity:.85}
@@ -142,13 +155,13 @@ body{
 .go.alt{background:var(--on);color:var(--on-ink)}
 
 .go.sm{font-size:max(7px,calc(var(--u)*5px));padding:calc(var(--u)*4px) calc(var(--u)*8px);opacity:.85}
-#shop,#dev,#rst,#mis,#set,#mode{
+#shop,#dev,#rst,#mis,#set,#mode,#acc{
   position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
   background:rgba(4,12,20,.74);font-family:var(--pf);
   padding:max(10px,env(safe-area-inset-top,0px)) 10px max(10px,env(safe-area-inset-bottom,0px));
 }
-#shop[hidden],#dev[hidden],#rst[hidden],#mis[hidden],#set[hidden],#mode[hidden]{display:none}
-#rst,#mis,#set,#mode{z-index:30}
+#shop[hidden],#dev[hidden],#rst[hidden],#mis[hidden],#set[hidden],#mode[hidden],#acc[hidden]{display:none}
+#rst,#mis,#set,#mode,#acc{z-index:30}
 #rst{z-index:31}
 #rst .row{justify-content:center;gap:12px}
 .shop-panel{
@@ -286,10 +299,14 @@ body{
     <div id="overlay" class="show" data-mode="title">
       <div class="ov-top">
         <button class="ov-chip" id="mis-btn" type="button">MISSIONS</button>
-        <button class="ov-gear" id="set-btn" type="button" aria-label="Réglages" title="Réglages">⚙</button>
+        <div class="ov-right">
+          <button class="ov-gear ov-acc" id="acc-btn" type="button" aria-label="Compte Google" title="Compte Google"></button>
+          <button class="ov-gear ov-lang" id="lang-btn" type="button" aria-label="English" title="English"></button>
+          <button class="ov-gear" id="set-btn" type="button" aria-label="Réglages" title="Réglages">⚙</button>
+        </div>
       </div>
       <div class="ov-logo">
-        <h1 id="ov-title">CANNE &amp; DAUPHINS</h1>
+        <h1 id="ov-title">PECHADOPHIN</h1>
         <p id="ov-text">Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.</p>
       </div>
       <div class="ov-center">
@@ -351,6 +368,15 @@ body{
   </div>
 </div>
 
+<div id="acc" hidden role="dialog" aria-modal="true" aria-labelledby="acc-title">
+  <div class="shop-panel dev-panel">
+    <div class="shop-head"><h2 id="acc-title">COMPTE GOOGLE</h2></div>
+    <div id="acc-body"></div>
+    <p class="shop-note" id="acc-note"></p>
+    <button class="go" id="acc-close" type="button">RETOUR</button>
+  </div>
+</div>
+
 <div id="set" hidden role="dialog" aria-modal="true" aria-labelledby="set-title">
   <div class="shop-panel dev-panel">
     <div class="shop-head"><h2 id="set-title">RÉGLAGES</h2></div>
@@ -408,6 +434,86 @@ body{
 <script>
 (()=>{
 'use strict';
+
+/* ================= Langues (FR / EN) =================
+   Le texte du jeu est écrit en français ; en anglais, chaque chaîne est traduite à l'affichage (canvas : txt / textes flottants ; DOM : observateur de mutations). */
+const LANG_KEY='canne-dauphins-langue';
+let lang='fr';
+try{const sv=localStorage.getItem(LANG_KEY);lang=sv==='en'||sv==='fr'?sv:((navigator.language||'fr').toLowerCase().startsWith('fr')?'fr':'en');}catch(e){}
+const EN={
+'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
+'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
+'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile et wyzan':'testers: moustik, ofodile and wyzan',
+'BOUTIQUE':'SHOP','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
+'RÉINITIALISER LA SAVE':'RESET SAVE','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
+'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
+'ALLER À L\'ARÈNE DU POULPE':'GO TO THE OCTOPUS ARENA','FERMER':'CLOSE','SAUT':'JUMP','PÊCHE':'FISH',
+'Zone de jeu : un pêcheur affronte des dauphins':'Game area: a fisherman fights dolphins','Réglages':'Settings','Perles':'Pearls','Or':'Gold','Âmes rouges':'Red souls','Rayons de la boutique':'Shop sections',
+'Joystick de déplacement : pousse-le à gauche ou à droite pour te déplacer':'Movement joystick: push it left or right to move','Joystick : déplacement':'Joystick: movement','Pause':'Pause','Pause (Échap)':'Pause (Esc)',
+'Couper le son':'Mute sound','Son':'Sound','Activer le son':'Turn sound on','Joystick de caméra et de visée : oriente la caméra et la visée, avec aide à la visée':'Camera and aim joystick: steers the camera and your aim, with aim assist',
+'Joystick : caméra et visée (aide à la visée)':'Joystick: camera and aim (aim assist)','Sauter':'Jump','Lancer la canne à pêche':'Cast the fishing rod',
+'Passer en anglais':'Switch to English','Passer en français':'Switch to French','English':'English','Français':'Français',
+'ÉQUIPÉ':'EQUIPPED','ÉQUIPER':'EQUIP','ÉQUIPÉE':'EQUIPPED','ACHETER':'BUY','OFFERT':'FREE','POSSÉDÉ':'OWNED','OFFERTE':'FREE','AMÉLIORER':'UPGRADE','INDISPONIBLE':'UNAVAILABLE','NIVEAU MAX':'MAX LEVEL','NIVEAU 5/5':'LEVEL 5/5','NIVEAU 3/3':'LEVEL 3/3',
+'DÉBLOQUÉ À LA PLAGE':'UNLOCKED AT THE BEACH','VERROUILLÉ':'LOCKED','TRIDENT REQUIS':'TRIDENT REQUIRED','NIVEAUX CONSERVÉS':'LEVELS KEPT','MARCHAND':'MERCHANT',
+'Trident infernal':'Infernal trident','Perce les ennemis':'Pierces enemies','Canne à pêche':'Fishing rod','Remplacée par le trident':'Replaced by the trident','Arme de départ':'Starting weapon','Tridents multiples':'Multiple tridents',
+'Portée':'Range','Zone de dégâts':'Damage area','Vitesse de tir':'Fire rate','Dégâts':'Damage','Perforation':'Piercing','Points de vie':'Hit points',
+'Pêcheur':'Fisherman','Pirate':'Pirate','Ninja':'Ninja','Cow-boy':'Cowboy','Chevalier de l\'espace':'Space knight','Apprenti sorcier':'Sorcerer\'s apprentice','Super-héros':'Superhero','Astronaute':'Astronaut','Zombie':'Zombie','Plombier':'Plumber','Cuisinier':'Chef','Viking':'Viking','Robot':'Robot','Clown':'Clown','Fantôme':'Ghost','Pharaon':'Pharaoh','Costume de dino':'Dino costume','Roi':'King',
+'PERLES':'PEARLS','OR':'GOLD','ÂMES ROUGES':'RED SOULS',
+'Atteindre la plage':'Reach the beach','Tuer 10 vers de sable':'Kill 10 sand worms','Vaincre le démon requin':'Defeat the shark demon','Vaincre le poulpe géant':'Defeat the giant octopus','Vaincre la méduse':'Defeat the jellyfish','Vaincre le château de sable':'Defeat the sandcastle','Posséder 10 skins':'Own 10 skins','Tridents multiples au maximum':'Max out multiple tridents','Trident : toutes les améliorations au maximum':'Trident: max out every upgrade',
+'Le mode choisi sera actif à la prochaine partie.':'The chosen mode will apply from the next game.',
+'Une perle se cache tous les 7 écrans : sur une plateforme, au-dessus d\'un trou ou près du sol. Elles se gardent d\'une partie à l\'autre.':'A pearl is hidden every 7 screens: on a platform, above a pit or near the ground. You keep them from one game to the next.',
+'La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.':'The rod is unavailable since you reached the beach: its levels are kept, but the trident takes over.',
+'Chaque dauphin battu rapporte de l\'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s\'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.':'Each dolphin defeated gives gold (2 for a blue one, 4 for a red shooter, 5 for a pink one, more if it is tough). 5 levels per upgrade. The damage area is invisible: full damage at the center, -50% at the edge.',
+'Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu\'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s\'achète plus : il se débloque en atteignant la plage.':'Each boss (shark demon, giant octopus, jellyfish) gives red souls only the first time it is defeated. They strengthen your fisherman. The trident can no longer be bought: it unlocks when you reach the beach.',
+'Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l\'or.':'The infernal trident unlocks when you reach the beach. Its upgrades cost gold.',
+'Le marchand améliore ton arme équipée contre de l\'or. Ton score n\'est pas touché et le jeu est en pause.':'The merchant upgrades your equipped weapon for gold. Your score is untouched and the game is paused.',
+'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
+'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
+'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
+'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON',
+'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
+'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : perles, or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: pearls, gold, red souls, upgrades, skins, best score and the beach checkpoint.',
+'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
+'terminée':'completed',
+'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
+'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
+'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).'
+};
+const EN_RULES=[
+ [/^SON : (OUI|NON)$/,m=>'SOUND: '+(m[1]==='OUI'?'ON':'OFF')],
+ [/^INVINCIBLE : (OUI|NON)$/,m=>'INVINCIBLE: '+(m[1]==='OUI'?'YES':'NO')],
+ [/^Niveau (\d+) sur (\d+)$/,m=>'Level '+m[1]+' of '+m[2]],
+ [/^MAX : (.+)$/,m=>'MAX: '+trStr(m[1])],
+ [/^IL MANQUE (\d+)$/,m=>'NEED '+m[1]+' MORE'],
+ [/^VER (\d+\/\d+)$/,m=>'WORM '+m[1]],
+ [/^COMBO x(\d+)$/,m=>'COMBO x'+m[1]],
+ [/^MEILLEUR SCORE (.*)$/,m=>'BEST SCORE '+m[1]],
+ [/^PERLES (.*)$/,m=>'PEARLS '+m[1]],
+ [/^OR (.*)$/,m=>'GOLD '+m[1]],
+ [/^ÂMES ROUGES (.*)$/,m=>'RED SOULS '+m[1]],
+ [/^\+(\d+) OR$/,m=>'+'+m[1]+' GOLD'],
+ [/^VERS : (.*)$/,m=>'WORMS: '+m[1]],
+ [/^Donner (\d+) (.+)$/,m=>'Give '+m[1]+' '+({'perles':'pearls','or':'gold','âmes rouges':'red souls'}[m[2]]||m[2])],
+ [/^Le trident traverse plusieurs ennemis d'un seul lancer\. Toutes ses améliorations coûtent de l'or\. Les tridents multiples se débloquent en tuant (\d+) vers de la plage \((\d+)\/(\d+)\)\.$/,m=>'The trident pierces several enemies in a single throw. All its upgrades cost gold. Multiple tridents unlock by killing '+m[1]+' beach worms ('+m[2]+'/'+m[3]+').'],
+ [/^(.+) : (terminée|(\d+) sur (\d+))$/,m=>trStr(m[1])+': '+(m[2]==='terminée'?'completed':m[3]+' of '+m[4])]
+];
+const enCache=new Map();
+function trStr(s){
+  if(lang!=='en'||typeof s!=='string'||s==='')return s;
+  let r=enCache.get(s);if(r!==undefined)return r;
+  const k=s.trim(),pre=s.slice(0,s.indexOf(k)),post=s.slice(s.indexOf(k)+k.length);
+  let o=null;
+  if(Object.prototype.hasOwnProperty.call(EN,k))o=EN[k];
+  if(o===null)for(const [re,fn] of EN_RULES){const m=k.match(re);if(m){o=fn(m);break;}}
+  if(o===null&&k.includes(' > '))o=k.split(' > ').map(trStr).join(' > ');
+  if(o===null&&k.includes(' : ')){const ps=k.split(' : ').map(trStr);if(ps.join(' : ')!==k)o=ps.join(': ');}
+  if(o===null){   // unités chiffrées (valeurs des améliorations)
+    let t=k.replace(/(\d),(\d)/g,'$1.$2').replace(/ cases\b/g,' tiles').replace(/ tirs\/s\b/g,' shots/s').replace(/ dégâts?\b/g,' damage').replace(/ cibles\b/g,' targets').replace(/ PV\b/g,' HP').replace(/ autour de toi\b/g,' around you');
+    o=t!==k?t:k;
+  }
+  r=pre+o+post;enCache.set(s,r);return r;
+}
 
 /* ================= Constantes ================= */
 const VW=384, VH=216, T=16, STEP=1/60;
@@ -2567,12 +2673,14 @@ function drawFx(){
   ctx.font="8px 'Press Start 2P', monospace";ctx.textBaseline='top';ctx.textAlign='center';
   for(const t of texts){
     const x=Math.round(t.x),y=Math.round(t.y);
-    ctx.fillStyle='#14182c';ctx.fillText(t.s,x+1,y+1);
-    ctx.fillStyle=t.col;ctx.fillText(t.s,x,y);
+    const ts=trStr(t.s);
+    ctx.fillStyle='#14182c';ctx.fillText(ts,x+1,y+1);
+    ctx.fillStyle=t.col;ctx.fillText(ts,x,y);
   }
 }
 function txt(s,x,y,col,align){
   ctx.textAlign=align||'left';ctx.textBaseline='top';
+  s=trStr(s);
   ctx.fillStyle='#14182c';ctx.fillText(s,x+1,y+1);
   ctx.fillStyle=col;ctx.fillText(s,x,y);
 }
@@ -2661,7 +2769,7 @@ function render(){
   const kd=(inp.right?1:0)-(inp.left?1:0),mx=(joyEl.offsetWidth||0)*0.31;
   const jx=joy.active?joy.tx:kd*mx,jy=joy.active?joy.ty:0;
   joyThumb.style.transform='translate('+Math.round(jx)+'px,'+Math.round(jy)+'px)';
-  $('merch-btn').hidden=!(nearMerch&&state==='play'&&!overlayVisible&&!shopOpen&&!paused&&!devOpen&&!misOpen&&!setOpen&&!modeOpen);
+  $('merch-btn').hidden=!(nearMerch&&state==='play'&&!overlayVisible&&!shopOpen&&!paused&&!devOpen&&!misOpen&&!setOpen&&!modeOpen&&!accOpen);
   joyEl.classList.toggle('on',joy.active||kd!==0);
   look2Thumb.style.transform='translate('+Math.round(look.tx)+'px,'+Math.round(look.ty)+'px)';
   look2El.classList.toggle('on',look.active);
@@ -2912,6 +3020,7 @@ addEventListener('keydown',e=>{
   if(misOpen){if(e.code==='Escape'){e.preventDefault();closeMis();}return;}
   if(setOpen){if(e.code==='Escape'){e.preventDefault();closeSet();}return;}
   if(modeOpen){if(e.code==='Escape'){e.preventDefault();closeMode();}return;}
+  if(accOpen){if(e.code==='Escape'){e.preventDefault();closeAcc();}return;}
   if(devOpen){if(e.code==='Escape'){e.preventDefault();closeDev();}return;}
   if(shopOpen){if(e.code==='Escape'){e.preventDefault();closeShop();}return;}
   if(overlayVisible&&(e.code==='Enter'||e.code==='NumpadEnter'||(state==='over'&&e.code==='KeyR'))){e.preventDefault();if(paused)resumeGame();else startGame();return;}
@@ -2921,7 +3030,7 @@ addEventListener('keydown',e=>{
   const k=KEYMAP[e.code];
   if(k){e.preventDefault();if(e.repeat)return;ensureAudio();press(k);}
 });
-addEventListener('keyup',e=>{if(shopOpen||devOpen||misOpen||setOpen||modeOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
+addEventListener('keyup',e=>{if(shopOpen||devOpen||misOpen||setOpen||modeOpen||accOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
 addEventListener('blur',clearInputs);
 addEventListener('beforeunload',()=>{if(score>best){best=score;saveBest();}});
 ovBtn.addEventListener('click',()=>{if(paused)resumeGame();else startGame();});
@@ -2938,7 +3047,7 @@ $('mute').addEventListener('click',toggleMute);
 $('set-sound').addEventListener('click',toggleMute);
 /* ---- Missions et réglages (menus ouverts depuis l'écran titre, la pause et l'écran de mort) ---- */
 const misEl=$('mis'),setEl=$('set');
-let misOpen=false,setOpen=false,modeOpen=false;
+let misOpen=false,setOpen=false,modeOpen=false,accOpen=false;
 function missionList(){
   const bs=shop.bossSouls||{},tupSum=T_KEYS.reduce((n,k)=>n+shop.tup[k],0);
   return [
@@ -3336,6 +3445,127 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+/* ---- Connexion Google (Google Identity Services) ---- */
+const GOOGLE_KEY='canne-dauphins-google';
+const GOOGLE_CLIENT_ID=((document.querySelector('meta[name="google-client-id"]')||{}).content||window.GOOGLE_CLIENT_ID||'').trim();
+let gUser=null,gReady=false,gLoading=false;
+try{const sv=JSON.parse(localStorage.getItem(GOOGLE_KEY)||'null');if(sv&&sv.sub)gUser=sv;}catch(e){}
+const accEl=$('acc'),accBtn=$('acc-btn'),accBody=$('acc-body'),accNote=$('acc-note');
+const ICON_USER='<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#4285f4"/><circle cx="12" cy="9" r="4.2" fill="#fff"/><path d="M3.5 22c0-5 3.8-8 8.5-8s8.5 3 8.5 8z" fill="#fff"/></svg>';
+function gDecode(tok){
+  try{const b=tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(b+'='.repeat((4-b.length%4)%4)))));}catch(e){return null;}
+}
+function gUpdateBtn(){
+  accBtn.textContent='';
+  if(gUser&&gUser.picture){const im=document.createElement('img');im.src=gUser.picture;im.alt='';im.referrerPolicy='no-referrer';accBtn.appendChild(im);}
+  else accBtn.innerHTML=ICON_USER;
+}
+function gOnCredential(resp){
+  const d=resp&&resp.credential?gDecode(resp.credential):null;
+  if(!d||!d.sub)return;
+  gUser={sub:d.sub,name:d.name||d.email||'',email:d.email||'',picture:d.picture||''};
+  try{localStorage.setItem(GOOGLE_KEY,JSON.stringify(gUser));}catch(e){}
+  gUpdateBtn();gRenderAcc();
+}
+function gSignOut(){
+  gUser=null;try{localStorage.removeItem(GOOGLE_KEY);}catch(e){}
+  try{window.google&&google.accounts.id.disableAutoSelect();}catch(e){}
+  gUpdateBtn();gRenderAcc();
+}
+function gLoadScript(cb){
+  if(gReady){cb(true);return;}
+  if(gLoading)return;
+  gLoading=true;
+  const sc=document.createElement('script');sc.src='https://accounts.google.com/gsi/client';sc.async=true;sc.defer=true;
+  sc.onload=()=>{
+    try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:gOnCredential,auto_select:false,cancel_on_tap_outside:true});gReady=true;gLoading=false;cb(true);}
+    catch(e){gLoading=false;cb(false);}
+  };
+  sc.onerror=()=>{gLoading=false;cb(false);};
+  document.head.appendChild(sc);
+}
+function gRenderAcc(){
+  accBody.textContent='';accNote.textContent='';
+  if(gUser){
+    const row=document.createElement('div');row.className='acc-row';
+    if(gUser.picture){const im=document.createElement('img');im.src=gUser.picture;im.alt='';im.referrerPolicy='no-referrer';row.appendChild(im);}
+    const tx=document.createElement('div');tx.textContent=gUser.name;const sm=document.createElement('small');sm.textContent=gUser.email;tx.appendChild(sm);row.appendChild(tx);
+    accBody.appendChild(row);
+    accNote.textContent='Connecté avec Google.';
+    const b=document.createElement('button');b.type='button';b.className='sbtn';b.textContent='SE DÉCONNECTER';b.addEventListener('click',gSignOut);
+    accBody.appendChild(b);
+    return;
+  }
+  if(!GOOGLE_CLIENT_ID){accNote.textContent="Connexion Google non configurée : renseigne l'identifiant client Google du jeu (balise google-client-id).";return;}
+  accNote.textContent='Connecte-toi avec ton compte Google.';
+  const holder=document.createElement('div');holder.id='g-btn';accBody.appendChild(holder);
+  gLoadScript(ok=>{
+    if(!ok){accNote.textContent='Connexion Google indisponible (hors ligne ou origine non autorisée).';return;}
+    if(!accOpen||gUser)return;
+    try{google.accounts.id.renderButton(holder,{theme:'filled_blue',size:'large',shape:'pill',text:'signin_with',locale:lang,width:Math.min(280,Math.max(180,accBody.clientWidth||240))});}catch(e){accNote.textContent='Connexion Google indisponible (hors ligne ou origine non autorisée).';}
+  });
+}
+function openAcc(){clearInputs();accOpen=true;accEl.hidden=false;gRenderAcc();try{$('acc-close').focus({preventScroll:true});}catch(e){}}
+function closeAcc(){accOpen=false;accEl.hidden=true;try{accBtn.focus({preventScroll:true});}catch(e){}}
+accBtn.addEventListener('click',openAcc);$('acc-close').addEventListener('click',closeAcc);
+accEl.addEventListener('pointerdown',e=>{if(e.target===accEl)closeAcc();});
+gUpdateBtn();
+
+/* ---- Langue : traduction du DOM + drapeau du pays vers lequel on bascule ---- */
+const frStore=new WeakMap(),frAttrStore=new WeakMap();
+function trTextNode(n){
+  const v=n.nodeValue;let st=frStore.get(n);
+  if(!st||v!==st.cur){st={fr:v,cur:v};frStore.set(n,st);}
+  const target=lang==='en'?trStr(st.fr):st.fr;
+  if(target!==v)n.nodeValue=target;
+  st.cur=target;
+}
+function trAttrs(el){
+  let m=frAttrStore.get(el);if(!m){m={};frAttrStore.set(el,m);}
+  for(const a of['aria-label','title']){
+    if(!el.hasAttribute(a))continue;
+    const v=el.getAttribute(a);let st=m[a];
+    if(!st||v!==st.cur){st={fr:v,cur:v};m[a]=st;}
+    const target=lang==='en'?trStr(st.fr):st.fr;
+    if(target!==v)el.setAttribute(a,target);
+    st.cur=target;
+  }
+}
+function trWalk(n){
+  if(n.nodeType===3){if(n.nodeValue.trim())trTextNode(n);return;}
+  if(n.nodeType!==1||n.tagName==='SCRIPT'||n.tagName==='STYLE')return;
+  trAttrs(n);
+  for(const c of n.childNodes)trWalk(c);
+}
+const FLAG_UK='<svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="60" height="40" fill="#012169"/><path d="M0 0L60 40M60 0L0 40" stroke="#fff" stroke-width="8"/><path d="M0 0L60 40M60 0L0 40" stroke="#c8102e" stroke-width="3"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="13"/><path d="M30 0V40M0 20H60" stroke="#c8102e" stroke-width="8"/></svg>';
+const FLAG_FR='<svg viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="20" height="40" fill="#0055a4"/><rect x="20" width="20" height="40" fill="#fff"/><rect x="40" width="20" height="40" fill="#ef4135"/></svg>';
+const langBtn=$('lang-btn');
+function updateLangBtn(){   // le bouton montre le drapeau de la langue vers laquelle on bascule
+  langBtn.innerHTML=lang==='fr'?FLAG_UK:FLAG_FR;
+  const l=lang==='fr'?'Passer en anglais':'Passer en français';
+  langBtn.setAttribute('aria-label',l);langBtn.setAttribute('title',l);
+}
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.title='Pechadophin';
+  updateLangBtn();
+  trWalk(document.body);
+}
+new MutationObserver(ms=>{
+  for(const m of ms){
+    if(m.type==='childList')for(const n of m.addedNodes)trWalk(n);
+    else if(m.type==='characterData')trTextNode(m.target);
+    else if(m.type==='attributes')trAttrs(m.target);
+  }
+}).observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['aria-label','title']});
+langBtn.addEventListener('click',()=>{
+  lang=lang==='fr'?'en':'fr';
+  try{localStorage.setItem(LANG_KEY,lang);}catch(e){}
+  applyLang();
+  if(accOpen&&!gUser)gRenderAcc();
+});
+applyLang();
 })();
 </script>
 </body>
