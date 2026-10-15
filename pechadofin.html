@@ -307,6 +307,20 @@ body{
   .pad{height:48px}
   #controls{padding:4px 12px 8px}
 }
+/* ---- menus plus doux ---- */
+.shop-panel{border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);animation:mpop .2s ease-out}
+#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap{animation:mfade .2s ease-out;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.card,.wsq,.dev-row,.mis-row,.acc-row{border-radius:10px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.card:hover,.wsq:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.18)}
+.card canvas,.wsq canvas,#weap-big canvas{border-radius:8px}
+.sbtn,.go,.tab{border-radius:8px;transition:filter .15s ease,transform .1s ease,background-color .15s ease}
+.sbtn:hover:not(:disabled),.tab:hover{filter:brightness(1.07)}
+.sbtn:active:not(:disabled),.go:active,.tab:active{transform:translateY(1px)}
+.pip{border-radius:3px;transition:background-color .2s ease}
+.mis-bar{border-radius:4px;overflow:hidden}.mis-bar i{transition:width .3s ease}
+@keyframes mpop{from{transform:translateY(6px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.shop-panel,#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap{animation:none}.card,.wsq,.sbtn,.go,.tab{transition:none}}
 </style>
 </head>
 <body>
@@ -357,9 +371,9 @@ body{
     </div>
     <div class="tabs" role="tablist" aria-label="Rayons de la boutique">
       <button class="tab" id="tab-skins" role="tab" aria-selected="true" type="button">SKINS</button>
-      <button class="tab" id="tab-rod" role="tab" aria-selected="false" type="button">CANNE</button>
-      <button class="tab" id="tab-souls" role="tab" aria-selected="false" type="button">ARMES</button>
-      <button class="tab" id="tab-trident" role="tab" aria-selected="false" type="button">TRIDENT</button>
+      <button class="tab" id="tab-rod" hidden role="tab" aria-selected="false" type="button">CANNE</button>
+      <button class="tab" id="tab-souls" role="tab" aria-selected="false" type="button">ÂMES</button>
+      <button class="tab" id="tab-trident" hidden role="tab" aria-selected="false" type="button">TRIDENT</button>
     </div>
     <p class="shop-note" id="shop-note"></p>
     <div id="shop-list"></div>
@@ -496,7 +510,7 @@ const EN={
 'Une perle se cache tous les 7 écrans : sur une plateforme, au-dessus d\'un trou ou près du sol. Elles se gardent d\'une partie à l\'autre.':'A pearl is hidden every 7 screens: on a platform, above a pit or near the ground. You keep them from one game to the next.',
 'La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.':'The rod is unavailable since you reached the beach: its levels are kept, but the trident takes over.',
 'Chaque dauphin battu rapporte de l\'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s\'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.':'Each dolphin defeated gives gold (2 for a blue one, 4 for a red shooter, 5 for a pink one, more if it is tough). 5 levels per upgrade. The damage area is invisible: full damage at the center, -50% at the edge.',
-'Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu\'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s\'achète plus : il se débloque en atteignant la plage.':'Each boss (shark demon, giant octopus, jellyfish) gives red souls only the first time it is defeated. They strengthen your fisherman. The trident can no longer be bought: it unlocks when you reach the beach.',
+'Améliore tes points de vie avec les âmes rouges. Les armes et leurs améliorations sont dans le menu ARMES. Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu\'il est vaincu. Elles renforcent ton pêcheur.':'Upgrade your hit points with red souls. Weapons and their upgrades are in the WEAPONS menu. Each boss (shark demon, giant octopus, jellyfish) gives red souls only the first time it is defeated. They strengthen your fisherman.',
 'Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l\'or.':'The infernal trident unlocks when you reach the beach. Its upgrades cost gold.',
 'Le marchand améliore ton arme équipée contre de l\'or. Ton score n\'est pas touché et le jeu est en pause.':'The merchant upgrades your equipped weapon for gold. Your score is untouched and the game is paused.',
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
@@ -506,7 +520,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'terminée':'completed','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
@@ -3652,7 +3666,7 @@ function renderShop(){
   $('shop-gold').textContent=shop.gold;
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
-  const notes={skins:"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.",dagger:"Les dagues attaquent en dash : chaque amélioration coûte de l'or. La hauteur de saut va jusqu'à x2. La parade annule parfois un coup au corps à corps juste après un dash.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s'achète plus : il se débloque en atteignant la plage.",
+  const notes={skins:"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.",dagger:"Les dagues attaquent en dash : chaque amélioration coûte de l'or. La hauteur de saut va jusqu'à x2. La parade annule parfois un coup au corps à corps juste après un dash.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Améliore tes points de vie avec les âmes rouges. Les armes et leurs améliorations sont dans le menu ARMES. Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur.",
     trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or.":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=shopMerchant?"Le marchand améliore ton arme équipée contre de l'or. Ton score n'est pas touché et le jeu est en pause.":notes[shopTab];
   if(shopTab==='dagger')renderDagger();else if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
@@ -3709,38 +3723,6 @@ function renderSouls(){
   b.setAttribute('aria-label',u.name+' : '+b.textContent);
   card.appendChild(b);
   shopList.appendChild(card);
-  // armes
-  const mkCard=(name,desc,icon,eq)=>{
-    const c=document.createElement('div');c.className='card'+(eq?' eq':'');
-    const i=document.createElement('canvas');i.className='ic';i.width=12;i.height=12;drawIcon(i,icon,true);i.setAttribute('aria-hidden','true');c.appendChild(i);
-    const n=document.createElement('div');n.className='nm';n.textContent=name;c.appendChild(n);
-    const d=document.createElement('div');d.className='val';d.textContent=desc;c.appendChild(d);
-    return c;
-  };
-  const mkBtn=(label,disabled,fn,cls)=>{
-    const x=document.createElement('button');x.className='sbtn'+(cls?' '+cls:'');x.type='button';x.textContent=label;x.disabled=!!disabled;
-    if(fn&&!disabled)x.addEventListener('click',fn);
-    return x;
-  };
-  const triEq=shop.weapon==='trident';
-  const tc=mkCard('Trident infernal','Perce les ennemis',ICONS.trident,triEq);
-  const tp=document.createElement('div');tp.className='pr';
-  if(shop.tridentOwned)tp.textContent='POSSÉDÉ';
-  else tp.textContent='DÉBLOQUÉ À LA PLAGE';
-  tc.appendChild(tp);
-  let tb;
-  if(!shop.tridentOwned)tb=mkBtn('VERROUILLÉ',true);
-  else if(triEq)tb=mkBtn('ÉQUIPÉ',true);
-  else tb=mkBtn('ÉQUIPER',false,()=>{shop.weapon='trident';saveShop();renderShop();},'equip');
-  tb.setAttribute('aria-label','Trident infernal : '+tb.textContent);
-  tc.appendChild(tb);shopList.appendChild(tc);
-  if(shop.tridentOwned){
-    const rc=mkCard('Canne à pêche',rodLocked()?'Remplacée par le trident':'Arme de départ',ICONS.range,!triEq&&!rodLocked());
-    const rp=document.createElement('div');rp.className='pr';rp.textContent=rodLocked()?'NIVEAUX CONSERVÉS':'OFFERTE';rc.appendChild(rp);
-    const rb=rodLocked()?mkBtn('INDISPONIBLE',true):!triEq?mkBtn('ÉQUIPÉE',true):mkBtn('ÉQUIPER',false,()=>{shop.weapon='rod';saveShop();renderShop();},'equip');
-    rb.setAttribute('aria-label','Canne à pêche : '+rb.textContent);
-    rc.appendChild(rb);shopList.appendChild(rc);
-  }
 }
 function renderTrident(){
   shopList.textContent='';
@@ -3864,6 +3846,7 @@ function openShop(tab){
   shopMerchant=tab==='merchant';
   if(shopMerchant)shopTab=shop.weapon==='trident'?'trident':shop.weapon==='dagger'?'dagger':'rod';   // le marchand ne vend que les améliorations de l'arme équipée
   else if(typeof tab==='string')shopTab=tab;
+  if(!shopMerchant&&(shopTab==='rod'||shopTab==='trident'||shopTab==='dagger'))shopTab='skins';   // les armes se gèrent dans le menu ARMES
   ensureAudio();
   clearInputs();
   shopOpen=true;shopEl.hidden=false;renderShop();
