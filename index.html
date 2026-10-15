@@ -96,6 +96,24 @@ body{
   border:calc(var(--p)*2) solid #14182c;border-radius:calc(var(--p)*5);box-shadow:0 calc(var(--p)*3) 0 #14182c;
 }
 .ov-big.skins{background:linear-gradient(#b068ff,#6a2fc8)}
+.ov-big.weap{background:linear-gradient(#ff9a4a,#c8501f)}
+.ov-left{display:flex;flex-direction:column;gap:calc(var(--p)*4)}
+.ov-left .ov-big{height:calc(var(--p)*22)}
+#weap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;padding:3px}
+.wsq{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 4px;border:2px solid var(--btn-line);background:var(--btn);cursor:pointer;font:400 7px/1.4 var(--pf);color:inherit}
+.wsq canvas{width:48px;height:48px;image-rendering:pixelated;background:linear-gradient(#8fcdf4,#cfeafb);border:2px solid var(--btn-line)}
+.wsq.eq{border-color:var(--on);box-shadow:0 0 0 2px var(--on)}
+.wsq.sel{outline:3px solid #ff9a4a;outline-offset:1px}
+.wsq.lock canvas{filter:brightness(0) opacity(.45)}
+#weap-detail{display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--btn-line);padding-top:8px;min-height:0;flex:1 1 auto;overflow-y:auto;touch-action:pan-y}
+#weap-grid{flex:none}
+#weap-detail[hidden]{display:none}
+.weap-head{display:flex;gap:10px;align-items:center}
+#weap-big canvas{width:96px;height:96px;image-rendering:pixelated;background:linear-gradient(#8fcdf4,#cfeafb);border:2px solid var(--btn-line)}
+#weap-name{font:400 10px/1.4 var(--pf);margin:0}
+#weap-desc{font:400 7px/1.8 var(--pf);margin:0;opacity:.85}
+#weap-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px;padding:3px}
+
 #merch-btn{position:absolute;left:50%;bottom:calc(var(--u)*8px);transform:translateX(-50%);z-index:3;width:auto;height:auto;padding:calc(var(--u)*5px) calc(var(--u)*10px);font-size:max(7px,calc(var(--u)*7px))}
 #merch-btn[hidden]{display:none}
 #shop.merchant .tabs{display:none}
@@ -155,13 +173,13 @@ body{
 .go.alt{background:var(--on);color:var(--on-ink)}
 
 .go.sm{font-size:max(7px,calc(var(--u)*5px));padding:calc(var(--u)*4px) calc(var(--u)*8px);opacity:.85}
-#shop,#dev,#rst,#mis,#set,#mode,#acc{
+#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap{
   position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
   background:rgba(4,12,20,.74);font-family:var(--pf);
   padding:max(10px,env(safe-area-inset-top,0px)) 10px max(10px,env(safe-area-inset-bottom,0px));
 }
-#shop[hidden],#dev[hidden],#rst[hidden],#mis[hidden],#set[hidden],#mode[hidden],#acc[hidden]{display:none}
-#rst,#mis,#set,#mode,#acc{z-index:30}
+#shop[hidden],#dev[hidden],#rst[hidden],#mis[hidden],#set[hidden],#mode[hidden],#acc[hidden],#weap[hidden]{display:none}
+#rst,#mis,#set,#mode,#acc,#weap{z-index:30}
 #rst{z-index:31}
 #rst .row{justify-content:center;gap:12px}
 .shop-panel{
@@ -312,11 +330,11 @@ body{
       <div class="ov-center">
         <button id="ov-btn" type="button"><canvas id="ov-char" width="16" height="16" aria-hidden="true"></canvas><span id="ov-label">APPUIE POUR JOUER</span></button>
         <div id="ov-stats" hidden>
-          <div id="st-score"></div><div id="st-best"></div><div id="st-pearls"></div><div id="st-gold"></div><div id="st-souls"></div><div id="st-rec"></div>
+          <div id="st-score"></div><div id="st-best"></div><div id="st-gold"></div><div id="st-souls"></div><div id="st-rec"></div>
         </div>
       </div>
       <div class="ov-bot">
-        <button class="ov-big skins" id="skins-btn" type="button">MODE</button>
+        <div class="ov-left"><button class="ov-big weap" id="weap-btn" type="button">ARMES</button><button class="ov-big skins" id="skins-btn" type="button">MODE</button></div>
         <div class="ov-mid">
           <p id="ov-cp" hidden>★ CHECKPOINT : LA PLAGE ★</p>
           <button class="go alt" id="ov-restart" type="button" hidden>RECOMMENCER</button>
@@ -333,7 +351,6 @@ body{
     <div class="shop-head">
       <h2 id="shop-title">BOUTIQUE</h2>
       <div class="bals">
-        <div class="bal" title="Perles"><canvas id="pearl-ic" width="7" height="6" aria-hidden="true"></canvas><span id="shop-bal">0</span></div>
         <div class="bal" title="Or"><canvas id="gold-ic" width="7" height="6" aria-hidden="true"></canvas><span id="shop-gold">0</span></div>
         <div class="bal" title="Âmes rouges"><canvas id="soul-ic" width="9" height="10" aria-hidden="true"></canvas><span id="shop-souls">0</span></div>
       </div>
@@ -355,6 +372,18 @@ body{
     <div class="shop-head"><h2 id="mis-title">MISSIONS</h2></div>
     <div id="mis-list"></div>
     <button class="go" id="mis-close" type="button">RETOUR</button>
+  </div>
+</div>
+
+<div id="weap" hidden role="dialog" aria-modal="true" aria-labelledby="weap-title">
+  <div class="shop-panel">
+    <div class="shop-head"><h2 id="weap-title">ARMES</h2><div class="bals"><div class="bal" title="Or"><canvas id="weap-gold-ic" width="7" height="6" aria-hidden="true"></canvas><span id="weap-gold">0</span></div></div></div>
+    <div id="weap-grid"></div>
+    <div id="weap-detail" hidden>
+      <div class="weap-head"><div id="weap-big"></div><div><p id="weap-name"></p><p id="weap-desc"></p><button class="sbtn equip" id="weap-eq" type="button">ÉQUIPER</button></div></div>
+      <div id="weap-list"></div>
+    </div>
+    <button class="go" id="weap-close" type="button">RETOUR</button>
   </div>
 </div>
 
@@ -475,9 +504,14 @@ const EN={
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
 'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON',
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
-'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : perles, or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: pearls, gold, red souls, upgrades, skins, best score and the beach checkpoint.',
+'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
+'terminée':'completed','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
+'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
+'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
+"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.":'Skins are bought with gold. Open the chests you find along the way to earn some.',
+'DAGUES OBTENUES !':'DAGGERS OBTAINED!','ÉQUIPE-LES DANS ARMES':'EQUIP THEM IN WEAPONS','LA VACHE GÉANTE !':'THE GIANT COW!','ENRAGÉE !':'ENRAGED!','VACHE GÉANTE':'GIANT COW','Vaincre la vache géante':'Defeat the giant cow','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
@@ -558,9 +592,11 @@ const ZONE_W=ARENA_EVERY*(VW/T);                       // largeur d'une zone en 
 const zoneK=tx=>{const a=Math.abs(tx);return a<BEACH_TX?0:Math.floor((a-BEACH_TX)/ZONE_W)+1;};
 /* Pool de zones (anarchie) : la partie commence dans la 1re (plaines), puis chaque boss d'arène change de zone, tirée au hasard dans tout le pool.
    Pour ajouter une zone : ajouter une entrée ici (beach = style sable ; boss = boss d'arène de cette zone : 'octo' ou 'castle'). */
-const ZONES=[{id:'plain',beach:false,boss:'octo'},{id:'beach',beach:true,boss:'castle'}];
+const ZONES=[{id:'plain',beach:false,boss:'octo'},{id:'beach',beach:true,boss:'castle'},{id:'swamp',beach:false,swamp:true,boss:'octo'}];
+const SWAMP_TX=BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)+13;   // classique : les marécages commencent à la sortie de l'arène du château de sable
 const zoneDefK=k=>k<=0?ZONES[0]:ZONES[Math.min(ZONES.length-1,Math.floor(hash2(k,401)*ZONES.length))];
-const inBeach=tx=>Math.abs(tx)>=BEACH_TX&&(!anarchyOn||zoneDefK(zoneK(tx)).beach);
+const inBeach=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?zoneDefK(zoneK(tx)).beach:Math.abs(tx)<SWAMP_TX);
+const inSwamp=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?!!zoneDefK(zoneK(tx)).swamp:Math.abs(tx)>=SWAMP_TX);
 const TCELL=56, TFLAT=8;                              // un tunnel possible par cellule de 56 cases, 8 cases de raccord avec le relief
 const plat=new Set();      // plateformes traversables par le dessous
 const chunks=new Set();
@@ -658,7 +694,7 @@ function column(tx){
   const ar=arenaAt(tx);
   if(ar){
     const dx=tx-ar.cx,w=clamp(1-(Math.abs(dx)-19)/20,0,1);
-    c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12),beach:inBeach(tx)};
+    c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12),beach:inBeach(tx),swamp:inSwamp(tx)};
     colCache.set(tx,c);return c;
   }
   const p=pitInfo(Math.floor(tx/22));
@@ -669,7 +705,7 @@ function column(tx){
   else if(p&&tx>=p.s+p.w&&tx<=p.s+p.w+1) g=p.hr;
   else if(beach){const bg=beachGround(tx);g=bg.g;tun=bg.tun;}
   else g=Math.round(spawnBlend(tx));
-  c={g,pit,beach,tun}; colCache.set(tx,c); return c;
+  c={g,pit,beach,tun,swamp:inSwamp(tx)}; colCache.set(tx,c); return c;
 }
 function solidTile(tx,ty){
   const c=column(tx);
@@ -756,34 +792,14 @@ function genChunk(cx){
       }
     }
   }
-  // perle : une tous les 7 écrans (7 x 384 px = 168 cases), dans les deux sens depuis le départ
-  const PEARL_TILES=7*VW/T;
-  for(let k=Math.ceil(x0/PEARL_TILES);k*PEARL_TILES<x0+16;k++){
-    if(k===0)continue;
-    const st=k*PEARL_TILES,kind=rng();
-    let pxp,pyp;
-    if(kind<0.4){
-      const cand=myPlats.filter(pl=>Math.abs(pl.tx+pl.w/2-st)<=12);
-      if(cand.length){
-        const pl=cand[Math.floor(rng()*cand.length)],tx=pl.tx+Math.floor(rng()*pl.w);
-        if(plat.has(tx*512+pl.row+200)){pxp=tx*T+T/2;pyp=pl.row*T-16;}
-      }
+  // coffres : marron au hasard un peu partout, rouge uniquement dans les marécages (il contient les dagues)
+  if(Math.abs(x0)>20){
+    const sg=x0+8<0?-1:1,red=inSwamp(x0+8)&&(rng()<0.06||(!anarchyOn&&x0<=sg*(SWAMP_TX+30)&&sg*(SWAMP_TX+30)<x0+16));
+    if(red||rng()<0.16){
+      let tx=x0+2+Math.floor(rng()*12),k=0;
+      while(k<12&&(column(tx).pit||column(tx).tun||column(tx).ar||column(tx+1).pit||column(tx+1).g!==column(tx).g)){tx++;k++;}
+      if(k<12)worldPearls.push({kind:red?'red':'chest',x:tx*T+1,y:column(tx).g*T-11,w:14,h:11,ph:rng()*6});
     }
-    if(pxp===undefined&&kind<0.65){
-      for(let d=0;d<=10&&pxp===undefined;d++)for(const sg of[1,-1]){
-        const tx=st+sg*d;
-        if(column(tx).pit){
-          let l=tx,r=tx;while(column(l-1).pit)l--;while(column(r+1).pit)r++;
-          const mid=Math.floor((l+r)/2);
-          pxp=mid*T+T/2;pyp=column(mid).g*T-44;break;
-        }
-      }
-    }
-    if(pxp===undefined){
-      let tx=st;while(column(tx).pit||column(tx).tun)tx++;
-      pxp=tx*T+T/2;pyp=column(tx).g*T-(rng()<0.5?16:36);
-    }
-    worldPearls.push({x:pxp-7,y:pyp,w:14,h:12,ph:rng()*6});
   }
 }
 function ensureChunks(){
@@ -1010,6 +1026,7 @@ function rngCollab(credential) {
 }
 SKINS.push(RNG_SKIN);
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
+for(const sk of SKINS)sk.price*=50;   // les skins s'achètent en or (le moins cher : 100 or)
 for(const sk of SKINS){
   sk.spr={};
   const pal=Object.assign({},PAL_P,sk.pal);
@@ -1036,6 +1053,11 @@ const HEART_OFF=spr(HEART_ROWS,{r:'#3c4a63',p:'#52617d'},true);
 const LURE=spr(["o...oo..","oo.oooo.","ooooooeo","oo.oooo.","o...oo.."],{o:'#ff9a3c',e:'#14182c'},true);
 
 const PEARL=spr([".PPp.","Ppppp","pppdd",".ddd."],{p:'#e6dcff',P:'#ffffff',d:'#a89ad6'},true);
+const CHEST_ROWS=["..kkkkkkkkkk..",".kbbbbbbbbbbk.","kbBBBBBBBBBBbk","kbBBBBBBBBBBbk","kkkkkkyykkkkkk","kbbbbbyybbbbbk","kbBBBByyBBBBbk","kbBBBBBBBBBBbk","kbBBBBBBBBBBbk","kbbbbbbbbbbbbk","kkkkkkkkkkkkkk"];
+const CHEST=spr(CHEST_ROWS,{k:'#2a1608',b:'#a0662e',B:'#7a4a1e',y:'#ffd23f'},false);
+const CHEST_R=spr(CHEST_ROWS,{k:'#2a0808',b:'#e0453a',B:'#a82020',y:'#ffd23f'},false);
+const ROD_ICON=spr(["..........ww","........ww.w","......ww...w",".....w.....w","....w......w","...w.......y","..w.......yy",".bw.......y.","bb.........."],{w:'#c98a4b',b:'#6b3f1c',y:'#dfe6f5'},true);
+const DAGGER_ICON=spr(["........w",".......ww","......ww.","..y..ww..","...yww...","...bb....","..b.y....",".b.......","b........"],{w:'#dfe6f5',y:'#ffd23f',b:'#6b3f1c'},true);
 const GOLD=spr([".hyy.","hyyyY","yyyYY",".YYY."],{y:'#ffd23f',Y:'#c98a10',h:'#fff3b0'},true);
 const ICONS={
  range:spr(["..x...x..",".xx...xx.","xxxxxxxxx",".xx...xx.","..x...x.."],{x:'#4bd0d8'},true),
@@ -1244,6 +1266,9 @@ function makeGrass(dec,v){
   return c;
 }
 const GRASS=[];for(let d=0;d<6;d++){GRASS.push([0,1,2].map(v=>makeGrass(d,v)));}
+function darkenImg(img,col){const c=mk(img.width,img.height),g=c.getContext('2d');g.drawImage(img,0,0);g.globalCompositeOperation='multiply';g.fillStyle=col;g.fillRect(0,0,c.width,c.height);g.globalCompositeOperation='destination-in';g.drawImage(img,0,0);return c;}
+const SGRASS=GRASS.map(a=>a.map(i=>darkenImg(i,'#6f8a5c'))),SDIRT=DIRT.map(a=>a.map(i=>darkenImg(i,'#7d7a62')));   // marécages : herbe et terre sombres
+const TOWER=spr(["k..kk..kk..k","kkkkkkkkkkkk","kssSssSssSsk","kssssssssssk",".kssSsssSsk.",".kssssssssk.",".ksskkksssk.",".kssk.kssSk.",".kSsk.kssmk.",".kssssssmmk.",".kssSssssmk.",".kssssSsssk.",".kmsssssssk.",".kmmsssSssk.",".kssssssssk.",".ksSssssssk.",".kssssssmmk.",".kssssssssk.",".kkkkkkkkkk."],{k:'#1e2420',s:'#7c8577',S:'#5e665a',m:'#4f7a3a'},false);   // mini tour de château en ruine
 /* ---------- Sable (zone plage) ---------- */
 function makeSand(shade,v){
   const c=mk(T,T),g=c.getContext('2d');
@@ -1361,20 +1386,23 @@ const TUP={
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={pearls:0,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={pearls:0,daggerOwned:false,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
-      d.pearls=Math.max(0,Math.floor(Number(j.pearls))||0);
       d.gold=Math.max(0,Math.floor(Number(j.gold))||0);
+      if(Number(j.pearls)>0)d.gold+=Math.floor(Number(j.pearls))*50;   // les perles n'existent plus : 1 perle = 50 or
+      d.pearls=0;
+      d.daggerOwned=j.daggerOwned===true;
       d.souls=Math.max(0,Math.floor(Number(j.souls))||0);
       d.hp=clamp(Math.floor(Number(j.hp))||0,0,5);
       d.beach=(j.beach===1||j.beach===-1)?j.beach:0;   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
-      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
+      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
-      d.weapon=(d.tridentOwned&&(j.weapon==='trident'||(d.beach!==0&&!anarchyOn)))?'trident':'rod';   // plage atteinte : la canne n'est plus utilisable
+      d.weapon=(d.tridentOwned&&(j.weapon==='trident'||(d.beach!==0&&!anarchyOn)))?'trident':'rod';
+      if(j.weapon==='dagger'&&d.daggerOwned)d.weapon='dagger';   // plage atteinte : la canne n'est plus utilisable
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
       if(Array.isArray(j.owned))for(const id of j.owned)if(SKINS.some(x=>x.id===id)&&!d.owned.includes(id))d.owned.push(id);
@@ -1547,12 +1575,12 @@ function stepPlayer(dt){
   if(jumpBuf>0)jumpBuf-=dt;
   const ax=inp.axis||0,d=ax!==0?ax:(inp.right?1:0)-(inp.left?1:0);
   if(p.stun<=0){
-    if(d!==0){const sg=d>0?1:-1,lim=MAXV*Math.abs(d)*(p.boost?2:1);p.vx+=sg*(p.onGround?1500:900)*dt;p.vx=clamp(p.vx,-lim,lim);p.face=sg;}
+    if(d!==0){const sg=d>0?1:-1,lim=MAXV*Math.abs(d)*(p.boost?2:1)*(shop.weapon==='dagger'&&!glockOn?DAG.spd:1);p.vx+=sg*(p.onGround?1500:900)*dt;p.vx=clamp(p.vx,-lim,lim);p.face=sg;}
     else{const f=(p.onGround?1400:350)*dt;p.vx=Math.abs(p.vx)<=f?0:p.vx-Math.sign(p.vx)*f;}
   }
   if(aim.active&&Math.abs(aim.x)>0.25&&p.stun<=0)p.face=aim.x>0?1:-1;   // le pêcheur regarde du côté où il vise
   if(p.onGround)p.coyote=0.1;else p.coyote-=dt;
-  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV;p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
+  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*(shop.weapon==='dagger'&&!glockOn?DAG.jump:1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
   if(!inp.jump&&p.vy<-140&&p.stun<=0&&!p.boost)p.vy=-140;
   p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
   {
@@ -1587,6 +1615,7 @@ function hookHit(h,dmg,R){
     targets.push({r:tentRect(t),hit:d=>hitOcto(t,d)});
   }
   if(castle&&castle.state==='fight')targets.push({r:bucketRect(castle),hit:d=>hitCastle(d)});
+  if(cow&&cow.state==='alive'&&cow.spawnT<=0)targets.push({r:[cow.x,cow.y,cow.w,cow.h],hit:d=>hitCow(d)});
   if(!targets.some(t=>rectsOverlap(h.x-5,h.y-5,10,10,t.r[0],t.r[1],t.r[2],t.r[3])))return false;   // le grappin touche : la zone se déclenche
   for(const t of targets){
     const dist=rectDist(h.x,h.y,t.r[0],t.r[1],t.r[2],t.r[3]);
@@ -1596,6 +1625,46 @@ function hookHit(h,dmg,R){
     t.hit(d);
   }
   return true;
+}
+/* ---------- Dagues : chaque attaque est un dash qui blesse tout sur sa trajectoire ---------- */
+const DAG={dmg:8,cd:0.42,dist:84,time:0.13,spd:1.25,jump:1.1};
+function stepDagger(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  if(castCd>0)castCd-=dt;
+  if(throwAnim>0)throwAnim-=dt;
+  if(!p.dash&&(fireBuf>0||inp.fire||aim.auto)&&castCd<=0&&p.stun<=0&&state==='play'){
+    fireBuf=0;castCd=DAG.cd;throwAnim=0.16;
+    let ux=aim.x,uy=aim.y;const l=Math.hypot(ux,uy)||1;ux/=l;uy/=l;
+    if(uy>0&&p.onGround){uy=0;ux=ux>=0?1:-1;}   // pas de dash dans le sol
+    p.dash={t:DAG.time,vx:ux*DAG.dist/DAG.time,vy:uy*DAG.dist/DAG.time,hit:new Set()};
+    if(Math.abs(ux)>0.2)p.face=ux>0?1:-1;
+    sfx.trident();
+  }
+  const d=p.dash;if(!d)return;
+  d.t-=dt;
+  moveX(p,d.vx*dt);moveY(p,d.vy*dt);p.vy=0;
+  if(Math.random()<0.9)parts.push({x:p.x+5+(Math.random()-0.5)*6,y:p.y+4+Math.random()*8,vx:-d.vx*0.05,vy:-d.vy*0.05,g:0,life:0.22,col:Math.random()<0.5?'#cfd8ff':'#ffffff',sz:2});
+  const rx=p.x-7,ry=p.y-5,rw=p.w+14,rh=p.h+10,dmg=DAG.dmg;
+  const tryHit=(key,r,fn)=>{if(d.hit.has(key))return;if(rectsOverlap(rx,ry,rw,rh,r[0],r[1],r[2],r[3])){d.hit.add(key);fn(dmg);}};
+  for(const e of enemies)if(e.state==='alive')tryHit(e,[e.x,e.y,e.w,e.h],x=>hitEnemy(e,x));
+  if(boss&&boss.state==='alive'&&boss.spawnT<=0)tryHit(boss,[boss.x,boss.y,boss.w,boss.h],x=>hitBoss(boss,x));
+  if(jelly&&jelly.state==='alive'&&jelly.spawnT<=0)tryHit(jelly,[jelly.x,jelly.y,jelly.w,jelly.h],x=>hitJelly(jelly,x));
+  if(octo&&octo.state==='fight')for(const t of tents)if(t.state!=='warn')tryHit(t,tentRect(t),x=>hitOcto(t,x));
+  if(castle&&castle.state==='fight')tryHit(castle,bucketRect(castle),x=>hitCastle(x));
+  if(cow&&cow.state==='alive'&&cow.spawnT<=0)tryHit(cow,[cow.x,cow.y,cow.w,cow.h],x=>hitCow(x));
+  if(d.t<=0)p.dash=null;
+}
+function drawDaggersHeld(hx,hy){
+  const p=player,a=p.dash?Math.atan2(p.dash.vy,p.dash.vx):(aim.active?Math.atan2(aim.y,aim.x):(p.face>0?0:Math.PI));
+  ctx.save();ctx.translate(Math.round(hx),Math.round(hy-1));ctx.rotate(a);if(Math.cos(a)<0)ctx.scale(1,-1);
+  for(const oy of[-3,2]){
+    ctx.fillStyle='#14182c';ctx.fillRect(-2,oy-1,12,3);
+    ctx.fillStyle='#6b3f1c';ctx.fillRect(-1,oy,3,1);
+    ctx.fillStyle='#ffd23f';ctx.fillRect(2,oy-1,1,3);
+    ctx.fillStyle='#dfe6f5';ctx.fillRect(3,oy,6,1);ctx.fillStyle='#ffffff';ctx.fillRect(9,oy,1,1);
+  }
+  ctx.restore();
 }
 function stepTrident(dt){
   const p=player;
@@ -1642,12 +1711,14 @@ function stepTrident(dt){
       if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(t);hitOcto(t,dmg);h.n++;if(h.n>=pierce)break;}
     }
     if(h.n<pierce&&castle&&castle.state==='fight'&&!h.hit.has(castle)){const r=bucketRect(castle);if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(castle);hitCastle(dmg);h.n++;}}
+    if(h.n<pierce&&cow&&cow.state==='alive'&&cow.spawnT<=0&&!h.hit.has(cow)&&rectsOverlap(h.x-5,h.y-5,10,10,cow.x,cow.y,cow.w,cow.h)){h.hit.add(cow);hitCow(dmg);h.n++;}
     if(h.n>=pierce){h.done=true;burst(h.x,h.y,'#ffb347',8,80);}
     if(Math.random()<0.8)parts.push({x:h.x-h.ux*6,y:h.y-h.uy*6+(Math.random()-0.5)*3,vx:-h.ux*20,vy:-h.uy*20+(Math.random()-0.5)*14,g:0,life:0.3,col:Math.random()<0.5?'#ff4a2a':'#ffb347',sz:1});
   }
   tridents=tridents.filter(h=>!h.done);
 }
 function stepHook(dt){
+  if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
   if(shop.weapon==='trident'||glockOn){stepTrident(dt);return;}
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
@@ -1816,7 +1887,7 @@ function killBoss(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnBoss(){
-  if(boss||octo||castle||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
+  if(boss||octo||castle||cow||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
   const p=player,k=Math.round(p.x/BOSS_EVERY);
   if(k===0||bossDone.has(k))return;
   const sx=k*BOSS_EVERY;
@@ -1873,7 +1944,7 @@ function maybeStartArena(){
   if(!anarchyOn)night=false;   // le poulpe met fin à la nuit rouge
   ar.state='active';ar.gateL=true;ar.gateR=true;      // les portes se referment : plus de sortie possible
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
-  boss=null;bossShots=[];tents=[];jelly=null;
+  boss=null;bossShots=[];tents=[];jelly=null;cow=null;
   const oh=anarchyOn?encHp(OCTO_HP):OCTO_HP;
   octo={ar,hp:oh,maxHp:oh,state:'intro',t:0,intro:2.2,rage:false,flash:0,nextT:1,sway:0,dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
@@ -1884,7 +1955,7 @@ function startCastle(ar,il,ir){
   if(!anarchyOn)night=false;
   ar.state='active';ar.gateL=true;ar.gateR=true;
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
-  boss=null;bossShots=[];tents=[];jelly=null;
+  boss=null;bossShots=[];tents=[];jelly=null;cow=null;
   const ch=anarchyOn?encHp(CASTLE_HP):CASTLE_HP;
   castle={ar,hp:ch,maxHp:ch,state:'intro',t:0,intro:2.2,rage:false,flash:0,waves:[],nextW:2.2,nextG:7,bx:ar.cx*T+8+64,bf:0,hitCd:0,dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
@@ -2017,6 +2088,112 @@ function stepOcto(dt){
   }
   stepTents(dt);
 }
+/* ---------- Vache géante : boss des marécages, elle roule sur le joueur ---------- */
+const COW_HP=600, COW_SCREENS=20;
+let cow=null,cowSpawned=false,cowDone=new Set();
+function maybeSpawnCow(){
+  if(cow||boss||octo||castle||jelly)return;
+  const p=player,tx=Math.floor((p.x+5)/T),side=tx<0?-1:1;
+  if(!inSwamp(tx))return;
+  let key;
+  if(anarchyOn){
+    const k=zoneK(tx),zs=BEACH_TX+(k-1)*ZONE_W;
+    if(Math.abs(tx)-zs<12*(VW/T)||cowDone.has(side*k))return;
+    key=side*k;
+  } else {
+    if(cowSpawned||Math.abs(tx)<SWAMP_TX+COW_SCREENS*(VW/T))return;
+  }
+  const w=44,h=30,bx=p.x+5+p.face*170-w/2,c=column(Math.floor((bx+w/2)/T)),ch=anarchyOn?encHp(COW_HP):COW_HP;
+  cow={x:bx,y:(c.pit?p.y+p.h:c.g*T)-h-60,w,h,vy:0,dir:p.x>bx?1:-1,hp:ch,maxHp:ch,state:'alive',spawnT:1.2,mode:'walk',mt:0,rot:0,flash:0,t:0,rage:false,sx:0};
+  cowSpawned=true;if(key!==undefined)cowDone.add(key);shake=0.6;sfx.bossSpawn();
+  floatText(p.x+5,p.y-34,'LA VACHE GÉANTE !','#ffffff');
+}
+function cowGround(b){const c=column(Math.floor((b.x+b.w/2)/T));return c.pit?null:c.g*T;}
+function hitCow(dmg){
+  const b=cow;if(!b||b.state!=='alive'||b.spawnT>0)return;
+  const removed=Math.min(dmg,b.hp);
+  b.hp-=dmg;b.flash=0.12;
+  combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;
+  score+=pts;
+  floatText(b.x+b.w/2,b.y-8,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  burst(b.x+b.w/2,b.y+b.h/2,'#ffffff',8,90);
+  if(b.hp<=0)killCow();else sfx.hit();
+}
+function killCow(){
+  const b=cow;b.hp=0;b.state='dead';b.t=0;b.vy=-160;
+  kills++;shake=0.6;sfx.bossDie();
+  const cx=b.x+b.w/2,cy=b.y+b.h/2;
+  const gs=soulReward('cow',2);shop.gold+=150;saveShop();
+  if(gs){floatText(cx,cy-22,'+2 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy,t:0});soulFx.push({x:cx+10,y:cy,t:0.15});}
+  floatText(cx,cy+2,'+150 OR','#ffd23f');
+  burst(cx,cy,'#ffffff',30,160);burst(cx,cy,'#14182c',14,120);
+  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
+}
+function stepCow(dt){
+  maybeSpawnCow();
+  const b=cow;if(!b)return;
+  const p=player;
+  b.t+=dt;if(b.flash>0)b.flash-=dt;
+  if(b.state==='dead'){b.vy+=GRAV*0.6*dt;b.y+=b.vy*dt;b.rot+=dt*4;if(b.t>3)cow=null;return;}
+  const g=cowGround(b);
+  if(g!==null){if(b.y+b.h<g-1){b.vy=Math.min(b.vy+GRAV*dt,MAXFALL);b.y+=b.vy*dt;if(b.y+b.h>=g){b.y=g-b.h;b.vy=0;}}else{b.y=g-b.h;b.vy=0;}}
+  if(b.spawnT>0){b.spawnT-=dt;return;}
+  if(!b.rage&&b.hp<=b.maxHp/2){b.rage=true;shake=0.5;sfx.bossSpawn();floatText(b.x+b.w/2,b.y-20,'ENRAGÉE !','#ff4a4a');}
+  const sp=(b.rage?1.3:1)*anaSpd()*(night?NIGHT_SPEED:1);
+  b.mt+=dt;
+  const dx=p.x+5-(b.x+b.w/2);
+  if(b.mode==='walk'){
+    b.dir=dx>0?1:-1;b.x+=b.dir*34*sp*dt;
+    if(b.mt>(b.rage?0.8:1.3)){b.mode='wind';b.mt=0;b.dir=dx>0?1:-1;}
+  } else if(b.mode==='wind'){   // se met en boule : télégraphe
+    b.rot-=b.dir*dt*10;
+    if(Math.random()<0.5)parts.push({x:b.x+b.w/2-b.dir*18,y:b.y+b.h,vx:-b.dir*40,vy:-30,g:200,life:0.4,col:'#6b5a3a',sz:2});
+    if(b.mt>0.7){b.mode='roll';b.mt=0;b.sx=b.x;sfx.slam();}
+  } else if(b.mode==='roll'){
+    const v=235*sp;
+    const nx=b.x+b.dir*v*dt,fx=b.dir>0?nx+b.w:nx;
+    if(solidAt(fx,b.y+b.h/2)){b.mode='tired';b.mt=0;shake=Math.max(shake,0.3);sfx.slam();}
+    else{b.x=nx;b.rot+=b.dir*v*dt/15;}
+    if(Math.random()<0.6)parts.push({x:b.x+b.w/2-b.dir*14,y:b.y+b.h-2,vx:-b.dir*60,vy:-40,g:300,life:0.35,col:'#7a8a5a',sz:2});
+    if(b.mt>2.4||(Math.sign(dx)!==b.dir&&Math.abs(dx)>110)){b.mode='tired';b.mt=0;}
+  } else {   // essoufflée : la bonne fenêtre pour frapper
+    b.rot*=0.85;
+    if(b.mt>(b.rage?0.7:1.1)){b.mode='walk';b.mt=0;b.rot=0;}
+  }
+  if(Math.abs(b.x-p.x)>900){b.x=p.x+5-p.face*300;}   // ne se laisse pas semer
+  if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x+4,b.y+4,b.w-8,b.h-4))hurtPlayer(b.x+b.w/2);
+}
+function drawCow(){
+  const b=cow;if(!b)return;
+  const cx=Math.round(b.x+b.w/2),cy=Math.round(b.y+b.h/2);
+  ctx.save();ctx.translate(cx,cy);
+  if(b.spawnT>0)ctx.globalAlpha=clamp(1-b.spawnT/1.2,0,1);
+  const ball=b.mode==='roll'||b.mode==='wind'||b.state==='dead';
+  const W=b.flash>0?'#ffd6d6':'#f4f2ea',K='#14182c',S='#2a2a33';
+  if(ball){
+    ctx.rotate(b.rot);
+    ctx.fillStyle=K;disc(0,0,17);ctx.fillStyle=W;disc(0,0,15);
+    ctx.fillStyle=S;disc(-6,-5,5);disc(7,3,4);disc(-2,8,3);disc(5,-9,3);
+    ctx.fillStyle='#f2a0b0';ctx.fillRect(10,-3,5,6);ctx.fillStyle=K;ctx.fillRect(11,-1,1,1);ctx.fillRect(13,-1,1,1);
+    ctx.fillStyle='#e8dcb0';ctx.fillRect(-3,-17,2,4);ctx.fillRect(2,-17,2,4);
+  } else {
+    if(b.dir<0)ctx.scale(-1,1);
+    const st=b.mode==='walk'?Math.floor(b.t*8)%2:0;
+    ctx.fillStyle=K;ctx.fillRect(-19,-9,32,17);
+    ctx.fillStyle=W;ctx.fillRect(-18,-8,30,15);
+    ctx.fillStyle=S;ctx.fillRect(-14,-6,8,6);ctx.fillRect(0,-4,6,5);ctx.fillRect(-6,2,5,4);
+    for(const [lx,o] of [[-16,st],[-10,1-st],[4,st],[9,1-st]]){ctx.fillStyle=K;ctx.fillRect(lx-1,6,5,9-o);ctx.fillStyle=W;ctx.fillRect(lx,6,3,8-o);ctx.fillStyle=S;ctx.fillRect(lx,13-o,3,2);}
+    ctx.fillStyle=K;ctx.fillRect(11,-14,12,14);ctx.fillStyle=W;ctx.fillRect(12,-13,10,12);
+    ctx.fillStyle='#f2a0b0';ctx.fillRect(16,-6,7,5);ctx.fillStyle=K;ctx.fillRect(18,-5,1,1);ctx.fillRect(21,-5,1,1);
+    ctx.fillStyle=b.rage?'#ff3b2f':K;ctx.fillRect(15,-10,2,2);
+    ctx.fillStyle='#e8dcb0';ctx.fillRect(12,-17,2,4);ctx.fillRect(19,-17,2,4);
+    ctx.fillStyle='#f2a0b0';ctx.fillRect(-6,7,6,2);
+    ctx.fillStyle=K;ctx.fillRect(-21,-8,3,6);
+  }
+  ctx.restore();
+  if(b.mode==='wind'&&b.state==='alive'){ctx.fillStyle='#ff4a3a';ctx.fillRect(cx-1,cy-30,2,6);ctx.fillRect(cx-1,cy-22,2,2);}
+}
 function stepBoss(dt){
   maybeSpawnBoss();
   const b=boss;if(!b)return;
@@ -2096,7 +2273,7 @@ function killJelly(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnJelly(){
-  if(jelly||octo||castle)return;
+  if(jelly||octo||castle||cow)return;
   const p=player,tx=Math.floor((p.x+5)/T),side=tx<0?-1:1,per=JELLY_SCREENS*(VW/T);
   let key;
   if(anarchyOn){   // anarchie : une méduse tous les 37 écrans après l'entrée de la plage, tant qu'aucun autre boss n'est là
@@ -2248,9 +2425,16 @@ function stepWorldPearls(){
   for(const q of worldPearls){
     if(q.got||Math.abs(q.x-p.x)>40)continue;
     if(rectsOverlap(p.x,p.y,p.w,p.h,q.x,q.y,q.w,q.h)){
-      q.got=true;shop.pearls++;saveShop();sfx.pearl();
-      floatText(q.x+7,q.y-6,'+1 PERLE','#e6dcff');
-      burst(q.x+7,q.y+6,'#e6dcff',12,80);
+      q.got=true;sfx.pearl();
+      if(q.kind==='red'){   // coffre rouge des marécages : les dagues
+        if(!shop.daggerOwned){shop.daggerOwned=true;floatText(q.x+7,q.y-16,'DAGUES OBTENUES !','#ff6a7a');floatText(q.x+7,q.y-6,'ÉQUIPE-LES DANS ARMES','#ffe14d');sfx.heal();}
+        else{shop.gold+=150;floatText(q.x+7,q.y-6,'+150 OR','#ffd23f');}
+        burst(q.x+7,q.y+4,'#ff4a4a',18,100);
+      } else {
+        const g=10+Math.floor(Math.random()*16)+2*Math.min(8,Math.floor(Math.abs(q.x)/2400));
+        shop.gold+=g;floatText(q.x+7,q.y-6,'+'+g+' OR','#ffd23f');
+      }
+      saveShop();burst(q.x+7,q.y+4,'#ffd23f',12,80);
     }
   }
   if(worldPearls.some(q=>q.got))worldPearls=worldPearls.filter(q=>!q.got);
@@ -2306,7 +2490,7 @@ function update(dt){
     }
   }
   if(!shop.beach&&inBeach(Math.floor((player.x+5)/T))){   // la plage est atteinte : checkpoint débloqué
-    shop.beach=player.x<0?-1:1;shop.tridentOwned=true;if(rodLocked())shop.weapon='trident';saveShop();sfx.heal();shake=Math.max(shake,0.3);   // le trident est débloqué et équipé, la canne ne s'améliore plus
+    shop.beach=player.x<0?-1:1;shop.tridentOwned=true;if(rodLocked()&&shop.weapon==='rod')shop.weapon='trident';saveShop();sfx.heal();shake=Math.max(shake,0.3);   // le trident est débloqué et équipé, la canne ne s'améliore plus
     floatText(player.x+5,player.y-32,'CHECKPOINT !','#7ff0e8');
     floatText(player.x+5,player.y-22,'LA PLAGE','#ffe14d');
     floatText(player.x+5,player.y-12,'TRIDENT DÉBLOQUÉ !','#ff9a5a');
@@ -2317,6 +2501,7 @@ function update(dt){
   stepMerchant();
   stepBoss(dt);
   stepJelly(dt);
+  stepCow(dt);
   stepOcto(dt);
   stepCastle(dt);
   stepBossShots(dt);
@@ -2355,7 +2540,8 @@ const clouds=[{x:40,y:30,s:1,par:.10},{x:200,y:52,s:2,par:.16},{x:330,y:24,s:1,p
 
 const BG_GRASS={sky:SKY,sea:'#46a0e4',seaTop:'#78c4f4',spark:'#bfe6ff',h1:'#6fa7a0',h1t:'#8cc2b6',h2:'#3f9a5c',h2t:'#63bd72'};
 const BG_BEACH={sky:['#4db3ee','#5fc3f2','#76d0f5','#92dcf6','#b0e7f7','#cff1f6','#ecf8ef','#fdf6d8'],sea:'#2ec6cf',seaTop:'#9ff4ee',spark:'#d6fffb',h1:'#e6c987',h1t:'#f3deaa',h2:'#d9b877',h2t:'#f0d9a0'};
-let bzView=0;   // 0 = herbe, 1 = plage (fondu progressif à la sortie de l'arène)
+let bzView=0,swView=0;
+const BG_SWAMP={sky:['#4f6a5e','#5a7666','#668270','#738d7a','#839a86','#95a893','#a8b6a0','#bcc4ad'],sea:'#3c6b5a',seaTop:'#6f9a86',spark:'#a9cdb9',h1:'#4f6b55',h1t:'#62806a',h2:'#35503a',h2t:'#4a6b4c'};   // 0 = herbe, 1 = plage (fondu progressif à la sortie de l'arène)
 function drawBackground(cx,cy,P){
   const bh=Math.ceil(VH/P.sky.length);
   for(let i=0;i<P.sky.length;i++){ctx.fillStyle=P.sky[i];ctx.fillRect(0,i*bh,VW,bh+1);}
@@ -2393,10 +2579,29 @@ function drawBackground(cx,cy,P){
 function drawWater(cx,cy){
   const wy=WATER_ROW*T;
   if(wy>cy+VH+4)return;
-  ctx.fillStyle=bzView>0.5?'#1fb3bd':'#2b78cf';ctx.fillRect(cx-8,wy+3,VW+16,Math.max(0,cy+VH-wy));
-  ctx.fillStyle=bzView>0.5?'#4fd4d6':'#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
+  ctx.fillStyle=swView>0.5?'#2f5a4a':bzView>0.5?'#1fb3bd':'#2b78cf';ctx.fillRect(cx-8,wy+3,VW+16,Math.max(0,cy+VH-wy));
+  ctx.fillStyle=swView>0.5?'#5c8a74':bzView>0.5?'#4fd4d6':'#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
   ctx.fillStyle='#d8f1ff';
   for(let x=Math.floor(cx/4)*4;x<cx+VW+4;x+=4){ctx.fillRect(x,wy+(Math.sin(time*3+x*0.15)>0?0:1),4,2);}
+}
+function drawSwampTowers(cx){   // décor : mini tours de château en ruine
+  const tx0=Math.floor(cx/T)-2,tx1=Math.floor((cx+VW)/T)+2;
+  for(let tx=tx0;tx<=tx1;tx++){
+    if(hash2(tx,51)>=0.035)continue;
+    const c=column(tx);if(!c.swamp||c.pit||c.ar||c.tun)continue;
+    ctx.drawImage(TOWER,tx*T+2,c.g*T-TOWER.height+2);
+  }
+}
+function drawPuddles(cx){   // décor : petites flaques d'eau croupie
+  const tx0=Math.floor(cx/T)-1,tx1=Math.floor((cx+VW)/T)+1;
+  for(let tx=tx0;tx<=tx1;tx++){
+    if(hash2(tx,52)>=0.16)continue;
+    const c=column(tx),n=column(tx+1);if(!c.swamp||c.pit||c.ar||n.pit||n.g!==c.g)continue;
+    const y=c.g*T-1,x=tx*T+4,w=18+Math.floor(hash2(tx,53)*8);
+    ctx.fillStyle='#1d3a2e';ctx.fillRect(x-1,y-1,w+2,4);
+    ctx.fillStyle='#355f50';ctx.fillRect(x,y,w,2);
+    ctx.fillStyle='#7fb3a0';ctx.fillRect(x+2+Math.floor((time*6+tx)%Math.max(1,w-6)),y,3,1);
+  }
 }
 function drawPalms(cx,cy){
   const tx0=Math.floor(cx/T)-3,tx1=Math.floor((cx+VW)/T)+3;
@@ -2425,9 +2630,9 @@ function drawTiles(cx,cy){
         if(ty===col.g){
           if(col.ar&&col.ar.type!=='castle'&&col.dx>=-13&&col.dx<=12)ctx.drawImage(STONE_TOP,tx*T,ty*T);
           else if(sand)ctx.drawImage(SANDTOP[dec<5?0:dec-4][v],tx*T,ty*T-6);
-          else ctx.drawImage(GRASS[dec<5?0:dec-4][v],tx*T,ty*T-6);
+          else ctx.drawImage((col.swamp?SGRASS:GRASS)[dec<5?0:dec-4][v],tx*T,ty*T-6);
         }
-        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2;ctx.drawImage((sand?SAND:DIRT)[sh][mod(tx*7+ty*3,3)],tx*T,ty*T);}
+        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2;ctx.drawImage((sand?SAND:col.swamp?SDIRT:DIRT)[sh][mod(tx*7+ty*3,3)],tx*T,ty*T);}
         if(tun&&ty>col.g){   // bords éclairés / ombrés des parois de sable
           if(!solidTile(tx,ty-1)){ctx.fillStyle='#f6e2ac';ctx.fillRect(tx*T,ty*T,T,2);}
           if(!solidTile(tx,ty+1)){ctx.fillStyle='#6e5026';ctx.fillRect(tx*T,ty*T+T-2,T,2);}
@@ -2540,6 +2745,7 @@ function drawPlayer(){
     }
     ctx.restore();
   }
+  else if(shop.weapon==='dagger')drawDaggersHeld(hx,hy);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
     const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
@@ -2560,10 +2766,10 @@ function drawPickups(){
 function drawWorldPearls(cx,cy){
   for(const q of worldPearls){
     if(q.x+20<cx||q.x-6>cx+VW||q.y+20<cy||q.y-6>cy+VH)continue;
-    const bob=Math.round(Math.sin(time*3+q.ph)*2),x=Math.round(q.x),y=Math.round(q.y)+bob;
-    ctx.fillStyle='rgba(230,220,255,.28)';disc(x+7,y+6,9);
-    ctx.drawImage(PEARL,x,y,14,12);
-    if(Math.sin(time*5+q.ph)>0.75){ctx.fillStyle='#ffffff';ctx.fillRect(x+11,y-2,1,5);ctx.fillRect(x+9,y,5,1);}
+    const x=Math.round(q.x),y=Math.round(q.y);
+    if(q.kind==='red'){ctx.fillStyle='rgba(255,60,60,'+(0.18+0.1*Math.sin(time*4+q.ph)).toFixed(2)+')';disc(x+7,y+5,11);}
+    ctx.drawImage(q.kind==='red'?CHEST_R:CHEST,x,y);
+    if(Math.sin(time*5+q.ph)>0.8){ctx.fillStyle='#ffffff';ctx.fillRect(x+11,y-3,1,5);ctx.fillRect(x+9,y-1,5,1);}
   }
 }
 function drawOcto(){
@@ -2822,19 +3028,17 @@ function drawHUD(){
   txt((kills%HEAL_EVERY)+'/'+HEAL_EVERY,25,39,'#e4f4ff');
   txt('SCORE '+pad6(score),VW-6,6,'#ffffff','right');
   txt('BEST '+pad6(Math.max(best,score)),VW-6,18,'#bfe0ff','right');
-  const pt='x'+shop.pearls;
-  txt(pt,VW-6,30,'#e6dcff','right');
-  ctx.drawImage(PEARL,Math.round(VW-6-ctx.measureText(pt).width-9),29);
   const gt='x'+shop.gold;
-  txt(gt,VW-6,42,'#ffd23f','right');
-  ctx.drawImage(GOLD,Math.round(VW-6-ctx.measureText(gt).width-9),41);
+  txt(gt,VW-6,30,'#ffd23f','right');
+  ctx.drawImage(GOLD,Math.round(VW-6-ctx.measureText(gt).width-9),29);
   const sl='x'+shop.souls;
-  txt(sl,VW-6,54,'#ff7a88','right');
-  ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),52);
+  txt(sl,VW-6,42,'#ff7a88','right');
+  ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),40);
   const bb=castle&&castle.state!=='dying'
     ?{name:'CHÂTEAU DE SABLE',hp:castle.hp,max:castle.maxHp,ticks:[0.5],name_c:castle.rage?'#ff6a6a':'#f6e2ac',col:castle.rage?'#ff7a3a':'#e4c882',dark:'#4a3a1a',hi:'#fff0c4'}
     :octo&&octo.state!=='dying'
     ?{name:'POULPE GÉANT',hp:octo.hp,max:octo.maxHp,ticks:[0.5],name_c:octo.rage?'#ff6a6a':'#c9a8ff',col:octo.rage?'#ff3b4a':'#9a6bff',dark:octo.rage?'#4a0a14':'#2a1650',hi:octo.rage?'#ff8a8a':'#c9a8ff'}
+    :cow&&cow.state==='alive'?{name:'VACHE GÉANTE',hp:cow.hp,max:cow.maxHp,ticks:[0.5],name_c:cow.rage?'#ff6a6a':'#ffffff',col:cow.rage?'#ff4a4a':'#e8e4d8',dark:'#3a3a40',hi:'#ffffff'}
     :jelly&&jelly.state==='alive'?{name:'MÉDUSE',hp:jelly.hp,max:jelly.maxHp,ticks:[0.5],name_c:'#f6f0ff',col:'#d9b8ff',dark:'#2a1650',hi:'#ffffff'}
     :boss?{name:'DÉMON REQUIN',hp:boss.hp,max:boss.maxHp,ticks:[0.2,0.4,0.6,0.8],name_c:'#ff6a6a',col:'#e0202c',dark:'#4a0a10',hi:'#ff6a5a'}:null;
   if(bb){
@@ -2852,10 +3056,11 @@ function drawHUD(){
 function render(){
   ctx.imageSmoothingEnabled=false;
   const cx=Math.round(cam.x),cy=Math.round(cam.y);
-  if(anarchyOn){const tg=inBeach(Math.round((cx+VW/2)/T))?1:0;bzView+=(tg-bzView)*0.06;if(Math.abs(tg-bzView)<0.01)bzView=tg;}   // fondu d'une zone à l'autre
-  else bzView=clamp((Math.abs(cx+VW/2)/T-(BEACH_TX-8))/16,0,1);
+  {const cc=Math.round((cx+VW/2)/T),tb=inBeach(cc)?1:0,ts=inSwamp(cc)?1:0;   // fondu d'une zone à l'autre
+   bzView+=(tb-bzView)*0.06;if(Math.abs(tb-bzView)<0.01)bzView=tb;swView+=(ts-swView)*0.06;if(Math.abs(ts-swView)<0.01)swView=ts;}
   if(bzView<1)drawBackground(cx,cy,BG_GRASS);
   if(bzView>0){ctx.globalAlpha=bzView;drawBackground(cx,cy,BG_BEACH);ctx.globalAlpha=1;}
+  if(swView>0){ctx.globalAlpha=swView;drawBackground(cx,cy,BG_SWAMP);ctx.globalAlpha=1;}
   if(nightA>0.01){ctx.fillStyle='rgba(70,0,12,'+(0.62*nightA).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel rouge sang
   if(skyCur[3]>0.005){ctx.fillStyle='rgba('+Math.round(skyCur[0])+','+Math.round(skyCur[1])+','+Math.round(skyCur[2])+','+skyCur[3].toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel d'anarchie
   if(octo){ctx.fillStyle=octo.rage?'rgba(110,10,25,'+(0.22+0.08*Math.sin(time*6)).toFixed(2)+')':'rgba(25,8,50,0.38)';ctx.fillRect(0,0,VW,VH);}
@@ -2866,7 +3071,9 @@ function render(){
   drawOcto();
   drawCastle();
   drawPalms(cx,cy);
+  drawSwampTowers(cx);
   drawTiles(cx,cy);
+  drawPuddles(cx);
   drawTents();
   drawCastleFx();
   drawMerchants();
@@ -2878,6 +3085,7 @@ function render(){
   }
   drawBoss();
   drawJelly();
+  drawCow();
   drawBossShots();
   drawTridents();
   drawPlayer();
@@ -2894,7 +3102,7 @@ function render(){
   const kd=(inp.right?1:0)-(inp.left?1:0),mx=(joyEl.offsetWidth||0)*0.31;
   const jx=joy.active?joy.tx:kd*mx,jy=joy.active?joy.ty:0;
   joyThumb.style.transform='translate('+Math.round(jx)+'px,'+Math.round(jy)+'px)';
-  $('merch-btn').hidden=!(nearMerch&&state==='play'&&!overlayVisible&&!shopOpen&&!paused&&!devOpen&&!misOpen&&!setOpen&&!modeOpen&&!accOpen);
+  $('merch-btn').hidden=!(nearMerch&&state==='play'&&!overlayVisible&&!shopOpen&&!paused&&!devOpen&&!misOpen&&!setOpen&&!modeOpen&&!accOpen&&!weapOpen);
   joyEl.classList.toggle('on',joy.active||kd!==0);
   look2Thumb.style.transform='translate('+Math.round(look.tx)+'px,'+Math.round(look.ty)+'px)';
   look2El.classList.toggle('on',look.active);
@@ -2923,7 +3131,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();
-  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;
+  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;cowSpawned=false;cowDone=new Set();
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -2943,7 +3151,7 @@ function startGame(){
   ensureAudio();
   resetWorld();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
-  if(rodLocked()&&shop.weapon!=='trident'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
+  if(rodLocked()&&shop.weapon==='rod'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
   if(shop.beach&&!anarchyOn){   // checkpoint : on repart de la plage (anarchie : on commence toujours dans les plaines), l'arène du poulpe derrière soi est considérée comme vaincue
     const ar=arenaAt(shop.beach*ARENA_START*(VW/T));
     if(ar)ar.state='won';
@@ -2983,7 +3191,6 @@ function showOver(){
   ovText.hidden=true;ovStats.hidden=false;
   $('st-score').textContent='SCORE '+score;
   $('st-best').textContent='MEILLEUR SCORE '+best;
-  $('st-pearls').textContent='PERLES '+shop.pearls;
   $('st-gold').textContent='OR '+shop.gold;
   $('st-souls').textContent='ÂMES ROUGES '+shop.souls;
   $('st-rec').textContent=newRecord?'NOUVEAU RECORD !':'';
@@ -2996,7 +3203,7 @@ let rstOpen=false,rstStep=0;
 function renderRst(){
   if(rstStep===1){
     $('rst-title').textContent='RÉINITIALISER LA SAVE ?';
-    $('rst-text').textContent='Toute ta progression sera perdue : perles, or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.';
+    $('rst-text').textContent='Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.';
     $('rst-yes').textContent='CONTINUER';
   } else {
     $('rst-title').textContent='DERNIÈRE CONFIRMATION';
@@ -3085,6 +3292,7 @@ function assistTarget(cx,cy,a0){
   if(jelly&&jelly.state==='alive'&&jelly.spawnT<=0)c.push([jelly.x+jelly.w/2,jelly.y+jelly.h/2]);
   if(octo&&octo.state==='fight')for(const t of tents)if(t.state!=='warn'&&t.state!=='retract')c.push([t.x,t.floorY-36]);
   if(castle&&castle.state==='fight'){const r=bucketRect(castle);c.push([r[0]+r[2]/2,r[1]+r[3]/2]);}
+  if(cow&&cow.state==='alive'&&cow.spawnT<=0)c.push([cow.x+cow.w/2,cow.y+cow.h/2]);
   let best=null,bs=1e9;
   for(const q of c){
     const dx=q[0]-cx,dy=q[1]-cy,d=Math.hypot(dx,dy);
@@ -3147,6 +3355,7 @@ addEventListener('keydown',e=>{
   if(setOpen){if(e.code==='Escape'){e.preventDefault();closeSet();}return;}
   if(modeOpen){if(e.code==='Escape'){e.preventDefault();closeMode();}return;}
   if(accOpen){if(e.code==='Escape'){e.preventDefault();closeAcc();}return;}
+  if(weapOpen){if(e.code==='Escape'){e.preventDefault();closeWeap();}return;}
   if(devOpen){if(e.code==='Escape'){e.preventDefault();closeDev();}return;}
   if(shopOpen){if(e.code==='Escape'){e.preventDefault();closeShop();}return;}
   if(overlayVisible&&(e.code==='Enter'||e.code==='NumpadEnter'||(state==='over'&&e.code==='KeyR'))){e.preventDefault();if(paused)resumeGame();else startGame();return;}
@@ -3156,7 +3365,7 @@ addEventListener('keydown',e=>{
   const k=KEYMAP[e.code];
   if(k){e.preventDefault();if(e.repeat)return;ensureAudio();press(k);}
 });
-addEventListener('keyup',e=>{if(shopOpen||devOpen||misOpen||setOpen||modeOpen||accOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
+addEventListener('keyup',e=>{if(shopOpen||devOpen||misOpen||setOpen||modeOpen||accOpen||weapOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
 addEventListener('blur',clearInputs);
 addEventListener('beforeunload',()=>{if(score>best){best=score;saveBest();}});
 ovBtn.addEventListener('click',()=>{if(paused)resumeGame();else startGame();});
@@ -3183,6 +3392,7 @@ function missionList(){
     ['Vaincre le poulpe géant',bs.octo?1:0,1],
     ['Vaincre la méduse',bs.jelly?1:0,1],
     ['Vaincre le château de sable',bs.castle?1:0,1],
+    ['Vaincre la vache géante',bs.cow?1:0,1],
     ['Posséder 10 skins',Math.min(shop.owned.length,10),10],
     ['Tridents multiples au maximum',shop.tmulti,3],
     ['Trident : toutes les améliorations au maximum',tupSum,T_KEYS.length*5]
@@ -3217,6 +3427,49 @@ function setMode(want){
   if(state!=='play'){anarchyOn=anarchyWant;resetWorld();placePlayer();enemies=[];}   // sur le menu : actif tout de suite ; en partie : à la prochaine partie
   updateMode();if(typeof updateDev==='function')updateDev();
 }
+/* ---------- Menu ARMES (menu principal) : une case par arme, cliquer ouvre sa fiche et ses améliorations ---------- */
+const WEAPONS=[
+  {id:'rod',name:'Canne à pêche',desc:'Grappin qui déclenche une zone de dégâts.',icon:()=>ROD_ICON,owned:()=>true,locked:()=>rodLocked(),render:()=>renderRod()},
+  {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
+  {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()}
+];
+let weapOpen=false,weapSel=null;
+const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
+function weapImg(w,size){const c=document.createElement('canvas');c.width=size;c.height=size;const g=c.getContext('2d');g.imageSmoothingEnabled=false;const im=w.icon(),s=Math.max(1,Math.floor(Math.min(size/im.width,size/im.height)*0.9));g.drawImage(im,Math.round((size-im.width*s)/2),Math.round((size-im.height*s)/2),im.width*s,im.height*s);return c;}
+function renderWeap(){
+  $('weap-gold').textContent=shop.gold;
+  weapGrid.textContent='';
+  for(const w of WEAPONS){
+    const b=document.createElement('button');b.type='button';b.className='wsq'+(shop.weapon===w.id?' eq':'')+(w.owned()?'':' lock')+(weapSel===w.id?' sel':'');
+    b.appendChild(weapImg(w,32));
+    const n=document.createElement('span');n.textContent=w.owned()?w.name:'???';b.appendChild(n);
+    b.setAttribute('aria-label',w.owned()?w.name:'Arme verrouillée');
+    b.addEventListener('click',()=>{weapSel=weapSel===w.id?null:w.id;renderWeap();});
+    weapGrid.appendChild(b);
+  }
+  weapDet.hidden=!weapSel;
+  if(!weapSel)return;
+  const w=WEAPONS.find(x=>x.id===weapSel);
+  const big=$('weap-big');big.textContent='';big.appendChild(weapImg(w,64));
+  $('weap-name').textContent=w.owned()?w.name:'???';
+  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':'Débloquée en atteignant la plage.');
+  const eb=$('weap-eq');
+  eb.disabled=!w.owned()||shop.weapon===w.id||(w.locked&&w.locked());
+  eb.textContent=!w.owned()?'VERROUILLÉE':shop.weapon===w.id?'ÉQUIPÉE':(w.locked&&w.locked())?'INDISPONIBLE':'ÉQUIPER';
+  const keep=shopList;shopList=$('weap-list');
+  try{if(w.owned())w.render();else shopList.textContent='';}finally{shopList=keep;}
+}
+function openWeap(){clearInputs();weapOpen=true;weapEl.hidden=false;weapSel=null;renderWeap();try{$('weap-close').focus({preventScroll:true});}catch(e){}}
+function closeWeap(){weapOpen=false;weapEl.hidden=true;try{$('weap-btn').focus({preventScroll:true});}catch(e){}}
+$('weap-btn').addEventListener('click',openWeap);$('weap-close').addEventListener('click',closeWeap);
+weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
+$('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
+function renderDagger(){
+  shopList.textContent='';
+  const p=document.createElement('p');p.className='shop-note';p.style.gridColumn='1/-1';
+  p.textContent='Améliorations des dagues : bientôt.';
+  shopList.appendChild(p);
+}
 function openMode(){clearInputs();modeOpen=true;modeEl.hidden=false;updateMode();try{$('mode-close').focus({preventScroll:true});}catch(e){}}
 function closeMode(){modeOpen=false;modeEl.hidden=true;try{$('skins-btn').focus({preventScroll:true});}catch(e){}}
 $('mode-classic').addEventListener('click',()=>setMode(false));$('mode-ana').addEventListener('click',()=>setMode(true));
@@ -3229,22 +3482,22 @@ misEl.addEventListener('pointerdown',e=>{if(e.target===misEl)closeMis();});
 setEl.addEventListener('pointerdown',e=>{if(e.target===setEl)closeSet();});
 
 /* ================= Boutique ================= */
-const shopEl=$('shop'),shopList=$('shop-list');
+const shopEl=$('shop');let shopList=$('shop-list');
 let shopTab='skins';
 function drawIcon(cnv,img,center){const g=cnv.getContext('2d');g.clearRect(0,0,cnv.width,cnv.height);g.drawImage(img,center?Math.floor((cnv.width-img.width)/2):0,center?Math.floor((cnv.height-img.height)/2):0);}
 const pearlIcon=c=>drawIcon(c,PEARL);
-pearlIcon($('pearl-ic'));drawIcon($('gold-ic'),GOLD);drawIcon($('soul-ic'),SOUL);
+drawIcon($('gold-ic'),GOLD);drawIcon($('weap-gold-ic'),GOLD);drawIcon($('soul-ic'),SOUL);
 function renderShop(){
+  if(weapOpen){renderWeap();return;}   // achat depuis la fiche d'une arme
   shopEl.classList.toggle('merchant',shopMerchant);
   $('shop-title').textContent=shopMerchant?'MARCHAND':'BOUTIQUE';
-  $('shop-bal').textContent=shop.pearls;
   $('shop-gold').textContent=shop.gold;
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
-  const notes={skins:"Une perle se cache tous les 7 écrans : sur une plateforme, au-dessus d'un trou ou près du sol. Elles se gardent d'une partie à l'autre.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s'achète plus : il se débloque en atteignant la plage.",
+  const notes={skins:"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.",dagger:"Améliorations des dagues : bientôt.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s'achète plus : il se débloque en atteignant la plage.",
     trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or. Les tridents multiples se débloquent en tuant "+WORM_UNLOCK+" vers de la plage ("+Math.min(shop.wormKills,WORM_UNLOCK)+"/"+WORM_UNLOCK+").":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=shopMerchant?"Le marchand améliore ton arme équipée contre de l'or. Ton score n'est pas touché et le jeu est en pause.":notes[shopTab];
-  if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
+  if(shopTab==='dagger')renderDagger();else if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
 }
 function renderRod(){
   shopList.textContent='';
@@ -3431,28 +3684,28 @@ function renderSkins(){
     const pr=document.createElement('div');pr.className='pr';
     if(owned){pr.textContent=sk.collab?'COLLAB':sk.price===0?'OFFERT':'POSSÉDÉ';}
     else if(sk.collab){pr.textContent='COLLAB RNG∞';}
-    else{const ic=document.createElement('canvas');ic.width=7;ic.height=6;pearlIcon(ic);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.price;pr.appendChild(sp);}
+    else{const ic=document.createElement('canvas');ic.width=7;ic.height=6;drawIcon(ic,GOLD);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.price;pr.appendChild(sp);}
     card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
     if(eq){b.textContent='ÉQUIPÉ';b.disabled=true;}
     else if(owned){b.textContent='ÉQUIPER';b.classList.add('equip');b.addEventListener('click',()=>{shop.equipped=sk.id;saveShop();renderShop();});}
     else if(sk.collab){b.textContent='DÉBLOQUER';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();accHint='rng';openAcc();});}   // skin collab : renvoie à la connexion Google
-    else if(shop.pearls>=sk.price){b.textContent='ACHETER';b.addEventListener('click',()=>buySkin(sk));}
-    else{b.textContent='IL MANQUE '+(sk.price-shop.pearls);b.disabled=true;}
+    else if(shop.gold>=sk.price){b.textContent='ACHETER';b.addEventListener('click',()=>buySkin(sk));}
+    else{b.textContent='IL MANQUE '+(sk.price-shop.gold);b.disabled=true;}
     b.setAttribute('aria-label',sk.name+' : '+b.textContent);
     card.appendChild(b);
     shopList.appendChild(card);
   }
 }
 function buySkin(sk){
-  if(shop.owned.includes(sk.id)||shop.pearls<sk.price)return;
-  shop.pearls-=sk.price;shop.owned.push(sk.id);shop.equipped=sk.id;
+  if(shop.owned.includes(sk.id)||shop.gold<sk.price)return;
+  shop.gold-=sk.price;shop.owned.push(sk.id);shop.equipped=sk.id;
   saveShop();sfx.heal();renderShop();
   const nb=shopList.querySelector('.card.eq .sbtn');if(nb)nb.focus({preventScroll:true});
 }
 function openShop(tab){
   shopMerchant=tab==='merchant';
-  if(shopMerchant)shopTab=shop.weapon==='trident'?'trident':'rod';   // le marchand ne vend que les améliorations de l'arme équipée
+  if(shopMerchant)shopTab=shop.weapon==='trident'?'trident':shop.weapon==='dagger'?'dagger':'rod';   // le marchand ne vend que les améliorations de l'arme équipée
   else if(typeof tab==='string')shopTab=tab;
   ensureAudio();
   clearInputs();
@@ -3485,7 +3738,7 @@ shopEl.addEventListener('pointerdown',e=>{if(e.target===shopEl)closeShop();});
 const devEl=$('dev'),devList=$('dev-list'),devBal={};
 function buildDev(){
   devList.textContent='';
-  for(const [key,label,img] of [['pearls','PERLES',PEARL],['gold','OR',GOLD],['souls','ÂMES ROUGES',SOUL]]){
+  for(const [key,label,img] of [['gold','OR',GOLD],['souls','ÂMES ROUGES',SOUL]]){
     const row=document.createElement('div');row.className='dev-row';
     const who=document.createElement('div');who.className='who';
     const ic=document.createElement('canvas');ic.width=img.width;ic.height=img.height;drawIcon(ic,img);
