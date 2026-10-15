@@ -404,7 +404,7 @@ body{
     <div class="shop-head"><h2 id="dev-title">MENU DEV</h2></div>
     <p class="shop-note">Outil de test : donne-toi des monnaies (enregistrées) et active l'invincibilité. Le jeu est en pause tant que ce menu est ouvert.</p>
     <div id="dev-list"></div>
-    <button class="sbtn" id="dev-glock" type="button" aria-pressed="false" style="width:100%;padding:10px">GLOCK 18 : NON</button>
+    <button class="sbtn" id="dev-glock" type="button" aria-pressed="false" style="width:100%;padding:10px">AKIMBO GLOCK 18 : NON</button>
     <button class="sbtn equip" id="dev-arena" type="button" style="width:100%;padding:10px">ALLER À L'ARÈNE DU POULPE</button>
     <button class="sbtn" id="dev-god" type="button" aria-pressed="false">INVINCIBLE : NON</button>
     <button class="go" id="dev-close" type="button">FERMER</button>
@@ -485,7 +485,7 @@ const EN={
 const EN_RULES=[
  [/^SON : (OUI|NON)$/,m=>'SOUND: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^INVINCIBLE : (OUI|NON)$/,m=>'INVINCIBLE: '+(m[1]==='OUI'?'YES':'NO')],
- [/^GLOCK 18 : (OUI|NON)$/,m=>'GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
+ [/^AKIMBO GLOCK 18 : (OUI|NON)$/,m=>'AKIMBO GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^Niveau (\d+) sur (\d+)$/,m=>'Level '+m[1]+' of '+m[2]],
  [/^MAX : (.+)$/,m=>'MAX: '+trStr(m[1])],
  [/^IL MANQUE (\d+)$/,m=>'NEED '+m[1]+' MORE'],
@@ -1503,10 +1503,10 @@ function stepTrident(dt){
   if(throwAnim>0)throwAnim-=dt;
   if((fireBuf>0||inp.fire||aim.auto)&&castCd<=0&&p.stun<=0&&state==='play'){
     fireBuf=0;
-    if(glockOn){   // Glock 18 (menu de test) : une balle rapide, 25 dégâts
+    if(glockOn){   // Akimbo Glock 18 (menu de test) : deux pistolets, 25 dégâts par balle
       const cx=p.x+5,cy=p.y+6,len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len;
       castCd=GLOCK.rate;throwAnim=0.08;
-      tridents.push({x:cx+ux*10,y:cy+uy*10,ux,uy,d:0,hit:new Set(),n:0,g:true});
+      for(const o of[-3,3])tridents.push({x:cx+ux*10-uy*o,y:cy+uy*10+ux*o,ux,uy,d:0,hit:new Set(),n:0,g:true});   // akimbo : une balle par pistolet
       sfx.hit();
     } else {
     const n=TMULTI.vals[shop.tmulti],cx=p.x+5,cy=p.y+6;
@@ -2432,8 +2432,10 @@ function drawPlayer(){
   const isTri=shop.weapon==='trident',tip=rodTip(isTri?throwAnim>0:hooks.length>0),hx=p.x+5+p.face*5,hy=p.y+8;
   if(glockOn){   // pistolet tenu dans la direction de la visée
     const a=Math.atan2(aim.y,aim.x);ctx.save();ctx.translate(Math.round(hx),Math.round(hy-1));ctx.rotate(a);if(aim.x<0)ctx.scale(1,-1);
-    ctx.fillStyle='#14182c';ctx.fillRect(-1,-2,9,4);ctx.fillRect(-1,1,3,4);ctx.fillStyle='#4a5068';ctx.fillRect(0,-1,7,2);ctx.fillRect(0,1,1,3);
-    if(throwAnim>0){ctx.fillStyle='#ffe14d';ctx.fillRect(8,-2,3,3);}
+    for(const oy of[-3,3]){   // akimbo : un pistolet dans chaque main
+      ctx.fillStyle='#14182c';ctx.fillRect(-1,oy-2,9,4);ctx.fillRect(-1,oy+1,3,4);ctx.fillStyle='#4a5068';ctx.fillRect(0,oy-1,7,2);ctx.fillRect(0,oy+1,1,3);
+      if(throwAnim>0){ctx.fillStyle='#ffe14d';ctx.fillRect(8,oy-2,3,3);}
+    }
     ctx.restore();
   }
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
@@ -3402,7 +3404,7 @@ function updateDev(){
   g.textContent='INVINCIBLE : '+(godMode?'OUI':'NON');
   g.setAttribute('aria-pressed',String(godMode));
   g.classList.toggle('on',godMode);
-  const gl=$('dev-glock');gl.textContent='GLOCK 18 : '+(glockOn?'OUI':'NON');gl.setAttribute('aria-pressed',String(glockOn));gl.classList.toggle('on',glockOn);
+  const gl=$('dev-glock');gl.textContent='AKIMBO GLOCK 18 : '+(glockOn?'OUI':'NON');gl.setAttribute('aria-pressed',String(glockOn));gl.classList.toggle('on',glockOn);
 }
 function devGive(key,n){shop[key]+=n;saveShop();sfx.heal();updateDev();}
 function openDev(){
