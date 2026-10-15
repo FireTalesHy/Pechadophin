@@ -1071,6 +1071,7 @@ const PEARL=spr([".PPp.","Ppppp","pppdd",".ddd."],{p:'#e6dcff',P:'#ffffff',d:'#a
 const CHEST_ROWS=["..kkkkkkkkkk..",".kbbbbbbbbbbk.","kbBBBBBBBBBBbk","kbBBBBBBBBBBbk","kkkkkkyykkkkkk","kbbbbbyybbbbbk","kbBBBByyBBBBbk","kbBBBBBBBBBBbk","kbBBBBBBBBBBbk","kbbbbbbbbbbbbk","kkkkkkkkkkkkkk"];
 const CHEST=spr(CHEST_ROWS,{k:'#2a1608',b:'#a0662e',B:'#7a4a1e',y:'#ffd23f'},false);
 const CHEST_R=spr(CHEST_ROWS,{k:'#2a0808',b:'#e0453a',B:'#a82020',y:'#ffd23f'},false);
+const SHIELD_IC=spr(["xxxxxxx","xwwwwwx","xwwxwwx","xwxxxwx",".xwxwx.",".xwwwx.","..xwx..","...x..."],{x:'#14182c',w:'#cfd8ff'},true);
 const ROD_ICON=spr(["..........ww","........ww.w","......ww...w",".....w.....w","....w......w","...w.......y","..w.......yy",".bw.......y.","bb.........."],{w:'#c98a4b',b:'#6b3f1c',y:'#dfe6f5'},true);
 const DAGGER_ICON=spr(["........w",".......ww","......ww.","..y..ww..","...yww...","...bb....","..b.y....",".b.......","b........"],{w:'#dfe6f5',y:'#ffd23f',b:'#6b3f1c'},true);
 const GOLD=spr([".hyy.","hyyyY","yyyYY",".YYY."],{y:'#ffd23f',Y:'#c98a10',h:'#fff3b0'},true);
@@ -3594,7 +3595,7 @@ weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
 $('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
 function renderDagger(){
   shopList.textContent='';
-  const locked=!shop.daggerOwned,icons={dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate};
+  const locked=!shop.daggerOwned,icons={dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC};
   for(const key of D_KEYS){
     const u=DUP[key],lv=shop.dup[key],max=lv>=5;
     const card=document.createElement('div');card.className='card';
