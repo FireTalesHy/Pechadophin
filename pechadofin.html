@@ -116,6 +116,12 @@ body{
 
 #merch-btn{position:absolute;left:50%;bottom:calc(var(--u)*8px);transform:translateX(-50%);z-index:3;width:auto;height:auto;padding:calc(var(--u)*5px) calc(var(--u)*10px);font-size:max(7px,calc(var(--u)*7px))}
 #merch-btn[hidden]{display:none}
+#merch-btn{border-radius:999px;background:linear-gradient(#ffb066,#e8641e);border:2px solid #14182c;box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.35);-webkit-text-stroke:0;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);letter-spacing:.5px;transition:transform .12s ease,filter .15s ease;animation:mbob 1.6s ease-in-out infinite}
+#merch-btn:hover{filter:brightness(1.08)}
+#merch-btn:active{transform:translateX(-50%) translateY(2px)}
+@keyframes mbob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){#merch-btn{animation:none}}
+#overlay[data-mode="pause"] #weap-btn{display:none}   /* en pleine partie, on passe par le marchand */
 #shop.merchant .tabs{display:none}
 .ov-big.small{font-size:max(7px,calc(var(--p)*7))}
 .ov-big.shopb{background:linear-gradient(#4a97ff,#1f62c8)}
@@ -520,7 +526,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'terminée':'completed','MARCHAND':'MERCHANT','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
@@ -2588,7 +2594,7 @@ function stepCamera(dt){
 }
 
 function update(dt){
-  if(devOpen||paused||shopOpen)return;
+  if(devOpen||paused||shopOpen||weapOpen)return;
   time+=dt;
   nightA+=(((night&&(!anarchyOn||anaSky%5===1))?1:0)-nightA)*(1-Math.exp(-1.4*dt));
   {const tg=anarchyOn?SKY_PH[anaSky%5]:SKY_PH[0],k=1-Math.exp(-1.4*dt);for(let i=0;i<4;i++)skyCur[i]+=(tg[i]-skyCur[i])*k;}   // la nuit tombe (et se lève) progressivement
@@ -3504,7 +3510,7 @@ addEventListener('keydown',e=>{
   if(shopOpen){if(e.code==='Escape'){e.preventDefault();closeShop();}return;}
   if(overlayVisible&&(e.code==='Enter'||e.code==='NumpadEnter'||(state==='over'&&e.code==='KeyR'))){e.preventDefault();if(paused)resumeGame();else startGame();return;}
   if((e.code==='Escape'||e.code==='KeyP')&&!e.repeat){e.preventDefault();if(paused)resumeGame();else pauseGame();return;}
-  if(e.code==='KeyE'&&!e.repeat&&nearMerch&&state==='play'&&!paused&&!overlayVisible){e.preventDefault();openShop('merchant');return;}
+  if(e.code==='KeyE'&&!e.repeat&&nearMerch&&state==='play'&&!paused&&!overlayVisible){e.preventDefault();openWeap(true);return;}
   if(paused)return;
   const k=KEYMAP[e.code];
   if(k){e.preventDefault();if(e.repeat)return;ensureAudio();press(k);}
@@ -3602,9 +3608,15 @@ function renderWeap(){
   const keep=shopList;shopList=$('weap-list');
   try{if(w.owned())w.render();else shopList.textContent='';}finally{shopList=keep;}
 }
-function openWeap(){clearInputs();weapOpen=true;weapEl.hidden=false;weapSel=null;renderWeap();try{$('weap-close').focus({preventScroll:true});}catch(e){}}
-function closeWeap(){weapOpen=false;weapEl.hidden=true;try{$('weap-btn').focus({preventScroll:true});}catch(e){}}
-$('weap-btn').addEventListener('click',openWeap);$('weap-close').addEventListener('click',closeWeap);
+let weapMerch=false;
+function openWeap(merch){clearInputs();weapMerch=merch===true;weapOpen=true;weapEl.hidden=false;weapSel=weapMerch?shop.weapon:null;$('weap-title').textContent=weapMerch?'MARCHAND':'ARMES';renderWeap();try{$('weap-close').focus({preventScroll:true});}catch(e){}}
+function closeWeap(){
+  const wasMerch=weapMerch;weapOpen=false;weapMerch=false;weapEl.hidden=true;
+  last=performance.now();acc=0;
+  if(wasMerch){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();}
+  else try{$('weap-btn').focus({preventScroll:true});}catch(e){}
+}
+$('weap-btn').addEventListener('click',()=>openWeap(false));$('weap-close').addEventListener('click',closeWeap);
 weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
 $('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
 function renderDagger(){
@@ -3869,7 +3881,7 @@ $('shop-btn').addEventListener('click',()=>{
   if(ov.dataset.mode==='pause'){if(score>best){best=score;saveBest();}showTitle();return;}   // retour au menu principal (la partie en cours est abandonnée)
   openShop(shopTab==='skins'?(shop.beach?'trident':'rod'):shopTab);
 });   // BOUTIQUE : les rayons canne / âmes / trident
-$('merch-btn').addEventListener('click',()=>{if(nearMerch&&state==='play'&&!paused&&!overlayVisible)openShop('merchant');$('merch-btn').blur();});
+$('merch-btn').addEventListener('click',()=>{if(nearMerch&&state==='play'&&!paused&&!overlayVisible)openWeap(true);$('merch-btn').blur();});
 $('skins-btn').addEventListener('click',openMode);   // MODE : choix classique / anarchie
 $('shop-close').addEventListener('click',closeShop);
 shopEl.addEventListener('pointerdown',e=>{if(e.target===shopEl)closeShop();});
