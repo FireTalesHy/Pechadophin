@@ -477,7 +477,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : perles, or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: pearls, gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
+'terminée':'completed','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
@@ -991,14 +991,15 @@ const RNG_SKIN = {
 const RNG_COLLAB_API = 'https://db.rng-infinite.com/api/site';
 function rngCollab(credential) {
   if (!credential) return;
+  rngMsg('Vérification auprès de RNG∞…');
   fetch(RNG_COLLAB_API, { method: 'POST', body: JSON.stringify({ action: 'collab', game: 'pechadophin', credential }) })
     .then(r => r.json())
     .then(d => {
-      if (!d || !d.rng || shop.owned.includes(RNG_SKIN.id)) return;
-      shop.owned.push(RNG_SKIN.id); saveShop();
-      try { if (typeof renderSkins === 'function') renderSkins(); } catch (e) { /* boutique pas ouverte */ }
+      if (d && d.rng && !shop.owned.includes(RNG_SKIN.id)) { shop.owned.push(RNG_SKIN.id); saveShop(); }
+      rngMsg(shop.owned.includes(RNG_SKIN.id) ? 'Skin RNG∞ débloqué ! Équipe-le dans la boutique.' : (d && d.error) ? 'RNG∞ a refusé la vérification, reconnecte-toi.' : 'Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.');
+      try { if (shopOpen) renderShop(); } catch (e) { /* boutique pas ouverte */ }
     })
-    .catch(() => { /* hors ligne : on réessaiera à la prochaine connexion */ });
+    .catch(() => rngMsg('Serveur RNG∞ injoignable, réessaie plus tard.'));
 }
 SKINS.push(RNG_SKIN);
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
@@ -3724,19 +3725,28 @@ function cloudQueue(){   // appelé à chaque sauvegarde locale : envoi groupé 
 addEventListener('pointerdown',()=>{   // jeton absent ou expiré : renouvelé sur un geste du joueur, hors partie
   if(cloudLinked()&&state!=='play'&&!cloudS.busy&&!(cloudS.tok&&Date.now()<cloudS.exp))cloudSync(false);
 },true);
-var accHint='';
+var accHint='',rngStatus='';
+function rngMsg(m){rngStatus=m;if(accOpen&&gUser)gRenderAcc();}
 function rngHelp(){   // instructions pour débloquer le skin collab
-  if(accHint!=='rng'||shop.owned.includes(RNG_SKIN.id))return;
+  if(accHint!=='rng')return;
+  if(shop.owned.includes(RNG_SKIN.id)){if(rngStatus){const st=document.createElement('p');st.className='shop-note';st.textContent=rngStatus;accBody.appendChild(st);}return;}
   const t=document.createElement('p');t.className='shop-note';
   t.textContent='Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.';
   accBody.appendChild(t);
   const a=document.createElement('a');a.className='sbtn';a.href='https://rng-infinite.com/?ref=pechadophin';a.target='_blank';a.rel='noopener';a.textContent='OUVRIR RNG∞';a.style.cssText='display:block;text-align:center;text-decoration:none';
   accBody.appendChild(a);
+  if(rngStatus){const st=document.createElement('p');st.className='shop-note';st.style.color='var(--on)';st.textContent=rngStatus;accBody.appendChild(st);}
   if(gUser){const r=document.createElement('button');r.type='button';r.className='sbtn equip';r.textContent='VÉRIFIER MAINTENANT';r.addEventListener('click',rngRecheck);accBody.appendChild(r);}
 }
 function rngRecheck(){   // redemande un jeton Google (sans resaisie) pour reinterroger RNG∞
   if(!gUser||!GOOGLE_CLIENT_ID)return;
-  gLoadScript(ok=>{if(ok)try{google.accounts.id.prompt();}catch(e){}});
+  rngMsg('Demande de connexion à Google…');
+  gLoadScript(ok=>{
+    if(!ok){rngMsg('Google indisponible, réessaie plus tard.');return;}
+    try{google.accounts.id.prompt(n=>{   // Google peut ne pas afficher sa fenêtre (refusée récemment, cookies tiers bloqués…)
+      if(n&&((n.isNotDisplayed&&n.isNotDisplayed())||(n.isSkippedMoment&&n.isSkippedMoment())))rngMsg('Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.');
+    });}catch(e){}
+  });
 }
 function gRenderAcc(){
   accBody.textContent='';accNote.textContent='';
