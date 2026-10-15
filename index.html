@@ -3606,13 +3606,13 @@ function gOnCredential(resp){
   gUser={sub:d.sub,name:d.name||d.email||'',email:d.email||'',picture:d.picture||''};
   try{localStorage.setItem(GOOGLE_KEY,JSON.stringify(gUser));}catch(e){}
   gUpdateBtn();gRenderAcc();gCheckDev();
+  rngCollab(resp.credential);   // collab RNG∞ : débloque le skin si le joueur a aussi un compte RNG∞
 }
 function gSignOut(){
   cloudUnlink();
   gUser=null;try{localStorage.removeItem(GOOGLE_KEY);}catch(e){}
   try{window.google&&google.accounts.id.disableAutoSelect();}catch(e){}
   gUpdateBtn();gRenderAcc();gCheckDev();
-  rngCollab(resp.credential);   // collab RNG∞ : débloque le skin si le joueur a aussi un compte RNG∞
 }
 function gLoadScript(cb){
   if(gReady){cb(true);return;}
