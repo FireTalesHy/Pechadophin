@@ -953,9 +953,12 @@ function drawRngRoll(cx, top) {
   const lockAt = i => 0.7 + i * 0.28, end = lockAt(5) + 3;
   if (el > end + 0.5) { rngR = null; return; }
   const lead = rngR.s.search(/[1-9]/), alpha = el > end ? 1 - (el - end) / 0.5 : 1;
-  if (!rngR.paid && el >= lockAt(5) + 0.3) {   // bonus : la suite 69 n'importe où dans le tirage rapporte 69 or
+  if (!rngR.paid && el >= lockAt(5) + 0.3) {   // bonus : les suites 13, 67 et 69 n'importe où dans le tirage rapportent autant d'or
     rngR.paid = true;
-    if (rngR.s.includes('69')) { shop.gold += 69; saveShop(); sfx.heal(); floatText(cx, top - 26, '+69 OR', '#ffd23f'); burst(cx, top - 10, '#ffd23f', 14, 90); }
+    let dy = 26;
+    for (const n of ['13', '67', '69']) if (rngR.s.includes(n)) {   // chaque suite trouvée rapporte son nombre en or (cumulable)
+      shop.gold += +n; saveShop(); sfx.heal(); floatText(cx, top - dy, '+' + n + ' OR', '#ffd23f'); burst(cx, top - 10, '#ffd23f', 14, 90); dy += 10;
+    }
   }
   ctx.save(); ctx.globalAlpha = Math.max(0, alpha);
   for (let i = 0; i < 6; i++) {
