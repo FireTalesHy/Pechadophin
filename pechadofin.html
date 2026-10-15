@@ -506,7 +506,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'terminée':'completed','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
@@ -1408,7 +1408,7 @@ const TUP={
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={pearls:0,daggerOwned:false,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,pearls:0,daggerOwned:false,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1418,7 +1418,8 @@ function loadShop(){
       d.daggerOwned=j.daggerOwned===true;
       d.souls=Math.max(0,Math.floor(Number(j.souls))||0);
       d.hp=clamp(Math.floor(Number(j.hp))||0,0,5);
-      d.beach=(j.beach===1||j.beach===-1)?j.beach:0;   // checkpoint : côté de la plage atteinte (0 = pas encore)
+      d.beach=(j.beach===1||j.beach===-1)?j.beach:0;
+      d.swamp=(j.swamp===1||j.swamp===-1)?j.swamp:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
       if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
@@ -2578,6 +2579,12 @@ function update(dt){
       if(hit&&lockMsgT<=0){lockMsgT=2.5;floatText(player.x+5,player.y-26,'PLUS DE RETOUR EN ARRIÈRE','#ff8a8a');floatText(player.x+5,player.y-16,'BATS LE CHÂTEAU DE SABLE','#ffe14d');}
     }
   }
+  if(!anarchyOn&&!shop.swamp&&inSwamp(Math.floor((player.x+5)/T))){   // les marécages sont atteints : 2e checkpoint
+    shop.swamp=player.x<0?-1:1;if(!shop.beach)shop.beach=shop.swamp;saveShop();sfx.heal();shake=Math.max(shake,0.3);
+    floatText(player.x+5,player.y-32,'CHECKPOINT !','#7ff0e8');
+    floatText(player.x+5,player.y-22,'LES MARÉCAGES','#9fd17a');
+    refreshCp();
+  }
   if(!shop.beach&&inBeach(Math.floor((player.x+5)/T))){   // la plage est atteinte : checkpoint débloqué
     shop.beach=player.x<0?-1:1;shop.tridentOwned=true;if(rodLocked()&&shop.weapon==='rod')shop.weapon='trident';saveShop();sfx.heal();shake=Math.max(shake,0.3);   // le trident est débloqué et équipé, la canne ne s'améliore plus
     floatText(player.x+5,player.y-32,'CHECKPOINT !','#7ff0e8');
@@ -3218,7 +3225,7 @@ function setShopBtn(mode){   // en pause : le bouton BOUTIQUE devient RETOUR MEN
 }
 function drawOvChar(){ovCtx.clearRect(0,0,16,16);ovCtx.imageSmoothingEnabled=false;ovCtx.drawImage(curSkin().spr.idle,0,0);}   // le skin équipé au centre des menus
 const OV_TEXT0=ovText.textContent,OV_TITLE0=ovTitle.textContent,ovCp=$('ov-cp');
-function refreshCp(){ovCp.hidden=!shop.beach;}
+function refreshCp(){ovCp.hidden=!shop.beach;ovCp.textContent=shop.swamp?'★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT : LA PLAGE ★';}
 function showTitle(){   // retour à l'écran titre (après un reset de la save par exemple)
   paused=false;initTitle();
   overlayVisible=true;ov.classList.add('show');
@@ -3251,7 +3258,12 @@ function startGame(){
   resetWorld();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
   if(rodLocked()&&shop.weapon==='rod'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
-  if(shop.beach&&!anarchyOn){   // checkpoint : on repart de la plage (anarchie : on commence toujours dans les plaines), l'arène du poulpe derrière soi est considérée comme vaincue
+  if(shop.swamp&&!anarchyOn){   // checkpoint des marécages : poulpe, château et méduse derrière soi
+    const sg=shop.swamp;
+    for(const tx of[sg*ARENA_START*(VW/T),sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T))]){const ar=arenaAt(tx);if(ar)ar.state='won';}
+    bossSpawned=true;octoRun=true;castleRun=true;jellySpawned=true;
+    placePlayer(sg*(SWAMP_TX+10)*T);
+  } else if(shop.beach&&!anarchyOn){   // checkpoint : on repart de la plage (anarchie : on commence toujours dans les plaines), l'arène du poulpe derrière soi est considérée comme vaincue
     const ar=arenaAt(shop.beach*ARENA_START*(VW/T));
     if(ar)ar.state='won';
     bossSpawned=true;octoRun=true;
