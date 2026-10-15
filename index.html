@@ -506,7 +506,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'terminée':'completed','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
@@ -1359,7 +1359,7 @@ const ANA_KEY='canne-dauphins-anarchie';
 let anarchyWant=false,anarchyOn=false,anaEnc=0,jellyDone=new Set();
 try{anarchyWant=localStorage.getItem(ANA_KEY)==='1';}catch(e){}
 anarchyOn=anarchyWant;
-const rodLocked=()=>shop.beach!==0&&!anarchyOn;   // la canne est indisponible une fois la plage atteinte, sauf en mode anarchie
+const rodLocked=()=>false;   // plus aucune arme bloquée selon la zone
 let anaMul=1;
 /* PV des boss en anarchie : le facteur grandit à chaque rencontre (x1,5, puis x1,6, x1,7, ...) : croissance plus qu'exponentielle */
 const encHp=base=>{const m=anaMul;anaMul*=1.5+0.1*anaEnc;anaEnc++;return Math.round(base*m);};
@@ -1424,7 +1424,7 @@ function loadShop(){
       if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
-      d.weapon=(d.tridentOwned&&(j.weapon==='trident'||(d.beach!==0&&!anarchyOn)))?'trident':'rod';
+      d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
       if(j.weapon==='dagger'&&d.daggerOwned)d.weapon='dagger';   // plage atteinte : la canne n'est plus utilisable
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
@@ -1550,8 +1550,7 @@ function hitEnemy(e,dmg){
     shop.gold+=gold;
     if(e.kind==='worm'){   // les vers débloquent les tridents multiples
       const was=shop.wormKills;shop.wormKills++;
-      if(was<WORM_UNLOCK&&shop.wormKills>=WORM_UNLOCK){floatText(e.x+e.w/2,e.y-22,'TRIDENTS MULTIPLES !','#ff6a7a');sfx.heal();}
-      else if(shop.wormKills<WORM_UNLOCK)floatText(e.x+e.w/2,e.y-22,'VER '+shop.wormKills+'/'+WORM_UNLOCK,'#ffb0a0');
+      if(shop.wormKills<=WORM_UNLOCK)floatText(e.x+e.w/2,e.y-22,'VER '+shop.wormKills+'/'+WORM_UNLOCK,'#ffb0a0');
     }
     saveShop();
     floatText(e.x+e.w/2,e.y+8,'+'+gold+' OR','#ffd23f');
@@ -1705,7 +1704,7 @@ function stepTrident(dt){
       for(const o of[-3,3])tridents.push({x:cx+ux*10-uy*o,y:cy+uy*10+ux*o,ux,uy,d:0,hit:new Set(),n:0,g:true});   // akimbo : une balle par pistolet
       sfx.hit();
     } else {
-    const n=TMULTI.vals[shop.tmulti],cx=p.x+5,cy=p.y+6;
+    const n=1,cx=p.x+5,cy=p.y+6;   // tridents multiples supprimés
     castCd=TUP.rate.vals[shop.tup.rate];throwAnim=0.16;
     const base=Math.atan2(aim.y,aim.x),sg=aim.x>=0?1:-1;
     for(const deg of TM_DIRS[n]){   // le 1er part vers la visée, les autres autour du personnage
@@ -3505,7 +3504,6 @@ function missionList(){
     ['Vaincre le château de sable',bs.castle?1:0,1],
     ['Vaincre la vache géante',bs.cow?1:0,1],
     ['Posséder 10 skins',Math.min(shop.owned.length,10),10],
-    ['Tridents multiples au maximum',shop.tmulti,3],
     ['Trident : toutes les améliorations au maximum',tupSum,T_KEYS.length*5]
   ];
 }
@@ -3606,7 +3604,7 @@ function renderShop(){
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
   const notes={skins:"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.",dagger:"Améliorations des dagues : bientôt.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s'achète plus : il se débloque en atteignant la plage.",
-    trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or. Les tridents multiples se débloquent en tuant "+WORM_UNLOCK+" vers de la plage ("+Math.min(shop.wormKills,WORM_UNLOCK)+"/"+WORM_UNLOCK+").":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
+    trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or.":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=shopMerchant?"Le marchand améliore ton arme équipée contre de l'or. Ton score n'est pas touché et le jeu est en pause.":notes[shopTab];
   if(shopTab==='dagger')renderDagger();else if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
 }
@@ -3723,7 +3721,6 @@ function renderTrident(){
     card.appendChild(b);
     shopList.appendChild(card);
   }
-  renderMulti(locked);
 }
 function renderMulti(locked){
   const lv=shop.tmulti,max=lv>=3;
