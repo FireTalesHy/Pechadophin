@@ -596,6 +596,17 @@ const ZONES=[{id:'plain',beach:false,boss:'octo'},{id:'beach',beach:true,boss:'c
 const SWAMP_TX=BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)+13;   // classique : les marécages commencent à la sortie de l'arène du château de sable
 const zoneDefK=k=>k<=0?ZONES[0]:ZONES[Math.min(ZONES.length-1,Math.floor(hash2(k,401)*ZONES.length))];
 const inBeach=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?zoneDefK(zoneK(tx)).beach:Math.abs(tx)<SWAMP_TX);
+const COW_FIELD_SCREENS=20,cowFields=new Map();
+function cowFieldAt(tx){   // grand pré plat (1 écran) où la vache géante attend, avec 2 plateformes volantes
+  const a=Math.abs(tx),sg=tx<0?-1:1;let fc;
+  if(anarchyOn){const k=zoneK(tx);if(k<1||!zoneDefK(k).swamp)return null;fc=BEACH_TX+(k-1)*ZONE_W+12*(VW/T);}
+  else{if(a<SWAMP_TX)return null;fc=SWAMP_TX+COW_FIELD_SCREENS*(VW/T);}
+  if(Math.abs(a-fc)>14)return null;
+  const key=sg*fc;let f=cowFields.get(key);
+  if(!f){f={fc,sg,floor:clamp(Math.round(gBase(sg*fc)),16,23)};cowFields.set(key,f);}
+  return f;
+}
+const cowPlat=(tx,ty)=>{const f=cowFieldAt(tx);if(!f||ty!==f.floor-4)return false;const d=Math.abs(Math.abs(tx)-f.fc);return d>=3&&d<=6;};
 const inSwamp=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?!!zoneDefK(zoneK(tx)).swamp:Math.abs(tx)>=SWAMP_TX);
 const TCELL=56, TFLAT=8;                              // un tunnel possible par cellule de 56 cases, 8 cases de raccord avec le relief
 const plat=new Set();      // plateformes traversables par le dessous
@@ -697,6 +708,8 @@ function column(tx){
     c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12),beach:inBeach(tx),swamp:inSwamp(tx)};
     colCache.set(tx,c);return c;
   }
+  const cf=cowFieldAt(tx);
+  if(cf){const d=Math.abs(Math.abs(tx)-cf.fc),w=clamp(1-(d-10)/4,0,1);c={g:Math.round(lerp(spawnBlend(tx),cf.floor,w)),pit:false,beach:false,swamp:true,cf};colCache.set(tx,c);return c;}
   const p=pitInfo(Math.floor(tx/22));
   const beach=inBeach(tx);
   let g,pit=false,tun=null;
@@ -728,7 +741,7 @@ const palmPlat=(tx,ty)=>{   // la couronne de feuilles d'un cocotier sert de pla
   for(let d=-1;d<=1;d++){const pm=palmAt(tx+d);if(pm&&ty===pm.g-2&&(pm.flip?d===1||d===0:d===0||d===-1))return true;}
   return false;
 };
-const oneWay=(tx,ty)=>(plat.has(tx*512+ty+200)&&!column(tx).ar&&!inBeach(tx))||palmPlat(tx,ty);
+const oneWay=(tx,ty)=>(plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty);
 const solidAt=(x,y)=>solidTile(Math.floor(x/T),Math.floor(y/T));
 const supportAt=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T);return solidTile(tx,ty)||oneWay(tx,ty);};
 
@@ -738,6 +751,7 @@ function genChunk(cx){
   const x0=cx*16, myPlats=[];
   const ca=arenaAt(x0+8);
   if(ca&&Math.abs(x0+8-ca.cx)<=30)return;   // rien à l'intérieur ni autour de l'arène
+  if(cowFieldAt(x0)||cowFieldAt(x0+15))return;   // pré de la vache : vide
   const beachC=inBeach(x0+8);   // zone plage : pas de plateformes, pas de dauphins bleus ni volants
   let nChains=rng()<0.72?1:0; if(rng()<0.25) nChains++;
   if(beachC)nChains=0;
@@ -775,7 +789,8 @@ function genChunk(cx){
       enemies.push(mkEnemy('hop',(pl.tx+1+rng()*(pl.w-2))*T,pl.row*T-9.01));
     } else {
       const col=column(tx); if(col.pit) continue;
-      enemies.push(mkEnemy(rng()<0.3?'shoot':'hop',tx*T,col.g*T-9.01));
+      if(col.swamp){const k=rng();enemies.push(k<0.4?mkEnemy('zombie',tx*T,col.g*T-12.01):k<0.7?mkEnemy('mcow',tx*T,col.g*T-11.01):mkEnemy('hop',tx*T,col.g*T-9.01));}   // marais : mini zombies, mini vaches et dauphins
+      else enemies.push(mkEnemy(rng()<0.3?'shoot':'hop',tx*T,col.g*T-9.01));
     }
   }
   if(beachC){   // vers dans les tunnels : un ou deux dans la galerie du fond, parfois un sur les rampes
@@ -1268,6 +1283,13 @@ function makeGrass(dec,v){
 const GRASS=[];for(let d=0;d<6;d++){GRASS.push([0,1,2].map(v=>makeGrass(d,v)));}
 function darkenImg(img,col){const c=mk(img.width,img.height),g=c.getContext('2d');g.drawImage(img,0,0);g.globalCompositeOperation='multiply';g.fillStyle=col;g.fillRect(0,0,c.width,c.height);g.globalCompositeOperation='destination-in';g.drawImage(img,0,0);return c;}
 const SGRASS=GRASS.map(a=>a.map(i=>darkenImg(i,'#6f8a5c'))),SDIRT=DIRT.map(a=>a.map(i=>darkenImg(i,'#7d7a62')));   // marécages : herbe et terre sombres
+const STONE_PLAT=(()=>{const c=mk(T,T),g=c.getContext('2d');
+  g.fillStyle='#1e2420';g.fillRect(0,0,T,8);g.fillRect(1,-0,3,0);
+  g.fillStyle='#7c8577';g.fillRect(0,2,T,5);g.fillStyle='#9aa394';g.fillRect(0,2,T,1);
+  g.fillStyle='#5e665a';g.fillRect(7,3,1,4);g.fillRect(0,5,T,1);
+  g.fillStyle='#1e2420';g.fillRect(2,0,3,2);g.fillRect(11,0,3,2);g.fillStyle='#7c8577';g.fillRect(3,0,1,2);g.fillRect(12,0,1,2);
+  g.fillStyle='#4f7a3a';g.fillRect(4,7,2,2);g.fillRect(12,7,1,3);
+  return c;})();
 const TOWER=spr(["k..kk..kk..k","kkkkkkkkkkkk","kssSssSssSsk","kssssssssssk",".kssSsssSsk.",".kssssssssk.",".ksskkksssk.",".kssk.kssSk.",".kSsk.kssmk.",".kssssssmmk.",".kssSssssmk.",".kssssSsssk.",".kmsssssssk.",".kmmsssSssk.",".kssssssssk.",".ksSssssssk.",".kssssssmmk.",".kssssssssk.",".kkkkkkkkkk."],{k:'#1e2420',s:'#7c8577',S:'#5e665a',m:'#4f7a3a'},false);   // mini tour de château en ruine
 /* ---------- Sable (zone plage) ---------- */
 function makeSand(shade,v){
@@ -1498,6 +1520,8 @@ function mkEnemy0(kind,x,y){
   const tier=Math.min(8,Math.floor(Math.abs(x)/2400));
   if(kind==='hop') return {kind,x,y,w:14,h:9,vx:0,vy:0,dir,hp:1+tier,maxHp:1+tier,tier,speed:30+Math.random()*14,state:'alive',t:0,flash:0,onGround:false,hopT:0.4+Math.random(),turnT:0};
   if(kind==='worm') return {kind,x,y,w:16,h:8,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:22+Math.random()*10,state:'alive',t:Math.random()*6,flash:0,onGround:false,turnT:0};
+  if(kind==='zombie') return {kind,x,y,w:12,h:12,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:24+Math.random()*10,state:'alive',t:0,flash:0,onGround:false,hopT:0.4+Math.random(),turnT:0};
+  if(kind==='mcow') return {kind,x,y,w:16,h:11,vx:0,vy:0,dir,hp:3+tier,maxHp:3+tier,tier,speed:20+Math.random()*8,state:'alive',t:0,flash:0,onGround:false,mode:'walk',mt:Math.random(),rot:0};
   if(kind==='gull') return {kind,x,y,baseY:y,w:14,h:8,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:40+Math.random()*10,state:'alive',t:Math.random()*5,ph:Math.random()*6,flash:0,onGround:false,mode:'glide',mt:0,cd:1+Math.random()*1.5,dvx:0,dvy:0};
   if(kind==='shoot') return {kind,x,y,w:14,h:9,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:13+Math.random()*7,state:'alive',t:0,flash:0,onGround:false,hopT:1.2+Math.random()*1.5,turnT:0,fireCd:1.5+Math.random()*2,charge:0};
   return {kind:'fly',x,y,baseY:y,w:16,h:9,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:34+Math.random()*10,state:'alive',t:Math.random()*5,ph:Math.random()*6,flash:0,lock:0,onGround:false};
@@ -1521,7 +1545,7 @@ function hitEnemy(e,dmg){
     e.state='dead';e.t=0;e.vy=-170;e.vx=-e.dir*30;
     kills++; shake=Math.max(shake,0.08); sfx.kill();
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
-    const gold=(e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
+    const gold=(e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
     shop.gold+=gold;
     if(e.kind==='worm'){   // les vers débloquent les tridents multiples
       const was=shop.wormKills;shop.wormKills++;
@@ -1828,6 +1852,54 @@ function aiGull(e,dt){   // mouette : plane en altitude, repère le joueur, s'é
     if(e.mt>1.2){e.mode='glide';e.mt=0;e.cd=(2.2+Math.random()*1.5)*anaCd();e.baseY=e.y;}
   }
 }
+function aiMcow(e,dt){   // mini vache : se promène puis roule vers le joueur (sans cracher)
+  const p=player;
+  e.vy=Math.min(e.vy+GRAV*dt,MAXFALL);e.mt+=dt;
+  const dx=p.x-e.x,near=Math.abs(dx)<140&&Math.abs(p.y-e.y)<50;
+  let v=0;
+  if(e.mode==='roll'){v=e.dir*130*(night?NIGHT_SPEED:1);e.rot+=e.dir*130*dt/6;if(e.mt>1.3){e.mode='rest';e.mt=0;}}
+  else if(e.mode==='rest'){e.rot*=0.8;if(e.mt>1){e.mode='walk';e.mt=0;e.rot=0;}}
+  else{v=e.dir*e.speed*(night?NIGHT_SPEED:1);if(near&&e.mt>0.8){e.dir=dx>0?1:-1;e.mode='roll';e.mt=0;}}
+  if(moveX(e,v*dt)){e.dir=-e.dir;if(e.mode==='roll'){e.mode='rest';e.mt=0;}}
+  moveY(e,e.vy*dt);
+  if(e.onGround&&e.mode==='walk'){const fx=e.dir>0?e.x+e.w+1:e.x-1;if(!supportAt(fx,e.y+e.h+2))e.dir=-e.dir;}
+  if(e.y>WATER_ROW*T+10){e.state='dead';e.t=9;}
+}
+function drawZombie(e){   // mini zombie mignon qui sautille
+  const dead=e.state==='dead',cx=Math.round(e.x+e.w/2),by=Math.round(e.y+e.h);
+  const st=!dead?Math.min(0.25,Math.abs(e.vy)/700):0;
+  ctx.save();ctx.translate(cx,by);ctx.scale((e.dir>0?1:-1)*(1-st*0.4),(dead?-1:1)*(1+st*0.6));
+  const G=e.flash>0?'#ffffff':'#8fd16a',g=e.flash>0?'#e8e8ff':'#5fa64a',K='#14182c';
+  ctx.fillStyle=K;ctx.fillRect(-6,-14,12,10);ctx.fillRect(-5,-5,10,6);
+  ctx.fillStyle=G;ctx.fillRect(-5,-13,10,8);
+  ctx.fillStyle=g;ctx.fillRect(-5,-13,10,2);ctx.fillRect(-2,-14,2,1);
+  ctx.fillStyle='#ffffff';ctx.fillRect(-3,-10,3,3);ctx.fillRect(1,-10,3,3);
+  ctx.fillStyle=K;ctx.fillRect(-1,-9,1,2);ctx.fillRect(3,-9,1,2);
+  ctx.fillStyle='#ff8aa3';ctx.fillRect(-4,-7,1,1);ctx.fillRect(4,-7,1,1);
+  ctx.fillStyle='#7a5ac8';ctx.fillRect(-4,-4,8,4);
+  ctx.fillStyle=G;ctx.fillRect(4,-4,4,2);
+  ctx.fillStyle='#3a2a5a';ctx.fillRect(-3,0,2,1);ctx.fillRect(1,0,2,1);
+  ctx.restore();
+  if(!dead&&e.maxHp>1){const w=Math.min(18,e.maxHp*3+2),bx=cx-Math.floor(w/2),y=by-20;ctx.fillStyle='#14182c';ctx.fillRect(bx-1,y-1,w+2,4);ctx.fillStyle='#ff5a5a';ctx.fillRect(bx,y,Math.max(1,Math.round(w*e.hp/e.maxHp)),2);}
+}
+function drawMcow(e){   // mini vache (boule quand elle roule)
+  const dead=e.state==='dead',cx=Math.round(e.x+e.w/2),cy=Math.round(e.y+e.h/2);
+  const W=e.flash>0?'#ffd6d6':'#f4f2ea',K='#14182c',S='#2a2a33';
+  ctx.save();ctx.translate(cx,cy);if(dead)ctx.scale(1,-1);
+  if(e.mode==='roll'){ctx.rotate(e.rot);ctx.fillStyle=K;disc(0,0,7);ctx.fillStyle=W;disc(0,0,6);ctx.fillStyle=S;disc(-2,-2,2);disc(3,2,1);ctx.fillStyle='#f2a0b0';ctx.fillRect(4,-1,2,3);}
+  else{
+    if(e.dir<0)ctx.scale(-1,1);
+    const st=Math.floor(time*8)%2;
+    ctx.fillStyle=K;ctx.fillRect(-8,-4,13,8);ctx.fillStyle=W;ctx.fillRect(-7,-3,11,6);
+    ctx.fillStyle=S;ctx.fillRect(-5,-2,3,3);ctx.fillRect(0,0,2,2);
+    ctx.fillStyle=K;ctx.fillRect(3,-7,6,7);ctx.fillStyle=W;ctx.fillRect(4,-6,4,5);
+    ctx.fillStyle='#f2a0b0';ctx.fillRect(6,-3,3,2);ctx.fillStyle=K;ctx.fillRect(5,-5,1,1);
+    ctx.fillStyle='#e8dcb0';ctx.fillRect(4,-8,1,2);ctx.fillRect(7,-8,1,2);
+    ctx.fillStyle=K;ctx.fillRect(-6,3,2,3-st);ctx.fillRect(1,3,2,2+st);
+  }
+  ctx.restore();
+  if(!dead&&e.maxHp>1){const w=Math.min(18,e.maxHp*3+2),bx=cx-Math.floor(w/2),y=cy-14;ctx.fillStyle='#14182c';ctx.fillRect(bx-1,y-1,w+2,4);ctx.fillStyle='#ff5a5a';ctx.fillRect(bx,y,Math.max(1,Math.round(w*e.hp/e.maxHp)),2);}
+}
 function aiFly(e,dt){
   const p=player;
   e.lock-=dt;
@@ -1845,7 +1917,7 @@ function stepEnemies(dt){
     if(e.state==='dead'){e.t+=dt;e.vy+=GRAV*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;continue;}
     if(Math.abs(e.x-p.x)>380||Math.abs(e.y-p.y)>320)continue;
     e.t+=dt; if(e.flash>0)e.flash-=dt;
-    if(e.kind==='gull')aiGull(e,dt);else if(e.kind==='fly')aiFly(e,dt);else if(e.kind==='worm')aiWorm(e,dt);else aiHop(e,dt);
+    if(e.kind==='gull')aiGull(e,dt);else if(e.kind==='mcow')aiMcow(e,dt);else if(e.kind==='fly')aiFly(e,dt);else if(e.kind==='worm')aiWorm(e,dt);else aiHop(e,dt);
     if(state==='play'&&p.invuln<=0&&e.state==='alive'&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,e.x,e.y,e.w,e.h)) hurtPlayer(e.x+e.w/2);
   }
   enemies=enemies.filter(e=>!(e.state==='dead'&&(e.y>(WATER_ROW+4)*T||e.t>3))&&Math.abs(e.x-p.x)<2400);
@@ -2090,21 +2162,16 @@ function stepOcto(dt){
 }
 /* ---------- Vache géante : boss des marécages, elle roule sur le joueur ---------- */
 const COW_HP=600, COW_SCREENS=20;
-let cow=null,cowSpawned=false,cowDone=new Set();
+let cow=null,cowSpawned=false,cowDone=new Set(),milk=[];
 function maybeSpawnCow(){
   if(cow||boss||octo||castle||jelly)return;
-  const p=player,tx=Math.floor((p.x+5)/T),side=tx<0?-1:1;
-  if(!inSwamp(tx))return;
+  const p=player,tx=Math.floor((p.x+5)/T),f=cowFieldAt(tx);
+  if(!f||Math.abs(Math.abs(tx)-f.fc)>9)return;
   let key;
-  if(anarchyOn){
-    const k=zoneK(tx),zs=BEACH_TX+(k-1)*ZONE_W;
-    if(Math.abs(tx)-zs<12*(VW/T)||cowDone.has(side*k))return;
-    key=side*k;
-  } else {
-    if(cowSpawned||Math.abs(tx)<SWAMP_TX+COW_SCREENS*(VW/T))return;
-  }
-  const w=44,h=30,bx=p.x+5+p.face*170-w/2,c=column(Math.floor((bx+w/2)/T)),ch=anarchyOn?encHp(COW_HP):COW_HP;
-  cow={x:bx,y:(c.pit?p.y+p.h:c.g*T)-h-60,w,h,vy:0,dir:p.x>bx?1:-1,hp:ch,maxHp:ch,state:'alive',spawnT:1.2,mode:'walk',mt:0,rot:0,flash:0,t:0,rage:false,sx:0};
+  if(anarchyOn){key=f.sg*zoneK(tx);if(cowDone.has(key))return;}
+  else if(cowSpawned)return;
+  const w=44,h=30,ctx0=f.sg*f.fc,side=(tx-ctx0)>=0?-1:1,bx=(ctx0+side*8)*T+8-w/2,ch=anarchyOn?encHp(COW_HP):COW_HP;
+  cow={x:bx,y:f.floor*T-h-80,w,h,vy:0,dir:-side,hp:ch,maxHp:ch,state:'alive',spawnT:1.2,mode:'walk',mt:0,rot:0,flash:0,t:0,rage:false,sx:0,spit:0};
   cowSpawned=true;if(key!==undefined)cowDone.add(key);shake=0.6;sfx.bossSpawn();
   floatText(p.x+5,p.y-34,'LA VACHE GÉANTE !','#ffffff');
 }
@@ -2145,7 +2212,18 @@ function stepCow(dt){
   const dx=p.x+5-(b.x+b.w/2);
   if(b.mode==='walk'){
     b.dir=dx>0?1:-1;b.x+=b.dir*34*sp*dt;
-    if(b.mt>(b.rage?0.8:1.3)){b.mode='wind';b.mt=0;b.dir=dx>0?1:-1;}
+    if(b.mt>(b.rage?0.8:1.3)){b.mt=0;b.dir=dx>0?1:-1;b.mode=Math.abs(dx)>70&&Math.random()<0.5?'aim':'wind';}
+  } else if(b.mode==='aim'){   // gonfle les joues avant de cracher
+    b.dir=dx>0?1:-1;
+    if(b.mt>0.5){b.mode='spit';b.mt=0;b.spitHit=false;b.tx=p.x+5;b.ty=p.y+p.h;sfx.bossFire();}
+  } else if(b.mode==='spit'){   // jet de lait en arc, coupé dès qu'il touche le sol
+    b.spit-=dt;
+    if(!b.spitHit&&b.mt<0.9&&b.spit<=0){
+      b.spit=0.03;
+      const mx=b.x+b.w/2+b.dir*20,my=b.y+6,tf=0.75,gx=b.tx-mx,gy=b.ty-my;
+      milk.push({x:mx,y:my,vx:gx/tf+(Math.random()-0.5)*14,vy:(gy-0.5*500*tf*tf)/tf+(Math.random()-0.5)*14,t:0});
+    }
+    if((b.spitHit&&!milk.length)||b.mt>1.8){b.mode='walk';b.mt=0;}
   } else if(b.mode==='wind'){   // se met en boule : télégraphe
     b.rot-=b.dir*dt*10;
     if(Math.random()<0.5)parts.push({x:b.x+b.w/2-b.dir*18,y:b.y+b.h,vx:-b.dir*40,vy:-30,g:200,life:0.4,col:'#6b5a3a',sz:2});
@@ -2164,6 +2242,16 @@ function stepCow(dt){
   if(Math.abs(b.x-p.x)>900){b.x=p.x+5-p.face*300;}   // ne se laisse pas semer
   if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x+4,b.y+4,b.w-8,b.h-4))hurtPlayer(b.x+b.w/2);
 }
+function stepMilk(dt){
+  const p=player;
+  for(const m of milk){
+    m.t+=dt;m.vy+=500*dt;m.x+=m.vx*dt;m.y+=m.vy*dt;
+    if(solidAt(m.x,m.y)||oneWay(Math.floor(m.x/T),Math.floor(m.y/T))&&m.vy>0||m.t>3){m.dead=true;if(cow)cow.spitHit=true;parts.push({x:m.x,y:m.y-1,vx:(Math.random()-0.5)*60,vy:-40-Math.random()*40,g:400,life:0.35,col:'#ffffff',sz:2});continue;}
+    if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,m.x-2,m.y-2,4,4)){m.dead=true;hurtPlayer(m.x);}
+  }
+  milk=milk.filter(m=>!m.dead);
+}
+function drawMilk(){for(const m of milk){ctx.fillStyle='#d8e4f0';ctx.fillRect(Math.round(m.x)-2,Math.round(m.y)-2,4,4);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(m.x)-1,Math.round(m.y)-2,3,3);}}
 function drawCow(){
   const b=cow;if(!b)return;
   const cx=Math.round(b.x+b.w/2),cy=Math.round(b.y+b.h/2);
@@ -2192,6 +2280,7 @@ function drawCow(){
     ctx.fillStyle=K;ctx.fillRect(-21,-8,3,6);
   }
   ctx.restore();
+  if(b.mode==='aim'&&b.state==='alive'){ctx.fillStyle='#ffffff';disc(cx+b.dir*20,cy-8,2+Math.round(b.mt*6));}
   if(b.mode==='wind'&&b.state==='alive'){ctx.fillStyle='#ff4a3a';ctx.fillRect(cx-1,cy-30,2,6);ctx.fillRect(cx-1,cy-22,2,2);}
 }
 function stepBoss(dt){
@@ -2502,6 +2591,7 @@ function update(dt){
   stepBoss(dt);
   stepJelly(dt);
   stepCow(dt);
+  stepMilk(dt);
   stepOcto(dt);
   stepCastle(dt);
   stepBossShots(dt);
@@ -2653,7 +2743,13 @@ function drawTiles(cx,cy){
         else ctx.drawImage(ty===col.g-WALL_H?WALL_CAP:WALL,tx*T,ty*T);
       }
     }
-    for(let ty=ty0;ty<=ty1;ty++) if(!inBeach(tx)&&oneWay(tx,ty)) ctx.drawImage(PLANK,tx*T,ty*T);
+    for(let ty=ty0;ty<=ty1;ty++) if(!inBeach(tx)&&oneWay(tx,ty)){
+      if(col.swamp){   // marais : plateformes en haut de tour
+        let l=tx,r=tx;while(l>tx-8&&oneWay(l-1,ty))l--;while(r<tx+8&&oneWay(r+1,ty))r++;
+        if(tx===((l+r)>>1)&&!col.pit){const by=col.g*T,x=tx*T+3;ctx.fillStyle='#1e2420';ctx.fillRect(x-1,ty*T+6,12,by-ty*T-6);ctx.fillStyle='#6a7366';ctx.fillRect(x,ty*T+6,10,by-ty*T-6);ctx.fillStyle='#545c51';for(let yy=ty*T+10;yy<by;yy+=8)ctx.fillRect(x,yy,10,1);ctx.fillStyle='#4f7a3a';ctx.fillRect(x,by-6,3,6);if(by-ty*T>30){ctx.fillStyle='#1e2420';ctx.fillRect(x+4,ty*T+14,2,5);}}
+        ctx.drawImage(STONE_PLAT,tx*T,ty*T);
+      } else ctx.drawImage(PLANK,tx*T,ty*T);
+    }
   }
 }
 function drawWorm(e){   // ver simplifié : 3 blocs roses + un œil
@@ -2700,6 +2796,8 @@ function drawGull(e){
 function drawEnemy(e){
   if(e.kind==='worm'){drawWorm(e);return;}
   if(e.kind==='gull'){drawGull(e);return;}
+  if(e.kind==='zombie'){drawZombie(e);return;}
+  if(e.kind==='mcow'){drawMcow(e);return;}
   const dead=e.state==='dead';
   const img=e.kind==='hop'?(e.flash>0?DOLB_W:DOLB):e.kind==='shoot'?(e.flash>0?DOLR_W:DOLR):(e.flash>0?DOLP_W:DOLP);
   const cx=Math.round(e.x+e.w/2),cy=Math.round(e.y+e.h/2);
@@ -3086,6 +3184,7 @@ function render(){
   drawBoss();
   drawJelly();
   drawCow();
+  drawMilk();
   drawBossShots();
   drawTridents();
   drawPlayer();
@@ -3130,8 +3229,8 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 }
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
-  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();
-  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;cowSpawned=false;cowDone=new Set();
+  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();
+  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
