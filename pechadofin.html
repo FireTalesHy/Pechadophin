@@ -3384,6 +3384,7 @@ function updateDev(){
 }
 function devGive(key,n){shop[key]+=n;saveShop();sfx.heal();updateDev();}
 function openDev(){
+  if(!devOk)return;   // menu de test réservé à certains comptes Google
   ensureAudio();
   clearInputs();
   devOpen=true;devEl.hidden=false;
@@ -3456,6 +3457,19 @@ const ICON_USER='<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" he
 function gDecode(tok){
   try{const b=tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(b+'='.repeat((4-b.length%4)%4)))));}catch(e){return null;}
 }
+/* Menu de test : réservé aux comptes Google dont l'empreinte SHA-256 de l'email est listée (les emails n'apparaissent pas en clair) */
+const DEV_HASHES=['e25b16544775982eeb8ea2148661d8046bfc4e0eded6e98f6f27dc69fae69eb7','859183087dc35fabb8678f375619b54dcf4a6d7debc07857c1473d58642abd66'];
+let devOk=false;
+async function gCheckDev(){
+  devOk=false;
+  if(!gUser||!gUser.email||!(window.crypto&&crypto.subtle))return;
+  try{
+    const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(gUser.email.trim().toLowerCase()));
+    const h=[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    devOk=DEV_HASHES.includes(h);
+  }catch(e){}
+  if(!devOk&&devOpen)closeDev();
+}
 function gUpdateBtn(){
   accBtn.textContent='';
   if(gUser&&gUser.picture){const im=document.createElement('img');im.src=gUser.picture;im.alt='';im.referrerPolicy='no-referrer';accBtn.appendChild(im);}
@@ -3466,12 +3480,12 @@ function gOnCredential(resp){
   if(!d||!d.sub)return;
   gUser={sub:d.sub,name:d.name||d.email||'',email:d.email||'',picture:d.picture||''};
   try{localStorage.setItem(GOOGLE_KEY,JSON.stringify(gUser));}catch(e){}
-  gUpdateBtn();gRenderAcc();
+  gUpdateBtn();gRenderAcc();gCheckDev();
 }
 function gSignOut(){
   gUser=null;try{localStorage.removeItem(GOOGLE_KEY);}catch(e){}
   try{window.google&&google.accounts.id.disableAutoSelect();}catch(e){}
-  gUpdateBtn();gRenderAcc();
+  gUpdateBtn();gRenderAcc();gCheckDev();
 }
 function gLoadScript(cb){
   if(gReady){cb(true);return;}
@@ -3510,7 +3524,7 @@ function openAcc(){clearInputs();accOpen=true;accEl.hidden=false;gRenderAcc();tr
 function closeAcc(){accOpen=false;accEl.hidden=true;try{accBtn.focus({preventScroll:true});}catch(e){}}
 accBtn.addEventListener('click',openAcc);$('acc-close').addEventListener('click',closeAcc);
 accEl.addEventListener('pointerdown',e=>{if(e.target===accEl)closeAcc();});
-gUpdateBtn();
+gUpdateBtn();gCheckDev();
 
 /* ---- Langue : traduction du DOM + drapeau du pays vers lequel on bascule ---- */
 const frStore=new WeakMap(),frAttrStore=new WeakMap();
