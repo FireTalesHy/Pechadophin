@@ -1,6 +1,6 @@
-# 🎣 Canne & Dauphins
+# 🎣 Pechadophin
 
-**Version V0.2.11**
+**Version V0.2.12**
 
 Un jeu de plateforme en pixel art, [jouable directement dans le navigateur](https://firetaleshy.github.io/Pechadophin/) : tu es un pêcheur qui affronte des dauphins, un démon requin, un poulpe géant, une méduse et un château de sable, dans un monde généré aléatoirement à chaque partie.
 
@@ -28,7 +28,9 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 - Un démon requin à laser, accompagné d'une nuit rouge sang
 - Une arène avec un poulpe géant, de chaque côté du départ
 - La plage : une zone en sable avec des tunnels, des vers, un checkpoint et des cocotiers qui servent de plateformes, un boss volant (la méduse, lasers blancs et tentacules rotatives) et le château de sable (vagues de sable, seau d'eau à viser)
-- Deux modes de jeu : Classique et Anarchie (boss sans fin, zones et ciel qui changent à chaque rencontre)
+- Deux modes de jeu : Classique et Anarchie (boss sans fin, zone tirée au hasard après chaque boss d'arène, ciel qui change à chaque requin)
+- Jeu en français ou en anglais (bouton drapeau)
+- Connexion avec un compte Google (voir [privacy.html](privacy.html))
 - Des marchands en pleine partie pour améliorer l'arme équipée
 - Une boutique : 18 skins (perles), améliorations (or) et âmes rouges
 - Nouveau menu principal, menu pause, sauvegarde locale du meilleur score et de la boutique, bouton de réinitialisation de la save (double confirmation)

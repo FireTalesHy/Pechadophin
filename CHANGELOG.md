@@ -1,6 +1,19 @@
 # Changelog
 
-Toutes les modifications notables de **Canne & Dauphins** (`pechadofin.html`).
+Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
+
+## [V0.2.12] - 2026-10-15
+
+### Ajouté
+- **Nouveau nom** : le jeu s'appelle désormais **Pechadophin**.
+- **Français / Anglais** : bouton drapeau en haut du menu (il affiche le drapeau de la langue vers laquelle on bascule). Tout le jeu est traduit et le choix est mémorisé.
+- **Connexion Google** : bouton compte dans le menu pour se connecter avec son compte Google (nom et photo affichés). Rien n'est envoyé à un serveur : la session reste dans le navigateur.
+- **Page de confidentialité** (`privacy.html`).
+
+### Modifié
+- **Château de sable** : le seau doit être touché 2 fois (peu importe les dégâts) pour s'activer et blesser le château.
+- **Mode Classique** : la méduse apparaît 26 écrans après le début du sable (ou du checkpoint), le château de sable 22 écrans après la méduse.
+- **Mode Anarchie** : la partie commence toujours dans les plaines ; après chaque boss d'arène, la zone suivante est tirée au hasard parmi toutes les zones (plaines, plage), et le boss d'arène dépend de la zone (poulpe dans les plaines, château de sable sur la plage).
 
 ## [V0.2.11] - 2026-10-13
 
