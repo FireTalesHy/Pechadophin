@@ -1671,11 +1671,13 @@ function tryParry(){   // dagues : chance d'annuler un coup au corps à corps pe
 function stepDagger(dt){
   const p=player;
   if(p.parryT>0)p.parryT-=dt;
+  if(p.dashCd>0)p.dashCd-=dt;
+  if(p.dashWait&&p.onGround&&!p.dash){p.dashWait=false;p.dashCd=1;}   // recharge de 1 s qui démarre au contact du sol
   if(fireBuf>0)fireBuf-=dt;
   if(castCd>0)castCd-=dt;
   if(throwAnim>0)throwAnim-=dt;
-  if(!p.dash&&(fireBuf>0||inp.fire||aim.auto)&&castCd<=0&&p.stun<=0&&state==='play'){
-    fireBuf=0;castCd=DAG.cd;throwAnim=0.16;
+  if(!p.dash&&!p.dashWait&&!(p.dashCd>0)&&(fireBuf>0||inp.fire||aim.auto)&&castCd<=0&&p.stun<=0&&state==='play'){
+    fireBuf=0;castCd=DAG.cd;p.dashWait=true;throwAnim=0.16;
     let ux=aim.x,uy=aim.y;const l=Math.hypot(ux,uy)||1;ux/=l;uy/=l;
     if(uy>0&&p.onGround){uy=0;ux=ux>=0?1:-1;}   // pas de dash dans le sol
     p.dash={t:DAG.time,vx:ux*dagV('dist')/DAG.time,vy:uy*dagV('dist')/DAG.time,hit:new Set()};
