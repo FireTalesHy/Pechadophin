@@ -2,6 +2,29 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.3.1] - 2026-10-15
+
+### Ajouté
+- **Les marécages** : nouvelle zone juste après l'arène du château de sable (mode Classique), aussi tirée au hasard en mode Anarchie.
+  - Herbe et terre sombres, ciel et eau verdâtres, petites flaques et mini tours de château en ruine.
+  - Les plateformes sont des sommets de tours en pierre.
+  - Nouveaux ennemis : mini zombies qui sautillent et mini vaches qui roulent sur le joueur (les dauphins bleus et volants restent).
+- **Vache géante** : boss des marécages, 600 PV, qui attend sur un grand pré plat avec deux plateformes volantes.
+  - Elle se met en boule et roule sur le joueur, ou crache un jet de lait en arc qui s'arrête en touchant le sol.
+  - Enragée à 50 % de PV. Récompense : 150 or et 2 âmes rouges (première victoire seulement). Nouvelle mission associée.
+- **Coffres** : des coffres marron apparaissent au hasard et donnent de l'or.
+- **Coffre rouge** : uniquement dans les marécages, il contient une nouvelle arme, les **dagues**.
+- **Dagues** : chaque attaque est un dash qui blesse tout sur sa trajectoire. Avec les dagues, on se déplace plus vite et on saute un peu plus haut.
+- **Menu ARMES** (menu principal) : une case par arme ; cliquer sur une arme ouvre sa fiche en grand avec ses améliorations et le bouton pour l'équiper.
+- **Sauvegarde cloud** : avec la connexion Google, la progression est sauvegardée dans un fichier caché du Google Drive du joueur et récupérée sur un autre appareil.
+- **Tir automatique** : en maintenant le joystick de visée 1 seconde, le jeu tire tout seul.
+- **Collab RNG∞** : skin RNG∞ à débloquer en ayant un compte RNG∞ avec le même compte Google (bouton DÉBLOQUER dans la boutique), tirage de chiffres au-dessus du pêcheur à chaque dauphin, et les suites 13, 67 et 69 rapportent autant d'or. Lien vers RNG∞ dans les réglages.
+
+### Modifié
+- **Perles supprimées** : les perles déjà gagnées sont converties en or (1 perle = 50 or).
+- **Skins** : ils s'achètent maintenant en or (le moins cher coûte 100 or).
+- **Page de confidentialité** mise à jour (sauvegarde cloud et collab RNG∞).
+
 ## [V0.2.12] - 2026-10-15
 
 ### Ajouté
