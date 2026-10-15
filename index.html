@@ -506,7 +506,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'terminée':'completed','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
@@ -1405,10 +1405,16 @@ const TUP={
  rate:{name:'Vitesse de tir',vals:[0.70,0.60,0.50,0.42,0.35,0.28],cost:[35,75,130,200,300],fmt:v=>fr1(1/v)+' tirs/s'},
  range:{name:'Portée',vals:[140,165,190,220,250,290],cost:[25,55,95,150,220],fmt:v=>fr1(v/16)+' cases'}
 };
+const D_KEYS=['dmg','dist','jump'];
+const DUP={   // améliorations des dagues (or)
+ dmg:{name:'Dégâts',vals:[8,11,14,18,23,30],cost:[40,90,150,240,360],fmt:v=>v+' dégâts'},
+ dist:{name:'Longueur du dash',vals:[84,100,116,134,152,172],cost:[35,75,130,200,300],fmt:v=>fr1(v/16)+' cases'},
+ jump:{name:'Hauteur de saut',vals:[1.2,1.36,1.52,1.68,1.84,2],cost:[30,65,110,170,260],fmt:v=>'x'+fr1(v)}   // jusqu'à 2 fois plus haut
+};
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,pearls:0,daggerOwned:false,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,pearls:0,daggerOwned:false,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1426,6 +1432,7 @@ function loadShop(){
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
       if(j.weapon==='dagger'&&d.daggerOwned)d.weapon='dagger';   // plage atteinte : la canne n'est plus utilisable
+      if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
       if(Array.isArray(j.owned))for(const id of j.owned)if(SKINS.some(x=>x.id===id)&&!d.owned.includes(id))d.owned.push(id);
@@ -1604,7 +1611,7 @@ function stepPlayer(dt){
   }
   if(aim.active&&Math.abs(aim.x)>0.25&&p.stun<=0)p.face=aim.x>0?1:-1;   // le pêcheur regarde du côté où il vise
   if(p.onGround)p.coyote=0.1;else p.coyote-=dt;
-  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*(shop.weapon==='dagger'&&!glockOn?DAG.jump:1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
+  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*(shop.weapon==='dagger'&&!glockOn?Math.sqrt(dagV('jump')):1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
   if(!inp.jump&&p.vy<-140&&p.stun<=0&&!p.boost)p.vy=-140;
   p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
   {
@@ -1651,7 +1658,8 @@ function hookHit(h,dmg,R){
   return true;
 }
 /* ---------- Dagues : chaque attaque est un dash qui blesse tout sur sa trajectoire ---------- */
-const DAG={dmg:8,cd:0.42,dist:84,time:0.13,spd:1.25,jump:1.1};
+const DAG={cd:0.42,time:0.13,spd:1.25};
+const dagV=k=>DUP[k].vals[(shop.dup||{})[k]||0];
 function stepDagger(dt){
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
@@ -1661,7 +1669,7 @@ function stepDagger(dt){
     fireBuf=0;castCd=DAG.cd;throwAnim=0.16;
     let ux=aim.x,uy=aim.y;const l=Math.hypot(ux,uy)||1;ux/=l;uy/=l;
     if(uy>0&&p.onGround){uy=0;ux=ux>=0?1:-1;}   // pas de dash dans le sol
-    p.dash={t:DAG.time,vx:ux*DAG.dist/DAG.time,vy:uy*DAG.dist/DAG.time,hit:new Set()};
+    p.dash={t:DAG.time,vx:ux*dagV('dist')/DAG.time,vy:uy*dagV('dist')/DAG.time,hit:new Set()};
     if(Math.abs(ux)>0.2)p.face=ux>0?1:-1;
     sfx.trident();
   }
@@ -1669,7 +1677,7 @@ function stepDagger(dt){
   d.t-=dt;
   moveX(p,d.vx*dt);moveY(p,d.vy*dt);p.vy=0;
   if(Math.random()<0.9)parts.push({x:p.x+5+(Math.random()-0.5)*6,y:p.y+4+Math.random()*8,vx:-d.vx*0.05,vy:-d.vy*0.05,g:0,life:0.22,col:Math.random()<0.5?'#cfd8ff':'#ffffff',sz:2});
-  const rx=p.x-7,ry=p.y-5,rw=p.w+14,rh=p.h+10,dmg=DAG.dmg;
+  const rx=p.x-7,ry=p.y-5,rw=p.w+14,rh=p.h+10,dmg=dagV('dmg');
   const tryHit=(key,r,fn)=>{if(d.hit.has(key))return;if(rectsOverlap(rx,ry,rw,rh,r[0],r[1],r[2],r[3])){d.hit.add(key);fn(dmg);}};
   for(const e of enemies)if(e.state==='alive')tryHit(e,[e.x,e.y,e.w,e.h],x=>hitEnemy(e,x));
   if(boss&&boss.state==='alive'&&boss.spawnT<=0)tryHit(boss,[boss.x,boss.y,boss.w,boss.h],x=>hitBoss(boss,x));
@@ -3575,9 +3583,38 @@ weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
 $('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
 function renderDagger(){
   shopList.textContent='';
-  const p=document.createElement('p');p.className='shop-note';p.style.gridColumn='1/-1';
-  p.textContent='Améliorations des dagues : bientôt.';
-  shopList.appendChild(p);
+  const locked=!shop.daggerOwned,icons={dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate};
+  for(const key of D_KEYS){
+    const u=DUP[key],lv=shop.dup[key],max=lv>=5;
+    const card=document.createElement('div');card.className='card';
+    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,icons[key],true);ic.setAttribute('aria-hidden','true');
+    card.appendChild(ic);
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
+    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 5');
+    for(let i=0;i<5;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
+    card.appendChild(pips);
+    const val=document.createElement('div');val.className='val';
+    val.textContent=max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]);
+    card.appendChild(val);
+    const pr=document.createElement('div');pr.className='pr';
+    if(max){pr.textContent='NIVEAU 5/5';}
+    else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
+    card.appendChild(pr);
+    const b=document.createElement('button');b.className='sbtn';b.type='button';
+    if(locked){b.textContent='DAGUES REQUISES';b.disabled=true;}
+    else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
+    else if(shop.gold>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyDUp(key));}
+    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.gold);b.disabled=true;}
+    b.setAttribute('aria-label',u.name+' : '+b.textContent);
+    card.appendChild(b);
+    shopList.appendChild(card);
+  }
+}
+function buyDUp(key){
+  const u=DUP[key],lv=shop.dup[key];
+  if(!shop.daggerOwned||lv>=5||shop.gold<u.cost[lv])return;
+  shop.gold-=u.cost[lv];shop.dup[key]=lv+1;
+  saveShop();sfx.heal();renderShop();
 }
 function openMode(){clearInputs();modeOpen=true;modeEl.hidden=false;updateMode();try{$('mode-close').focus({preventScroll:true});}catch(e){}}
 function closeMode(){modeOpen=false;modeEl.hidden=true;try{$('skins-btn').focus({preventScroll:true});}catch(e){}}
@@ -3603,7 +3640,7 @@ function renderShop(){
   $('shop-gold').textContent=shop.gold;
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
-  const notes={skins:"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.",dagger:"Améliorations des dagues : bientôt.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s'achète plus : il se débloque en atteignant la plage.",
+  const notes={skins:"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.",dagger:"Les dagues attaquent en dash : chaque amélioration coûte de l'or. La hauteur de saut va jusqu'à x2.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur. Le trident ne s'achète plus : il se débloque en atteignant la plage.",
     trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or.":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=shopMerchant?"Le marchand améliore ton arme équipée contre de l'or. Ton score n'est pas touché et le jeu est en pause.":notes[shopTab];
   if(shopTab==='dagger')renderDagger();else if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
