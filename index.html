@@ -3462,7 +3462,7 @@ function gDecode(tok){
   try{const b=tok.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(b+'='.repeat((4-b.length%4)%4)))));}catch(e){return null;}
 }
 /* Menu de test : réservé aux comptes Google dont l'empreinte SHA-256 de l'email est listée (les emails n'apparaissent pas en clair) */
-const DEV_HASHES=['e25b16544775982eeb8ea2148661d8046bfc4e0eded6e98f6f27dc69fae69eb7','859183087dc35fabb8678f375619b54dcf4a6d7debc07857c1473d58642abd66','dc43a5c5b584cc5a1df067c1001867aa89f419433a6d7b27cc9add46674c87be'];
+const DEV_HASHES=['e25b16544775982eeb8ea2148661d8046bfc4e0eded6e98f6f27dc69fae69eb7','859183087dc35fabb8678f375619b54dcf4a6d7debc07857c1473d58642abd66','dc43a5c5b584cc5a1df067c1001867aa89f419433a6d7b27cc9add46674c87be','0a396f3832c858e95864aa6ad5572dd6b22caa6e3755c4552bde2713fdb5008f'];
 let devOk=false;
 async function gCheckDev(){
   devOk=false;
