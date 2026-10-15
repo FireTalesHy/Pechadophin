@@ -477,7 +477,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : perles, or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: pearls, gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
+'terminée':'completed','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
@@ -3413,7 +3413,6 @@ function buyUp(key){
 function renderSkins(){
   shopList.textContent='';
   for(const sk of SKINS){
-    if(sk.collab&&!shop.owned.includes(sk.id))continue;   // skin collab : caché tant qu'il n'est pas débloqué
     const owned=shop.owned.includes(sk.id),eq=shop.equipped===sk.id;
     const card=document.createElement('div');card.className='card'+(eq?' eq':'');
     const pv=document.createElement('canvas');pv.width=16;pv.height=16;
@@ -3422,12 +3421,14 @@ function renderSkins(){
     card.appendChild(pv);
     const nm=document.createElement('div');nm.className='nm';nm.textContent=sk.name;card.appendChild(nm);
     const pr=document.createElement('div');pr.className='pr';
-    if(owned){pr.textContent=sk.price===0?'OFFERT':'POSSÉDÉ';}
+    if(owned){pr.textContent=sk.collab?'COLLAB':sk.price===0?'OFFERT':'POSSÉDÉ';}
+    else if(sk.collab){pr.textContent='COLLAB RNG∞';}
     else{const ic=document.createElement('canvas');ic.width=7;ic.height=6;pearlIcon(ic);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.price;pr.appendChild(sp);}
     card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
     if(eq){b.textContent='ÉQUIPÉ';b.disabled=true;}
     else if(owned){b.textContent='ÉQUIPER';b.classList.add('equip');b.addEventListener('click',()=>{shop.equipped=sk.id;saveShop();renderShop();});}
+    else if(sk.collab){b.textContent='DÉBLOQUER';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();accHint='rng';openAcc();});}   // skin collab : renvoie à la connexion Google
     else if(shop.pearls>=sk.price){b.textContent='ACHETER';b.addEventListener('click',()=>buySkin(sk));}
     else{b.textContent='IL MANQUE '+(sk.price-shop.pearls);b.disabled=true;}
     b.setAttribute('aria-label',sk.name+' : '+b.textContent);
@@ -3618,7 +3619,7 @@ function gLoadScript(cb){
   gLoading=true;
   const sc=document.createElement('script');sc.src='https://accounts.google.com/gsi/client';sc.async=true;sc.defer=true;
   sc.onload=()=>{
-    try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:gOnCredential,auto_select:false,cancel_on_tap_outside:true});gReady=true;gLoading=false;cb(true);}
+    try{google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:gOnCredential,auto_select:!!gUser,cancel_on_tap_outside:true});gReady=true;gLoading=false;cb(true);}
     catch(e){gLoading=false;cb(false);}
   };
   sc.onerror=()=>{gLoading=false;cb(false);};
@@ -3723,8 +3724,23 @@ function cloudQueue(){   // appelé à chaque sauvegarde locale : envoi groupé 
 addEventListener('pointerdown',()=>{   // jeton absent ou expiré : renouvelé sur un geste du joueur, hors partie
   if(cloudLinked()&&state!=='play'&&!cloudS.busy&&!(cloudS.tok&&Date.now()<cloudS.exp))cloudSync(false);
 },true);
+var accHint='';
+function rngHelp(){   // instructions pour débloquer le skin collab
+  if(accHint!=='rng'||shop.owned.includes(RNG_SKIN.id))return;
+  const t=document.createElement('p');t.className='shop-note';
+  t.textContent='Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.';
+  accBody.appendChild(t);
+  const a=document.createElement('a');a.className='sbtn';a.href='https://rng-infinite.com/?ref=pechadophin';a.target='_blank';a.rel='noopener';a.textContent='OUVRIR RNG∞';a.style.cssText='display:block;text-align:center;text-decoration:none';
+  accBody.appendChild(a);
+  if(gUser){const r=document.createElement('button');r.type='button';r.className='sbtn equip';r.textContent='VÉRIFIER MAINTENANT';r.addEventListener('click',rngRecheck);accBody.appendChild(r);}
+}
+function rngRecheck(){   // redemande un jeton Google (sans resaisie) pour reinterroger RNG∞
+  if(!gUser||!GOOGLE_CLIENT_ID)return;
+  gLoadScript(ok=>{if(ok)try{google.accounts.id.prompt();}catch(e){}});
+}
 function gRenderAcc(){
   accBody.textContent='';accNote.textContent='';
+  rngHelp();
   if(gUser){
     const row=document.createElement('div');row.className='acc-row';
     if(gUser.picture){const im=document.createElement('img');im.src=gUser.picture;im.alt='';im.referrerPolicy='no-referrer';row.appendChild(im);}
@@ -3754,10 +3770,11 @@ function gRenderAcc(){
   });
 }
 function openAcc(){clearInputs();accOpen=true;accEl.hidden=false;gRenderAcc();try{$('acc-close').focus({preventScroll:true});}catch(e){}}
-function closeAcc(){accOpen=false;accEl.hidden=true;try{accBtn.focus({preventScroll:true});}catch(e){}}
+function closeAcc(){accHint='';accOpen=false;accEl.hidden=true;try{accBtn.focus({preventScroll:true});}catch(e){}}
 accBtn.addEventListener('click',openAcc);$('acc-close').addEventListener('click',closeAcc);
 accEl.addEventListener('pointerdown',e=>{if(e.target===accEl)closeAcc();});
 gUpdateBtn();gCheckDev();
+if(gUser&&GOOGLE_CLIENT_ID&&!shop.owned.includes(RNG_SKIN.id))setTimeout(rngRecheck,1500);   // comptes déjà connectés : reconnexion silencieuse pour la collab RNG∞
 
 /* ---- Langue : traduction du DOM + drapeau du pays vers lequel on bascule ---- */
 const frStore=new WeakMap(),frAttrStore=new WeakMap();
