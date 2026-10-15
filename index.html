@@ -132,6 +132,15 @@ body{
 #ov-cp{margin:0;font:400 max(6px,calc(var(--p)*4.6))/1.4 var(--pf);color:#ffd23f}
 #ov-restart{font:400 max(7px,calc(var(--p)*5))/1 var(--pf);padding:calc(var(--p)*4) calc(var(--p)*8)}
 .credits{margin:0;opacity:.6;font:400 max(5px,calc(var(--p)*3.8))/1.8 var(--pf)}
+
+.ov-chips{display:flex;flex-direction:column;gap:calc(var(--p)*4);align-items:flex-start}
+#lb-list{display:flex;flex-direction:column;gap:6px;overflow-y:auto;min-height:0;padding:3px}
+.lb-row{display:flex;align-items:center;gap:10px;border:2px solid var(--btn-line);background:var(--btn);padding:8px 10px;border-radius:10px;font:400 9px/1.4 var(--pf)}
+.lb-row .rk{width:26px;text-align:center}.lb-row .nmx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-row.me{border-color:var(--on);box-shadow:0 0 0 2px var(--on)}
+.lb-row:nth-child(1) .rk{color:#e0a800}.lb-row:nth-child(2) .rk{color:#8a96a8}.lb-row:nth-child(3) .rk{color:#b8743a}
+#lb{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(4,12,20,.74);font-family:var(--pf);padding:10px;animation:mfade .2s ease-out}
+#lb[hidden]{display:none}
 #mis-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;touch-action:pan-y;min-height:0;padding:3px}
 .mis-row{border:2px solid var(--btn-line);background:var(--btn);padding:8px 10px;display:flex;flex-direction:column;gap:6px;font:400 9px/1.4 var(--pf)}
 .mis-row.done{border-color:var(--on)}
@@ -339,7 +348,7 @@ body{
     <button class="ov-big shopb" id="merch-btn" type="button" hidden>MARCHAND (E)</button>
     <div id="overlay" class="show" data-mode="title">
       <div class="ov-top">
-        <button class="ov-chip" id="mis-btn" type="button">MISSIONS</button>
+        <div class="ov-chips"><button class="ov-chip" id="mis-btn" type="button">MISSIONS</button><button class="ov-chip" id="lb-btn" type="button">TOP 10</button></div>
         <div class="ov-right">
           <button class="ov-gear ov-acc" id="acc-btn" type="button" aria-label="Compte Google" title="Compte Google"></button>
           <button class="ov-gear ov-lang" id="lang-btn" type="button" aria-label="English" title="English"></button>
@@ -353,7 +362,7 @@ body{
       <div class="ov-center">
         <button id="ov-btn" type="button"><canvas id="ov-char" width="16" height="16" aria-hidden="true"></canvas><span id="ov-label">APPUIE POUR JOUER</span></button>
         <div id="ov-stats" hidden>
-          <div id="st-score"></div><div id="st-best"></div><div id="st-gold"></div><div id="st-souls"></div><div id="st-rec"></div>
+          <div id="st-score"></div><div id="st-best"></div><div id="st-gold"></div><div id="st-souls"></div><div id="st-rec"></div><div id="st-lb"></div>
         </div>
       </div>
       <div class="ov-bot">
@@ -407,6 +416,15 @@ body{
       <div id="weap-list"></div>
     </div>
     <button class="go" id="weap-close" type="button">RETOUR</button>
+  </div>
+</div>
+
+<div id="lb" hidden role="dialog" aria-modal="true" aria-labelledby="lb-title">
+  <div class="shop-panel dev-panel">
+    <div class="shop-head"><h2 id="lb-title">TOP 10 ANARCHIE</h2></div>
+    <p class="shop-note" id="lb-note">Les 10 meilleurs scores de tous les temps en mode Anarchie. Connecte-toi avec Google pour y figurer.</p>
+    <div id="lb-list"></div>
+    <button class="go" id="lb-close" type="button">RETOUR</button>
   </div>
 </div>
 
@@ -529,7 +547,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','MARCHAND':'MERCHANT','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'terminée':'completed','Ton pseudo pour le classement :':'Your leaderboard nickname:','Choisis ton pseudo pour le classement :':'Choose your leaderboard nickname:','Pseudo':'Nickname','VALIDER':'SAVE','TOP 10 ANARCHIE':'ANARCHY TOP 10','Les 10 meilleurs scores de tous les temps en mode Anarchie. Connecte-toi avec Google pour y figurer.':'The 10 best all-time scores in Anarchy mode. Sign in with Google to be on it.','Aucun score pour le moment : sois le premier !':'No scores yet: be the first!','Classement indisponible pour le moment.':'Leaderboard unavailable right now.','Chargement…':'Loading…','Score envoyé au classement.':'Score sent to the leaderboard.','Envoi du score au classement…':'Sending score to the leaderboard…','Connecte-toi avec Google pour entrer au TOP 10.':'Sign in with Google to enter the TOP 10.','MARCHAND':'MERCHANT','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
@@ -541,6 +559,7 @@ const EN={
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).'
 };
 const EN_RULES=[
+ [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
  [/^SON : (OUI|NON)$/,m=>'SOUND: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^INVINCIBLE : (OUI|NON)$/,m=>'INVINCIBLE: '+(m[1]==='OUI'?'YES':'NO')],
  [/^AKIMBO GLOCK 18 : (OUI|NON)$/,m=>'AKIMBO GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
@@ -3337,6 +3356,8 @@ function resumeGame(){
 }
 function showOver(){
   state='over';
+  {const el=$('st-lb');if(el)el.textContent='';}
+  if(anarchyOn&&score>0&&typeof lbSubmit==='function'){if(gUser){lbPending=score;$('st-lb').textContent='Envoi du score au classement…';lbSubmit();}else $('st-lb').textContent='Connecte-toi avec Google pour entrer au TOP 10.';}
   paused=false;ovRestart.hidden=true;
   overlayVisible=true;ov.classList.add('show');
   ov.dataset.mode='over';drawOvChar();setShopBtn('over');
@@ -3506,6 +3527,7 @@ addEventListener('keydown',e=>{
   if(rstOpen){if(e.code==='Escape'){e.preventDefault();closeRst();}return;}
   if(misOpen){if(e.code==='Escape'){e.preventDefault();closeMis();}return;}
   if(setOpen){if(e.code==='Escape'){e.preventDefault();closeSet();}return;}
+  if(lbOpen)return;
   if(modeOpen){if(e.code==='Escape'){e.preventDefault();closeMode();}return;}
   if(accOpen){if(e.code==='Escape'){e.preventDefault();closeAcc();}return;}
   if(weapOpen){if(e.code==='Escape'){e.preventDefault();closeWeap();}return;}
@@ -4018,11 +4040,54 @@ function gUpdateBtn(){
 function gOnCredential(resp){
   const d=resp&&resp.credential?gDecode(resp.credential):null;
   if(!d||!d.sub)return;
-  gUser={sub:d.sub,name:d.name||d.email||'',email:d.email||'',picture:d.picture||''};
+  const oldPs=(gUser&&gUser.sub===d.sub&&gUser.pseudo)||((()=>{try{return (JSON.parse(localStorage.getItem('canne-dauphins-pseudos')||'{}'))[d.sub];}catch(e){return null;}})());
+  gUser={sub:d.sub,name:d.name||d.email||'',email:d.email||'',picture:d.picture||'',pseudo:oldPs||''};
   try{localStorage.setItem(GOOGLE_KEY,JSON.stringify(gUser));}catch(e){}
   gUpdateBtn();gRenderAcc();gCheckDev();
   rngCollab(resp.credential);   // collab RNG∞ : débloque le skin si le joueur a aussi un compte RNG∞
+  gCred=resp.credential;gCredT=Date.now();
+  if(lbPending)lbSubmit();
+  if(!gUser.pseudo&&!accOpen)openAcc();   // première connexion : on demande le pseudo
 }
+/* ---- Classement Anarchie (top 10 all time, joueurs connectés) ---- */
+let gCred=null,gCredT=0,lbPending=0,lbOpen=false,lbData=null,lbMsg='';
+const lbEl=$('lb'),lbList=$('lb-list');
+function lbRender(){
+  lbList.textContent='';
+  if(lbMsg){const m=document.createElement('p');m.className='shop-note';m.textContent=lbMsg;lbList.appendChild(m);}
+  if(!lbData)return;
+  if(!lbData.length){const m=document.createElement('p');m.className='shop-note';m.textContent='Aucun score pour le moment : sois le premier !';lbList.appendChild(m);return;}
+  lbData.forEach((r,i)=>{
+    const row=document.createElement('div');row.className='lb-row'+(gUser&&gUser.pseudo&&r.name===gUser.pseudo?' me':'');
+    const a=document.createElement('span');a.className='rk';a.textContent='#'+(i+1);
+    const b=document.createElement('span');b.className='nmx';b.textContent=r.name;
+    const c=document.createElement('span');c.textContent=String(r.score).padStart(6,'0');
+    row.append(a,b,c);lbList.appendChild(row);
+  });
+}
+async function lbLoad(){
+  try{const r=await fetch('/api/scores');const j=await r.json();if(j.top){lbData=j.top;lbMsg='';}else lbMsg='Classement indisponible pour le moment.';}
+  catch(e){lbMsg='Classement indisponible pour le moment.';}
+  if(lbOpen)lbRender();
+}
+async function lbSubmit(){   // envoie le score de fin de partie (anarchie) avec le jeton Google
+  const sc=lbPending;if(!sc||!gUser)return;
+  if(!gCred||Date.now()-gCredT>55*60*1000){   // jeton expiré : on en redemande un à Google sans resaisie
+    gLoadScript(ok=>{if(ok)try{google.accounts.id.prompt();}catch(e){}});
+    return;
+  }
+  lbPending=0;
+  try{
+    const r=await fetch('/api/scores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:gCred,score:sc,name:gUser.pseudo||''})});
+    const j=await r.json();
+    if(j.top){lbData=j.top;const rk=j.top.findIndex(x=>x.score===sc);const el=$('st-lb');if(el)el.textContent=rk>=0?'TOP 10 ANARCHIE : #'+(rk+1)+' !':'Score envoyé au classement.';}
+  }catch(e){}
+}
+function openLb(){clearInputs();lbOpen=true;lbEl.hidden=false;lbMsg='Chargement…';lbRender();lbLoad();try{$('lb-close').focus({preventScroll:true});}catch(e){}}
+function closeLb(){lbOpen=false;lbEl.hidden=true;try{$('lb-btn').focus({preventScroll:true});}catch(e){}}
+$('lb-btn').addEventListener('click',openLb);$('lb-close').addEventListener('click',closeLb);
+lbEl.addEventListener('pointerdown',e=>{if(e.target===lbEl)closeLb();});
+addEventListener('keydown',e=>{if(lbOpen&&e.code==='Escape'){e.preventDefault();e.stopPropagation();closeLb();}},true);
 function gSignOut(){
   cloudUnlink();
   gUser=null;try{localStorage.removeItem(GOOGLE_KEY);}catch(e){}
@@ -4171,6 +4236,17 @@ function gRenderAcc(){
     if(gUser.picture){const im=document.createElement('img');im.src=gUser.picture;im.alt='';im.referrerPolicy='no-referrer';row.appendChild(im);}
     const tx=document.createElement('div');tx.textContent=gUser.name;const sm=document.createElement('small');sm.textContent=gUser.email;tx.appendChild(sm);row.appendChild(tx);
     accBody.appendChild(row);
+    {   // pseudo affiché dans le classement
+      const lab=document.createElement('p');lab.className='shop-note';lab.textContent=gUser.pseudo?'Ton pseudo pour le classement :':'Choisis ton pseudo pour le classement :';accBody.appendChild(lab);
+      const f=document.createElement('div');f.style.cssText='display:flex;gap:6px';
+      const inp=document.createElement('input');inp.type='text';inp.maxLength=16;inp.value=gUser.pseudo||'';inp.placeholder='Pseudo';inp.setAttribute('aria-label','Pseudo');
+      inp.style.cssText='flex:1;min-width:0;font:400 10px/1 var(--pf);padding:8px;border:2px solid var(--btn-line);border-radius:8px;background:#fff;color:#14182c';
+      const ok=document.createElement('button');ok.type='button';ok.className='sbtn equip';ok.style.width='auto';ok.textContent='VALIDER';
+      const save=()=>{const v=inp.value.replace(/[<>]/g,'').trim().slice(0,16);if(v.length<2){inp.focus();return;}gUser.pseudo=v;try{localStorage.setItem(GOOGLE_KEY,JSON.stringify(gUser));const m=JSON.parse(localStorage.getItem('canne-dauphins-pseudos')||'{}');m[gUser.sub]=v;localStorage.setItem('canne-dauphins-pseudos',JSON.stringify(m));}catch(e){}sfx.heal();gRenderAcc();};
+      ok.addEventListener('click',save);inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save();}e.stopPropagation();});
+      f.append(inp,ok);accBody.appendChild(f);
+      if(!gUser.pseudo)setTimeout(()=>{try{inp.focus();}catch(e){}},50);
+    }
     accNote.textContent=cloudS.status||(cloudLinked()?'Sauvegarde cloud activée.':'Connecté avec Google.');
     if(cloudS.choice){   // première liaison : la save du compte et celle de l'appareil diffèrent
       const t=document.createElement('p');t.className='shop-note';t.textContent='Une sauvegarde existe déjà sur ton compte. Laquelle garder ?';accBody.appendChild(t);
