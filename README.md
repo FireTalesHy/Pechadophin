@@ -8,7 +8,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 
 ## ▶️ Jouer
 
-- En ligne : **[https://firetaleshy.github.io/Pechadophin/](https://firetaleshy.github.io/Pechadophin/)**
+- En ligne : **[https://pechadophin.vercel.app/](https://pechadophin.vercel.app/)** (aussi sur [GitHub Pages](https://firetaleshy.github.io/Pechadophin/))
 - En local : télécharge le dépôt et ouvre `index.html` dans ton navigateur.
 
 ## 🎮 Commandes
