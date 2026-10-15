@@ -478,6 +478,7 @@ const EN={
 'terminée':'completed',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
+'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).'
 };
 const EN_RULES=[
@@ -492,6 +493,8 @@ const EN_RULES=[
  [/^PERLES (.*)$/,m=>'PEARLS '+m[1]],
  [/^OR (.*)$/,m=>'GOLD '+m[1]],
  [/^ÂMES ROUGES (.*)$/,m=>'RED SOULS '+m[1]],
+ [/^Sauvegarde cloud activée \((\d\d:\d\d)\)\.$/,m=>'Cloud save enabled ('+m[1]+').'],
+ [/^Sauvegardé \((\d\d:\d\d)\)\.$/,m=>'Saved ('+m[1]+').'],
  [/^\+(\d+) OR$/,m=>'+'+m[1]+' GOLD'],
  [/^VERS : (.*)$/,m=>'WORMS: '+m[1]],
  [/^Donner (\d+) (.+)$/,m=>'Give '+m[1]+' '+({'perles':'pearls','or':'gold','âmes rouges':'red souls'}[m[2]]||m[2])],
@@ -1224,7 +1227,7 @@ const SKY_PH=[[0,0,0,0],[0,0,0,0],[255,120,30,.26],[8,18,70,.52],[255,150,190,.2
 let anaSky=0;const skyCur=[0,0,0,0];   // nuit rouge sang : de l'apparition du requin jusqu'au poulpe ; le requin n'apparaît qu'une fois par partie
 const combo={n:0,t:0};
 const inp={left:false,right:false,jump:false,fire:false,axis:0};
-const aim={x:1,y:0,active:false,joy:false,ang:0,tx:null,ty:null,was:false};   // tx,ty : cible de l'aide à la visée
+const aim={x:1,y:0,active:false,joy:false,ang:0,tx:null,ty:null,was:false,t0:0,auto:false};   // tx,ty : cible de l'aide à la visée
 const look={active:false,id:null,tx:0,ty:0,nx:0,ny:0};   // joystick de caméra et de visée (nx,ny : vecteur normalisé x force 0..1)
 let camLX=0,camLY=0;              // direction de visée (vecteur unitaire)
 const mouse={x:0,y:0,on:false,fire:false};              // curseur (coordonnées du canvas) et clic gauche
@@ -1233,7 +1236,7 @@ let hooks=[],lead=null,castCd=0,tridents=[],throwAnim=0;
 const cam={x:0,y:0};
 
 try{best=parseInt(localStorage.getItem(BEST_KEY)||'0',10)||0;}catch(e){best=0;}
-function saveBest(){try{localStorage.setItem(BEST_KEY,String(best));}catch(e){}}
+function saveBest(){try{localStorage.setItem(BEST_KEY,String(best));}catch(e){}cloudQueue();}
 
 const UP_KEYS=['range','count','rate','dmg'];
 const fr1=v=>String(Math.round(v*10)/10).replace('.',',');
@@ -1285,7 +1288,7 @@ function soulReward(key,n){
   if(shop.bossSouls[key])return false;
   shop.bossSouls[key]=true;shop.souls+=n;return true;
 }
-function saveShop(){try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}}
+function saveShop(){try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}cloudQueue();}
 const maxLives=()=>SOUL_UP.hp.vals[shop.hp];
 const curSkin=()=>SKINS.find(x=>x.id===shop.equipped)||SKINS[0];
 
@@ -1496,7 +1499,7 @@ function stepTrident(dt){
   if(fireBuf>0)fireBuf-=dt;
   if(castCd>0)castCd-=dt;
   if(throwAnim>0)throwAnim-=dt;
-  if((fireBuf>0||inp.fire)&&castCd<=0&&p.stun<=0&&state==='play'){
+  if((fireBuf>0||inp.fire||aim.auto)&&castCd<=0&&p.stun<=0&&state==='play'){
     fireBuf=0;
     const n=TMULTI.vals[shop.tmulti],cx=p.x+5,cy=p.y+6;
     castCd=TUP.rate.vals[shop.tup.rate];throwAnim=0.16;
@@ -1537,7 +1540,7 @@ function stepHook(dt){
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
   if(castCd>0)castCd-=dt;
-  if((fireBuf>0||inp.fire)&&castCd<=0&&!hooks.length&&p.stun<=0&&state==='play'){   // un nouveau tir seulement quand le précédent est revenu
+  if((fireBuf>0||inp.fire||aim.auto)&&castCd<=0&&!hooks.length&&p.stun<=0&&state==='play'){   // un nouveau tir seulement quand le précédent est revenu
     fireBuf=0;
     const tip=rodTip(true),n=UP.count.vals[shop.up.count],base=Math.atan2(aim.y,aim.x);
     castCd=UP.rate.vals[shop.up.rate];
@@ -2978,14 +2981,15 @@ function updateAim(){
   if(look.active&&(look.nx||look.ny)){
     const a0=Math.atan2(look.ny,look.nx),t=assistTarget(cx,cy,a0);
     const goal=t?a0+t.df*0.9:a0;
-    if(!aim.was)aim.ang=goal;
+    if(!aim.was){aim.ang=goal;aim.t0=time;}
     else{let d=goal-aim.ang;d=Math.atan2(Math.sin(d),Math.cos(d));aim.ang+=d*0.45;}
     aim.was=true;
+    aim.auto=time-aim.t0>=1;   // joystick de visée maintenu 1 s : tir automatique
     aim.x=Math.cos(aim.ang);aim.y=Math.sin(aim.ang);aim.active=true;aim.joy=true;
     if(t){aim.tx=t.x;aim.ty=t.y;}
     return;
   }
-  aim.was=false;
+  aim.was=false;aim.auto=false;
   if(mouse.on){
     const dx=mouse.x+Math.round(cam.x)-cx,dy=mouse.y+Math.round(cam.y)-cy,len=Math.hypot(dx,dy);
     if(len>6){aim.x=dx/len;aim.y=dy/len;}else{aim.x=p.face;aim.y=0;}
@@ -3483,6 +3487,7 @@ function gOnCredential(resp){
   gUpdateBtn();gRenderAcc();gCheckDev();
 }
 function gSignOut(){
+  cloudUnlink();
   gUser=null;try{localStorage.removeItem(GOOGLE_KEY);}catch(e){}
   try{window.google&&google.accounts.id.disableAutoSelect();}catch(e){}
   gUpdateBtn();gRenderAcc();gCheckDev();
@@ -3499,6 +3504,105 @@ function gLoadScript(cb){
   sc.onerror=()=>{gLoading=false;cb(false);};
   document.head.appendChild(sc);
 }
+/* ---- Sauvegarde cloud : fichier caché dans le Google Drive du joueur (dossier d'application, invisible dans son Drive) ---- */
+var cloudS={tok:null,exp:0,fileId:null,timer:null,busy:false,status:'',choice:null,dirty:false};
+const CLOUD_KEY='canne-dauphins-cloud',CLOUD_FILE='pechadophin-save.json',CLOUD_SCOPE='https://www.googleapis.com/auth/drive.appdata';
+function cloudRec(){try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||'null')||{};}catch(e){return {};}}
+function cloudSetRec(r){try{localStorage.setItem(CLOUD_KEY,JSON.stringify(r));}catch(e){}}
+function cloudLinked(){const r=cloudRec();return !!(gUser&&r.sub===gUser.sub&&r.on);}
+function cloudUnlink(){const r=cloudRec();r.on=false;cloudSetRec(r);cloudS.tok=null;cloudS.exp=0;cloudS.fileId=null;cloudS.choice=null;cloudS.status='';}
+function cloudLocal(){let sh=null;try{sh=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');}catch(e){}return {v:1,t:Date.now(),shop:sh,best};}
+function cloudSetStatus(s){cloudS.status=s;if(accOpen&&gUser)gRenderAcc();}
+function cloudToken(prompt){
+  return new Promise(res=>{
+    if(cloudS.tok&&Date.now()<cloudS.exp){res(true);return;}
+    gLoadScript(ok=>{
+      if(!ok||!window.google||!google.accounts.oauth2){res(false);return;}
+      try{
+        const tc=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:CLOUD_SCOPE,hint:gUser&&gUser.email,
+          callback:r=>{if(r&&r.access_token){cloudS.tok=r.access_token;cloudS.exp=Date.now()+((r.expires_in||3600)-60)*1000;res(true);}else res(false);},
+          error_callback:()=>res(false)});
+        tc.requestAccessToken({prompt:prompt||''});
+      }catch(e){res(false);}
+    });
+  });
+}
+async function cloudFetch(url,opt){
+  opt=opt||{};opt.headers=Object.assign({Authorization:'Bearer '+cloudS.tok},opt.headers||{});
+  const r=await fetch(url,opt);if(!r.ok)throw new Error('drive '+r.status);return r;
+}
+async function cloudFind(){
+  const q=encodeURIComponent("name='"+CLOUD_FILE+"'");
+  const j=await (await cloudFetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id)&q='+q)).json();
+  cloudS.fileId=j.files&&j.files[0]?j.files[0].id:null;return cloudS.fileId;
+}
+async function cloudRead(){if(!cloudS.fileId)return null;return await (await cloudFetch('https://www.googleapis.com/drive/v3/files/'+cloudS.fileId+'?alt=media')).json();}
+async function cloudWrite(data){
+  const body=JSON.stringify(data);
+  if(cloudS.fileId){await cloudFetch('https://www.googleapis.com/upload/drive/v3/files/'+cloudS.fileId+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body});}
+  else{
+    const b='pechadophin'+Date.now(),meta=JSON.stringify({name:CLOUD_FILE,parents:['appDataFolder']});
+    const mp='--'+b+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+meta+'\r\n--'+b+'\r\nContent-Type: application/json\r\n\r\n'+body+'\r\n--'+b+'--';
+    const j=await (await cloudFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body:mp})).json();
+    cloudS.fileId=j.id;
+  }
+  const r=cloudRec();r.t=data.t;cloudSetRec(r);
+}
+function cloudApply(d){   // remplace la progression de l'appareil par celle du compte
+  if(!d||!d.shop)return;
+  try{localStorage.setItem(SHOP_KEY,JSON.stringify(d.shop));localStorage.setItem(BEST_KEY,String(d.best||0));}catch(e){}
+  shop=loadShop();best=d.best||0;
+  const r=cloudRec();r.t=d.t||Date.now();cloudSetRec(r);
+  try{refreshCp();drawOvChar();if(shopOpen)renderShop();}catch(e){}
+}
+const cloudTime=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+async function cloudLink(){   // activée depuis le menu Compte (le clic permet la fenêtre d'autorisation Google)
+  if(!gUser||cloudS.busy)return;
+  cloudS.busy=true;cloudSetStatus('Connexion au cloud…');
+  try{
+    if(!await cloudToken('consent')){cloudS.busy=false;cloudSetStatus('Autorisation refusée ou indisponible.');return;}
+    cloudSetRec({sub:gUser.sub,on:true,t:0});
+    await cloudFind();
+    const d=await cloudRead(),loc=cloudLocal();
+    if(d&&d.shop&&JSON.stringify(d.shop)!==JSON.stringify(loc.shop)){cloudS.choice=d;cloudS.busy=false;cloudSetStatus('');return;}
+    if(d&&d.shop){const r=cloudRec();r.t=d.t;cloudSetRec(r);}else await cloudWrite(loc);
+    cloudS.busy=false;cloudSetStatus('Sauvegarde cloud activée ('+cloudTime()+').');
+  }catch(e){cloudS.busy=false;cloudSetStatus('Erreur de sauvegarde cloud.');}
+}
+async function cloudChoose(which){
+  const d=cloudS.choice;cloudS.choice=null;cloudS.busy=true;cloudSetStatus('Synchronisation…');
+  try{
+    if(which==='cloud'){
+      if(state==='play'){cloudS.busy=false;cloudS.choice=d;cloudSetStatus('Termine ta partie avant de charger la save du compte.');return;}
+      cloudApply(d);
+    } else await cloudWrite(cloudLocal());
+    cloudS.busy=false;cloudSetStatus('Sauvegarde cloud activée ('+cloudTime()+').');
+  }catch(e){cloudS.busy=false;cloudSetStatus('Erreur de sauvegarde cloud.');}
+}
+async function cloudSync(manual){   // compte → appareil si le compte est plus récent, sinon appareil → compte
+  if(!cloudLinked()||cloudS.busy)return;
+  cloudS.busy=true;if(manual)cloudSetStatus('Synchronisation…');
+  try{
+    if(!await cloudToken('')){cloudS.busy=false;if(manual)cloudSetStatus('Autorisation refusée ou indisponible.');return;}
+    if(!cloudS.fileId)await cloudFind();
+    const d=await cloudRead(),r=cloudRec();
+    if(d&&d.t>(r.t||0)&&state!=='play'&&!cloudS.dirty)cloudApply(d);
+    else await cloudWrite(cloudLocal());
+    cloudS.dirty=false;cloudS.busy=false;cloudSetStatus('Sauvegardé ('+cloudTime()+').');
+  }catch(e){cloudS.busy=false;cloudSetStatus('Erreur de sauvegarde cloud.');}
+}
+function cloudQueue(){   // appelé à chaque sauvegarde locale : envoi groupé quelques secondes plus tard
+  try{if(!cloudS||!cloudLinked())return;}catch(e){return;}   // appel possible avant l'initialisation du compte
+  cloudS.dirty=true;clearTimeout(cloudS.timer);
+  cloudS.timer=setTimeout(async()=>{
+    if(!cloudS.tok||Date.now()>=cloudS.exp||cloudS.busy)return;   // jeton expiré : renvoi au prochain geste du joueur hors partie
+    try{cloudS.busy=true;if(!cloudS.fileId)await cloudFind();await cloudWrite(cloudLocal());cloudS.dirty=false;cloudS.status='Sauvegardé ('+cloudTime()+').';}catch(e){cloudS.status='Erreur de sauvegarde cloud.';}
+    cloudS.busy=false;
+  },2500);
+}
+addEventListener('pointerdown',()=>{   // jeton absent ou expiré : renouvelé sur un geste du joueur, hors partie
+  if(cloudLinked()&&state!=='play'&&!cloudS.busy&&!(cloudS.tok&&Date.now()<cloudS.exp))cloudSync(false);
+},true);
 function gRenderAcc(){
   accBody.textContent='';accNote.textContent='';
   if(gUser){
@@ -3506,7 +3610,16 @@ function gRenderAcc(){
     if(gUser.picture){const im=document.createElement('img');im.src=gUser.picture;im.alt='';im.referrerPolicy='no-referrer';row.appendChild(im);}
     const tx=document.createElement('div');tx.textContent=gUser.name;const sm=document.createElement('small');sm.textContent=gUser.email;tx.appendChild(sm);row.appendChild(tx);
     accBody.appendChild(row);
-    accNote.textContent='Connecté avec Google.';
+    accNote.textContent=cloudS.status||(cloudLinked()?'Sauvegarde cloud activée.':'Connecté avec Google.');
+    if(cloudS.choice){   // première liaison : la save du compte et celle de l'appareil diffèrent
+      const t=document.createElement('p');t.className='shop-note';t.textContent='Une sauvegarde existe déjà sur ton compte. Laquelle garder ?';accBody.appendChild(t);
+      const a=document.createElement('button');a.type='button';a.className='sbtn';a.textContent='GARDER LA SAVE DU COMPTE';a.addEventListener('click',()=>cloudChoose('cloud'));accBody.appendChild(a);
+      const l=document.createElement('button');l.type='button';l.className='sbtn';l.textContent='GARDER LA SAVE DE CET APPAREIL';l.addEventListener('click',()=>cloudChoose('local'));accBody.appendChild(l);
+    } else {
+      const c=document.createElement('button');c.type='button';c.className='sbtn equip';
+      c.textContent=cloudLinked()?'SYNCHRONISER MAINTENANT':'ACTIVER LA SAUVEGARDE CLOUD';
+      c.disabled=cloudS.busy;c.addEventListener('click',()=>cloudLinked()?cloudSync(true):cloudLink());accBody.appendChild(c);
+    }
     const b=document.createElement('button');b.type='button';b.className='sbtn';b.textContent='SE DÉCONNECTER';b.addEventListener('click',gSignOut);
     accBody.appendChild(b);
     return;
