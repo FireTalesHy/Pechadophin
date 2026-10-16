@@ -748,11 +748,9 @@ function arenaAt(tx){
   return ar;
 }
 function column(tx){
-  if(tx<0&&!rzIn(tx)){   // à gauche du départ : cul-de-sac avec le trou secret, le vrai chemin est à droite
-    let c=colCache.get(tx);if(c)return c;
-    const g0=column(0).g;
-    c=tx>=HOLE_L&&tx<=HOLE_R?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<HOLE_L-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false}:{g:g0,pit:false,beach:false,tun:null,swamp:false};
-    colCache.set(tx,c);return c;
+  if(hole&&tx<=hole.e&&!rzIn(tx)){   // 3 écrans à gauche du départ (ou du checkpoint) : le trou secret puis un mur, le vrai chemin est à droite
+    const g0=hole.g;
+    return tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false}:{g:g0,pit:false,beach:false,tun:null,swamp:false};
   }
   if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
   let c=colCache.get(tx); if(c!==undefined) return c;
@@ -801,7 +799,7 @@ const supportAt=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T);return solid
 
 function genChunk(cx){
   if(chunks.has(cx)) return; chunks.add(cx);
-  if(cx<0)return;   // rien dans le cul-de-sac de gauche
+  if(hole&&cx*16+15<=hole.e)return;   // rien dans le cul-de-sac de gauche
   const rng=mulberry32((SEED^Math.imul(cx,2654435761))|0);
   const x0=cx*16, myPlats=[];
   const ca=arenaAt(x0+8);
@@ -2344,12 +2342,12 @@ function stepMilk(dt){
 }
 function drawMilk(){for(const m of milk){ctx.fillStyle='#d8e4f0';ctx.fillRect(Math.round(m.x)-2,Math.round(m.y)-2,4,4);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(m.x)-1,Math.round(m.y)-2,3,3);}}
 /* ===== Zone secrète : tirer 6 fois sur une plateforme à pilier ouvre l'arène du boss « 6 » ===== */
-const HOLE_L=-15,HOLE_R=-13,RZC=1<<21,RZW=12,RZG=20,SIX_HP=800;   // arène d'un écran, loin du monde
+let hole=null;const RZC=1<<21,RZW=12,RZG=20,SIX_HP=800;   // arène d'un écran, loin du monde
 let rz=null,six=null,sixShots=[],sixJet=[],rzTr=null,sixCd=0;
 const RZ_FLOOR={g:RZG,pit:false,beach:false,tun:null,swamp:false},RZ_WALL={g:RZG-40,pit:false,beach:false,tun:null,swamp:false};
 const rzIn=tx=>!!rz&&tx>RZC-60&&tx<RZC+60;
 function rzEnter(){
-  rz={back:{x:(HOLE_R+3)*T,y:column(0).g*T-14},grid:[]};
+  rz={back:{x:(hole.r+3)*T,y:hole.g*T-14},grid:[]};
   for(let i=0;i<RZW*2*3;i++)rz.grid.push({d:String(Math.floor(Math.random()*10)),a:0.15+Math.random()*0.5});
   hooks=[];tridents=[];milk=[];sixShots=[];sixJet=[];bossShots=[];
   Object.assign(player,{x:(RZC-8)*T,y:RZG*T-14,vx:0,vy:0,onGround:true,invuln:1,stun:0,dash:null});
@@ -2801,7 +2799,7 @@ function update(dt){
     return;
   }
   if(state==='over'){stepFx(dt);return;}
-  if(!rz&&!rzTr&&state==='play'){const p=player,tx=Math.floor((p.x+5)/T);if(tx>=HOLE_L&&tx<=HOLE_R&&p.y>(column(0).g+2)*T){rzTr={t:0,dir:'in',sw:false};sfx.bossSpawn();}}   // tombé dans le trou secret
+  if(!rz&&!rzTr&&state==='play'){const p=player,tx=Math.floor((p.x+5)/T);if(hole&&tx>=hole.l&&tx<=hole.r&&p.y>(hole.g+2)*T){rzTr={t:0,dir:'in',sw:false};sfx.bossSpawn();}}   // tombé dans le trou secret
   if(rzTr){stepRzTr(dt);stepFx(dt);return;}
   if(rz){   // arène secrète : rien d'autre ne vit ici
     stepPlayer(dt);if(state!=='play')return;
@@ -3446,7 +3444,7 @@ function render(){
   drawPalms(cx,cy);
   drawSwampTowers(cx);
   drawTiles(cx,cy);
-  if(cx<(HOLE_R+1)*T){const gy=column(0).g*T;ctx.fillStyle='#000000';ctx.fillRect(HOLE_L*T,gy,(HOLE_R-HOLE_L+1)*T,VH*3);if(Math.sin(time*3)>0.6){ctx.globalAlpha=0.5;ctx.drawImage(RNG_DIGITS['6'],(HOLE_L+1)*T+4,gy+10);ctx.globalAlpha=1;}}   // le trou secret
+  if(hole&&cx<(hole.r+1)*T&&cx+VW>hole.l*T){const gy=hole.g*T;ctx.fillStyle='#000000';ctx.fillRect(hole.l*T,gy,(hole.r-hole.l+1)*T,VH*3);if(Math.sin(time*3)>0.6){ctx.globalAlpha=0.5;ctx.drawImage(RNG_DIGITS['6'],(hole.l+1)*T+4,gy+10);ctx.globalAlpha=1;}}   // le trou secret
   drawPuddles(cx);
   drawTents();
   drawCastleFx();
@@ -3514,6 +3512,8 @@ function resetWorld(){
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
 function placePlayer(sx){
+  {hole=null;const st=Math.floor(((sx!==undefined?sx:-5)+5)/T),e=st-4,g=column(e).g,l=st-3*(VW/T);   // le trou est 3 écrans à gauche du point de départ
+   for(let k=l-80;k<=e;k++)colCache.delete(k);hole={l:l-1,r:l+1,e,g};}
   const cp=sx!==undefined,g=cp?column(Math.floor((sx+5)/T)).g:column(0).g;
   Object.assign(player,{x:cp?sx:-5,y:g*T-14,vx:0,vy:0,face:cp?(sx<0?-1:1):1,onGround:true,coyote:0,invuln:0,stun:0});
   player.safe={x:player.x,y:player.y};
@@ -3532,12 +3532,12 @@ function startGame(){
   if(rodLocked()&&shop.weapon==='rod'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
   if(shop.swamp&&!anarchyOn){   // checkpoint des marécages : poulpe, château et méduse derrière soi
     const sg=shop.swamp;
-    for(const tx of[sg*ARENA_START*(VW/T),sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T))]){const ar=arenaAt(tx);if(ar)ar.state='won';}
+    for(const tx of[sg*ARENA_START*(VW/T),sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T))]){const ar=arenaAt(tx);if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}}
     bossSpawned=true;octoRun=true;castleRun=true;jellySpawned=true;
     placePlayer(sg*(SWAMP_TX+10)*T);
   } else if(shop.beach&&!anarchyOn){   // checkpoint : on repart de la plage (anarchie : on commence toujours dans les plaines), l'arène du poulpe derrière soi est considérée comme vaincue
     const ar=arenaAt(shop.beach*ARENA_START*(VW/T));
-    if(ar)ar.state='won';
+    if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}
     bossSpawned=true;octoRun=true;
     placePlayer(shop.beach*(BEACH_TX+10)*T);
   } else placePlayer();
