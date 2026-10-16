@@ -12,7 +12,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 - En local : télécharge le dépôt et ouvre `index.html` dans ton navigateur.
 
 ## 🎮 Commandes
-
+                                                                                      .
 | Action | Clavier / souris | Tablette |
 | --- | --- | --- |
 | Se déplacer | `Q` / `D` ou `←` / `→` | Joystick de gauche |
