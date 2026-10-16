@@ -24,7 +24,12 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (!URL_ || !TOK) { res.status(500).json({ error: 'storage' }); return; }
   try {
-    if (req.method === 'GET') { res.status(200).json({ top: await top() }); return; }
+    if (req.method === 'GET') {
+      const out = { top: await top() };
+      const sub = req.query && req.query.sub;
+      if (sub) { const m = await redis(['ZSCORE', 'anarchy', String(sub).slice(0, 64)]); out.mine = m ? Number(m) : 0; }   // record enregistré du joueur
+      res.status(200).json(out); return;
+    }
     if (req.method === 'POST') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
       const sc = Math.floor(Number(body.score));

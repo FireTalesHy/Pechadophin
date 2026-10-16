@@ -369,6 +369,7 @@ body{
         <div class="ov-left"><button class="ov-big weap" id="weap-btn" type="button">ARMES</button><button class="ov-big skins" id="skins-btn" type="button">MODE</button></div>
         <div class="ov-mid">
           <p id="ov-cp" hidden>★ CHECKPOINT : LA PLAGE ★</p>
+          <button class="sbtn equip" id="ana-save" type="button" hidden style="width:auto;padding:8px 14px">SAUVEGARDER LE SCORE</button>
           <button class="go alt" id="ov-restart" type="button" hidden>RECOMMENCER</button>
           <p class="credits" id="credits">dev : L'taleshy et cocobat<br>testeurs : moustik, ofodile et wyzan</p>
         </div>
@@ -549,7 +550,7 @@ const EN={
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
-'terminée':'completed','Ton pseudo pour le classement :':'Your leaderboard nickname:','Choisis ton pseudo pour le classement :':'Choose your leaderboard nickname:','Pseudo':'Nickname','VALIDER':'SAVE','TOP 10 ANARCHIE':'ANARCHY TOP 10','Les 10 meilleurs scores de tous les temps en mode Anarchie. Connecte-toi avec Google pour y figurer.':'The 10 best all-time scores in Anarchy mode. Sign in with Google to be on it.','Aucun score pour le moment : sois le premier !':'No scores yet: be the first!','Classement indisponible pour le moment.':'Leaderboard unavailable right now.','Chargement…':'Loading…','Score envoyé au classement.':'Score sent to the leaderboard.','Envoi du score au classement…':'Sending score to the leaderboard…','Connecte-toi avec Google pour entrer au TOP 10.':'Sign in with Google to enter the TOP 10.','MARCHAND':'MERCHANT','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
+'terminée':'completed','SAUVEGARDER LE SCORE':'SAVE SCORE','ENVOI…':'SENDING…','Ton pseudo pour le classement :':'Your leaderboard nickname:','Choisis ton pseudo pour le classement :':'Choose your leaderboard nickname:','Pseudo':'Nickname','VALIDER':'SAVE','TOP 10 ANARCHIE':'ANARCHY TOP 10','Les 10 meilleurs scores de tous les temps en mode Anarchie. Connecte-toi avec Google pour y figurer.':'The 10 best all-time scores in Anarchy mode. Sign in with Google to be on it.','Aucun score pour le moment : sois le premier !':'No scores yet: be the first!','Classement indisponible pour le moment.':'Leaderboard unavailable right now.','Chargement…':'Loading…','Score envoyé au classement.':'Score sent to the leaderboard.','Envoi du score au classement…':'Sending score to the leaderboard…','Connecte-toi avec Google pour entrer au TOP 10.':'Sign in with Google to enter the TOP 10.','MARCHAND':'MERCHANT','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
@@ -563,6 +564,7 @@ const EN={
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
  [/^TAILLE DES JOYSTICKS : (\d+) %$/,m=>'JOYSTICK SIZE: '+m[1]+'%'],
+ [/^RECORD À BATTRE : (\d+)$/,m=>'RECORD TO BEAT: '+m[1]],
  [/^SON : (OUI|NON)$/,m=>'SOUND: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^INVINCIBLE : (OUI|NON)$/,m=>'INVINCIBLE: '+(m[1]==='OUI'?'YES':'NO')],
  [/^AKIMBO GLOCK 18 : (OUI|NON)$/,m=>'AKIMBO GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
@@ -3347,9 +3349,11 @@ function pauseGame(){
   ov.dataset.mode='pause';drawOvChar();setShopBtn('pause');
   ovTitle.textContent='PAUSE';ovText.textContent=OV_TEXT0;ovText.hidden=true;ovStats.hidden=true;
   ovLabel.textContent='APPUIE POUR REPRENDRE';ovRestart.hidden=true;refreshCp();
+  if(typeof anaSaveRefresh==='function')anaSaveRefresh();
   try{ovBtn.focus({preventScroll:true});}catch(e){}
 }
 function resumeGame(){
+  {const b=$('ana-save');if(b)b.hidden=true;}
   if(!paused)return;
   paused=false;clearInputs();jumpBuf=0;fireBuf=0;
   overlayVisible=false;ov.classList.remove('show');
@@ -4050,6 +4054,7 @@ function gOnCredential(resp){
   rngCollab(resp.credential);   // collab RNG∞ : débloque le skin si le joueur a aussi un compte RNG∞
   gCred=resp.credential;gCredT=Date.now();
   if(lbPending)lbSubmit();
+  anaBestFetch();
   if(!gUser.pseudo&&!accOpen)openAcc();   // première connexion : on demande le pseudo
 }
 /* ---- Classement Anarchie (top 10 all time, joueurs connectés) ---- */
@@ -4083,9 +4088,20 @@ async function lbSubmit(){   // envoie le score de fin de partie (anarchie) avec
   try{
     const r=await fetch('/api/scores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:gCred,score:sc,name:gUser.pseudo||''})});
     const j=await r.json();
-    if(j.top){lbData=j.top;const rk=j.top.findIndex(x=>x.score===sc);const el=$('st-lb');if(el)el.textContent=rk>=0?'TOP 10 ANARCHIE : #'+(rk+1)+' !':'Score envoyé au classement.';}
+    if(j.top){lbData=j.top;anaBestSet(sc);anaSaveRefresh();const rk=j.top.findIndex(x=>x.score===sc);const el=$('st-lb');if(el)el.textContent=rk>=0?'TOP 10 ANARCHIE : #'+(rk+1)+' !':'Score envoyé au classement.';}
   }catch(e){}
 }
+/* sauvegarde volontaire du score en pleine partie (anarchie), seulement si on bat son record enregistré */
+function anaBestGet(){try{return (JSON.parse(localStorage.getItem('canne-dauphins-anabest')||'{}'))[gUser&&gUser.sub]||0;}catch(e){return 0;}}
+function anaBestSet(v){if(!gUser)return;try{const m=JSON.parse(localStorage.getItem('canne-dauphins-anabest')||'{}');if(v>(m[gUser.sub]||0)){m[gUser.sub]=v;localStorage.setItem('canne-dauphins-anabest',JSON.stringify(m));}}catch(e){}}
+async function anaBestFetch(){if(!gUser)return;try{const r=await fetch('/api/scores?sub='+encodeURIComponent(gUser.sub));const j=await r.json();if(j.mine)anaBestSet(j.mine);}catch(e){}anaSaveRefresh();}
+function anaSaveRefresh(){
+  const b=$('ana-save');if(!b)return;
+  const show=anarchyOn&&paused&&state==='play'&&!!gUser;b.hidden=!show;if(!show)return;
+  const best=anaBestGet(),ok=score>best;
+  b.disabled=!ok;b.textContent=ok?'SAUVEGARDER LE SCORE':'RECORD À BATTRE : '+best;
+}
+$('ana-save').addEventListener('click',()=>{if(!gUser||score<=anaBestGet())return;lbPending=score;const b=$('ana-save');b.disabled=true;b.textContent='ENVOI…';lbSubmit();});
 function openLb(){clearInputs();lbOpen=true;lbEl.hidden=false;lbMsg='Chargement…';lbRender();lbLoad();try{$('lb-close').focus({preventScroll:true});}catch(e){}}
 function closeLb(){lbOpen=false;lbEl.hidden=true;try{$('lb-btn').focus({preventScroll:true});}catch(e){}}
 $('lb-btn').addEventListener('click',openLb);$('lb-close').addEventListener('click',closeLb);
@@ -4277,7 +4293,7 @@ function openAcc(){clearInputs();accOpen=true;accEl.hidden=false;gRenderAcc();tr
 function closeAcc(){accHint='';accOpen=false;accEl.hidden=true;try{accBtn.focus({preventScroll:true});}catch(e){}}
 accBtn.addEventListener('click',openAcc);$('acc-close').addEventListener('click',closeAcc);
 accEl.addEventListener('pointerdown',e=>{if(e.target===accEl)closeAcc();});
-gUpdateBtn();gCheckDev();
+gUpdateBtn();gCheckDev();if(gUser)anaBestFetch();
 if(gUser&&GOOGLE_CLIENT_ID&&!shop.owned.includes(RNG_SKIN.id))setTimeout(rngRecheck,1500);   // comptes déjà connectés : reconnexion silencieuse pour la collab RNG∞
 
 /* ---- Langue : traduction du DOM + drapeau du pays vers lequel on bascule ---- */
