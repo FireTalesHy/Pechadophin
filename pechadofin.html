@@ -2819,7 +2819,7 @@ function drawTiles(cx,cy){
     for(let ty=ty0;ty<=ty1;ty++) if(!inBeach(tx)&&oneWay(tx,ty)){
       if(col.swamp){   // marais : plateformes en haut de tour
         let l=tx,r=tx;while(l>tx-8&&oneWay(l-1,ty))l--;while(r<tx+8&&oneWay(r+1,ty))r++;
-        if(tx===((l+r)>>1)&&!col.pit){const by=col.g*T,x=tx*T+3;ctx.fillStyle='#1e2420';ctx.fillRect(x-1,ty*T+6,12,by-ty*T-6);ctx.fillStyle='#6a7366';ctx.fillRect(x,ty*T+6,10,by-ty*T-6);ctx.fillStyle='#545c51';for(let yy=ty*T+10;yy<by;yy+=8)ctx.fillRect(x,yy,10,1);ctx.fillStyle='#4f7a3a';ctx.fillRect(x,by-6,3,6);if(by-ty*T>30){ctx.fillStyle='#1e2420';ctx.fillRect(x+4,ty*T+14,2,5);}}
+        if(tx===((l+r)>>1)&&!col.pit){const by=col.g*T,x=tx*T-4;ctx.fillStyle='#1e2420';ctx.fillRect(x-1,ty*T+6,26,by-ty*T-6);ctx.fillStyle='#6a7366';ctx.fillRect(x,ty*T+6,24,by-ty*T-6);ctx.fillStyle='#7c8577';ctx.fillRect(x,ty*T+6,3,by-ty*T-6);ctx.fillStyle='#545c51';for(let yy=ty*T+10,r=0;yy<by;yy+=8,r++){ctx.fillRect(x,yy,24,1);ctx.fillRect(x+(r%2?8:16),yy-7,1,7);}ctx.fillStyle='#4f7a3a';ctx.fillRect(x,by-7,4,7);ctx.fillRect(x+19,by-5,5,5);if(by-ty*T>30){ctx.fillStyle='#1e2420';ctx.fillRect(x+10,ty*T+14,4,7);ctx.fillRect(x+11,ty*T+13,2,1);}}
         ctx.drawImage(STONE_PLAT,tx*T,ty*T);
       } else ctx.drawImage(PLANK,tx*T,ty*T);
     }
