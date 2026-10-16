@@ -4094,7 +4094,7 @@ async function lbSubmit(){   // envoie le score de fin de partie (anarchie) avec
 /* sauvegarde volontaire du score en pleine partie (anarchie), seulement si on bat son record enregistré */
 function anaBestGet(){try{return (JSON.parse(localStorage.getItem('canne-dauphins-anabest')||'{}'))[gUser&&gUser.sub]||0;}catch(e){return 0;}}
 function anaBestSet(v){if(!gUser)return;try{const m=JSON.parse(localStorage.getItem('canne-dauphins-anabest')||'{}');if(v>(m[gUser.sub]||0)){m[gUser.sub]=v;localStorage.setItem('canne-dauphins-anabest',JSON.stringify(m));}}catch(e){}}
-async function anaBestFetch(){if(!gUser)return;try{const r=await fetch('/api/scores?sub='+encodeURIComponent(gUser.sub));const j=await r.json();if(typeof j.mine==='number'){try{const m=JSON.parse(localStorage.getItem('canne-dauphins-anabest')||'{}');m[gUser.sub]=j.mine;localStorage.setItem('canne-dauphins-anabest',JSON.stringify(m));}catch(e){}}   // le serveur fait foi (ex. après une remise à zéro)}catch(e){}anaSaveRefresh();}
+async function anaBestFetch(){if(!gUser)return;try{const r=await fetch('/api/scores?sub='+encodeURIComponent(gUser.sub));const j=await r.json();if(typeof j.mine==='number'){try{const m=JSON.parse(localStorage.getItem('canne-dauphins-anabest')||'{}');m[gUser.sub]=j.mine;localStorage.setItem('canne-dauphins-anabest',JSON.stringify(m));}catch(e){}}}catch(e){}anaSaveRefresh();}
 function anaSaveRefresh(){
   const b=$('ana-save');if(!b)return;
   const show=anarchyOn&&paused&&state==='play'&&!!gUser;b.hidden=!show;if(!show)return;
