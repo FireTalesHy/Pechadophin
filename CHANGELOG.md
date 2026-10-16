@@ -2,6 +2,26 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.3.5] - 2026-10-16
+
+### Ajouté
+- **Boss secret n°6** : dans les marécages, toucher 6 fois une plateforme posée sur un pilier plonge l'écran dans le noir et téléporte dans une zone secrète d'un écran (fond noir, sol en liseré blanc, chiffres aléatoires qui défilent en dessous, impossible d'en sortir).
+  - Le boss est un grand 6 blanc ailé qui flotte et lance des tridents lents et des salves de chiffres. 800 PV, enragé à 50 %.
+  - Récompense : la nouvelle arme **Numéro 6**, 300 or et 3 âmes rouges (première victoire), puis retour à l'endroit d'où on est parti.
+- **Arme Numéro 6** : un jet continu de chiffres qui retombent en arc, comme le lait de la vache.
+- **Checkpoint des marécages** (mode Classique).
+- **Améliorations des dagues** : dégâts, longueur du dash, hauteur de saut (jusqu'à x2) et parade (25 à 60 % de chance).
+- **Classement TOP 10** du mode Anarchie, avec un pseudo choisi à la connexion Google, et bouton pour enregistrer son score quand on bat son record.
+- **Taille des joysticks** réglable dans les réglages.
+
+### Modifié
+- Les armes se changent uniquement dans le menu ARMES, ou chez le marchand pendant une partie (nouveau bouton marchand).
+- Menus plus fluides.
+- Tridents multiples supprimés et plus de blocage d'arme par zone.
+- Dash des dagues : 1 s de recharge après l'atterrissage, portée maximale réduite.
+- Piliers des marécages plus larges, uniquement sous les plateformes au-dessus d'un sol plat.
+- Remise à zéro de tous les meilleurs scores.
+
 ## [V0.3.1] - 2026-10-15
 
 ### Ajouté

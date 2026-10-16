@@ -1,6 +1,6 @@
 # 🎣 Pechadophin
 
-**Version V0.3.1**
+**Version V0.3.5**
 
 Un jeu de plateforme en pixel art, [jouable directement dans le navigateur](https://firetaleshy.github.io/Pechadophin/) : tu es un pêcheur qui affronte des dauphins, un démon requin, un poulpe géant, une méduse et un château de sable, dans un monde généré aléatoirement à chaque partie.
 
@@ -23,7 +23,8 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 
 ## ✨ Contenu
 
-- Trois armes, présentées dans le menu ARMES : une canne améliorable, un trident infernal (débloqué à la plage) avec les tridents multiples, et des dagues qui attaquent en dash (dans le coffre rouge des marécages)
+- Quatre armes, présentées dans le menu ARMES : une canne améliorable, un trident infernal (débloqué à la plage), des dagues qui attaquent en dash (dans le coffre rouge des marécages, améliorables) et l'arme Numéro 6, laissée par un boss secret caché dans les marécages
+- Classement TOP 10 du mode Anarchie
 - Des dauphins bleus, roses (volants) et rouges (tireurs de boules de feu), des vers de sable et des mouettes en piqué sur la plage
 - Un démon requin à laser, accompagné d'une nuit rouge sang
 - Une arène avec un poulpe géant, de chaque côté du départ
