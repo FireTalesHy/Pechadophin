@@ -276,7 +276,7 @@ body{
 .grp:has(#joy),.grp:has(#joy2){align-items:center}
 #joy,#joy2{
   --s:clamp(84px,24vw,112px);
-  position:relative;flex:none;width:var(--s);height:var(--s);border-radius:50%;
+  position:relative;flex:none;width:calc(var(--s) * var(--js,1));height:calc(var(--s) * var(--js,1));border-radius:50%;
   background:radial-gradient(circle at 50% 38%,var(--btn) 0,var(--btn) 52%,var(--btn-shadow) 100%);
   border:2px solid var(--btn-line);
   box-shadow:0 4px 0 var(--btn-shadow);
@@ -451,6 +451,8 @@ body{
   <div class="shop-panel dev-panel">
     <div class="shop-head"><h2 id="set-title">RÉGLAGES</h2></div>
     <button class="sbtn" id="set-sound" type="button">SON : OUI</button>
+    <label class="shop-note" for="set-joy" id="set-joy-l" style="opacity:1">TAILLE DES JOYSTICKS : 100 %</label>
+    <input type="range" id="set-joy" min="60" max="160" step="10" value="100" style="width:100%;accent-color:#ff8a3d">
     <p class="shop-note" id="ov-hint">Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).</p>
     <a class="sbtn" id="rng-link" href="https://rng-infinite.com/?ref=pechadophin" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">JOUE AUSSI À RNG∞</a>
     <button class="go alt sm" id="rst-btn" type="button">RÉINITIALISER LA SAVE</button>
@@ -560,6 +562,7 @@ const EN={
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
+ [/^TAILLE DES JOYSTICKS : (\d+) %$/,m=>'JOYSTICK SIZE: '+m[1]+'%'],
  [/^SON : (OUI|NON)$/,m=>'SOUND: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^INVINCIBLE : (OUI|NON)$/,m=>'INVINCIBLE: '+(m[1]==='OUI'?'YES':'NO')],
  [/^AKIMBO GLOCK 18 : (OUI|NON)$/,m=>'AKIMBO GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
@@ -4331,6 +4334,12 @@ langBtn.addEventListener('click',()=>{
   if(accOpen&&!gUser)gRenderAcc();
 });
 applyLang();
+
+/* ---- Taille des joysticks (réglages) ---- */
+{const JK='canne-dauphins-joy',inp=$('set-joy'),lab=$('set-joy-l');
+ const apply=v=>{v=clamp(Math.round(v/10)*10,60,160);document.documentElement.style.setProperty('--js',String(v/100));inp.value=v;lab.textContent='TAILLE DES JOYSTICKS : '+v+' %';};
+ let v0=100;try{v0=Number(localStorage.getItem(JK))||100;}catch(e){}apply(v0);
+ inp.addEventListener('input',()=>{apply(Number(inp.value));try{localStorage.setItem(JK,String(inp.value));}catch(e){}});}
 })();
 </script>
 </body>
