@@ -2,6 +2,7 @@
 // Stockage : Upstash Redis (intégration Vercel). Le jeton Google est vérifié côté serveur.
 const CLIENT_ID = '613987510700-0gp3rfu2tmcm32uu0aun7q1lmubl8vav.apps.googleusercontent.com';
 const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const KEY = 'anarchy:s2';   // classement remis à zéro le 16/10/2026 (ancienne saison : 'anarchy')
 const TOK = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 
 async function redis(cmd) {
@@ -11,11 +12,11 @@ async function redis(cmd) {
   return j.result;
 }
 async function top() {
-  const a = (await redis(['ZREVRANGE', 'anarchy', 0, 9, 'WITHSCORES'])) || [];
+  const a = (await redis(['ZREVRANGE', KEY, 0, 9, 'WITHSCORES'])) || [];
   const out = [];
   for (let i = 0; i < a.length; i += 2) out.push({ sub: a[i], score: Number(a[i + 1]) });
   if (out.length) {
-    const names = await redis(['HMGET', 'anarchy:names', ...out.map(o => o.sub)]);
+    const names = await redis(['HMGET', KEY+':names', ...out.map(o => o.sub)]);
     out.forEach((o, i) => { o.name = names[i] || '???'; delete o.sub; });
   }
   return out;
@@ -27,7 +28,7 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       const out = { top: await top() };
       const sub = req.query && req.query.sub;
-      if (sub) { const m = await redis(['ZSCORE', 'anarchy', String(sub).slice(0, 64)]); out.mine = m ? Number(m) : 0; }   // record enregistré du joueur
+      if (sub) { const m = await redis(['ZSCORE', KEY, String(sub).slice(0, 64)]); out.mine = m ? Number(m) : 0; }   // record enregistré du joueur
       res.status(200).json(out); return;
     }
     if (req.method === 'POST') {
@@ -39,8 +40,8 @@ module.exports = async (req, res) => {
       if (!v.ok || t.aud !== CLIENT_ID || !t.sub) { res.status(401).json({ error: 'auth' }); return; }
       let name = String(body.name || '').replace(/[<>]/g, '').trim().slice(0, 16);
       if (name.length < 2) name = 'Joueur';   // pseudo choisi par le joueur à la connexion
-      await redis(['ZADD', 'anarchy', 'GT', sc, t.sub]);   // garde le meilleur score de chaque joueur
-      await redis(['HSET', 'anarchy:names', t.sub, name]);
+      await redis(['ZADD', KEY, 'GT', sc, t.sub]);   // garde le meilleur score de chaque joueur
+      await redis(['HSET', KEY+':names', t.sub, name]);
       res.status(200).json({ top: await top() });
       return;
     }
