@@ -555,7 +555,7 @@ const EN={
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
 "Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.":'Skins are bought with gold. Open the chests you find along the way to earn some.',
-'DAGUES OBTENUES !':'DAGGERS OBTAINED!','ÉQUIPE-LES DANS ARMES':'EQUIP THEM IN WEAPONS','LA VACHE GÉANTE !':'THE GIANT COW!','ENRAGÉE !':'ENRAGED!','VACHE GÉANTE':'GIANT COW','Vaincre la vache géante':'Defeat the giant cow','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
+'DAGUES OBTENUES !':'DAGGERS OBTAINED!','ARME N°6 OBTENUE !':'WEAPON N°6 OBTAINED!','ÉQUIPE-LA DANS ARMES':'EQUIP IT IN WEAPONS','+3 ÂMES ROUGES':'+3 RED SOULS','+300 OR':'+300 GOLD','ENRAGÉ !':'ENRAGED!','Numéro 6':'Number 6','Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.':'A continuous stream of digits falling in an arc, like the cow\'s milk. Dropped by boss n°6.','Un secret se cache dans les marécages…':'A secret hides in the swamps…','ÉQUIPE-LES DANS ARMES':'EQUIP THEM IN WEAPONS','LA VACHE GÉANTE !':'THE GIANT COW!','ENRAGÉE !':'ENRAGED!','VACHE GÉANTE':'GIANT COW','Vaincre la vache géante':'Defeat the giant cow','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
@@ -748,6 +748,7 @@ function arenaAt(tx){
   return ar;
 }
 function column(tx){
+  if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
   let c=colCache.get(tx); if(c!==undefined) return c;
   const ar=arenaAt(tx);
   if(ar){
@@ -788,7 +789,7 @@ const palmPlat=(tx,ty)=>{   // la couronne de feuilles d'un cocotier sert de pla
   for(let d=-1;d<=1;d++){const pm=palmAt(tx+d);if(pm&&ty===pm.g-2&&(pm.flip?d===1||d===0:d===0||d===-1))return true;}
   return false;
 };
-const oneWay=(tx,ty)=>(plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty);
+const oneWay=(tx,ty)=>!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty));
 const solidAt=(x,y)=>solidTile(Math.floor(x/T),Math.floor(y/T));
 const supportAt=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T);return solidTile(tx,ty)||oneWay(tx,ty);};
 
@@ -1463,7 +1464,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,pearls:0,daggerOwned:false,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,pearls:0,daggerOwned:false,sixOwned:false,gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1471,16 +1472,18 @@ function loadShop(){
       if(Number(j.pearls)>0)d.gold+=Math.floor(Number(j.pearls))*50;   // les perles n'existent plus : 1 perle = 50 or
       d.pearls=0;
       d.daggerOwned=j.daggerOwned===true;
+      d.sixOwned=j.sixOwned===true;
       d.souls=Math.max(0,Math.floor(Number(j.souls))||0);
       d.hp=clamp(Math.floor(Number(j.hp))||0,0,5);
       d.beach=(j.beach===1||j.beach===-1)?j.beach:0;
       d.swamp=(j.swamp===1||j.swamp===-1)?j.swamp:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
-      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
+      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
-      if(j.weapon==='dagger'&&d.daggerOwned)d.weapon='dagger';   // plage atteinte : la canne n'est plus utilisable
+      if(j.weapon==='dagger'&&d.daggerOwned)d.weapon='dagger';
+      if(j.weapon==='six'&&d.sixOwned)d.weapon='six';   // plage atteinte : la canne n'est plus utilisable
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
@@ -1683,7 +1686,7 @@ function stepPlayer(dt){
    Plein dégât au centre, -50 % à l'extrême bord de la zone. */
 const zoneR=n=>5+(n-1)*6;
 function rectDist(px,py,x,y,w,h){const dx=Math.max(x-px,0,px-(x+w)),dy=Math.max(y-py,0,py-(y+h));return Math.hypot(dx,dy);}
-function hookHit(h,dmg,R){
+function allTargets(){
   const targets=[];
   for(const e of enemies)if(e.state==='alive')targets.push({r:[e.x,e.y,e.w,e.h],hit:d=>hitEnemy(e,d)});
   const b=boss;
@@ -1696,6 +1699,11 @@ function hookHit(h,dmg,R){
   }
   if(castle&&castle.state==='fight')targets.push({r:bucketRect(castle),hit:d=>hitCastle(d)});
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)targets.push({r:[cow.x,cow.y,cow.w,cow.h],hit:d=>hitCow(d)});
+  if(six&&six.state==='alive'&&six.spawnT<=0)targets.push({r:[six.x,six.y,six.w,six.h],hit:d=>hitSix(d)});
+  return targets;
+}
+function hookHit(h,dmg,R){
+  const targets=allTargets();
   if(!targets.some(t=>rectsOverlap(h.x-5,h.y-5,10,10,t.r[0],t.r[1],t.r[2],t.r[3])))return false;   // le grappin touche : la zone se déclenche
   for(const t of targets){
     const dist=rectDist(h.x,h.y,t.r[0],t.r[1],t.r[2],t.r[3]);
@@ -1744,6 +1752,8 @@ function stepDagger(dt){
   if(octo&&octo.state==='fight')for(const t of tents)if(t.state!=='warn')tryHit(t,tentRect(t),x=>hitOcto(t,x));
   if(castle&&castle.state==='fight')tryHit(castle,bucketRect(castle),x=>hitCastle(x));
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)tryHit(cow,[cow.x,cow.y,cow.w,cow.h],x=>hitCow(x));
+  if(six&&six.state==='alive'&&six.spawnT<=0)tryHit(six,[six.x,six.y,six.w,six.h],x=>hitSix(x));
+  if(!d.pp){const ptx=Math.floor((p.x+5)/T),pty=Math.floor((p.y+p.h+2)/T);if(platShot(ptx,pty,p.x+5,p.y+p.h))d.pp=1;}
   if(d.t<=0){p.dash=null;p.parryT=0.6;}   // fenêtre de parade juste après le dash
 }
 function drawDaggersHeld(hx,hy){
@@ -1803,6 +1813,8 @@ function stepTrident(dt){
     }
     if(h.n<pierce&&castle&&castle.state==='fight'&&!h.hit.has(castle)){const r=bucketRect(castle);if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(castle);hitCastle(dmg);h.n++;}}
     if(h.n<pierce&&cow&&cow.state==='alive'&&cow.spawnT<=0&&!h.hit.has(cow)&&rectsOverlap(h.x-5,h.y-5,10,10,cow.x,cow.y,cow.w,cow.h)){h.hit.add(cow);hitCow(dmg);h.n++;}
+    if(h.n<pierce&&six&&six.state==='alive'&&six.spawnT<=0&&!h.hit.has(six)&&rectsOverlap(h.x-5,h.y-5,10,10,six.x,six.y,six.w,six.h)){h.hit.add(six);hitSix(dmg);h.n++;}
+    if(!h.pp&&platShot(Math.floor(h.x/T),Math.floor(h.y/T),h.x,h.y))h.pp=1;   // tir sur une plateforme à pilier
     if(h.n>=pierce){h.done=true;burst(h.x,h.y,'#ffb347',8,80);}
     if(Math.random()<0.8)parts.push({x:h.x-h.ux*6,y:h.y-h.uy*6+(Math.random()-0.5)*3,vx:-h.ux*20,vy:-h.uy*20+(Math.random()-0.5)*14,g:0,life:0.3,col:Math.random()<0.5?'#ff4a2a':'#ffb347',sz:1});
   }
@@ -1810,6 +1822,7 @@ function stepTrident(dt){
 }
 function stepHook(dt){
   if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
+  if(shop.weapon==='six'&&!glockOn){stepSixGun(dt);return;}
   if(shop.weapon==='trident'||glockOn){stepTrident(dt);return;}
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
@@ -1831,6 +1844,7 @@ function stepHook(dt){
     const h=lead;
     h.x+=h.ux*HOOK_V*spd*dt;h.y+=h.uy*HOOK_V*spd*dt;h.d+=HOOK_V*spd*dt;
     if(solidAt(h.x+h.ux*3,h.y+h.uy*3)||h.d>=range)h.phase='back';
+    else if(!h.pp&&platShot(Math.floor(h.x/T),Math.floor(h.y/T),h.x,h.y)){h.pp=1;h.phase='back';}
     else if(hookHit(h,dmg,zoneR(UP.count.vals[shop.up.count])))h.phase='back';
   }
   for(const h of hooks){
@@ -2319,6 +2333,146 @@ function stepMilk(dt){
   milk=milk.filter(m=>!m.dead);
 }
 function drawMilk(){for(const m of milk){ctx.fillStyle='#d8e4f0';ctx.fillRect(Math.round(m.x)-2,Math.round(m.y)-2,4,4);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(m.x)-1,Math.round(m.y)-2,3,3);}}
+/* ===== Zone secrète : tirer 6 fois sur une plateforme à pilier ouvre l'arène du boss « 6 » ===== */
+const RZC=1<<21,RZW=12,RZG=20,SIX_HP=800;   // arène d'un écran, loin du monde
+let rz=null,six=null,sixShots=[],sixJet=[],rzTr=null,pillarHits=new Map(),sixCd=0;
+const RZ_FLOOR={g:RZG,pit:false,beach:false,tun:null,swamp:false},RZ_WALL={g:RZG-40,pit:false,beach:false,tun:null,swamp:false};
+const rzIn=tx=>!!rz&&tx>RZC-60&&tx<RZC+60;
+function pillarPlatAt(tx,ty){   // clé de la plateforme si la case (tx,ty) est une plateforme de marais posée sur un pilier
+  if(rz||!oneWay(tx,ty))return null;
+  const col=column(tx);if(!col.swamp)return null;
+  let l=tx,r=tx;while(l>tx-8&&oneWay(l-1,ty))l--;while(r<tx+8&&oneWay(r+1,ty))r++;
+  const g=column(l).g;for(let k=l;k<=r;k++){const ck=column(k);if(ck.pit||ck.g!==g)return null;}
+  return l*1024+ty;
+}
+function platShot(tx,ty,x,y){
+  const k=pillarPlatAt(tx,ty);if(k===null||rzTr)return false;
+  const n=(pillarHits.get(k)||0)+1;pillarHits.set(k,n);
+  burst(x,ty*T+2,'#d8ddd0',5,60);
+  if(n>=6){pillarHits.clear();rzTr={t:0,dir:'in',sw:false};sfx.bossSpawn();}
+  return true;
+}
+function rzEnter(){
+  rz={back:{x:player.x,y:player.y},grid:[]};
+  for(let i=0;i<RZW*2*3;i++)rz.grid.push({d:String(Math.floor(Math.random()*10)),a:0.15+Math.random()*0.5});
+  hooks=[];tridents=[];milk=[];sixShots=[];sixJet=[];bossShots=[];
+  Object.assign(player,{x:(RZC-8)*T,y:RZG*T-14,vx:0,vy:0,onGround:true,invuln:1,stun:0,dash:null});
+  player.safe={x:player.x,y:player.y};
+  six={x:(RZC+4)*T-14,y:(RZG-8)*T,w:28,h:36,hp:SIX_HP,maxHp:SIX_HP,state:'alive',spawnT:1.4,t:0,cd:1.6,flash:0,rage:false,n:0,bx:(RZC+4)*T,by:(RZG-8)*T};
+  cam.x=(RZC-RZW)*T;cam.y=RZG*T-173;camLX=0;camLY=0;
+}
+function rzLeave(){
+  const b=rz.back;rz=null;six=null;sixShots=[];sixJet=[];tridents=[];hooks=[];
+  Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null});player.safe={x:b.x,y:b.y};
+  snapCamera();
+}
+function stepRzTr(dt){   // fondu au noir puis téléportation
+  rzTr.t+=dt;
+  if(!rzTr.sw&&rzTr.t>=0.7){rzTr.sw=true;if(rzTr.dir==='in')rzEnter();else rzLeave();}
+  if(rzTr.t>=1.5)rzTr=null;
+}
+function hitSix(dmg){
+  const b=six;if(!b||b.state!=='alive'||b.spawnT>0)return;
+  const removed=Math.min(dmg,b.hp);b.hp-=dmg;b.flash=0.12;
+  combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;score+=pts;
+  floatText(b.x+b.w/2,b.y-8,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  burst(b.x+b.w/2,b.y+b.h/2,'#ffffff',6,90);
+  if(b.hp<=0)killSix();else sfx.hit();
+}
+function killSix(){
+  const b=six;b.hp=0;b.state='dead';b.t=0;b.vy=-120;
+  kills++;shake=0.7;sfx.bossDie();
+  const cx=b.x+b.w/2,cy=b.y+b.h/2;
+  const first=!shop.sixOwned;shop.sixOwned=true;
+  const gs=soulReward('six',3);shop.gold+=300;saveShop();
+  if(gs){floatText(cx,cy-32,'+3 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy,t:0});soulFx.push({x:cx,y:cy,t:0.1});soulFx.push({x:cx+10,y:cy,t:0.2});}
+  floatText(cx,cy-22,'+300 OR','#ffd23f');
+  if(first){floatText(cx,cy-12,'ARME N°6 OBTENUE !','#ffffff');floatText(cx,cy-2,'ÉQUIPE-LA DANS ARMES','#ffe14d');}
+  burst(cx,cy,'#ffffff',40,180);burst(cx,cy,'#14182c',14,120);
+}
+function sixFire(kind){
+  const b=six,p=player,cx=b.x+b.w/2,cy=b.y+b.h/2,a=Math.atan2(p.y+7-cy,p.x+5-cx),sp=b.rage?1.25:1;
+  if(kind==='tri'){sixShots.push({k:'t',x:cx,y:cy,vx:Math.cos(a)*62*sp,vy:Math.sin(a)*62*sp,t:0});sfx.trident();}
+  else{const n=b.rage?7:5;for(let i=0;i<n;i++){const aa=a+(i-(n-1)/2)*0.22;sixShots.push({k:'n',d:String(Math.floor(Math.random()*10)),x:cx,y:cy,vx:Math.cos(aa)*95*sp,vy:Math.sin(aa)*95*sp,t:0});}sfx.bossFire();}
+}
+function stepSix(dt){
+  const p=player,b=six;
+  if(b){
+    b.t+=dt;if(b.flash>0)b.flash-=dt;
+    if(b.state==='dead'){b.vy+=200*dt;b.y+=b.vy*dt;if(b.t>2.6&&!rzTr)rzTr={t:0,dir:'out',sw:false};}
+    else if(b.spawnT>0)b.spawnT-=dt;
+    else{
+      if(!b.rage&&b.hp<=b.maxHp/2){b.rage=true;shake=0.5;sfx.bossSpawn();floatText(b.x+b.w/2,b.y-14,'ENRAGÉ !','#ff4a4a');}
+      const sp=b.rage?1.4:1;
+      b.x=b.bx-b.w/2+Math.sin(b.t*0.55*sp)*120;b.y=b.by+Math.sin(b.t*1.7)*14;   // flotte d'un bord à l'autre
+      b.cd-=dt;
+      if(b.cd<=0){b.n++;sixFire(b.n%3===0?'num':'tri');if(b.rage&&b.n%2)sixFire('num');b.cd=(b.rage?1.0:1.5);}
+      if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x+4,b.y+4,b.w-8,b.h-8)&&!tryParry())hurtPlayer(b.x+b.w/2);
+    }
+  }
+  for(const s of sixShots){
+    s.t+=dt;s.x+=s.vx*dt;s.y+=s.vy*dt;
+    if(s.t>9||solidAt(s.x,s.y)||s.x<(RZC-RZW)*T-8||s.x>(RZC+RZW)*T+8||s.y<(RZG-16)*T){s.dead=true;burst(s.x,s.y,'#ffffff',4,50);continue;}
+    if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,s.x-3,s.y-3,6,6)){s.dead=true;if(!tryParry())hurtPlayer(s.x);}
+  }
+  sixShots=sixShots.filter(s=>!s.dead);
+}
+function drawWing(x,y,dir,f){   // aile de plumes blanches qui bat
+  ctx.fillStyle='#ffffff';
+  for(let i=0;i<5;i++){const L=16-i*2,yy=y+i*3+Math.round(f*(4-i));ctx.fillRect(dir>0?x:x-L,yy,L,2);}
+  ctx.fillStyle='#c9ccd8';for(let i=0;i<5;i++){const L=16-i*2,yy=y+i*3+Math.round(f*(4-i))+2;ctx.fillRect(dir>0?x+2:x-L+2,yy,L-4,1);}
+}
+function drawSix(){
+  const b=six;
+  if(b){
+    ctx.save();
+    if(b.spawnT>0)ctx.globalAlpha=clamp(1-b.spawnT/1.4,0,1);
+    const x=Math.round(b.x),y=Math.round(b.y),f=Math.sin(b.t*(b.rage?14:9));
+    drawWing(x+b.w-2,y+6,1,f);drawWing(x+2,y+6,-1,f);
+    ctx.drawImage(RNG_DIGITS['6'],x-4,y-2,RNG_DIGITS['6'].width*4,RNG_DIGITS['6'].height*4);
+    if(b.flash>0){ctx.globalAlpha=0.5;ctx.fillStyle='#ff6a6a';ctx.fillRect(x+2,y+2,b.w-4,b.h-4);}
+    if(b.rage&&b.state==='alive'){ctx.globalAlpha=1;ctx.fillStyle='#ff3b3b';ctx.fillRect(x+12,y+21,3,3);}
+    ctx.restore();
+  }
+  for(const s of sixShots){
+    if(s.k==='n')ctx.drawImage(RNG_DIGITS[s.d],Math.round(s.x)-4,Math.round(s.y)-4);
+    else{ctx.save();ctx.translate(Math.round(s.x),Math.round(s.y));ctx.rotate(Math.atan2(s.vy,s.vx));ctx.fillStyle='#ffffff';ctx.fillRect(-9,-1,12,2);ctx.fillRect(3,-4,2,8);ctx.fillRect(3,-4,6,1);ctx.fillRect(3,3,6,1);ctx.fillRect(3,0,6,1);ctx.restore();}
+  }
+}
+function drawRz(cx,cy){   // fond noir, sol réduit à un liseré blanc, chiffres aléatoires en dessous
+  const x0=(RZC-RZW)*T,fy=RZG*T;
+  ctx.fillStyle='#ffffff';ctx.fillRect(x0,fy,RZW*2*T,1);
+  if(Math.random()<0.5){const c=rz.grid[Math.floor(Math.random()*rz.grid.length)];c.d=String(Math.floor(Math.random()*10));c.a=0.15+Math.random()*0.5;}
+  for(let i=0;i<rz.grid.length;i++){const c=rz.grid[i],gx=x0+(i%(RZW*2))*T+4,gy=fy+6+Math.floor(i/(RZW*2))*12;ctx.globalAlpha=c.a;ctx.drawImage(RNG_DIGITS[c.d],gx,gy);}
+  ctx.globalAlpha=1;
+}
+/* l'arme n°6 : un jet de chiffres en arc, comme le lait de la vache */
+function stepSixGun(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  if(sixCd>0)sixCd-=dt;
+  throwAnim=Math.max(0,throwAnim-dt);
+  if((fireBuf>0||inp.fire||aim.auto)&&p.stun<=0&&state==='play'){
+    fireBuf=0;throwAnim=0.1;
+    while(sixCd<=0){
+      sixCd+=0.05;
+      const len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len,v=250;
+      sixJet.push({x:p.x+5+ux*8,y:p.y+5+uy*8,vx:ux*v+(Math.random()-0.5)*16,vy:uy*v-40+(Math.random()-0.5)*16,t:0,d:String(Math.floor(Math.random()*10))});
+    }
+  } else if(sixCd<0)sixCd=0;
+}
+function stepSixJet(dt){
+  for(const m of sixJet){
+    m.t+=dt;m.vy+=500*dt;m.x+=m.vx*dt;m.y+=m.vy*dt;
+    const tx=Math.floor(m.x/T),ty=Math.floor(m.y/T);
+    if(solidAt(m.x,m.y)||oneWay(tx,ty)&&m.vy>0||m.t>3){m.dead=true;parts.push({x:m.x,y:m.y-1,vx:(Math.random()-0.5)*60,vy:-40-Math.random()*40,g:400,life:0.35,col:'#ffffff',sz:2});continue;}
+    const tg=allTargets();
+    for(const t of tg)if(rectsOverlap(m.x-3,m.y-3,6,6,t.r[0],t.r[1],t.r[2],t.r[3])){t.hit(2);m.dead=true;break;}
+  }
+  sixJet=sixJet.filter(m=>!m.dead);
+}
+function drawSixJet(){for(const m of sixJet)ctx.drawImage(RNG_DIGITS[m.d],Math.round(m.x)-4,Math.round(m.y)-4);}
 function drawCow(){
   const b=cow;if(!b)return;
   const cx=Math.round(b.x+b.w/2),cy=Math.round(b.y+b.h/2);
@@ -2605,6 +2759,7 @@ function stepFx(dt){
 function snapCamera(){camLX=0;camLY=0;cam.x=player.x+5-VW/2;cam.y=player.y+7-VH*0.6;}
 function stepCamera(dt){
   const p=player;
+  if(rz){cam.x=(RZC-RZW)*T;cam.y=RZG*T-173;return;}
   const lk=octo&&octo.ar.state==='active'?octo.ar:castle&&castle.ar.state==='active'?castle.ar:null;
   if(lk){   // caméra verrouillée sur l'arène
     const ar=lk,k=1-Math.exp(-4*dt);
@@ -2632,6 +2787,13 @@ function update(dt){
     return;
   }
   if(state==='over'){stepFx(dt);return;}
+  if(rzTr){stepRzTr(dt);stepFx(dt);return;}
+  if(rz){   // arène secrète : rien d'autre ne vit ici
+    stepPlayer(dt);if(state!=='play')return;
+    stepHook(dt);stepSix(dt);stepSixJet(dt);stepSoulFx(dt);stepFx(dt);
+    if(combo.n>0){combo.t-=dt;if(combo.t<=0){combo.n=0;combo.t=0;}}
+    return;
+  }
   ensureChunks();
   stepPlayer(dt);
   if(state!=='play')return;
@@ -2665,6 +2827,7 @@ function update(dt){
   stepJelly(dt);
   stepCow(dt);
   stepMilk(dt);
+  stepSixJet(dt);
   stepOcto(dt);
   stepCastle(dt);
   stepBossShots(dt);
@@ -2918,6 +3081,7 @@ function drawPlayer(){
     ctx.restore();
   }
   else if(shop.weapon==='dagger')drawDaggersHeld(hx,hy);
+  else if(shop.weapon==='six')ctx.drawImage(RNG_DIGITS['6'],Math.round(hx)-4,Math.round(hy)-7);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
     const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
@@ -3210,6 +3374,7 @@ function drawHUD(){
     ?{name:'CHÂTEAU DE SABLE',hp:castle.hp,max:castle.maxHp,ticks:[0.5],name_c:castle.rage?'#ff6a6a':'#f6e2ac',col:castle.rage?'#ff7a3a':'#e4c882',dark:'#4a3a1a',hi:'#fff0c4'}
     :octo&&octo.state!=='dying'
     ?{name:'POULPE GÉANT',hp:octo.hp,max:octo.maxHp,ticks:[0.5],name_c:octo.rage?'#ff6a6a':'#c9a8ff',col:octo.rage?'#ff3b4a':'#9a6bff',dark:octo.rage?'#4a0a14':'#2a1650',hi:octo.rage?'#ff8a8a':'#c9a8ff'}
+    :six&&six.state==='alive'?{name:'N°6',hp:six.hp,max:six.maxHp,ticks:[0.5],name_c:six.rage?'#ff6a6a':'#ffffff',col:six.rage?'#ff4a4a':'#ffffff',dark:'#202020',hi:'#ffffff'}
     :cow&&cow.state==='alive'?{name:'VACHE GÉANTE',hp:cow.hp,max:cow.maxHp,ticks:[0.5],name_c:cow.rage?'#ff6a6a':'#ffffff',col:cow.rage?'#ff4a4a':'#e8e4d8',dark:'#3a3a40',hi:'#ffffff'}
     :jelly&&jelly.state==='alive'?{name:'MÉDUSE',hp:jelly.hp,max:jelly.maxHp,ticks:[0.5],name_c:'#f6f0ff',col:'#d9b8ff',dark:'#2a1650',hi:'#ffffff'}
     :boss?{name:'DÉMON REQUIN',hp:boss.hp,max:boss.maxHp,ticks:[0.2,0.4,0.6,0.8],name_c:'#ff6a6a',col:'#e0202c',dark:'#4a0a10',hi:'#ff6a5a'}:null;
@@ -3225,8 +3390,28 @@ function drawHUD(){
     for(const tk of bb.ticks)ctx.fillRect(bx+Math.round(bw*tk),by,1,8);
   }
 }
+function drawRzFade(){const t=rzTr.t,a=t<0.7?t/0.7:clamp(1-(t-0.9)/0.6,0,1);ctx.fillStyle='rgba(0,0,0,'+a.toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}
+function renderRz(){
+  const cx=Math.round(cam.x),cy=Math.round(cam.y);
+  ctx.fillStyle='#000000';ctx.fillRect(0,0,VW,VH);
+  let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
+  ctx.save();ctx.translate(-cx+sx,-cy+sy);
+  drawRz(cx,cy);drawSix();drawTridents();drawPlayer();drawSixJet();drawReticle();drawSoulFx();drawFx();
+  ctx.restore();
+  if(state==='dying'&&dyingT<0.25){ctx.fillStyle='rgba(255,60,60,.28)';ctx.fillRect(0,0,VW,VH);}
+  if(rzTr)drawRzFade();
+  if(state!=='title'&&!overlayVisible)drawHUD();
+  document.querySelectorAll('.pad').forEach(b=>b.classList.toggle('on',!!inp[b.dataset.k]));
+  const kd=(inp.right?1:0)-(inp.left?1:0),mx=(joyEl.offsetWidth||0)*0.31;
+  joyThumb.style.transform='translate('+Math.round(joy.active?joy.tx:kd*mx)+'px,'+Math.round(joy.active?joy.ty:0)+'px)';
+  $('merch-btn').hidden=true;
+  joyEl.classList.toggle('on',joy.active||kd!==0);
+  look2Thumb.style.transform='translate('+Math.round(look.tx)+'px,'+Math.round(look.ty)+'px)';
+  look2El.classList.toggle('on',look.active);
+}
 function render(){
   ctx.imageSmoothingEnabled=false;
+  if(rz){renderRz();return;}
   const cx=Math.round(cam.x),cy=Math.round(cam.y);
   {const cc=Math.round((cx+VW/2)/T),tb=inBeach(cc)?1:0,ts=inSwamp(cc)?1:0;   // fondu d'une zone à l'autre
    bzView+=(tb-bzView)*0.06;if(Math.abs(tb-bzView)<0.01)bzView=tb;swView+=(ts-swView)*0.06;if(Math.abs(ts-swView)<0.01)swView=ts;}
@@ -3259,6 +3444,7 @@ function render(){
   drawJelly();
   drawCow();
   drawMilk();
+  drawSixJet();
   drawBossShots();
   drawTridents();
   drawPlayer();
@@ -3270,6 +3456,7 @@ function render(){
   if(nightA>0.01){ctx.fillStyle='rgba(130,0,10,'+((0.16+0.03*Math.sin(time*2))*nightA).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // teinte rouge sur le monde
   if(skyCur[3]>0.005){ctx.fillStyle='rgba('+Math.round(skyCur[0])+','+Math.round(skyCur[1])+','+Math.round(skyCur[2])+','+(skyCur[3]*0.3).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}
   if(state==='dying'&&dyingT<0.25){ctx.fillStyle='rgba(255,60,60,.28)';ctx.fillRect(0,0,VW,VH);}
+  if(rzTr)drawRzFade();
   if(state!=='title'&&!overlayVisible)drawHUD();   // le HUD est masqué derrière les menus
   document.querySelectorAll('.pad').forEach(b=>b.classList.toggle('on',!!inp[b.dataset.k]));
   const kd=(inp.right?1:0)-(inp.left?1:0),mx=(joyEl.offsetWidth||0)*0.31;
@@ -3304,7 +3491,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();
-  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();
+  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;pillarHits.clear();
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -3475,6 +3662,7 @@ function assistTarget(cx,cy,a0){
   if(octo&&octo.state==='fight')for(const t of tents)if(t.state!=='warn'&&t.state!=='retract')c.push([t.x,t.floorY-36]);
   if(castle&&castle.state==='fight'){const r=bucketRect(castle);c.push([r[0]+r[2]/2,r[1]+r[3]/2]);}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)c.push([cow.x+cow.w/2,cow.y+cow.h/2]);
+  if(six&&six.state==='alive'&&six.spawnT<=0)c.push([six.x+six.w/2,six.y+six.h/2]);
   let best=null,bs=1e9;
   for(const q of c){
     const dx=q[0]-cx,dy=q[1]-cy,d=Math.hypot(dx,dy);
@@ -3613,7 +3801,8 @@ function setMode(want){
 const WEAPONS=[
   {id:'rod',name:'Canne à pêche',desc:'Grappin qui déclenche une zone de dégâts.',icon:()=>ROD_ICON,owned:()=>true,locked:()=>rodLocked(),render:()=>renderRod()},
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
-  {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()}
+  {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
+  {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>{shopList.textContent='';}}
 ];
 let weapOpen=false,weapSel=null;
 const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
@@ -3634,7 +3823,7 @@ function renderWeap(){
   const w=WEAPONS.find(x=>x.id===weapSel);
   const big=$('weap-big');big.textContent='';big.appendChild(weapImg(w,64));
   $('weap-name').textContent=w.owned()?w.name:'???';
-  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':'Débloquée en atteignant la plage.');
+  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':'Débloquée en atteignant la plage.');
   const eb=$('weap-eq');
   eb.disabled=!w.owned()||shop.weapon===w.id||(w.locked&&w.locked());
   eb.textContent=!w.owned()?'VERROUILLÉE':shop.weapon===w.id?'ÉQUIPÉE':(w.locked&&w.locked())?'INDISPONIBLE':'ÉQUIPER';
