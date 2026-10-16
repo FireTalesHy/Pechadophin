@@ -2379,7 +2379,7 @@ function stepRzTr(dt){   // fondu au noir puis téléportation
 }
 function maybeSpawnSix(dt){   // anarchie : le 6 ailé peut surgir n'importe où
   if(!anarchyOn||six||boss||octo||castle||jelly||cow)return;
-  if(Math.random()>=dt/75)return;
+  if(Math.random()>=dt/600)return;   // rare : en moyenne une fois toutes les 10 minutes
   const p=player,h=anarchyOn?encHp(SIX_HP):SIX_HP;
   six={x:p.x-14,y:p.y-110,w:28,h:36,hp:h,maxHp:h,state:'alive',spawnT:1.4,t:0,cd:1.8,flash:0,rage:false,n:0,bx:p.x+5,by:p.y-100,world:true};
   shake=0.4;sfx.bossSpawn();floatText(p.x+5,p.y-30,'LE NUMÉRO 6 !','#ffffff');
