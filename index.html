@@ -750,7 +750,7 @@ function arenaAt(tx){
 function column(tx){
   if(hole&&tx<=hole.e&&!rzIn(tx)){   // 3 écrans à gauche du départ (ou du checkpoint) : le trou secret puis un mur, le vrai chemin est à droite
     const g0=hole.g;
-    return tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false}:{g:g0,pit:false,beach:false,tun:null,swamp:false};
+    return !hole.shut&&tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false}:{g:g0,pit:false,beach:false,tun:null,swamp:false};
   }
   if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
   let c=colCache.get(tx); if(c!==undefined) return c;
@@ -2356,7 +2356,8 @@ function rzEnter(){
   cam.x=(RZC-RZW)*T;cam.y=RZG*T-173;camLX=0;camLY=0;
 }
 function rzLeave(){
-  const b=rz.back;rz=null;six=null;sixShots=[];sixJet=[];tridents=[];hooks=[];
+  const b=rz.back;rz=null;if(hole&&six&&six.state==='dead')hole.shut=true;   // boss vaincu : le trou se rebouche
+six=null;sixShots=[];sixJet=[];tridents=[];hooks=[];
   Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null});player.safe={x:b.x,y:b.y};
   snapCamera();
 }
@@ -2799,7 +2800,7 @@ function update(dt){
     return;
   }
   if(state==='over'){stepFx(dt);return;}
-  if(!rz&&!rzTr&&state==='play'){const p=player,tx=Math.floor((p.x+5)/T);if(hole&&tx>=hole.l&&tx<=hole.r&&p.y>(hole.g+2)*T){rzTr={t:0,dir:'in',sw:false};sfx.bossSpawn();}}   // tombé dans le trou secret
+  if(!rz&&!rzTr&&state==='play'){const p=player,tx=Math.floor((p.x+5)/T);if(hole&&!hole.shut&&tx>=hole.l&&tx<=hole.r&&p.y>(hole.g+2)*T){rzTr={t:0,dir:'in',sw:false};sfx.bossSpawn();}}   // tombé dans le trou secret
   if(rzTr){stepRzTr(dt);stepFx(dt);return;}
   if(rz){   // arène secrète : rien d'autre ne vit ici
     stepPlayer(dt);if(state!=='play')return;
@@ -3444,7 +3445,7 @@ function render(){
   drawPalms(cx,cy);
   drawSwampTowers(cx);
   drawTiles(cx,cy);
-  if(hole&&cx<(hole.r+1)*T&&cx+VW>hole.l*T){const gy=hole.g*T;ctx.fillStyle='#000000';ctx.fillRect(hole.l*T,gy,(hole.r-hole.l+1)*T,VH*3);if(Math.sin(time*3)>0.6){ctx.globalAlpha=0.5;ctx.drawImage(RNG_DIGITS['6'],(hole.l+1)*T+4,gy+10);ctx.globalAlpha=1;}}   // le trou secret
+  if(hole&&!hole.shut&&cx<(hole.r+1)*T&&cx+VW>hole.l*T){const gy=hole.g*T;ctx.fillStyle='#000000';ctx.fillRect(hole.l*T,gy,(hole.r-hole.l+1)*T,VH*3);if(Math.sin(time*3)>0.6){ctx.globalAlpha=0.5;ctx.drawImage(RNG_DIGITS['6'],(hole.l+1)*T+4,gy+10);ctx.globalAlpha=1;}}   // le trou secret
   drawPuddles(cx);
   drawTents();
   drawCastleFx();
