@@ -550,7 +550,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
+'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -989,7 +989,7 @@ const SKINS=[
   hat:["................",".......kk.......","......krrk......","...kkkkkkkkkk...","...khhhhhhhhk..."],
   face:["...khHHHHHHhk...","...kHrrHHrrHk...","...kHHkkkkHHk...","....kkHHHHkk...."],
   torso:["...kbbbbbbbbk...","...kbbyybbbbHk..","...kBBBBBBBBk..."]},
- {id:'clown',name:'Clown',price:18,rod:'#d92b3a',
+ {id:'clown',name:'Clown',price:10000,rod:'#d92b3a',
   pal:{h:'#ff8a2a',g:'#ffe14d',r:'#e0262e',s:'#fff6ee',S:'#e6d8cc',b:'#7a4ad8',B:'#4a2a98',p:'#f2b630',n:'#d92b3a'},
   hat:["................","...h.g.r.g.h....","..hhhgrrrghhh...","..hhhhgggrrhh...","...khhhhhhhhk..."],
   face:["...kssssssssk...","...kskssskssk...","...ksssrrsssk...","....kkssssskk..."],
@@ -1375,6 +1375,12 @@ const ICE_PLAT=(()=>{const c=mk(T,T),g=c.getContext('2d');   // plateforme de gl
   g.fillStyle='#4c86b0';g.fillRect(3,8,3,2);g.fillRect(4,10,1,2);g.fillRect(10,8,3,3);g.fillRect(11,11,1,2);
   g.fillStyle='#bfe9ff';g.fillRect(3,8,1,2);g.fillRect(10,8,1,3);
   return c;})();
+const SCEPTER_ICON=spr(["........xx.",".......xwwx","......xwWwx",".......xwwx","......yxxx.",".....y.....","....y......","...y.......","..y........",".y.........","y.........."],{x:'#4aa8e8',w:'#bfe9ff',W:'#ffffff',y:'#cfd8e8'},true);
+const SCEPTER_H=(()=>{const c=mk(24,12),g=c.getContext('2d');   // sceptre tenu : horizontal, le cristal à droite
+  const R=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  R('#14182c',0,4,15,4);R('#cfd8e8',1,5,13,2);R('#ffffff',1,5,13,1);R('#ffd23f',9,3,2,6);
+  R('#14182c',14,1,8,10);R('#4aa8e8',15,2,6,8);R('#bfe9ff',16,3,4,6);R('#ffffff',17,4,2,3);R('#14182c',22,4,1,4);R('#4aa8e8',21,4,1,4);
+  return c;})();
 const WALL_I=(()=>{const c=mk(T,T),g=c.getContext('2d');
   g.fillStyle='#8cc3e4';g.fillRect(0,0,T,T);
   g.fillStyle='#6aa4cc';g.fillRect(0,7,T,1);g.fillRect(0,15,T,1);g.fillRect(7,0,1,8);g.fillRect(3,8,1,8);g.fillRect(11,8,1,8);
@@ -1597,6 +1603,14 @@ const TUP={
 };
 const D_KEYS=['dmg','dist','jump','parry'];
 const SX_KEYS=['spray','rgb','red','spin'];
+const SC_KEYS=['dmg','range','slow','laser'];
+const SCUP={   // améliorations du sceptre de glace (or)
+ dmg:{name:'Gel et dégâts',vals:[1,2,2,3,3,4],cost:[60,130,220,340,500],fmt:v=>v+' / 0,5 s'},   // dégâts sur la durée, par tranche de 0,5 s
+ range:{name:'Portée du souffle',vals:[72,82,92,102,114,128],cost:[50,110,190,290,420],fmt:v=>fr1(v/16)+' cases'},
+ slow:{name:'Ralentissement',vals:[45,55,63,70,77,85],cost:[45,100,170,260,390],fmt:v=>v+' %'},
+ laser:{name:'Lasers de glace',vals:[12,10,8,6.5,5,3.5],cost:[100,200,320,480,700],fmt:v=>'1 / '+String(v).replace('.',',')+' s'}   // niveau 3 : 2 lasers, niveau 5 : 3 lasers
+};
+const SC_LASER_DMG=[6,7,8,9,10,12];
 const SXUP={spray:{name:'Spray',desc:'Cadence de tir des chiffres x2 (une seule fois).',cost:500},rgb:{name:'RGB',desc:'Skin : chaque chiffre a une couleur différente.',cost:200},red:{name:'Rouge',desc:'Skin : tous les chiffres sont rouges.',cost:150},spin:{name:'Rotation',desc:'Skin : les chiffres tournent sur eux-mêmes.',cost:150}};
 const DUP={   // améliorations des dagues (or)
  dmg:{name:'Dégâts',vals:[8,11,14,18,23,30],cost:[40,90,150,240,360],fmt:v=>v+' dégâts'},
@@ -1607,7 +1621,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,scepterOwned:false,sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1631,6 +1645,9 @@ function loadShop(){
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
       if(j.weapon==='dagger'&&d.daggerOwned)d.weapon='dagger';
       if(j.weapon==='six'&&d.sixOwned)d.weapon='six';   // plage atteinte : la canne n'est plus utilisable
+      d.scepterOwned=j.scepterOwned===true;
+      if(j.sc&&typeof j.sc==='object')for(const k of SC_KEYS)d.sc[k]=clamp(Math.floor(Number(j.sc[k]))||0,0,5);
+      if(j.weapon==='scepter'&&d.scepterOwned)d.weapon='scepter';
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
@@ -1837,7 +1854,7 @@ const zoneR=n=>5+(n-1)*6;
 function rectDist(px,py,x,y,w,h){const dx=Math.max(x-px,0,px-(x+w)),dy=Math.max(y-py,0,py-(y+h));return Math.hypot(dx,dy);}
 function allTargets(){
   const targets=[];
-  for(const e of enemies)if(e.state==='alive')targets.push({r:[e.x,e.y,e.w,e.h],hit:d=>hitEnemy(e,d)});
+  for(const e of enemies)if(e.state==='alive')targets.push({r:[e.x,e.y,e.w,e.h],hit:d=>hitEnemy(e,d),e});
   const b=boss;
   if(b&&b.state==='alive'&&b.spawnT<=0)targets.push({r:[b.x,b.y,b.w,b.h],hit:d=>hitBoss(b,d)});
   const jf=jelly;
@@ -1975,6 +1992,7 @@ function stepTrident(dt){
 }
 function stepHook(dt){
   if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
+  if(shop.weapon==='scepter'&&!glockOn){stepScepter(dt);return;}
   if(shop.weapon==='six'&&!glockOn){stepSixGun(dt);return;}
   if(shop.weapon==='trident'||glockOn){stepTrident(dt);return;}
   const p=player;
@@ -2178,7 +2196,12 @@ function stepEnemies(dt){
     if(e.state==='dead'){e.t+=dt;e.vy+=GRAV*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;continue;}
     if(Math.abs(e.x-p.x)>380||Math.abs(e.y-p.y)>320)continue;
     e.t+=dt; if(e.flash>0)e.flash-=dt;
-    if(e.kind==='gull')aiGull(e,dt);else if(e.kind==='mcow')aiMcow(e,dt);else if(e.kind==='fly')aiFly(e,dt);else if(e.kind==='worm')aiWorm(e,dt);else if(e.kind==='bear')aiBear(e,dt);else aiHop(e,dt);
+    if(e.frost>0){   // gelé par le sceptre : dégâts sur la durée (toutes les 0,5 s) et ralentissement
+      e.frost-=dt;e.frostT=(e.frostT||0)-dt;
+      if(e.frostT<=0){e.frostT=0.5;hitEnemy(e,scV('dmg'));parts.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:(Math.random()-0.5)*40,vy:-30,g:0,life:0.4,col:'#bfe9ff',sz:2});if(e.state==='dead')continue;}
+    }
+    const edt=e.frost>0?dt*(1-(e.fslow||45)/100):dt;
+    if(e.kind==='gull')aiGull(e,edt);else if(e.kind==='mcow')aiMcow(e,edt);else if(e.kind==='fly')aiFly(e,edt);else if(e.kind==='worm')aiWorm(e,edt);else if(e.kind==='bear')aiBear(e,edt);else aiHop(e,edt);
     if(state==='play'&&p.invuln<=0&&e.state==='alive'&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,e.x,e.y,e.w,e.h)&&!tryParry()) hurtPlayer(e.x+e.w/2);
   }
   enemies=enemies.filter(e=>!(e.state==='dead'&&(e.y>(WATER_ROW+4)*T||e.t>3))&&Math.abs(e.x-p.x)<2400);
@@ -2609,13 +2632,15 @@ function hitEskimo(dmg){
 function killEskimo(){
   const e=eskimo,ar=e.ar;
   e.hp=0;e.state='dying';e.dieT=2.6;e.beams=[];e.lures=[];
-  ar.state='won';ar.gateL=false;ar.gateR=false;
-  kills++;shake=0.7;sfx.bossDie();sfx.gate();
+  const needPed=!anarchyOn&&!shop.scepterOwned;   // classique : un piédestal donne le sceptre de glace, les portes restent fermées tant qu'on ne l'a pas pris
+  ar.state='won';
+  if(needPed)scepPed={ar,x:ar.cx*T+8,y:ar.floor*T,t:0,delay:2.4};else{ar.gateL=false;ar.gateR=false;}
+  kills++;shake=0.7;sfx.bossDie();if(!needPed)sfx.gate();
   const gs=soulReward('eskimo',2);shop.gold+=200;saveShop();
   const cx=ar.cx*T+8,cy=ar.floor*T-110;
   if(gs)floatText(cx,cy,'+2 ÂMES ROUGES','#ff6a7a');
   floatText(cx,cy+11,'+200 OR','#ffd23f');
-  floatText(cx,cy+22,anarchyOn?'LE CHEMIN DU RETOUR S\'OUVRE !':"LES PORTES S'OUVRENT !",'#7ff0e8');
+  floatText(cx,cy+22,needPed?'PRENDS LE SCEPTRE !':anarchyOn?'LE CHEMIN DU RETOUR S\'OUVRE !':"LES PORTES S'OUVRENT !",'#7ff0e8');
   if(gs){soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});}
   burst(cx,cy+30,'#bfe9ff',30,170);burst(cx,cy+30,'#7fd0ff',18,120);
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
@@ -2680,6 +2705,145 @@ function stepEskimo(dt){
     else if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,l.x-4,l.y-4,8,8)){l.life=0;burst(l.x,l.y,'#ffb347',8,80);hurtPlayer(l.x);}
   }
   e.lures=e.lures.filter(l=>l.life>0);
+}
+/* ---------- Sceptre de glace : souffle qui ralentit et gèle (dégâts sur la durée) + lasers du sol rares. Récompense de l'esquimau (piédestal) ---------- */
+let scepCd=0,scepBossT=0,scepLaserCd=6,scepBeams=[],scepPed=null;
+const scV=k=>SCUP[k].vals[(shop.sc||{})[k]||0];
+const scLv=k=>(shop.sc||{})[k]||0;
+function stepScepter(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  throwAnim=Math.max(0,throwAnim-dt);
+  if(scepCd>0)scepCd-=dt;
+  if(scepBossT>0)scepBossT-=dt;
+  scepLaserCd-=dt;
+  if(!((fireBuf>0||inp.fire||aim.auto)&&p.stun<=0&&state==='play'))return;
+  fireBuf=0;throwAnim=0.12;
+  const ox=p.x+5,oy=p.y+6,len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len,a0=Math.atan2(uy,ux),half=0.4;
+  let R=scV('range');
+  for(let d=8;d<=R;d+=4)if(solidAt(ox+ux*d,oy+uy*d)){R=d;break;}   // le souffle s'arrête sur les murs
+  for(let i=0;i<4;i++){   // souffle : nuage de particules glacées
+    const sp=95+Math.random()*95,a=a0+(Math.random()-0.5)*2*half*0.9;
+    parts.push({x:ox+ux*8,y:oy+uy*8,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,g:0,life:Math.max(0.12,R/sp)*(0.75+Math.random()*0.25),col:['#ffffff','#e8fbff','#bfe9ff','#7fd0ff'][Math.floor(Math.random()*4)],sz:1+Math.floor(Math.random()*2)});
+  }
+  if(scepCd<=0){   // toutes les 0,25 s : gèle ce qui est dans le cône
+    scepCd=0.25;
+    for(const t of allTargets()){
+      const rx=t.r[0],ry=t.r[1],rw=t.r[2],rh=t.r[3];
+      const px=clamp(ox,rx,rx+rw),py=clamp(oy,ry,ry+rh),d=Math.hypot(px-ox,py-oy);
+      if(d>R)continue;
+      const tcx=rx+rw/2,tcy=ry+rh/2,dd=Math.hypot(tcx-ox,tcy-oy)||1;
+      let df=Math.atan2(tcy-oy,tcx-ox)-a0;df=Math.atan2(Math.sin(df),Math.cos(df));
+      if(Math.abs(df)>half+Math.atan2(Math.max(rw,rh)/2,Math.max(dd,6)))continue;
+      if(t.e){t.e.frost=3;t.e.fslow=scV('slow');}   // ennemi : ralenti et gelé pendant 3 s, dégâts à chaque tranche de 0,5 s
+      else if(scepBossT<=0){scepBossT=0.5;t.hit(scV('dmg'));}   // boss : dégâts directs tant que le souffle le touche
+      parts.push({x:tcx+(Math.random()-0.5)*rw*0.6,y:tcy+(Math.random()-0.5)*rh*0.6,vx:0,vy:-14,g:0,life:0.4,col:'#e8fbff',sz:2});
+    }
+  }
+  if(scepLaserCd<=0&&castScepterLasers())scepLaserCd=scV('laser');   // lasers : rares, et seulement s'il y a une cible proche
+}
+function castScepterLasers(){
+  const p=player,n=scLv('laser')>=5?3:scLv('laser')>=3?2:1;
+  const cand=allTargets().map(t=>({t,x:t.r[0]+t.r[2]/2,d:Math.hypot(t.r[0]+t.r[2]/2-(p.x+5),t.r[1]+t.r[3]/2-(p.y+7))})).filter(c=>c.d<230).sort((a,b)=>a.d-b.d);
+  if(!cand.length)return false;
+  const xs=[];
+  for(const c of cand){if(xs.length>=n)break;if(xs.every(x=>Math.abs(x-c.x)>26))xs.push(c.x);}
+  for(const x of xs)scepBeams.push({x,gy:column(Math.floor(x/T)).g*T,state:'warn',t:0});
+  sfx.slam();
+  return true;
+}
+function stepScepterBeams(dt){
+  for(const b of scepBeams){
+    b.t+=dt;
+    if(b.state==='warn'&&b.t>=0.55){
+      b.state='fire';b.t=0;shake=Math.max(shake,0.1);sfx.slam();burst(b.x,b.gy-2,'#bfe9ff',8,90);
+      const dmg=SC_LASER_DMG[scLv('laser')];
+      for(const t of allTargets())if(rectsOverlap(b.x-5,b.gy-176,10,176,t.r[0],t.r[1],t.r[2],t.r[3])){if(t.e){t.e.frost=3;t.e.fslow=scV('slow');}t.hit(dmg);}
+    } else if(b.state==='fire'&&b.t>=0.35)b.dead=true;
+  }
+  scepBeams=scepBeams.filter(b=>!b.dead);
+}
+function stepPedestal(dt){
+  const w=scepPed;if(!w)return;
+  w.t+=dt;
+  if(w.t<w.delay)return;
+  if(Math.random()<0.4)parts.push({x:w.x+(Math.random()-0.5)*14,y:w.y-26,vx:(Math.random()-0.5)*14,vy:-16-Math.random()*14,g:0,life:0.8,col:Math.random()<0.5?'#e8fbff':'#7fd0ff',sz:1});
+  const p=player;
+  if(state==='play'&&rectsOverlap(p.x,p.y,p.w,p.h,w.x-14,w.y-40,28,40)){
+    shop.scepterOwned=true;saveShop();sfx.heal();shake=Math.max(shake,0.3);
+    const ar=w.ar;ar.gateL=false;ar.gateR=false;sfx.gate();
+    floatText(w.x,w.y-62,'SCEPTRE DE GLACE OBTENU !','#bfe9ff');floatText(w.x,w.y-52,'ÉQUIPE-LE DANS ARMES','#ffe14d');floatText(w.x,w.y-42,"LES PORTES S'OUVRENT !",'#7ff0e8');
+    burst(w.x,w.y-28,'#bfe9ff',30,150);burst(w.x,w.y-28,'#ffffff',14,110);
+    scepPed=null;
+  }
+}
+function drawScepterHeld(hx,hy){
+  const a=Math.atan2(aim.y,aim.x);
+  ctx.save();ctx.translate(Math.round(hx),Math.round(hy));ctx.rotate(a);if(aim.x<0)ctx.scale(1,-1);
+  ctx.drawImage(SCEPTER_H,-2,-6);
+  ctx.restore();
+}
+function drawScepterFx(){
+  for(const b of scepBeams){
+    const x=Math.round(b.x),gy=b.gy;
+    if(b.state==='warn'){
+      const k=clamp(b.t/0.55,0,1),pulse=Math.sin(time*30)>0?1:0.6;
+      ctx.globalAlpha=pulse;ctx.fillStyle='#7fe0ff';ctx.fillRect(x-5,gy-2,10,2);ctx.fillStyle='#ffffff';ctx.fillRect(x-1,Math.round(gy-6-26*k),2,Math.round(6+26*k));ctx.fillStyle='#bff0ff';ctx.fillRect(x-3,gy-4,6,2);
+      ctx.globalAlpha=1;
+    } else {
+      const wob=Math.sin(time*60)>0?1:0;
+      ctx.globalAlpha=0.35;ctx.fillStyle='#7fe0ff';ctx.fillRect(x-8-wob,gy-176,16+wob*2,176);
+      ctx.globalAlpha=0.9;ctx.fillStyle='#7fe0ff';ctx.fillRect(x-5,gy-176,10,176);ctx.fillStyle='#bff0ff';ctx.fillRect(x-3,gy-176,6,176);ctx.fillStyle='#ffffff';ctx.fillRect(x-1,gy-176,2,176);
+      ctx.globalAlpha=1;ctx.fillStyle='#ffffff';ctx.fillRect(x-7,gy-3,14,3);
+    }
+  }
+  const w=scepPed;
+  if(w&&w.t>=w.delay){   // piédestal de glace avec le sceptre qui flotte
+    const k=clamp((w.t-w.delay)/0.8,0,1),x=Math.round(w.x),y=Math.round(w.y),rise=Math.round((1-k)*30);
+    ctx.save();ctx.beginPath();ctx.rect(x-20,y-90,40,90);ctx.clip();
+    ctx.fillStyle='#14182c';ctx.fillRect(x-13,y-16+rise,26,16);ctx.fillRect(x-9,y-22+rise,18,6);
+    ctx.fillStyle='#8cc3e4';ctx.fillRect(x-12,y-15+rise,24,15);ctx.fillStyle='#bfe9ff';ctx.fillRect(x-12,y-15+rise,24,2);ctx.fillStyle='#6aa4cc';ctx.fillRect(x-12,y-3+rise,24,3);
+    ctx.fillStyle='#d8f2ff';ctx.fillRect(x-8,y-21+rise,16,5);ctx.fillStyle='#8cc3e4';ctx.fillRect(x-8,y-17+rise,16,1);
+    const fy=Math.round(y-44+Math.sin(time*3)*3+rise);
+    ctx.globalAlpha=0.3+0.2*Math.sin(time*6);ctx.fillStyle='#7fd0ff';ctx.fillRect(x-14,fy-12,28,28);ctx.globalAlpha=1;
+    ctx.save();ctx.translate(x,fy);ctx.rotate(-0.5);ctx.scale(1.6,1.6);ctx.drawImage(SCEPTER_H,-12,-6);ctx.restore();
+    ctx.restore();
+  }
+}
+function renderScepter(){
+  shopList.textContent='';
+  const icons={dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg};
+  for(const key of SC_KEYS){
+    const u=SCUP[key],lv=shop.sc[key],max=lv>=5;
+    const card=document.createElement('div');card.className='card';
+    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,icons[key],true);ic.setAttribute('aria-hidden','true');
+    card.appendChild(ic);
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
+    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 5');
+    for(let i=0;i<5;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
+    card.appendChild(pips);
+    const val=document.createElement('div');val.className='val';
+    val.textContent=max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]);
+    card.appendChild(val);
+    const pr=document.createElement('div');pr.className='pr';
+    if(max){pr.textContent='NIVEAU 5/5';}
+    else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
+    card.appendChild(pr);
+    const b=document.createElement('button');b.className='sbtn';b.type='button';
+    if(!shop.scepterOwned){b.textContent='SCEPTRE REQUIS';b.disabled=true;}
+    else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
+    else if(shop.gold>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyScUp(key));}
+    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.gold);b.disabled=true;}
+    b.setAttribute('aria-label',u.name+' : '+b.textContent);
+    card.appendChild(b);
+    shopList.appendChild(card);
+  }
+}
+function buyScUp(key){
+  const u=SCUP[key],lv=shop.sc[key];
+  if(!shop.scepterOwned||lv>=5||shop.gold<u.cost[lv])return;
+  shop.gold-=u.cost[lv];shop.sc[key]=lv+1;
+  saveShop();sfx.heal();renderShop();
 }
 /* ---------- Vache géante : boss des marécages, elle roule sur le joueur ---------- */
 const COW_HP=600, COW_SCREENS=20;
@@ -3283,7 +3447,7 @@ function update(dt){
   maybeSpawnSix(dt);stepSix(dt);
   stepOcto(dt);
   stepCastle(dt);
-  stepWitch(dt);stepPoison(dt);stepEskimo(dt);
+  stepWitch(dt);stepPoison(dt);stepEskimo(dt);stepScepterBeams(dt);stepPedestal(dt);
   stepBossShots(dt);
   stepSoulFx(dt);
   stepPickups(dt);
@@ -3553,6 +3717,7 @@ function drawPlayer(){
   }
   else if(shop.weapon==='dagger')drawDaggersHeld(hx,hy);
   else if(shop.weapon==='six')ctx.drawImage(RNG_DIGITS['6'],Math.round(hx)-4,Math.round(hy)-7);
+  else if(shop.weapon==='scepter')drawScepterHeld(hx,hy);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
     const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
@@ -4072,13 +4237,14 @@ function render(){
   drawPuddles(cx);
   drawTents();
   drawCastleFx();
-  drawWitchFx();drawEskimoFx();
+  drawWitchFx();drawEskimoFx();drawScepterFx();
   drawMerchants();
   drawPickups();
   drawWorldPearls(cx,cy);
   for(const e of enemies){
     if(e.x+20<cx||e.x-20>cx+VW||e.y+30<cy||e.y-30>cy+VH)continue;
     drawEnemy(e);
+    if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(e.x+e.w/2+Math.sin(time*9+e.x)*4),Math.round(e.y-2),1,2);}   // givre
   }
   drawBoss();
   drawJelly();
@@ -4132,7 +4298,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();
-  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -4452,7 +4618,8 @@ const WEAPONS=[
   {id:'rod',name:'Canne à pêche',desc:'Grappin qui déclenche une zone de dégâts.',icon:()=>ROD_ICON,owned:()=>true,locked:()=>rodLocked(),render:()=>renderRod()},
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
-  {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()}
+  {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
+  {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
 let weapOpen=false,weapSel=null;
 const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
@@ -4473,7 +4640,7 @@ function renderWeap(){
   const w=WEAPONS.find(x=>x.id===weapSel);
   const big=$('weap-big');big.textContent='';big.appendChild(weapImg(w,64));
   $('weap-name').textContent=w.owned()?w.name:'???';
-  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':'Débloquée en atteignant la plage.');
+  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':w.id==='scepter'?'Vaincs l\'esquimau dans la glacière.':'Débloquée en atteignant la plage.');
   const eb=$('weap-eq');
   eb.disabled=!w.owned()||shop.weapon===w.id||(w.locked&&w.locked());
   eb.textContent=!w.owned()?'VERROUILLÉE':shop.weapon===w.id?'ÉQUIPÉE':(w.locked&&w.locked())?'INDISPONIBLE':'ÉQUIPER';
