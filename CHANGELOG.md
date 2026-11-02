@@ -2,6 +2,20 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.3.9] - 2026-11-02
+
+### Ajouté
+- **Boss de fin des marécages : la sorcière**, dans sa cabane. Elle lance 3 types de potions (poison, dégâts, étourdissement). En seconde phase, elle envoie son chat géant sur le terrain.
+- **La glacière** : nouvelle zone après les marécages, entièrement en glace, avec plateformes de glace, igloo pour le marchand, dauphins de glace (le tireur a des projectiles bleus) et mini ours.
+- **Boss de la glacière : l'esquimau**, qui tire des lasers depuis le sol et pêche lentement avec sa canne.
+- **Sceptre de glace** : nouvelle arme, laissée sur un piédestal par l'esquimau (les portes restent fermées tant qu'elle n'est pas ramassée). Son souffle de glace ralentit les ennemis et les blesse sur la durée, et des lasers de glace jaillissent parfois du sol.
+  - Quatre améliorations (dégâts, portée, ralentissement, fréquence des lasers) jusqu'au niveau 5, dans le menu ARMES ou chez le marchand.
+- **Checkpoint de la glacière** (mode Classique).
+- Un secret supplémentaire à découvrir dans les marécages.
+
+### Modifié
+- Le skin Clown coûte désormais 10 000 or.
+
 ## [V0.3.5] - 2026-10-16
 
 ### Ajouté
