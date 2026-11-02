@@ -237,6 +237,10 @@ body{
 .dev-btns{display:flex;gap:6px;flex-wrap:wrap}
 .dev-btns .sbtn{width:auto;padding:7px 9px}
 #dev-god{width:100%;padding:10px}
+.dev-biome{display:flex;flex-direction:column;gap:6px}
+.dev-biome-t{font:400 10px/1 var(--pf)}
+.dev-biome-b{display:flex;gap:8px}
+.dev-biome-b .sbtn{width:calc(25% - 6px);padding:7px 0}
 #dev-god.on,#dev-glock.on{background:var(--on);color:var(--on-ink);border-color:var(--on)}
 .shop-panel.dev-panel{width:min(520px,100%)}
 #rst .shop-note{font-size:10px;line-height:1.9;opacity:1;text-align:center}
@@ -479,7 +483,7 @@ body{
     <p class="shop-note">Outil de test : donne-toi des monnaies (enregistrées) et active l'invincibilité. Le jeu est en pause tant que ce menu est ouvert.</p>
     <div id="dev-list"></div>
     <button class="sbtn" id="dev-glock" type="button" aria-pressed="false" style="width:100%;padding:10px">AKIMBO GLOCK 18 : NON</button>
-    <button class="sbtn equip" id="dev-arena" type="button" style="width:100%;padding:10px">ALLER À L'ARÈNE DU POULPE</button>
+    <div class="dev-biome"><span class="dev-biome-t">BIOME</span><div class="dev-biome-b"><button class="sbtn equip dev-b" data-b="1" type="button">1</button><button class="sbtn equip dev-b" data-b="2" type="button">2</button><button class="sbtn equip dev-b" data-b="3" type="button">3</button></div></div>
     <button class="sbtn" id="dev-god" type="button" aria-pressed="false">INVINCIBLE : NON</button>
     <button class="go" id="dev-close" type="button">FERMER</button>
   </div>
@@ -546,7 +550,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON',
+'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -611,6 +615,7 @@ const COMBO_TIME=10, HEAL_EVERY=15;
 const CASTLE_HP=500;   // château de sable : seau d'eau à viser ; classique : 22 écrans après la méduse (elle-même à 26 écrans du début du sable) ; anarchie : au milieu de chaque zone plage
 const OCTO_HP=300, ARENA_START=27, ARENA_EVERY=36, WALL_H=14, CASTLE_SCREEN=ARENA_START+18;   // arène du poulpe : 1re à 27 écrans, puis tous les 36 écrans, des deux côtés
 const JELLY_HP=420, JELLY_SCREENS=37, JELLY_SCREENS_C=26, CASTLE_AFTER_JELLY=22, JELLY_BEAM_L=480;   // méduse : 420 PV, apparaît ~37 écrans après l'entrée de la plage
+const WITCH_HP=650, WITCH_AFTER=40;   // sorcière : fin du marécage, 40 écrans après son entrée (20 écrans après la vache)
 const BOSS_EVERY=18*VW, BOSS_HP=100, BOSS_SPEED=38, BOSS_FIRE_CD=5, LASER_CHARGE=0.65;   // un boss tous les 18 écrans (environ 1 minute de marche)
 const LASER_L=480, LASER_T=2, NIGHT_SPEED=1.15;   // laser du requin : longueur (tout l'écran) et durée ; vitesse des dauphins la nuit rouge
 const BEST_KEY='canne-dauphins-meilleur-score';
@@ -741,6 +746,10 @@ function arenaAt(tx){
   if(cx===null&&!anarchyOn){   // classique : château de sable, 22 écrans après la méduse
     const c1=sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T));
     if(Math.abs(tx-c1)<=39){cx=c1;id=sg*101;type='castle';}
+  }
+  if(cx===null&&!anarchyOn){   // classique : la cabane de la sorcière, fin du marécage
+    const c2=sg*(SWAMP_TX+WITCH_AFTER*(VW/T));
+    if(Math.abs(tx-c2)<=39){cx=c2;id=sg*102;type='witch';}
   }
   if(cx===null)return null;
   let ar=arenas.get(id);
@@ -1280,6 +1289,44 @@ const WALL_S=(()=>{const c=mk(T,T),g=c.getContext('2d');
 const WALL_S_CAP=(()=>{const c=mk(T,T),g=c.getContext('2d');
   g.drawImage(WALL_S,0,0);g.fillStyle='#b8985a';g.fillRect(0,0,T,2);g.fillStyle='#fff0c4';g.fillRect(0,0,T,1);g.fillStyle='#8a6c3a';g.fillRect(0,2,T,1);
   return c;})();
+const WALL_W=(()=>{const c=mk(T,T),g=c.getContext('2d');
+  g.fillStyle='#6b452a';g.fillRect(0,0,T,T);
+  g.fillStyle='#4a2c18';for(const x of[0,8])g.fillRect(x,0,1,T);g.fillRect(0,7,T,1);g.fillRect(0,15,T,1);
+  g.fillStyle='#8a5c38';g.fillRect(1,0,6,1);g.fillRect(9,0,6,1);g.fillRect(1,8,6,1);g.fillRect(9,8,6,1);
+  g.fillStyle='#3a2312';g.fillRect(3,3,1,1);g.fillRect(12,11,1,1);
+  return c;})();
+const WALL_W_CAP=(()=>{const c=mk(T,T),g=c.getContext('2d');
+  g.drawImage(WALL_W,0,0);g.fillStyle='#3a2312';g.fillRect(0,0,T,2);g.fillStyle='#a8744a';g.fillRect(0,0,T,1);
+  return c;})();
+const WITCH=(()=>{   // sorcière démesurée (140 x 176) ; yeux, bouche et bras sont dessinés à part
+  const W=140,H=176,c=mk(W,H),g=c.getContext('2d');
+  const R=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  for(let y=86;y<H;y++){const half=Math.round(26+(y-86)*0.42);R('#3b2a63',70-half,y,half*2,1);R('#2c1e4d',70-half,y,5,1);R('#4d3880',70+half-6,y,5,1);}
+  R('#ffd23f',52,128,4,4);R('#ffd23f',92,150,4,4);R('#ffd23f',34,156,3,3);R('#5a2f8a',84,126,14,14);R('#4a2478',60,152,16,12);
+  R('#6b4423',36,108,68,6);R('#e8c33f',65,107,10,8);R('#8a6a14',68,110,4,2);
+  R('#2a1c4a',44,84,52,9);
+  R('#1a1030',38,50,10,50);R('#1a1030',92,50,10,50);R('#1a1030',44,40,52,12);
+  R('#7fb26a',49,46,42,42);R('#7fb26a',46,49,48,36);
+  R('#6a9a56',46,70,6,14);R('#6a9a56',88,70,6,14);R('#6a9a56',60,86,20,4);
+  R('#7fb26a',66,64,10,16);R('#6a9a56',72,64,4,16);R('#6a9a56',68,78,10,5);R('#4a7a3a',68,70,3,3);
+  R('#1a1030',51,54,8,3);R('#1a1030',59,52,8,3);R('#1a1030',73,52,8,3);R('#1a1030',81,54,8,3);
+  for(let y=0;y<38;y++){const half=Math.round(9+y*0.55);R('#241545',70-half,y,half*2,1);R('#3a2468',70+half-5,y,4,1);}
+  R('#1c1038',22,38,96,8);R('#2e1a5a',22,38,96,2);R('#120a26',30,46,80,2);
+  R('#a8324a',44,30,52,8);R('#e8c33f',64,29,12,10);R('#241545',67,32,6,4);
+  return c;})();
+const WITCH_W=tint(WITCH,'#ffffff');
+const CAT=(()=>{   // le chat de la sorcière : 28 px de haut, le double du pêcheur
+  const W=34,H=28,c=mk(W,H),g=c.getContext('2d');
+  const R=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  const B='#221a3a',L='#3a2d5e';
+  R(B,5,10,21,12);R(L,7,10,17,2);
+  R(B,5,21,4,7);R(B,10,21,4,7);R(B,18,21,4,7);R(B,23,21,4,7);R('#4a3c78',5,26,4,2);R('#4a3c78',23,26,4,2);
+  R(B,22,3,11,11);R(L,23,3,9,2);R(B,22,0,3,5);R(B,30,0,3,5);R('#ff8fb0',23,1,1,3);R('#ff8fb0',31,1,1,3);
+  R('#ffe14d',24,7,3,3);R('#ffe14d',29,7,3,3);R('#14102a',25,7,1,3);R('#14102a',30,7,1,3);R('#ff8fb0',32,10,2,1);
+  R('#dcd6f0',31,12,3,1);R('#dcd6f0',31,13,3,1);
+  R(B,1,12,5,3);R(B,0,5,3,9);R(B,1,3,3,3);
+  return c;})();
+const CAT_W=tint(CAT,'#ffffff');
 const CASTLE=(()=>{
   const W=128,H=112,c=mk(W,H),g=c.getContext('2d');
   const S='#e4c882',L='#f6e2ac',D='#b8985a',O='#6e5026';
@@ -1489,7 +1536,7 @@ function loadShop(){
       d.beach=(j.beach===1||j.beach===-1)?1:0;   // le chemin est toujours à droite
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
-      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
+      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
@@ -1709,6 +1756,7 @@ function allTargets(){
     targets.push({r:tentRect(t),hit:d=>hitOcto(t,d)});
   }
   if(castle&&castle.state==='fight')targets.push({r:bucketRect(castle),hit:d=>hitCastle(d)});
+  {const wr=witchRect();if(wr)targets.push({r:wr,hit:d=>hitWitch(d)});}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)targets.push({r:[cow.x,cow.y,cow.w,cow.h],hit:d=>hitCow(d)});
   if(six&&six.state==='alive'&&six.spawnT<=0)targets.push({r:[six.x,six.y,six.w,six.h],hit:d=>hitSix(d)});
   return targets;
@@ -1762,6 +1810,7 @@ function stepDagger(dt){
   if(jelly&&jelly.state==='alive'&&jelly.spawnT<=0)tryHit(jelly,[jelly.x,jelly.y,jelly.w,jelly.h],x=>hitJelly(jelly,x));
   if(octo&&octo.state==='fight')for(const t of tents)if(t.state!=='warn')tryHit(t,tentRect(t),x=>hitOcto(t,x));
   if(castle&&castle.state==='fight')tryHit(castle,bucketRect(castle),x=>hitCastle(x));
+  {const wr=witchRect();if(wr)tryHit(witch,wr,x=>hitWitch(x));}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)tryHit(cow,[cow.x,cow.y,cow.w,cow.h],x=>hitCow(x));
   if(six&&six.state==='alive'&&six.spawnT<=0)tryHit(six,[six.x,six.y,six.w,six.h],x=>hitSix(x));
   if(d.t<=0){p.dash=null;p.parryT=0.6;}   // fenêtre de parade juste après le dash
@@ -1821,6 +1870,7 @@ function stepTrident(dt){
       const r=tentRect(t);
       if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(t);hitOcto(t,dmg);h.n++;if(h.n>=pierce)break;}
     }
+    {const wr=witchRect();if(h.n<pierce&&wr&&!h.hit.has(witch)&&rectsOverlap(h.x-5,h.y-5,10,10,wr[0],wr[1],wr[2],wr[3])){h.hit.add(witch);hitWitch(dmg);h.n++;}}
     if(h.n<pierce&&castle&&castle.state==='fight'&&!h.hit.has(castle)){const r=bucketRect(castle);if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(castle);hitCastle(dmg);h.n++;}}
     if(h.n<pierce&&cow&&cow.state==='alive'&&cow.spawnT<=0&&!h.hit.has(cow)&&rectsOverlap(h.x-5,h.y-5,10,10,cow.x,cow.y,cow.w,cow.h)){h.hit.add(cow);hitCow(dmg);h.n++;}
     if(h.n<pierce&&six&&six.state==='alive'&&six.spawnT<=0&&!h.hit.has(six)&&rectsOverlap(h.x-5,h.y-5,10,10,six.x,six.y,six.w,six.h)){h.hit.add(six);hitSix(dmg);h.n++;}
@@ -2048,7 +2098,7 @@ function killBoss(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnBoss(){
-  if(boss||octo||castle||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
+  if(boss||octo||castle||witch||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
   const p=player,k=Math.round(p.x/BOSS_EVERY);
   if(k===0||bossDone.has(k))return;
   const sx=k*BOSS_EVERY;
@@ -2093,14 +2143,15 @@ function killOcto(){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
 }
 function maybeStartArena(){
-  if(octo||castle)return;
+  if(octo||castle||witch)return;
   const p=player,ar=arenaAt(Math.floor((p.x+5)/T));
   if(!ar||ar.state!=='idle')return;
-  if(!anarchyOn&&(ar.type==='castle'?castleRun:octoRun)){ar.state='won';return;}   // classique : déjà affronté dans cette partie
+  if(!anarchyOn&&(ar.type==='castle'?castleRun:ar.type==='witch'?witchRun:octoRun)){ar.state='won';return;}   // classique : déjà affronté dans cette partie
   const il=(ar.cx-11)*T,ir=(ar.cx+11)*T,px=p.x+5;
   if(px<il+28||px>ir-28)return;
   if(!p.onGround||Math.abs(p.y+p.h-ar.floor*T)>2)return;
   if(ar.type==='castle'){castleRun=true;startCastle(ar,il,ir);return;}
+  if(ar.type==='witch'){witchRun=true;startWitch(ar,il,ir);return;}
   octoRun=true;
   if(!anarchyOn)night=false;   // le poulpe met fin à la nuit rouge
   ar.state='active';ar.gateL=true;ar.gateR=true;      // les portes se referment : plus de sortie possible
@@ -2249,11 +2300,171 @@ function stepOcto(dt){
   }
   stepTents(dt);
 }
+/* ---------- Sorcière : boss de fin de marécage, sa cabane est l'arène. Phase 1 : potions (poison, dégâts, étourdissement). Phase 2 : elle envoie son chat. ---------- */
+let witch=null,witchRun=false;
+const POTION_COL={poison:'#58e04a',damage:'#ff4a3a',stun:'#ffe14d'};
+function witchRect(){   // zone touchable : la sorcière elle-même, puis le chat en phase 2
+  const w=witch;if(!w||w.state!=='fight')return null;
+  if(w.phase===1)return [w.ar.cx*T+8-30,w.ar.floor*T-148,60,116];
+  const c=w.cat;return c?[c.x,c.y,c.w,c.h]:null;
+}
+function startWitch(ar,il,ir){
+  ar.state='active';ar.gateL=true;ar.gateR=true;
+  enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
+  boss=null;bossShots=[];tents=[];jelly=null;cow=null;
+  witch={ar,hp:WITCH_HP,maxHp:WITCH_HP,state:'intro',t:0,intro:2.4,phase:1,flash:0,side:1,nextP:1.8,pot:null,last:'',burst:0,throwT:0,tt:0,cat:null,potions:[],zones:[],dieT:0};
+  shake=0.6;sfx.gate();sfx.bossSpawn();
+}
+function witchHand(w,mode){   // position de la main qui lance
+  const cx=w.ar.cx*T+8,fl=w.ar.floor*T,s=w.side;
+  return mode==='wind'?{x:cx+s*54,y:fl-142}:mode==='throw'?{x:cx+s*76,y:fl-92}:{x:cx+s*52,y:fl-66};
+}
+function hitWitch(dmg){
+  const w=witch;if(!w||w.state!=='fight')return;
+  const wr=witchRect();if(!wr)return;
+  const removed=Math.min(dmg,w.hp);
+  w.hp-=dmg;w.flash=0.12;if(w.cat)w.cat.flash=0.12;
+  combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;
+  score+=pts;
+  floatText(wr[0]+wr[2]/2,wr[1]-4,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  burst(wr[0]+wr[2]/2,wr[1]+wr[3]/2,w.phase===1?'#9fe870':'#c9a0ff',8,90);
+  if(w.hp<=0)killWitch();
+  else if(w.phase===1&&w.hp<=w.maxHp/2)startWitchPhase2();
+  else sfx.hit();
+}
+function startWitchPhase2(){   // elle ne lance plus de potions : elle envoie son chat
+  const w=witch;
+  w.state='trans';w.tt=1.3;w.pot=null;w.throwT=0;shake=0.7;sfx.bossSpawn();
+  floatText(w.ar.cx*T+8,w.ar.floor*T-150,'ELLE ENVOIE SON CHAT !','#ffb347');
+}
+function spawnWitchCat(){
+  const w=witch,p=player,h=witchHand(w,'wind'),fl=w.ar.floor*T;
+  const vx=clamp((p.x-h.x)/0.77,-170,170);
+  w.cat={x:h.x-15,y:h.y-10,w:30,h:28,vx,vy:-120,face:vx<0?-1:1,state:'fly',t:0,flash:0,stalk:1.1};
+  w.phase=2;w.state='fight';w.pot=null;
+  shake=0.4;sfx.slam();burst(h.x,h.y,'#c9a0ff',14,110);
+}
+function killWitch(){
+  const w=witch,ar=w.ar;
+  w.hp=0;w.state='dying';w.dieT=2.6;w.potions=[];w.zones=[];w.pot=null;
+  ar.state='won';ar.gateL=false;ar.gateR=false;
+  if(w.cat)burst(w.cat.x+15,w.cat.y+14,'#c9a0ff',20,140);
+  kills++;shake=0.7;sfx.bossDie();sfx.gate();
+  const gs=soulReward('witch',2);shop.gold+=150;saveShop();
+  const cx=ar.cx*T+8,cy=ar.floor*T-110;
+  if(gs)floatText(cx,cy,'+2 ÂMES ROUGES','#ff6a7a');
+  floatText(cx,cy+11,'+150 OR','#ffd23f');
+  floatText(cx,cy+22,"LES PORTES S'OUVRENT !",'#7ff0e8');
+  if(gs){soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});}
+  burst(cx,cy+30,'#9fe870',30,170);burst(cx,cy+30,'#c9a0ff',18,120);
+  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+}
+function potionEffect(type,x){
+  const p=player;
+  if(type==='damage')hurtPlayer(x);
+  else if(type==='poison'){p.poison=Math.max(p.poison||0,4);p.poisonT=Math.max(p.poisonT||0,2);floatText(p.x+5,p.y-12,'POISON','#7cff6a');}
+  else{p.stun=Math.max(p.stun,1.3);p.dizzy=1.3;p.vx=0;floatText(p.x+5,p.y-12,'ÉTOURDI !','#ffe14d');}
+}
+function shatterPotion(w,type,x){
+  const fl=w.ar.floor*T;
+  sfx.splash();burst(x,fl-4,POTION_COL[type],12,110);
+  w.zones.push(type==='poison'?{kind:type,x,t:4.5,max:4.5,w:32}:type==='stun'?{kind:type,x,t:0.9,max:0.9,w:36}:{kind:type,x,t:0.45,max:0.45,w:28});
+}
+function throwPotion(w){
+  const p=player,h=witchHand(w,'throw'),tf=0.9,G=300;
+  const tx=p.x+5+clamp(p.vx,-120,120)*0.35,ty=p.y+7;
+  w.potions.push({x:h.x,y:h.y,vx:clamp((tx-h.x)/tf,-260,260),vy:(ty-h.y-0.5*G*tf*tf)/tf,type:w.curType,rot:0});
+  sfx.slam();
+}
+function stepWitch(dt){
+  const w=witch;if(!w)return;
+  const ar=w.ar,p=player,fl=ar.floor*T,cx=ar.cx*T+8,lo=(ar.cx-11)*T+16,hi=(ar.cx+11)*T-16;
+  w.t+=dt;if(w.flash>0)w.flash-=dt;if(w.throwT>0)w.throwT-=dt;
+  if(Math.abs(p.x+5-cx)>24)w.side=p.x+5>=cx?1:-1;
+  if(w.state==='intro'){w.intro-=dt;if(w.intro<=0)w.state='fight';return;}
+  if(w.state==='dying'){
+    w.dieT-=dt;
+    if(Math.random()<0.8)parts.push({x:cx+(Math.random()-0.5)*110,y:fl-Math.random()*150,vx:(Math.random()-0.5)*30,vy:-15,g:-10,life:0.9,col:Math.random()<0.5?'#9fe870':'#c9a0ff',sz:2});
+    if(w.dieT<=0)witch=null;
+    return;
+  }
+  // potions en vol
+  for(const pt of w.potions){
+    pt.vy+=300*dt;pt.x+=pt.vx*dt;pt.y+=pt.vy*dt;pt.rot+=dt*9;
+    if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,pt.x-4,pt.y-5,8,10)){
+      pt.dead=true;sfx.splash();burst(pt.x,pt.y,POTION_COL[pt.type],10,100);
+      potionEffect(pt.type,pt.x);
+      if(pt.type==='poison')w.zones.push({kind:'poison',x:pt.x,t:3,max:3,w:26,noFx:true});
+    } else if(pt.y>=fl-5||pt.x<lo-10||pt.x>hi+10){pt.dead=true;shatterPotion(w,pt.type,clamp(pt.x,lo,hi));}
+  }
+  w.potions=w.potions.filter(q=>!q.dead);
+  // zones (flaque de poison, nuage d'étourdissement, flamme)
+  for(const z of w.zones){
+    z.t-=dt;
+    if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,z.x-z.w/2,fl-18,z.w,18)){
+      if(z.kind==='poison'){p.poison=Math.max(p.poison||0,4);}
+      else if(!z.hit){z.hit=true;potionEffect(z.kind,z.x);}
+    }
+  }
+  w.zones=w.zones.filter(z=>z.t>0);
+  if(w.state==='trans'){w.tt-=dt;if(w.tt<=0)spawnWitchCat();return;}
+  if(w.phase===1){
+    w.nextP-=dt;
+    if(!w.pot&&w.nextP<=0){
+      const ty=['poison','damage','stun'];let t;
+      do{t=ty[Math.floor(Math.random()*3)];}while(t===w.last&&Math.random()<0.7);
+      w.last=t;w.curType=t;w.pot={type:t,t:0};
+    }
+    if(w.pot){
+      w.pot.t+=dt;
+      if(w.pot.t>=0.75){
+        throwPotion(w);w.pot=null;w.throwT=0.3;
+        const quick=w.burst;w.burst=quick?0:(Math.random()<0.3?1:0);
+        w.nextP=(quick?2.6:w.burst?0.55:2.3+Math.random()*0.7)*anaCd();
+      }
+    }
+    return;
+  }
+  stepWitchCat(dt,lo,hi);
+}
+function stepWitchCat(dt,lo,hi){
+  const w=witch,c=w.cat;if(!c)return;
+  const p=player,fl=w.ar.floor*T,rage=w.hp<=w.maxHp*0.25,sp=anaSpd()*(rage?1.3:1);
+  c.t+=dt;if(c.flash>0)c.flash-=dt;
+  const land=()=>{c.y=fl-c.h;c.vy=0;c.vx=0;c.state='recover';c.t=0;shake=Math.max(shake,0.2);sfx.slam();burst(c.x+c.w/2,fl-2,'#c9a26b',6,70);};
+  if(c.state==='fly'||c.state==='pounce'){
+    c.vy+=700*dt;c.x+=c.vx*dt;c.y+=c.vy*dt;
+    if(c.x<lo){c.x=lo;c.vx=0;}if(c.x+c.w>hi){c.x=hi-c.w;c.vx=0;}
+    if(c.y>=fl-c.h&&c.vy>0)land();
+  } else if(c.state==='stalk'){
+    c.face=(p.x+5>=c.x+c.w/2)?1:-1;
+    c.x=clamp(c.x+c.face*55*sp*dt,lo,hi-c.w);
+    if(c.t>=c.stalk){c.state='crouch';c.t=0;}
+  } else if(c.state==='crouch'){
+    c.face=(p.x+5>=c.x+c.w/2)?1:-1;
+    if(c.t>=(rage?0.3:0.5)){c.state='pounce';c.t=0;c.vx=c.face*(rage?230:190)*anaSpd();c.vy=-260;sfx.jump();}
+  } else if(c.state==='recover'){
+    if(c.t>=(rage?0.4:0.6)){c.state='stalk';c.t=0;c.stalk=(rage?0.7:1.1)+Math.random()*0.6;}
+  }
+  if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,c.x+3,c.y+4,c.w-6,c.h-4)&&!tryParry())hurtPlayer(c.x+c.w/2);
+}
+function stepPoison(dt){   // le poison retire des vies par à-coups mais ne tue jamais ; l'étourdissement est un simple effet visuel
+  const p=player;
+  if(p.dizzy>0)p.dizzy-=dt;
+  if(!(p.poison>0)||state!=='play'){if(state!=='play')p.poison=0;return;}
+  p.poison-=dt;p.poisonT=(p.poisonT||0)-dt;
+  if(Math.random()<0.25)parts.push({x:p.x+2+Math.random()*6,y:p.y+6,vx:0,vy:-18,g:-8,life:0.7,col:'#58e04a',sz:2});
+  if(p.poisonT<=0){
+    p.poisonT=2;
+    if(!godMode&&lives>1){lives--;shake=Math.max(shake,0.12);sfx.hurt();floatText(p.x+5,p.y-12,'POISON','#7cff6a');burst(p.x+5,p.y+7,'#58e04a',6);}
+  }
+}
 /* ---------- Vache géante : boss des marécages, elle roule sur le joueur ---------- */
 const COW_HP=600, COW_SCREENS=20;
 let cow=null,cowSpawned=false,cowDone=new Set(),milk=[];
 function maybeSpawnCow(){
-  if(cow||boss||octo||castle||jelly||six)return;
+  if(cow||boss||octo||castle||witch||jelly||six)return;
   const p=player,tx=Math.floor((p.x+5)/T),f=cowFieldAt(tx);
   if(!f||Math.abs(Math.abs(tx)-f.fc)>9)return;
   let key;
@@ -2367,7 +2578,7 @@ function stepRzTr(dt){   // fondu au noir puis téléportation
   if(rzTr.t>=1.5)rzTr=null;
 }
 function maybeSpawnSix(dt){   // anarchie : le 6 ailé peut surgir n'importe où
-  if(!anarchyOn||six||boss||octo||castle||jelly||cow)return;
+  if(!anarchyOn||six||boss||octo||castle||witch||jelly||cow)return;
   if(Math.random()>=dt/600)return;   // rare : en moyenne une fois toutes les 10 minutes
   const p=player,h=anarchyOn?encHp(SIX_HP):SIX_HP;
   six={x:p.x-14,y:p.y-110,w:28,h:36,hp:h,maxHp:h,state:'alive',spawnT:1.4,t:0,cd:1.8,flash:0,rage:false,n:0,bx:p.x+5,by:p.y-100,world:true};
@@ -2596,7 +2807,7 @@ function killJelly(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnJelly(){
-  if(jelly||octo||castle||cow||six)return;
+  if(jelly||octo||castle||witch||cow||six)return;
   const p=player,tx=Math.floor((p.x+5)/T),side=tx<0?-1:1,per=JELLY_SCREENS*(VW/T);
   let key;
   if(anarchyOn){   // anarchie : une méduse tous les 37 écrans après l'entrée de la plage, tant qu'aucun autre boss n'est là
@@ -2773,7 +2984,7 @@ function snapCamera(){camLX=0;camLY=0;cam.x=player.x+5-VW/2;cam.y=player.y+7-VH*
 function stepCamera(dt){
   const p=player;
   if(rz){cam.x=(RZC-RZW)*T;cam.y=RZG*T-173;return;}
-  const lk=octo&&octo.ar.state==='active'?octo.ar:castle&&castle.ar.state==='active'?castle.ar:null;
+  const lk=octo&&octo.ar.state==='active'?octo.ar:castle&&castle.ar.state==='active'?castle.ar:witch&&witch.ar.state==='active'?witch.ar:null;
   if(lk){   // caméra verrouillée sur l'arène
     const ar=lk,k=1-Math.exp(-4*dt);
     cam.x+=(ar.cx*T+8-VW/2-cam.x)*k;cam.y+=(ar.floor*T-173-cam.y)*k;
@@ -2845,6 +3056,7 @@ function update(dt){
   maybeSpawnSix(dt);stepSix(dt);
   stepOcto(dt);
   stepCastle(dt);
+  stepWitch(dt);stepPoison(dt);
   stepBossShots(dt);
   stepSoulFx(dt);
   stepPickups(dt);
@@ -2991,6 +3203,7 @@ function drawTiles(cx,cy){
           if(closed)ctx.drawImage(GATE,tx*T,ty*T);
           else{ctx.fillStyle='rgba(15,8,25,.6)';ctx.fillRect(tx*T,ty*T,T,T);}
         } else if(col.ar.type==='castle')ctx.drawImage(ty===col.g-WALL_H?WALL_S_CAP:WALL_S,tx*T,ty*T);
+        else if(col.ar.type==='witch')ctx.drawImage(ty===col.g-WALL_H?WALL_W_CAP:WALL_W,tx*T,ty*T);
         else ctx.drawImage(ty===col.g-WALL_H?WALL_CAP:WALL,tx*T,ty*T);
       }
     }
@@ -3187,6 +3400,105 @@ function drawCastle(){
     ctx.fillStyle='#6e5026';ctx.fillRect(Math.round(cx-14),ey-4,10,2);ctx.fillRect(Math.round(cx+4),ey-4,10,2);
   }
   ctx.restore();
+}
+function drawCabin(cx0,cy0){   // la cabane : fond de planches, fenêtre, étagères, chaudron
+  const ar=arenaAt(Math.floor((cx0+VW/2)/T));
+  if(!ar||ar.type!=='witch')return;
+  const fl=ar.floor*T,L=(ar.cx-11)*T,W=22*T,top=Math.max(fl-WALL_H*T,cy0-4),h=fl-top;
+  for(let x=L;x<L+W;x+=16){ctx.fillStyle=((x-L)/16)%2?'#6b452a':'#5f3d25';ctx.fillRect(x,top,15,h);ctx.fillStyle='#3e2616';ctx.fillRect(x+15,top,1,h);}
+  for(const yy of[fl-170,fl-100]){if(yy<top-8)continue;ctx.fillStyle='#3a2312';ctx.fillRect(L,yy,W,6);ctx.fillStyle='#5a3a22';ctx.fillRect(L,yy,W,1);}
+  ctx.fillStyle='#2a1a0e';ctx.fillRect(L+36,fl-140,48,40);ctx.fillStyle='#142a30';ctx.fillRect(L+39,fl-137,42,34);   // fenêtre
+  ctx.fillStyle='#e8f0c0';ctx.fillRect(L+66,fl-132,7,7);ctx.fillStyle='#142a30';ctx.fillRect(L+69,fl-133,5,7);
+  ctx.fillStyle='#2a1a0e';ctx.fillRect(L+59,fl-137,3,34);ctx.fillRect(L+39,fl-122,42,3);
+  const sx=L+W-118;   // étagère de bocaux
+  ctx.fillStyle='#2a1a0e';ctx.fillRect(sx,fl-110,96,4);ctx.fillRect(sx,fl-70,96,4);
+  const jc=['#58e04a','#ff4a3a','#ffe14d','#9a6bff','#58e04a','#ffe14d'];
+  for(let k=0;k<6;k++){ctx.fillStyle=jc[k];ctx.fillRect(sx+6+k*15,fl-122,9,12);ctx.fillRect(sx+7+k*15,fl-82+(k%2?2:0),8,12-(k%2?2:0));ctx.fillStyle='#a0642d';ctx.fillRect(sx+8+k*15,fl-124,5,2);}
+  ctx.fillStyle='#4a7a3a';for(const hx of[L+110,L+130,L+150]){ctx.fillRect(hx,top>fl-170?top:fl-170,1,20);ctx.fillRect(hx-2,(top>fl-170?top:fl-170)+20,5,9);}   // herbes suspendues
+  const cxp=L+30;   // chaudron
+  ctx.fillStyle='#ff9a3a';const fl1=Math.floor(time*10)%3;ctx.fillRect(cxp+4,fl-8,4,6+fl1);ctx.fillRect(cxp+13,fl-10,5,8-fl1);ctx.fillRect(cxp+22,fl-8,4,6+(2-fl1));
+  ctx.fillStyle='#ffe14d';ctx.fillRect(cxp+14,fl-6,3,4);
+  ctx.fillStyle='#1c1c24';ctx.fillRect(cxp-2,fl-30,34,22);ctx.fillRect(cxp,fl-8,4,8);ctx.fillRect(cxp+26,fl-8,4,8);
+  ctx.fillStyle='#2d2d3a';ctx.fillRect(cxp-4,fl-32,38,4);ctx.fillStyle='#6cff7a';ctx.fillRect(cxp-1,fl-33,32,3);
+  ctx.fillStyle='#b8ffbe';for(let k=0;k<3;k++){const bt=(time*0.8+k*0.33)%1;ctx.fillRect(Math.round(cxp+4+k*10+Math.sin(time*3+k)*2),Math.round(fl-34-bt*12),2,2);}
+}
+function drawWitch(){
+  const w=witch;if(!w)return;
+  const ar=w.ar,fl=ar.floor*T,cx=ar.cx*T+8;
+  let off=0;
+  if(w.state==='intro')off=Math.max(0,w.intro/2.4)*WITCH.height;
+  if(w.state==='dying')off=(1-w.dieT/2.6)*WITCH.height*0.9;
+  ctx.save();ctx.beginPath();ctx.rect(cx-176,fl-176,352,176);ctx.clip();
+  const sway=Math.round(Math.sin(w.t*1.3)*2),bx=Math.round(cx-WITCH.width/2+sway),by=Math.round(fl-WITCH.height+off),s=w.side;
+  ctx.drawImage(w.flash>0?WITCH_W:WITCH,bx,by);
+  const open=w.throwT>0||(w.pot&&w.pot.t>0.4)||w.state==='trans',pd=clamp((player.x-cx)/80,-1,1);
+  for(const ex of[54,78]){   // yeux
+    ctx.fillStyle='#14182c';ctx.fillRect(bx+ex-1,by+57,10,9);ctx.fillStyle=w.phase===2?'#ffb347':'#ffffff';ctx.fillRect(bx+ex,by+58,8,7);
+    ctx.fillStyle='#14182c';ctx.fillRect(Math.round(bx+ex+3+pd*2),by+59,3,5);
+  }
+  ctx.fillStyle='#2a0f1a';ctx.fillRect(bx+56,by+82,28,3);   // bouche
+  if(open){ctx.fillRect(bx+58,by+82,24,9);ctx.fillStyle='#ffffff';ctx.fillRect(bx+60,by+82,4,3);ctx.fillRect(bx+68,by+82,4,3);ctx.fillRect(bx+76,by+82,4,3);ctx.fillStyle='#c4384a';ctx.fillRect(bx+64,by+87,12,3);}
+  else{ctx.fillStyle='#ffffff';ctx.fillRect(bx+60,by+82,3,2);ctx.fillRect(bx+77,by+82,3,2);}
+  // bras : celui qui lance (du côté du joueur) et l'autre
+  const arm=(sx,sy,hx,hy)=>{
+    ctx.lineCap='butt';ctx.lineWidth=9;ctx.strokeStyle='#3b2a63';ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo((sx+hx)/2,(sy+hy)/2);ctx.stroke();
+    ctx.lineWidth=7;ctx.strokeStyle='#7fb26a';ctx.beginPath();ctx.moveTo((sx+hx)/2,(sy+hy)/2);ctx.lineTo(hx,hy);ctx.stroke();
+    ctx.fillStyle='#7fb26a';ctx.fillRect(Math.round(hx)-4,Math.round(hy)-4,9,9);
+  };
+  const mode=w.state==='trans'?'wind':w.throwT>0?'throw':w.pot?'wind':'rest';
+  let h=witchHand(w,mode);
+  if(mode==='wind'&&w.pot)h={x:h.x,y:h.y+(1-clamp(w.pot.t/0.75,0,1))*40};
+  arm(cx-s*44,fl-176+off+100,cx-s*54,fl-176+off+128);
+  arm(cx+s*44,fl-176+off+100,h.x,h.y+off);
+  if(w.pot){
+    const hx=Math.round(h.x),hy=Math.round(h.y),col=POTION_COL[w.pot.type];
+    ctx.globalAlpha=0.3+0.25*Math.sin(time*18);ctx.fillStyle=col;ctx.fillRect(hx-9,hy-17,19,19);ctx.globalAlpha=1;
+    ctx.fillStyle=col;ctx.fillRect(hx-4,hy-9,9,9);ctx.fillRect(hx-2,hy-13,5,4);ctx.fillStyle='#a0642d';ctx.fillRect(hx-2,hy-15,5,2);ctx.fillStyle='#ffffff';ctx.fillRect(hx-3,hy-8,2,3);
+  } else if(w.state==='trans'){
+    ctx.drawImage(CAT,Math.round(h.x)-17,Math.round(h.y)-26+Math.round(Math.sin(time*40)));
+  }
+  ctx.restore();
+}
+function drawWitchFx(){
+  const p=player;
+  if(p.dizzy>0){for(let k=0;k<3;k++){const a=time*6+k*2.09,sx=Math.round(p.x+5+Math.cos(a)*8),sy=Math.round(p.y-4+Math.sin(a)*3);ctx.fillStyle='#ffe14d';ctx.fillRect(sx-1,sy,3,1);ctx.fillRect(sx,sy-1,1,3);}}
+  const w=witch;if(!w)return;
+  const fl=w.ar.floor*T;
+  for(const z of w.zones){
+    if(z.noFx)continue;
+    const a=clamp(z.t/z.max*1.6,0,1),x0=Math.round(z.x-z.w/2);
+    ctx.globalAlpha=0.75*a;
+    if(z.kind==='poison'){
+      ctx.fillStyle='#3ec04a';ctx.fillRect(x0,fl-3,z.w,3);ctx.fillRect(x0+3,fl-6,z.w-6,3);
+      ctx.fillStyle='#b8ffbe';for(let k=0;k<3;k++)ctx.fillRect(Math.round(x0+4+k*10),Math.round(fl-8-((time*14+k*5)%9)),2,2);
+    } else if(z.kind==='stun'){
+      ctx.fillStyle='#fff3a0';ctx.fillRect(x0+4,fl-14,z.w-8,12);ctx.fillRect(x0,fl-9,z.w,7);
+      ctx.fillStyle='#ffe14d';for(let k=0;k<3;k++){const sx=Math.round(x0+6+k*11),sy=Math.round(fl-14+Math.sin(time*10+k)*3);ctx.fillRect(sx-1,sy,3,1);ctx.fillRect(sx,sy-1,1,3);}
+    } else {
+      ctx.fillStyle='#ff4a2a';ctx.fillRect(x0,fl-8,z.w,8);ctx.fillStyle='#ff9a3a';
+      for(let k=0;k<4;k++)ctx.fillRect(x0+2+k*7,Math.round(fl-10-Math.abs(Math.sin(time*20+k))*10),5,12);
+      ctx.fillStyle='#ffe14d';ctx.fillRect(x0+8,fl-5,z.w-16,5);
+    }
+    ctx.globalAlpha=1;
+  }
+  for(const pt of w.potions){
+    const x=Math.round(pt.x),y=Math.round(pt.y),col=POTION_COL[pt.type];
+    ctx.globalAlpha=0.35;ctx.fillStyle=col;ctx.fillRect(x-7,y-7,14,14);ctx.globalAlpha=1;
+    ctx.save();ctx.translate(x,y);ctx.rotate(pt.rot);
+    ctx.fillStyle=col;ctx.fillRect(-4,-3,8,8);ctx.fillRect(-2,-7,4,4);ctx.fillStyle='#a0642d';ctx.fillRect(-2,-9,4,2);ctx.fillStyle='#ffffff';ctx.fillRect(-3,-2,2,3);
+    ctx.restore();
+  }
+  const c=w.cat;
+  if(c&&w.state!=='dying'){
+    const rage=w.hp<=w.maxHp*0.25;
+    ctx.save();
+    ctx.translate(Math.round(c.x+c.w/2+(c.state==='crouch'?Math.round(Math.sin(time*60)):0)),Math.round(c.y+c.h));
+    ctx.scale(c.face,c.state==='crouch'?0.8:c.state==='pounce'?1.08:1);
+    ctx.drawImage(c.flash>0?CAT_W:CAT,-CAT.width/2,-CAT.height);
+    if(rage){ctx.fillStyle='#ff3b3b';ctx.fillRect(-CAT.width/2+24,-CAT.height+7,3,3);ctx.fillRect(-CAT.width/2+29,-CAT.height+7,3,3);}
+    ctx.restore();
+    if(c.state==='crouch'){const ex=Math.round(c.x+c.w/2-1),ey=Math.round(c.y-12);ctx.fillStyle='#ff4a3a';ctx.fillRect(ex,ey,3,7);ctx.fillRect(ex,ey+9,3,3);}
+  }
 }
 function drawCastleFx(){
   const c=castle;if(!c)return;
@@ -3385,7 +3697,9 @@ function drawHUD(){
   const sl='x'+shop.souls;
   txt(sl,VW-6,42,'#ff7a88','right');
   ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),40);
-  const bb=castle&&castle.state!=='dying'
+  const bb=witch&&witch.state!=='dying'
+    ?{name:witch.phase===1?'SORCIÈRE':'LE CHAT',hp:witch.hp,max:witch.maxHp,ticks:[0.5],name_c:witch.phase===1?'#9fe870':'#ffb347',col:witch.phase===1?'#7fb26a':'#ff9a3a',dark:'#1e3a1a',hi:'#d4ffb8'}
+    :castle&&castle.state!=='dying'
     ?{name:'CHÂTEAU DE SABLE',hp:castle.hp,max:castle.maxHp,ticks:[0.5],name_c:castle.rage?'#ff6a6a':'#f6e2ac',col:castle.rage?'#ff7a3a':'#e4c882',dark:'#4a3a1a',hi:'#fff0c4'}
     :octo&&octo.state!=='dying'
     ?{name:'POULPE GÉANT',hp:octo.hp,max:octo.maxHp,ticks:[0.5],name_c:octo.rage?'#ff6a6a':'#c9a8ff',col:octo.rage?'#ff3b4a':'#9a6bff',dark:octo.rage?'#4a0a14':'#2a1650',hi:octo.rage?'#ff8a8a':'#c9a8ff'}
@@ -3442,6 +3756,7 @@ function render(){
   drawWater(cx,cy);
   drawOcto();
   drawCastle();
+  drawCabin(cx,cy);drawWitch();
   drawPalms(cx,cy);
   drawSwampTowers(cx);
   drawTiles(cx,cy);
@@ -3449,6 +3764,7 @@ function render(){
   drawPuddles(cx);
   drawTents();
   drawCastleFx();
+  drawWitchFx();
   drawMerchants();
   drawPickups();
   drawWorldPearls(cx,cy);
@@ -3508,7 +3824,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();
-  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -3516,7 +3832,7 @@ function placePlayer(sx){
   {hole=null;const st=Math.floor(((sx!==undefined?sx:-5)+5)/T),e=st-4,g=column(e).g,l=st-3*(VW/T);   // le trou est 3 écrans à gauche du point de départ
    for(let k=l-80;k<=e;k++)colCache.delete(k);hole={l:l-1,r:l+1,e,g};}
   const cp=sx!==undefined,g=cp?column(Math.floor((sx+5)/T)).g:column(0).g;
-  Object.assign(player,{x:cp?sx:-5,y:g*T-14,vx:0,vy:0,face:cp?(sx<0?-1:1):1,onGround:true,coyote:0,invuln:0,stun:0});
+  Object.assign(player,{x:cp?sx:-5,y:g*T-14,vx:0,vy:0,face:cp?(sx<0?-1:1):1,onGround:true,coyote:0,invuln:0,stun:0,poison:0,poisonT:0,dizzy:0});
   player.safe={x:player.x,y:player.y};
   hooks=[];tridents=[];castCd=0;throwAnim=0;
   ensureChunks();snapCamera();
@@ -3680,6 +3996,7 @@ function assistTarget(cx,cy,a0){
   if(jelly&&jelly.state==='alive'&&jelly.spawnT<=0)c.push([jelly.x+jelly.w/2,jelly.y+jelly.h/2]);
   if(octo&&octo.state==='fight')for(const t of tents)if(t.state!=='warn'&&t.state!=='retract')c.push([t.x,t.floorY-36]);
   if(castle&&castle.state==='fight'){const r=bucketRect(castle);c.push([r[0]+r[2]/2,r[1]+r[3]/2]);}
+  {const wr=witchRect();if(wr)c.push([wr[0]+wr[2]/2,wr[1]+wr[3]/2]);}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)c.push([cow.x+cow.w/2,cow.y+cow.h/2]);
   if(six&&six.state==='alive'&&six.spawnT<=0)c.push([six.x+six.w/2,six.y+six.h/2]);
   let best=null,bs=1e9;
@@ -4199,15 +4516,27 @@ function closeDev(){
   last=performance.now();acc=0;
 }
 $('dev-close').addEventListener('click',closeDev);
-$('dev-arena').addEventListener('click',()=>{   // se place devant la porte de la prochaine arène
-  const p=player,sg=p.x<-200?-1:1,esp=19*T;   // près du départ : vers la droite
-  let j=0;
-  if(anarchyOn)while(Math.abs((ARENA_START+ARENA_EVERY*j)*VW)-esp<=Math.abs(p.x)+8)j++;
-  const cx=sg*(ARENA_START+ARENA_EVERY*j)*VW,x=cx-sg*esp;
-  p.x=x;p.y=column(Math.floor(x/T)).g*T-p.h;p.vx=0;p.vy=0;p.face=sg;
-  hooks=[];tridents=[];enemies=enemies.filter(e=>Math.abs(e.x-x)>500);
+function devBiomeTx(n){   // 1 = plaines, 2 = plage, 3 = marécages : 1re case de la zone + marge
+  if(n===1)return 0;
+  if(!anarchyOn)return n===2?BEACH_TX+10:SWAMP_TX+10;
+  for(let k=1;k<=24;k++){const z=zoneDefK(k);if(n===2?z.beach:z.swamp)return BEACH_TX+(k-1)*ZONE_W+10;}
+  return null;
+}
+function devBiome(n){   // téléporte au début du biome n (comme un checkpoint : arènes précédentes considérées comme vaincues)
+  const tx=devBiomeTx(n);
+  if(tx===null){floatText(player.x+5,player.y-20,'BIOME INTROUVABLE','#ff8a8a');closeDev();return;}
+  const sg=player.x<-200?-1:1,shut=hole&&hole.shut;
+  if(!anarchyOn&&n>=2){
+    const xs=[sg*ARENA_START*(VW/T)];if(n>=3)xs.push(sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)));
+    for(const x of xs){const ar=arenaAt(x);if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}}
+    bossSpawned=true;octoRun=true;night=false;if(n>=3){castleRun=true;jellySpawned=true;}
+  }
+  if(n===1)placePlayer();else placePlayer(sg*tx*T);
+  if(shut&&hole){hole.shut=true;for(let k=hole.l-80;k<=hole.e;k++)colCache.delete(k);}
+  enemies=enemies.filter(e=>Math.abs(e.x-player.x)>500);
   ensureChunks();snapCamera();closeDev();
-});
+}
+for(const b of devEl.querySelectorAll('.dev-b'))b.addEventListener('click',()=>devBiome(+b.dataset.b));
 $('dev-god').addEventListener('click',()=>{godMode=!godMode;updateDev();});
 $('dev-glock').addEventListener('click',()=>{glockOn=!glockOn;hooks=[];tridents=[];updateDev();});
 devEl.addEventListener('pointerdown',e=>{if(e.target===devEl)closeDev();});
