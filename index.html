@@ -846,7 +846,7 @@ function genChunk(cx){
   if(castleAt(x0)||castleAt(x0+15))return;   // rien devant le château
   if(ca&&Math.abs(x0+8-ca.cx)<=30)return;   // rien à l'intérieur ni autour de l'arène
   if(cowFieldAt(x0)||cowFieldAt(x0+15))return;   // pré de la vache : vide
-  const iceC=inIce(x0+8),e0=enemies.length;   // zone glacière : plus de plateformes, dauphins de glace et mini ours
+  const iceC=inIce(x0+8),cloudC=inCloud(x0+8),e0=enemies.length;   // zone glacière : plus de plateformes, dauphins de glace et mini ours
   const beachC=inBeach(x0+8);   // zone plage : pas de plateformes, pas de dauphins bleus ni volants
   let nChains=rng()<0.72?1:0; if(rng()<0.25) nChains++;
   if(beachC)nChains=0;
@@ -877,10 +877,10 @@ function genChunk(cx){
       if(rng()<0.38)enemies.push(mkEnemy('gull',tx*T,(col.g-7-Math.floor(rng()*3))*T));
       else enemies.push(mkEnemy('shoot',tx*T,col.g*T-9.01));continue;}   // sur le sable : seulement les dauphins rouges
     const r=rng();
-    if(r<0.3){
+    if(r<(cloudC?0.6:0.3)){   // monde nuage : deux fois plus de dauphins volants
       const col=column(tx);
       enemies.push(mkEnemy('fly',tx*T,(col.g-4-Math.floor(rng()*4))*T));
-    } else if(r<0.55&&myPlats.length){
+    } else if(r<(cloudC?0.75:0.55)&&myPlats.length){
       const pl=myPlats[Math.floor(rng()*myPlats.length)];
       enemies.push(mkEnemy('hop',(pl.tx+1+rng()*(pl.w-2))*T,pl.row*T-9.01));
     } else {
@@ -1399,6 +1399,8 @@ function makeCloudTop(dec,v){
   for(let k=0;k<3;k++){const bx=Math.floor(r()*10),bw=4+Math.floor(r()*4);g.fillStyle='#ffffff';g.fillRect(bx,4,bw,3);g.fillRect(bx+1,3,bw-2,1);}
   return c;
 }
+const CLOUD_PLAT=(()=>{const c=mk(T,T),g=c.getContext('2d');
+  g.fillStyle='#bccbe6';g.fillRect(1,6,14,3);g.fillStyle='#ffffff';g.fillRect(0,4,T,4);g.fillRect(2,2,5,3);g.fillRect(8,1,5,4);g.fillStyle='#e6eefb';g.fillRect(1,7,14,1);return c;})();
 const CLOUDTOP=[0,1,2,3,4].map(d=>[0,1,2].map(v=>makeCloudTop(d,v)));
 function makeIceTop(dec,v){
   const c=mk(T,T+6),g=c.getContext('2d');
@@ -3553,7 +3555,7 @@ function drawRz(cx,cy){   // fond noir, sol réduit à un liseré blanc, chiffre
 /* ---------- Jeu de tarot : une carte tirée en ligne droite. Silver Chariot : 3 cartes en éventail. Star Platinum : cartes étoilées qui rebondissent d'ennemi en ennemi ---------- */
 const TAROT_ICON=spr(["xxxxxxxxx","xwwwwwwwx","xwwwywwwx","xwwwywwwx","xwyyyyywx","xwwyyywwx","xwwywywwx","xwwwwwwwx","xwrrwrrwx","xwwwwwwwx","xwwwwwwwx","xxxxxxxxx"],{x:'#14182c',w:'#f4f1e6',y:'#ffd23f',r:'#c0392b'});
 const STAR_ICON=spr([".....y.....","....yWy....","....yWy....","yyyyyWyyyyy",".yyWWWWWyy.","..yyWWWyy..","..yyWWWyy..",".yyy.W.yyy.",".yy..y..yy.","yy.......yy"],{y:'#ffd23f',W:'#fff6b0'});
-const TXUP={chariot:{name:'Silver Chariot',desc:'Lance 3 cartes d\'un coup, en éventail (une seule fois).',cost:500},star:{name:'Star Platinum',desc:'Des cartes étoilées qui rebondissent vers les autres ennemis après un impact (une seule fois).',cost:1000}};
+const TXUP={chariot:{name:'Silver Chariot',desc:'Lance 3 cartes d\'un coup, en éventail (une seule fois).',cost:500},star:{name:'Star Platinum',desc:'Des cartes étoilées autoguidées, qui rebondissent vers les autres ennemis après un impact (une seule fois).',cost:1000}};
 const TX_KEYS=['chariot','star'];
 const CARD_DMG=4,CARD_CD=0.35,CARD_V=270;
 function stepTarot(dt){
@@ -3574,6 +3576,12 @@ function stepTarot(dt){
 function stepCards(dt){
   if(!tcards.length)return;
   for(const c of tcards){
+    if(c.star){   // Star Platinum : cartes autoguidées vers l'ennemi le plus proche (pas encore touché)
+      let bt=null,bd=220*220;
+      for(const u of allTargets()){const k2=u.e||('s'+u.r[2]+'x'+u.r[3]);if(c.hit.has(k2))continue;const ux=u.r[0]+u.r[2]/2-c.x,uy=u.r[1]+u.r[3]/2-c.y,d=ux*ux+uy*uy;if(d<bd){bd=d;bt={x:ux,y:uy};}}
+      if(bt){const sp=Math.hypot(c.vx,c.vy)||CARD_V,cur=Math.atan2(c.vy,c.vx);let da=Math.atan2(bt.y,bt.x)-cur;da=Math.atan2(Math.sin(da),Math.cos(da));
+        const na=cur+clamp(da,-7*dt,7*dt);c.vx=Math.cos(na)*sp;c.vy=Math.sin(na)*sp;}
+    }
     c.t+=dt;c.x+=c.vx*dt;c.y+=c.vy*dt;
     if(c.t>c.life||solidAt(c.x,c.y)){c.dead=true;parts.push({x:c.x,y:c.y,vx:(Math.random()-0.5)*50,vy:-30,g:300,life:0.3,col:c.star?'#ffd23f':'#f4f1e6',sz:2});continue;}
     for(const t of allTargets()){
@@ -4212,7 +4220,7 @@ function drawTiles(cx,cy){
         let flat=true;for(let k=l;k<=r&&flat;k++){const ck=column(k);if(ck.pit||ck.g!==col.g)flat=false;}   // pilier seulement si le sol est plat sur toute la largeur de la plateforme
         if(flat&&tx===((l+r)>>1)&&!col.pit){const by=col.g*T,x=tx*T-4;ctx.fillStyle='#1e2420';ctx.fillRect(x-1,ty*T+6,26,by-ty*T-6);ctx.fillStyle='#6a7366';ctx.fillRect(x,ty*T+6,24,by-ty*T-6);ctx.fillStyle='#7c8577';ctx.fillRect(x,ty*T+6,3,by-ty*T-6);ctx.fillStyle='#545c51';for(let yy=ty*T+10,r=0;yy<by;yy+=8,r++){ctx.fillRect(x,yy,24,1);ctx.fillRect(x+(r%2?8:16),yy-7,1,7);}ctx.fillStyle='#4f7a3a';ctx.fillRect(x,by-7,4,7);ctx.fillRect(x+19,by-5,5,5);if(by-ty*T>30){ctx.fillStyle='#1e2420';ctx.fillRect(x+10,ty*T+14,4,7);ctx.fillRect(x+11,ty*T+13,2,1);}}
         ctx.drawImage(STONE_PLAT,tx*T,ty*T);
-      } else ctx.drawImage(col.cloud||col.ice?ICE_PLAT:PLANK,tx*T,ty*T);
+      } else ctx.drawImage(col.cloud?CLOUD_PLAT:col.ice?ICE_PLAT:PLANK,tx*T,ty*T);
     }
   }
 }
@@ -5224,7 +5232,7 @@ const WEAPONS=[
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
-  {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Silver Chariot en lance 3, Star Platinum les fait rebondir d\'ennemi en ennemi. Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
+  {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Silver Chariot en lance 3, Star Platinum les rend autoguidées et les fait rebondir d\'ennemi en ennemi. Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
 let weapOpen=false,weapSel=null;
