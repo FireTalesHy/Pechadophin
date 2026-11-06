@@ -2,6 +2,20 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.4.0] - 2026-11-06
+
+### Ajouté
+- **Le château de glace** au bout de la glacière : on y entre par la porte et on grimpe une tour de 6 étages, avec plateformes, pics de glace, stalactites qui tombent, plateformes friables, chevaliers dauphins et archers.
+- **Boss : le Roi Cacamille 2**, dans sa chambre au sommet. Un grand roi tout fin qui lance des boules marrons par 3, 5, puis jusqu'à 9 une fois enragé, et fait venir ses chevaliers. On y accède par une porte qui téléporte dans sa chambre, avec deux plateformes accessibles d'un saut normal.
+- **Jeu de tarot** : nouvelle arme laissée par le roi, qui tire une carte.
+  - **Silver Chariot** (500 or) : lance 3 cartes en éventail au lieu d'une.
+  - **Star Platinum** (1000 or) : cartes étoilées perforantes, autoguidées vers les autres ennemis dès qu'une étoile a touché.
+- **Le monde nuage** : nouvelle zone, accessible par la fenêtre de la chambre du roi, avec son checkpoint (mode Classique). Ciel lumineux, sol et plateformes en nuages, dauphins volants deux fois plus nombreux, grands trous de 5 à 9 cases avec des ponts de nuages, beaucoup plus de plateformes, et de nouveaux éléments de plateforme :
+  - nuages mobiles (horizontaux ou verticaux) ;
+  - nuages friables qui cèdent après quelques instants ;
+  - ressorts roses qui propulsent très haut ;
+  - courants ascendants.
+
 ## [V0.3.9] - 2026-11-02
 
 ### Ajouté
