@@ -550,7 +550,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
+'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -738,7 +738,7 @@ function beachGround(tx){
 }
 /* Château de glace : une porte au bout de la glacière mène à une tour verticale (zone à part, loin du monde, comme l'arène secrète) */
 const TWC=0,TWW=24,TWB=24,TWN=6,TWR=12,TWTOP=TWB-TWN*TWR-14;   // 24 cases de large, 6 étages de 12 cases, salle du boss tout en haut
-let tw=null,twTr=null,twCd=0;
+let tw=null,twTr=null,twCd=0,king=null,kingBalls=[];
 const twIn=tx=>!!tw&&tx>=TWC-3&&tx<TWC+TWW+3;
 const TW_COL={g:TWB,pit:false,beach:false,tun:null,swamp:false,ice:false};
 const csCache=new Map();
@@ -1662,7 +1662,7 @@ function loadShop(){
       d.ice=(j.ice===1||j.ice===-1)?1:0;   // checkpoint de la glacière (mode classique)
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
-      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
+      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
@@ -1889,6 +1889,7 @@ function allTargets(){
   if(castle&&castle.state==='fight')targets.push({r:bucketRect(castle),hit:d=>hitCastle(d)});
   {const wr=witchRect();if(wr)targets.push({r:wr,hit:d=>hitWitch(d)});}
   {const er=eskRect();if(er)targets.push({r:er,hit:d=>hitEskimo(d)});}
+  {const kr=kingRect();if(kr)targets.push({r:kr,hit:d=>hitKing(d)});}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)targets.push({r:[cow.x,cow.y,cow.w,cow.h],hit:d=>hitCow(d)});
   if(six&&six.state==='alive'&&six.spawnT<=0)targets.push({r:[six.x,six.y,six.w,six.h],hit:d=>hitSix(d)});
   return targets;
@@ -1944,6 +1945,7 @@ function stepDagger(dt){
   if(castle&&castle.state==='fight')tryHit(castle,bucketRect(castle),x=>hitCastle(x));
   {const wr=witchRect();if(wr)tryHit(witch,wr,x=>hitWitch(x));}
   {const er=eskRect();if(er)tryHit(eskimo,er,x=>hitEskimo(x));}
+  {const kr=kingRect();if(kr)tryHit(king,kr,x=>hitKing(x));}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)tryHit(cow,[cow.x,cow.y,cow.w,cow.h],x=>hitCow(x));
   if(six&&six.state==='alive'&&six.spawnT<=0)tryHit(six,[six.x,six.y,six.w,six.h],x=>hitSix(x));
   if(d.t<=0){p.dash=null;p.parryT=0.6;}   // fenêtre de parade juste après le dash
@@ -2005,6 +2007,7 @@ function stepTrident(dt){
     }
     {const wr=witchRect();if(h.n<pierce&&wr&&!h.hit.has(witch)&&rectsOverlap(h.x-5,h.y-5,10,10,wr[0],wr[1],wr[2],wr[3])){h.hit.add(witch);hitWitch(dmg);h.n++;}}
     {const er=eskRect();if(h.n<pierce&&er&&!h.hit.has(eskimo)&&rectsOverlap(h.x-5,h.y-5,10,10,er[0],er[1],er[2],er[3])){h.hit.add(eskimo);hitEskimo(dmg);h.n++;}}
+    {const kr=kingRect();if(h.n<pierce&&kr&&!h.hit.has(king)&&rectsOverlap(h.x-5,h.y-5,10,10,kr[0],kr[1],kr[2],kr[3])){h.hit.add(king);hitKing(dmg);h.n++;}}
     if(h.n<pierce&&castle&&castle.state==='fight'&&!h.hit.has(castle)){const r=bucketRect(castle);if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(castle);hitCastle(dmg);h.n++;}}
     if(h.n<pierce&&cow&&cow.state==='alive'&&cow.spawnT<=0&&!h.hit.has(cow)&&rectsOverlap(h.x-5,h.y-5,10,10,cow.x,cow.y,cow.w,cow.h)){h.hit.add(cow);hitCow(dmg);h.n++;}
     if(h.n<pierce&&six&&six.state==='alive'&&six.spawnT<=0&&!h.hit.has(six)&&rectsOverlap(h.x-5,h.y-5,10,10,six.x,six.y,six.w,six.h)){h.hit.add(six);hitSix(dmg);h.n++;}
@@ -2892,13 +2895,15 @@ function buildTw(){
     if(st>=2){const r1=pr[0];spawns.push({kind:'archer',x:(TWC+(r1.a+r1.b)/2)*T,y:r1.ty*T-16,st});}   // l'archer guette depuis la 1re plateforme
     if(st>=2){const n=Math.min(3,st-1),r2=pr[1];for(let i=0;i<n;i++)icicles.push({x:(TWC+r2.a+1+i*2)*T+8,y:(F-11)*T,len:12,fy:0,vy:0,state:'idle',t:0});}   // stalactites au-dessus de la 2e plateforme
   }
-  return {grid,plat,recs,spikes,icicles,spawns,t:0,maxStage:0,saveEn:null,savePk:null,back:null};
+  const FN=TWB-TWR*TWN;   // la chambre du roi : deux corniches pour esquiver, et le rebord de la fenêtre à droite
+  for(const [a,b,dy] of [[8,11,3],[13,16,6],[20,23,3]]){const rec={a,b,ty:FN-dy,state:'ok',t:0,frag:false};for(let tx=a;tx<=b;tx++)plat.set(twKey(TWC+tx,rec.ty),rec);recs.push(rec);}
+  return {grid,plat,recs,spikes,icicles,spawns,t:0,maxStage:0,saveEn:null,savePk:null,back:null,kingDead:false,bars:false,win:false};
 }
 function twFloorY(x,y){const tx=Math.floor(x/T);for(let ty=Math.floor(y/T);ty<TWB+2;ty++)if(solidTile(tx,ty)||oneWay(tx,ty))return ty*T;return TWB*T;}
 function twEnter(cs){
   const p=player;
   tw=buildTw();tw.back={x:cs.cx*T+8-cs.sg*46-5,y:cs.floor*T-14,sg:cs.sg};
-  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];
+  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];
   for(const sp of tw.spawns){
     const hp=sp.kind==='knight'?5+Math.floor(sp.st/2):3+(sp.st>=4?1:0),dir=Math.random()<0.5?1:-1;
     enemies.push(sp.kind==='knight'
@@ -2911,8 +2916,9 @@ function twEnter(cs){
   floatText(p.x+5,p.y-30,'CHÂTEAU DE GLACE','#bfe9ff');
 }
 function twLeave(){
-  const b=tw.back;enemies=tw.saveEn||[];pickups=tw.savePk||[];tw=null;bossShots=[];hooks=[];tridents=[];scepBeams=[];
-  Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null,face:-b.sg});
+  const b=tw.back,win=tw.win;enemies=tw.saveEn||[];pickups=tw.savePk||[];tw=null;bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];
+  if(win){b.x+=b.sg*174;}   // sortie par la fenêtre : on atterrit de l'autre côté du château
+  Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null,face:win?b.sg:-b.sg});
   player.safe={x:b.x,y:b.y};twCd=2.5;snapCamera();
 }
 function twDoorCheck(dt){   // la porte du château : on y entre en marchant dedans
@@ -2928,7 +2934,7 @@ function stepTwTr(dt){
   if(twTr.t>=1.5)twTr=null;
 }
 function drawTwFade(){const t=twTr.t,a=t<0.7?t/0.7:clamp(1-(t-0.9)/0.6,0,1);ctx.fillStyle='rgba(0,0,0,'+a.toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}
-function twCamera(dt){const p=player;cam.x=TWC*T;const ty=clamp(p.y+7-VH*0.58,TWTOP*T,(TWB+1)*T-VH);cam.y+=(ty-cam.y)*(1-Math.exp(-6*dt));}
+function twCamera(dt){const p=player,FN=(TWB-TWR*TWN)*T;cam.x=TWC*T;const ty=p.y+p.h<=FN+2?FN+T-VH:clamp(p.y+7-VH*0.58,TWTOP*T,(TWB+1)*T-VH);cam.y+=(ty-cam.y)*(1-Math.exp(-6*dt));}   // dans la chambre du roi, la caméra se fige sur toute la pièce
 function twHaz(dt){
   const p=player;
   if(state==='play'&&p.invuln<=0)for(const s of tw.spikes)if(rectsOverlap(p.x+2,p.y+5,p.w-4,p.h-5,s.x,s.y,s.w,s.h)){hurtPlayer(s.x+s.w/2);break;}
@@ -2956,16 +2962,136 @@ function stepTw(dt){
   stepPlayer(dt);if(state!=='play')return;
   stepHook(dt);
   twHaz(dt);
-  stepEnemies(dt);stepBossShots(dt);stepScepterBeams(dt);stepSoulFx(dt);stepPickups(dt);stepFx(dt);
+  stepEnemies(dt);stepKing(dt);stepKingBalls(dt);stepBossShots(dt);stepScepterBeams(dt);stepSoulFx(dt);stepPickups(dt);stepFx(dt);
   if(combo.n>0){combo.t-=dt;if(combo.t<=0){combo.n=0;combo.t=0;}}
   const st=Math.floor((TWB*T-(p.y+p.h)+2)/(TWR*T));
   if(st>tw.maxStage){
     tw.maxStage=st;
-    if(st>=TWN){floatText(p.x+5,p.y-30,'SALLE DU BOSS','#ffe14d');floatText(p.x+5,p.y-20,'LA PORTE EST SCELLÉE','#bfe9ff');shake=Math.max(shake,0.3);sfx.bossSpawn();}
+    if(st>=TWN){floatText(p.x+5,p.y-30,'CHAMBRE DU ROI','#ffe14d');shake=Math.max(shake,0.3);sfx.bossSpawn();}
     else if(st>=1){floatText(p.x+5,p.y-30,'ÉTAGE '+st,'#bfe9ff');sfx.heal();}
   }
+  {const FN=(TWB-TWR*TWN)*T,cxp=p.x+5;
+   if(!king&&!tw.kingDead&&p.onGround&&Math.abs(p.y+p.h-FN)<2&&(cxp<(TWC+3)*T||cxp>(TWC+8)*T))startKing();   // on pose le pied dans la chambre : le roi apparaît et la trappe se ferme
+   if(tw.kingDead&&!twTr&&cxp>(TWC+20)*T&&p.y+p.h<=FN-3*T+2&&p.y+p.h>=FN-11*T){tw.win=true;twTr={t:0,dir:'out',sw:false};sfx.gate();}}   // le roi est tombé : on saute par la fenêtre
   if(tw.t>1&&!twTr&&p.onGround&&p.y>(TWB-5)*T&&Math.abs(p.x+5-(TWC+2.5)*T)<14){twTr={t:0,dir:'out',sw:false};sfx.gate();}   // la porte du rez-de-chaussée : retour dehors
   twCamera(dt);
+}
+/* ---------- Le roi : boss de la chambre tout en haut du château ---------- */
+const KING_HP=750;
+function kingRect(){const k=king;if(!k||k.state!=='fight')return null;return [k.x-7,k.y-49,14,49];}
+function startKing(){
+  const F=TWB-TWR*TWN,p=player;
+  king={x:(TWC+17)*T+8,y:F*T,hp:KING_HP,maxHp:KING_HP,state:'intro',t:0,intro:1.6,rage:false,flash:0,face:-1,mode:'idle',mt:1.2,tgt:(TWC+17)*T+8,addT:4.5,n:3,dieT:0};
+  for(let tx=4;tx<=7;tx++)tw.grid[(F-TWTOP)*TWW+tx]=1;   // la trappe se referme sous nos pieds
+  tw.bars=true;shake=0.5;sfx.bossSpawn();sfx.gate();
+  floatText(p.x+5,p.y-34,'LE ROI','#ffd23f');
+}
+function hitKing(dmg){
+  const k=king;if(!k||k.state!=='fight')return;
+  const removed=Math.min(dmg,k.hp);
+  k.hp-=dmg;k.flash=0.12;
+  combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;
+  score+=pts;
+  floatText(k.x,k.y-52,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  burst(k.x,k.y-26,'#e8c8ff',8,90);
+  if(k.hp<=0)killKing();
+  else{if(!k.rage&&k.hp<=k.maxHp/2){k.rage=true;shake=0.7;sfx.bossSpawn();floatText(k.x,k.y-64,'ENRAGÉ !','#ff4a4a');k.addT=Math.min(k.addT,1.5);}else sfx.hit();}
+}
+function killKing(){
+  const k=king,F=TWB-TWR*TWN;
+  k.hp=0;k.state='dying';k.dieT=2.6;kingBalls=[];
+  for(const e of enemies)if(e.state==='alive'&&(e.kind==='knight'||e.kind==='archer')&&e.y<(F+1)*T){e.state='dead';e.t=0;e.vy=-120;e.vx=0;burst(e.x+e.w/2,e.y+e.h/2,'#e8eefc',8,90);}   // les chevaliers du roi s'effondrent avec lui
+  tw.kingDead=true;tw.bars=false;
+  for(let tx=4;tx<=7;tx++)tw.grid[(F-TWTOP)*TWW+tx]=0;   // la trappe se rouvre
+  kills++;shake=0.8;sfx.bossDie();
+  const again=!!shop.bossSouls.king&&!anarchyOn,gs=soulReward('king',2),gold=again?30:300;shop.gold+=gold;saveShop();
+  const cx=k.x,cy=k.y-60;
+  if(gs){floatText(cx,cy-12,'+2 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy+30,t:0});soulFx.push({x:cx+10,y:cy+30,t:0.15});}
+  floatText(cx,cy,'+'+gold+' OR','#ffd23f');
+  floatText(cx,cy+11,'PAR LA FENÊTRE !','#7ff0e8');
+  burst(cx,cy+30,'#e8c8ff',30,170);burst(cx,cy+30,'#ffd23f',18,120);
+  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:F*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+}
+function kingThrow(n){
+  const k=king,p=player,ox=k.x+k.face*6,oy=k.y-32,a0=Math.atan2(p.y+6-oy,p.x+5-ox),spread=Math.min(1.5,0.16*(n-1));
+  for(let i=0;i<n;i++){
+    const a=n===1?a0:a0+(i-(n-1)/2)*(spread/(n-1)),sp=98+Math.random()*22;
+    kingBalls.push({x:ox,y:oy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,t:0,life:5});
+  }
+  sfx.bossFire();
+}
+function stepKing(dt){
+  const k=king;if(!k)return;
+  const p=player;
+  k.t+=dt;if(k.flash>0)k.flash-=dt;
+  if(k.state==='intro'){k.intro-=dt;if(k.intro<=0){k.state='fight';k.mode='idle';k.mt=1;}return;}
+  if(k.state==='dying'){k.dieT-=dt;if(Math.random()<0.5)parts.push({x:k.x+(Math.random()-0.5)*12,y:k.y-Math.random()*40,vx:(Math.random()-0.5)*40,vy:-40,life:0.5,col:Math.random()<0.5?'#ffd23f':'#e8c8ff',sz:2});if(k.dieT<=0)king=null;return;}
+  k.face=p.x+5>k.x?1:-1;
+  const sp=k.rage?34:20,x0=(TWC+2)*T,x1=(TWC+22)*T;
+  if(k.mode==='idle'||k.mode==='rest'){   // il arpente la chambre à petits pas
+    k.mt-=dt;
+    if(Math.abs(k.tgt-k.x)<3)k.tgt=x0+Math.random()*(x1-x0);
+    k.x+=Math.sign(k.tgt-k.x)*sp*dt;
+    if(k.mt<=0){
+      if(k.mode==='rest'){k.mode='idle';k.mt=0.5+Math.random()*0.6;}
+      else{k.mode='wind';k.mt=k.rage?0.6:0.9;k.n=k.rage?[5,7,9,9][Math.floor(Math.random()*4)]:(Math.random()<0.6?3:5);}   // sa main passe derrière son dos
+    }
+  } else if(k.mode==='wind'){k.mt-=dt;if(k.mt<=0){kingThrow(k.n);k.mode='throw';k.mt=0.35;}}
+  else if(k.mode==='throw'){k.mt-=dt;if(k.mt<=0){k.mode='rest';k.mt=k.rage?1:1.6;}}
+  k.addT-=dt;   // les chevaliers de la garde accourent
+  if(k.addT<=0){
+    k.addT=k.rage?6:9;
+    const F=TWB-TWR*TWN;let alive=0;for(const e of enemies)if(e.kind==='knight'&&e.state==='alive'&&e.y<(F+1)*T&&e.y>(F-12)*T)alive++;
+    if(alive<(k.rage?3:2)){
+      const left=Math.random()<0.5,x=(TWC+(left?2:21))*T,hp=4;
+      enemies.push({kind:'knight',x,y:F*T-18,w:12,h:18,vx:0,vy:0,dir:left?1:-1,hp,maxHp:hp,tier:0,speed:24,state:'alive',t:0,flash:0,onGround:false,mode:'walk',mt:0,cdT:1});
+      burst(x+6,F*T-9,'#e8eefc',10,80);sfx.slam();
+    }
+  }
+  if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,k.x-6,k.y-47,12,47)&&!tryParry())hurtPlayer(k.x);
+}
+function stepKingBalls(dt){
+  const p=player;
+  for(const b of kingBalls){
+    b.t+=dt;b.vy+=40*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;
+    if(solidAt(b.x,b.y)||oneWay(Math.floor(b.x/T),Math.floor(b.y/T))&&b.vy>0&&b.t>0.15){b.life=0;burst(b.x,b.y,'#6b4423',6,60);continue;}
+    if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x-3,b.y-3,6,6)){b.life=0;burst(b.x,b.y,'#6b4423',8,80);hurtPlayer(b.x);}
+  }
+  kingBalls=kingBalls.filter(b=>b.life>0);
+}
+function drawKing(){
+  const k=king;if(!k)return;
+  const dying=k.state==='dying',fl=k.flash>0,x=Math.round(k.x),fy=Math.round(k.y);
+  const R=(c,a,b,w,h)=>{ctx.fillStyle=c;ctx.fillRect(a,b,w,h);};
+  ctx.save();
+  if(k.state==='intro')ctx.globalAlpha=Math.sin(time*40)>0?clamp(1-k.intro/1.6,0.2,1):0.15;
+  const off=dying?Math.round((1-k.dieT/2.6)*49):0;
+  ctx.beginPath();ctx.rect(x-40,fy-70,80,70);ctx.clip();
+  const jx=k.rage&&!dying?Math.round(Math.sin(time*50)):0;
+  ctx.translate(x+jx,fy+off);ctx.scale(k.face,1);
+  const skin=fl?'#ffffff':'#f0c9a0',robe=fl?'#ffffff':(k.rage?'#b01c4a':'#7a2fa0'),robeD=fl?'#e8e8e8':(k.rage?'#6a0e2a':'#4e1a6e'),fur=fl?'#ffffff':'#f4f1e6',gold=fl?'#ffffff':'#ffd23f',tight=fl?'#ffffff':'#e8e4d8';
+  R('#14182c',-4,-2,4,2);R('#14182c',1,-2,5,2);   // souliers pointus
+  R(tight,-3,-14,2,12);R(tight,1,-14,2,12);   // jambes fines
+  R(robeD,-6,-31,12,19);R(robe,-5,-30,10,17);R(fur,-6,-14,12,3);R('#14182c',-4,-13,1,1);R('#14182c',0,-13,1,1);R('#14182c',3,-13,1,1);   // robe et bas en hermine
+  R(gold,-5,-22,10,2);R(fur,-4,-32,8,2);   // ceinture et col
+  R(skin,-3,-41,6,9);R(skin,3,-38,3,2);R(k.rage&&!fl?'#ff2a2a':'#14182c',1,-39,1,1);R('#d8d8e0',-1,-33,3,4);   // visage long, nez, œil, barbiche
+  R(gold,-4,-46,8,5);R(gold,-4,-48,2,2);R(gold,-1,-49,2,3);R(gold,2,-48,2,2);R(fl?'#ffffff':'#d92b3a',-1,-44,2,2);   // couronne
+  if(k.mode==='wind'){   // la main passe derrière le dos : une boule marron se forme
+    R(robe,-12,-28,8,2);R(skin,-14,-29,2,3);
+    const g=0.5+0.5*Math.sin(time*30);ctx.globalAlpha=0.35+0.3*g;R('#a06a3a',-19,-33,10,10);ctx.globalAlpha=1;
+    R('#4a2d14',-18,-32,8,8);R('#6b4423',-17,-31,6,6);R('#a06a3a',-16,-30,2,2);
+    R(robe,3,-29,2,8);R(skin,3,-21,2,2);
+  } else if(k.mode==='throw'){   // le bras part vers l'avant
+    R(robe,4,-33,9,2);R(skin,13,-34,2,3);R(robe,-5,-29,2,10);
+  } else {R(robe,3,-29,2,10);R(skin,3,-19,2,2);R(robe,-5,-29,2,10);}
+  ctx.restore();
+}
+function drawKingBalls(){
+  for(const b of kingBalls){
+    const x=Math.round(b.x),y=Math.round(b.y);
+    ctx.fillStyle='#14182c';disc(x,y,4);ctx.fillStyle='#6b4423';disc(x,y,3);ctx.fillStyle='#a06a3a';ctx.fillRect(x-1,y-2,2,2);ctx.fillStyle='#3a2410';ctx.fillRect(x,y+1,2,2);
+  }
 }
 /* ----- chevaliers dauphins ----- */
 function aiKnight(e,dt){
@@ -3066,15 +3192,28 @@ function drawTwBg(cy){
   ctx.fillStyle='#8fc8ec';ctx.fillRect(x0+T,door-5*T+1,3*T,5*T-1);ctx.fillStyle='#e8fbff';ctx.fillRect(x0+T+4,door-5*T+4,3*T-8,5*T-5);
   ctx.fillStyle='#14182c';ctx.fillRect(x0+T+2*T-1,door-5*T+4,2,5*T-5);
   if(time%1<0.7){ctx.fillStyle='#14182c';ctx.fillRect(x0+T+6,door-5*T+22,2,5);}
-  const rf=(TWB-TWR*TWN)*T;   // la porte scellée de la salle du boss
-  if(rf<cy+VH+40&&rf>cy-8*T){
-    const bx=x0+W-6*T,by=rf-6*T;
-    ctx.fillStyle='#14182c';ctx.fillRect(bx-3,by-3,4*T+6,6*T+3);
-    ctx.fillStyle='#6a7a94';ctx.fillRect(bx,by,4*T,6*T);ctx.fillStyle='#8696b0';ctx.fillRect(bx,by,4*T,3);
-    ctx.fillStyle='#4e5c76';ctx.fillRect(bx+2*T-1,by,2,6*T);
-    for(let k=0;k<5;k++){ctx.fillStyle='#aab4c8';ctx.fillRect(bx+4,by+8+k*16,3,3);ctx.fillRect(bx+4*T-7,by+8+k*16,3,3);}
-    const glow=0.55+0.35*Math.sin(time*3);ctx.globalAlpha=glow;ctx.fillStyle='#7fd0ff';ctx.fillRect(bx+2*T-4,by+34,8,8);ctx.fillStyle='#ffffff';ctx.fillRect(bx+2*T-2,by+36,4,4);ctx.globalAlpha=1;
-    for(const tx of[bx-14,bx+4*T+10]){ctx.fillStyle='#3a2a1a';ctx.fillRect(tx,by+24,4,26);ctx.fillStyle='#5a4a3a';ctx.fillRect(tx-2,by+22,8,4);const f=Math.floor(time*10+tx)%3;ctx.fillStyle='#3b9bff';ctx.fillRect(tx-1,by+9-f,6,13+f);ctx.fillStyle='#8fcfff';ctx.fillRect(tx,by+12-f,4,9);ctx.fillStyle='#ffffff';ctx.fillRect(tx+1,by+15,2,4);}
+  const rf=(TWB-TWR*TWN)*T;   // la chambre du roi
+  if(rf<cy+VH+40&&rf>cy-13*T){
+    ctx.fillStyle='#3a2a5a';ctx.fillRect(x0,rf-12*T,W,12*T);   // murs tendus de velours
+    for(let y=rf-12*T,row=0;y<rf;y+=12,row++){ctx.fillStyle='#4a3670';ctx.fillRect(x0,y,W,1);}
+    for(let x=x0+8;x<x0+W;x+=32){ctx.fillStyle='#4a3670';ctx.fillRect(x,rf-12*T,2,12*T);}
+    ctx.fillStyle='#7a2fa0';ctx.fillRect(x0+9*T,rf-2,8*T,2);ctx.fillStyle='#ffd23f';ctx.fillRect(x0+9*T,rf-2,8*T,1);   // tapis
+    const bx=x0+10*T,by=rf;   // grand lit à baldaquin
+    ctx.fillStyle='#14182c';ctx.fillRect(bx-2,by-58,6,58);ctx.fillRect(bx+6*T-4,by-58,6,58);ctx.fillRect(bx-4,by-60,6*T+8,6);
+    ctx.fillStyle='#6a4a2a';ctx.fillRect(bx-1,by-57,4,57);ctx.fillRect(bx+6*T-3,by-57,4,57);
+    ctx.fillStyle='#b01c4a';ctx.fillRect(bx-3,by-59,6*T+6,4);ctx.fillRect(bx+2,by-55,6*T-8,8);ctx.fillStyle='#d94a7a';ctx.fillRect(bx+2,by-55,6*T-8,2);
+    ctx.fillStyle='#14182c';ctx.fillRect(bx,by-18,6*T,18);ctx.fillStyle='#6a4a2a';ctx.fillRect(bx+1,by-17,6*T-2,16);
+    ctx.fillStyle='#7a2fa0';ctx.fillRect(bx+1,by-14,6*T-2,10);ctx.fillStyle='#ffd23f';ctx.fillRect(bx+1,by-14,6*T-2,2);ctx.fillStyle='#f4f1e6';ctx.fillRect(bx+3,by-17,22,5);ctx.fillRect(bx+3,by-17,22,1);
+    const lx=x0+W/2-4*T;   // lustre à flammes bleues
+    ctx.fillStyle='#14182c';ctx.fillRect(lx,rf-12*T+30,16,3);
+    ctx.fillStyle='#8a6a30';ctx.fillRect(lx+7,rf-12*T+2,2,28);ctx.fillRect(lx-8,rf-12*T+30,32,2);
+    for(const cx2 of[lx-6,lx+7,lx+20]){const f=Math.floor(time*10+cx2)%3;ctx.fillStyle='#e8e4d8';ctx.fillRect(cx2,rf-12*T+24,3,6);ctx.fillStyle='#3b9bff';ctx.fillRect(cx2-1,rf-12*T+19-f,5,6+f);ctx.fillStyle='#ffffff';ctx.fillRect(cx2+1,rf-12*T+21,1,3);}
+    for(const px of[x0+1*T,x0+3*T]){ctx.fillStyle='#14182c';ctx.fillRect(px,rf-9*T,32,40);ctx.fillStyle='#ffd23f';ctx.fillRect(px+2,rf-9*T+2,28,36);ctx.fillStyle='#5a3a8a';ctx.fillRect(px+4,rf-9*T+4,24,32);ctx.fillStyle='#f0c9a0';ctx.fillRect(px+12,rf-9*T+12,8,12);ctx.fillStyle='#ffd23f';ctx.fillRect(px+10,rf-9*T+8,12,4);}   // portraits
+    const wx=x0+20*T,wy=rf-10*T,ww=4*T-0,wh=7*T;   // la grande fenêtre à droite, au-dessus du rebord
+    ctx.fillStyle='#14182c';ctx.fillRect(wx-3,wy-3,ww+3,wh+3);ctx.fillRect(wx+2,wy-8,ww-6,6);
+    if(!tw.kingDead){ctx.fillStyle='#9fd0f0';ctx.fillRect(wx,wy,ww,wh);ctx.fillRect(wx+4,wy-6,ww-12,6);ctx.fillStyle='#d6efff';ctx.fillRect(wx,wy,ww,22);ctx.fillStyle='#14182c';ctx.fillRect(wx+ww/2-1,wy-6,2,wh+6);ctx.fillRect(wx,wy+wh/2,ww,2);
+      for(let k=0;k<8;k++){ctx.fillStyle='#ffffff';ctx.fillRect(wx+((k*23+time*14)%ww)|0,wy+((k*31+time*9)%wh)|0,1,1);}}
+    else{ctx.fillStyle='#0e1830';ctx.fillRect(wx,wy,ww,wh);ctx.fillRect(wx+4,wy-6,ww-12,6);ctx.fillStyle='#bfe9ff';for(let k=0;k<6;k++)ctx.fillRect(wx+k*11,wy,4,8-(k%3)*2);for(let k=0;k<12;k++){ctx.fillStyle='#ffffff';ctx.fillRect(wx+((k*17+time*30)%ww)|0,wy+((k*13+time*40)%wh)|0,1,2);}}
   }
 }
 function drawTwTiles(cy){
@@ -3089,6 +3228,7 @@ function drawTwTiles(cy){
     if(!twSolid(tx,ty-1)){ctx.fillStyle='#f4fbff';ctx.fillRect(x,y,T,3);ctx.fillStyle='#bfe9ff';ctx.fillRect(x,y+3,T,1);if(((tx*7+ty)%5)===0)ctx.fillRect(x+4,y-1,6,1);}
     if(!twSolid(tx,ty+1)){ctx.fillStyle='#3d6a94';ctx.fillRect(x,y+T-2,T,2);}
   }
+  if(tw.bars){const F=TWB-TWR*TWN;for(let tx=4;tx<=7;tx++){const x=(TWC+tx)*T,y=F*T;ctx.fillStyle='#14182c';ctx.fillRect(x,y,T,T);ctx.fillStyle='#8696b0';for(let b=2;b<T;b+=5)ctx.fillRect(x+b,y+1,2,T-2);ctx.fillStyle='#aab4c8';ctx.fillRect(x,y,T,2);}}   // la trappe est fermée par des barreaux
   for(const r of tw.recs){   // plateformes de glace
     if(r.state==='gone'||r.ty*T>cy+VH||r.ty*T<cy-20)continue;
     const jx=r.state==='crack'?(Math.sin(time*60)>0?1:-1):0;
@@ -3126,7 +3266,7 @@ function renderTw(){
     drawEnemy(e);
     if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);}
   }
-  drawPickups();drawBossShots();drawTridents();drawPlayer();drawReticle();drawSoulFx();drawFx();
+  drawKing();drawPickups();drawBossShots();drawKingBalls();drawTridents();drawPlayer();drawReticle();drawSoulFx();drawFx();
   ctx.restore();
   if(state==='dying'&&dyingT<0.25){ctx.fillStyle='rgba(255,60,60,.28)';ctx.fillRect(0,0,VW,VH);}
   if(twTr)drawTwFade();
@@ -4500,7 +4640,9 @@ function drawHUD(){
   const sl='x'+shop.souls;
   txt(sl,VW-6,42,'#ff7a88','right');
   ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),40);
-  const bb=eskimo&&eskimo.state!=='dying'
+  const bb=king&&king.state!=='dying'
+    ?{name:'LE ROI',hp:king.hp,max:king.maxHp,ticks:[0.5],name_c:king.rage?'#ff6a6a':'#ffd23f',col:king.rage?'#ff4a4a':'#b04ad8',dark:'#2a1040',hi:'#e8c8ff'}
+    :eskimo&&eskimo.state!=='dying'
     ?{name:'ESQUIMAU',hp:eskimo.hp,max:eskimo.maxHp,ticks:[0.5],name_c:eskimo.rage?'#ff6a6a':'#bfe9ff',col:eskimo.rage?'#ff7a5a':'#5ec8f0',dark:'#143a5a',hi:'#e8fbff'}
     :witch&&witch.state!=='dying'
     ?{name:witch.phase===1?'SORCIÈRE':'LE CHAT',hp:witch.hp,max:witch.maxHp,ticks:[0.5],name_c:witch.phase===1?'#9fe870':'#ffb347',col:witch.phase===1?'#7fb26a':'#ff9a3a',dark:'#1e3a1a',hi:'#d4ffb8'}
@@ -4631,7 +4773,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 }
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
-  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;
+  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
   enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
@@ -4811,6 +4953,7 @@ function assistTarget(cx,cy,a0){
   if(castle&&castle.state==='fight'){const r=bucketRect(castle);c.push([r[0]+r[2]/2,r[1]+r[3]/2]);}
   {const wr=witchRect();if(wr)c.push([wr[0]+wr[2]/2,wr[1]+wr[3]/2]);}
   {const er=eskRect();if(er)c.push([er[0]+er[2]/2,er[1]+er[3]/2]);}
+  {const kr=kingRect();if(kr)c.push([kr[0]+kr[2]/2,kr[1]+kr[3]/2]);}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)c.push([cow.x+cow.w/2,cow.y+cow.h/2]);
   if(six&&six.state==='alive'&&six.spawnT<=0)c.push([six.x+six.w/2,six.y+six.h/2]);
   let best=null,bs=1e9;
