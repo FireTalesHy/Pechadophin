@@ -3555,7 +3555,7 @@ function drawRz(cx,cy){   // fond noir, sol réduit à un liseré blanc, chiffre
 /* ---------- Jeu de tarot : une carte tirée en ligne droite. Silver Chariot : 3 cartes en éventail. Star Platinum : cartes étoilées qui rebondissent d'ennemi en ennemi ---------- */
 const TAROT_ICON=spr(["xxxxxxxxx","xwwwwwwwx","xwwwywwwx","xwwwywwwx","xwyyyyywx","xwwyyywwx","xwwywywwx","xwwwwwwwx","xwrrwrrwx","xwwwwwwwx","xwwwwwwwx","xxxxxxxxx"],{x:'#14182c',w:'#f4f1e6',y:'#ffd23f',r:'#c0392b'});
 const STAR_ICON=spr([".....y.....","....yWy....","....yWy....","yyyyyWyyyyy",".yyWWWWWyy.","..yyWWWyy..","..yyWWWyy..",".yyy.W.yyy.",".yy..y..yy.","yy.......yy"],{y:'#ffd23f',W:'#fff6b0'});
-const TXUP={chariot:{name:'Silver Chariot',desc:'Lance 3 cartes d\'un coup, en éventail (une seule fois).',cost:500},star:{name:'Star Platinum',desc:'Des cartes étoilées autoguidées, qui rebondissent vers les autres ennemis après un impact (une seule fois).',cost:1000}};
+const TXUP={chariot:{name:'Silver Chariot',desc:'Lance 3 cartes d\'un coup, en éventail (une seule fois).',cost:500},star:{name:'Star Platinum',desc:'Des cartes étoilées perforantes : dès qu\'une touche un ennemi, elles deviennent autoguidées vers les autres (une seule fois).',cost:1000}};
 const TX_KEYS=['chariot','star'];
 const CARD_DMG=4,CARD_CD=0.35,CARD_V=270;
 function stepTarot(dt){
@@ -3565,10 +3565,10 @@ function stepTarot(dt){
   throwAnim=Math.max(0,throwAnim-dt);
   if((fireBuf>0||inp.fire||aim.auto)&&tarotCd<=0&&p.stun<=0&&state==='play'){
     fireBuf=0;tarotCd=CARD_CD;throwAnim=0.12;
-    const len=Math.hypot(aim.x,aim.y)||1,a0=Math.atan2(aim.y/len,aim.x/len),n=shop.tx.chariot?3:1;
+    const len=Math.hypot(aim.x,aim.y)||1,a0=Math.atan2(aim.y/len,aim.x/len),n=shop.tx.chariot?3:1,grp={h:false};
     for(let i=0;i<n;i++){
       const a=a0+(n===1?0:(i-1)*0.2);
-      tcards.push({x:p.x+5+Math.cos(a)*8,y:p.y+6+Math.sin(a)*8,vx:Math.cos(a)*CARD_V,vy:Math.sin(a)*CARD_V,t:0,life:1.1,star:!!shop.tx.star,bn:0,hit:new Set(),sp:Math.random()*6});
+      tcards.push({x:p.x+5+Math.cos(a)*8,y:p.y+6+Math.sin(a)*8,vx:Math.cos(a)*CARD_V,vy:Math.sin(a)*CARD_V,t:0,life:1.1,star:!!shop.tx.star,grp,bn:0,hit:new Set(),sp:Math.random()*6});
     }
     sfx.hit&&sfx.hit();
   }
@@ -3576,7 +3576,7 @@ function stepTarot(dt){
 function stepCards(dt){
   if(!tcards.length)return;
   for(const c of tcards){
-    if(c.star){   // Star Platinum : cartes autoguidées vers l'ennemi le plus proche (pas encore touché)
+    if(c.star&&c.grp.h){   // Star Platinum : dès qu'une étoile de la volée a touché, toutes deviennent autoguidées vers l'ennemi le plus proche (pas encore touché)
       let bt=null,bd=220*220;
       for(const u of allTargets()){const k2=u.e||('s'+u.r[2]+'x'+u.r[3]);if(c.hit.has(k2))continue;const ux=u.r[0]+u.r[2]/2-c.x,uy=u.r[1]+u.r[3]/2-c.y,d=ux*ux+uy*uy;if(d<bd){bd=d;bt={x:ux,y:uy};}}
       if(bt){const sp=Math.hypot(c.vx,c.vy)||CARD_V,cur=Math.atan2(c.vy,c.vx);let da=Math.atan2(bt.y,bt.x)-cur;da=Math.atan2(Math.sin(da),Math.cos(da));
@@ -3588,13 +3588,7 @@ function stepCards(dt){
       const key=t.e||('s'+t.r[2]+'x'+t.r[3]);
       if(c.hit.has(key)||!rectsOverlap(c.x-3,c.y-3,6,6,t.r[0],t.r[1],t.r[2],t.r[3]))continue;
       t.hit(CARD_DMG);c.hit.add(key);burst(c.x,c.y,c.star?'#ffd23f':'#f4f1e6',6,70);
-      let best=null,bd=130*130;
-      if(c.star&&c.bn<4)for(const u of allTargets()){   // Star Platinum : la carte repart vers l'ennemi le plus proche qu'elle n'a pas encore touché
-        const k2=u.e||('s'+u.r[2]+'x'+u.r[3]);if(c.hit.has(k2))continue;
-        const ux=u.r[0]+u.r[2]/2,uy=u.r[1]+u.r[3]/2,d=(ux-c.x)**2+(uy-c.y)**2;
-        if(d<bd){bd=d;best={x:ux,y:uy};}
-      }
-      if(best){const a=Math.atan2(best.y-c.y,best.x-c.x);c.vx=Math.cos(a)*CARD_V*1.15;c.vy=Math.sin(a)*CARD_V*1.15;c.bn++;c.t=Math.min(c.t,c.life-0.6);}
+      if(c.star){c.grp.h=true;c.t=Math.min(c.t,c.life-0.8);}   // étoile perforante : elle traverse et repart vers la cible suivante
       else c.dead=true;
       break;
     }
@@ -5232,7 +5226,7 @@ const WEAPONS=[
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
-  {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Silver Chariot en lance 3, Star Platinum les rend autoguidées et les fait rebondir d\'ennemi en ennemi. Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
+  {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Silver Chariot en lance 3, Star Platinum : étoiles perforantes, autoguidées après un premier impact. Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
 let weapOpen=false,weapSel=null;
