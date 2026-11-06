@@ -550,7 +550,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
+'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','LE MONDE NUAGE':'THE CLOUD WORLD','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -662,7 +662,9 @@ function cowFieldAt(tx){   // grand pré plat (1 écran) où la vache géante at
 }
 const cowPlat=(tx,ty)=>{const f=cowFieldAt(tx);if(!f||ty!==f.floor-4)return false;const d=Math.abs(Math.abs(tx)-f.fc);return d>=3&&d<=6;};
 const inSwamp=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?!!zoneDefK(zoneK(tx)).swamp:(Math.abs(tx)>=SWAMP_TX&&Math.abs(tx)<ICE_TX));
-const inIce=tx=>anarchyOn?(Math.abs(tx)>=BEACH_TX&&!!zoneDefK(zoneK(tx)).ice):Math.abs(tx)>=ICE_TX;
+const CLOUD_TX=ICE_TX+ICE_SCREENS*(VW/T)+120;   // classique : le monde nuage commence après le château de glace (on y accède par la fenêtre du roi)
+const inCloud=tx=>!anarchyOn&&Math.abs(tx)>=CLOUD_TX;
+const inIce=tx=>anarchyOn?(Math.abs(tx)>=BEACH_TX&&!!zoneDefK(zoneK(tx)).ice):(Math.abs(tx)>=ICE_TX&&Math.abs(tx)<CLOUD_TX);
 const TCELL=56, TFLAT=8;                              // un tunnel possible par cellule de 56 cases, 8 cases de raccord avec le relief
 const plat=new Set();      // plateformes traversables par le dessous
 const chunks=new Set();
@@ -792,7 +794,7 @@ function column(tx){
   const ar=arenaAt(tx);
   if(ar){
     const dx=tx-ar.cx,w=clamp(1-(Math.abs(dx)-19)/20,0,1);
-    c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12),beach:inBeach(tx),swamp:inSwamp(tx),ice:inIce(tx)};
+    c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12),beach:inBeach(tx),swamp:inSwamp(tx),ice:inIce(tx),cloud:inCloud(tx)};
     colCache.set(tx,c);return c;
   }
   const cst=castleAt(tx);
@@ -807,7 +809,7 @@ function column(tx){
   else if(p&&tx>=p.s+p.w&&tx<=p.s+p.w+1) g=p.hr;
   else if(beach){const bg=beachGround(tx);g=bg.g;tun=bg.tun;}
   else g=Math.round(spawnBlend(tx));
-  c={g,pit,beach,tun,swamp:inSwamp(tx),ice:inIce(tx)}; colCache.set(tx,c); return c;
+  c={g,pit,beach,tun,swamp:inSwamp(tx),ice:inIce(tx),cloud:inCloud(tx)}; colCache.set(tx,c); return c;
 }
 function solidTile(tx,ty){
   if(tw&&twIn(tx))return twSolid(tx,ty);
@@ -1380,6 +1382,24 @@ function makeIce(shade,v){
   return c;
 }
 const ICE=[0,1,2].map(sh=>[0,1,2].map(v=>makeIce(sh,v)));
+function makeCloud(shade,v){   // monde nuage : coton blanc légèrement bleuté
+  const c=mk(T,T),g=c.getContext('2d');
+  const base=['#f6f9ff','#e6eefb','#d4e0f4'][shade],dark=['#e0e9f8','#cfdcf0','#bccbe6'][shade],light='#ffffff';
+  g.fillStyle=base;g.fillRect(0,0,T,T);
+  const r=mulberry32(v*541+shade*29+11);
+  for(let i=0;i<5;i++){g.fillStyle=r()<0.5?dark:light;const w=3+Math.floor(r()*4);g.fillRect(Math.floor(r()*(T-w)),Math.floor(r()*14),w,2);}
+  return c;
+}
+const CLOUD=[0,1,2].map(sh=>[0,1,2].map(v=>makeCloud(sh,v)));
+function makeCloudTop(dec,v){
+  const c=mk(T,T+6),g=c.getContext('2d');
+  g.drawImage(CLOUD[0][v],0,6);
+  g.fillStyle='#ffffff';g.fillRect(0,6,T,3);g.fillStyle='#d4e0f4';g.fillRect(0,9,T,1);
+  const r=mulberry32(v*23+dec*7+5);
+  for(let k=0;k<3;k++){const bx=Math.floor(r()*10),bw=4+Math.floor(r()*4);g.fillStyle='#ffffff';g.fillRect(bx,4,bw,3);g.fillRect(bx+1,3,bw-2,1);}
+  return c;
+}
+const CLOUDTOP=[0,1,2,3,4].map(d=>[0,1,2].map(v=>makeCloudTop(d,v)));
 function makeIceTop(dec,v){
   const c=mk(T,T+6),g=c.getContext('2d');
   g.drawImage(ICE[0][v],0,6);
@@ -1644,7 +1664,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,scepterOwned:false,sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1660,6 +1680,7 @@ function loadShop(){
       d.hp=clamp(Math.floor(Number(j.hp))||0,0,5);
       d.beach=(j.beach===1||j.beach===-1)?1:0;   // le chemin est toujours à droite
       d.ice=(j.ice===1||j.ice===-1)?1:0;   // checkpoint de la glacière (mode classique)
+      d.cloud=(j.cloud===1||j.cloud===-1)?1:0;   // checkpoint du monde nuage (mode classique)
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
       if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
@@ -1671,6 +1692,9 @@ function loadShop(){
       d.scepterOwned=j.scepterOwned===true;
       if(j.sc&&typeof j.sc==='object')for(const k of SC_KEYS)d.sc[k]=clamp(Math.floor(Number(j.sc[k]))||0,0,5);
       if(j.weapon==='scepter'&&d.scepterOwned)d.weapon='scepter';
+      d.tarotOwned=j.tarotOwned===true;
+      if(j.tx&&typeof j.tx==='object')for(const k of ['chariot','star'])d.tx[k]=j.tx[k]===true;
+      if(j.weapon==='tarot'&&d.tarotOwned)d.weapon='tarot';
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
@@ -2017,6 +2041,8 @@ function stepTrident(dt){
   tridents=tridents.filter(h=>!h.done);
 }
 function stepHook(dt){
+  stepCards(dt);
+  if(shop.weapon==='tarot'&&!glockOn){stepTarot(dt);return;}
   if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
   if(shop.weapon==='scepter'&&!glockOn){stepScepter(dt);return;}
   if(shop.weapon==='six'&&!glockOn){stepSixGun(dt);return;}
@@ -2876,34 +2902,34 @@ function buildTw(){
   const H=TWB-TWTOP+1,grid=new Uint8Array(TWW*H),plat=new Map(),recs=[],spikes=[],icicles=[],spawns=[];
   const set=(tx,ty)=>{grid[(ty-TWTOP)*TWW+tx]=1;};
   for(let sl=1;sl<=TWN;sl++){   // dalles d'1 case d'épaisseur (2 cases de marge au-dessus des plateformes), avec un trou de 4 cases (à droite aux étages impairs, à gauche aux pairs)
-    const F=TWB-TWR*sl,gx=sl%2?16:4;
-    for(let tx=0;tx<TWW;tx++){if(tx>=gx&&tx<gx+4)continue;set(tx,F);}
+    const F=TWB-TWR*sl,gx=sl%2?19:1;   // la dernière dalle est pleine : on rejoint la chambre du roi par la porte
+    for(let tx=0;tx<TWW;tx++){if(sl<TWN&&tx>=gx&&tx<gx+4)continue;set(tx,F);}
   }
   for(let ty=TWTOP;ty<=TWTOP+1;ty++)for(let tx=0;tx<TWW;tx++)set(tx,ty);   // plafond de la salle du boss
   const mir=(a,b,right)=>right?[a,b]:[TWW-1-b,TWW-1-a],mx=(x,right)=>right?x:TWW-1-x;
-  const P=[[12,17],[4,10],[13,20]];
+  const P=[[14,19],[6,12],[15,22]];
   for(let st=0;st<TWN;st++){
     const F=TWB-TWR*st,right=st%2===0,pr=[];
-    for(let k=0;k<3;k++){   // trois plateformes en zigzag, 3 cases d'écart
+    for(let k=0;k<(st<TWN-1?3:0);k++){   // trois plateformes en zigzag, 3 cases d'écart
       const [a,b]=mir(P[k][0],P[k][1],right),ty=F-3*(k+1),rec={a,b,ty,state:'ok',t:0,frag:(st>=2&&k===1)||(st>=4&&k===0)};
       for(let tx=a;tx<=b;tx++)plat.set(twKey(TWC+tx,ty),rec);
       recs.push(rec);pr.push(rec);
     }
-    if(st>=1){const sx=mx(9,right);for(let i=0;i<2;i++)spikes.push({x:(TWC+sx+i)*T+1,y:F*T-9,w:14,h:9});}   // pointes de glace sur la dalle
-    const kn=st===0?[14]:st<4?[st%2?10:15]:[9,17];
+    if(st>=1){const sx=right?10:12;for(let i=0;i<2;i++)spikes.push({x:(TWC+sx+i)*T+1,y:F*T-9,w:14,h:9});}   // pointes de glace sur la dalle
+    const kn=st===0?[14]:st<4?[st%2?7:15]:[9,17];
     for(const x of kn)spawns.push({kind:'knight',x:(TWC+mx(x,right))*T,y:F*T-18,st});
-    if(st>=2){const r1=pr[0];spawns.push({kind:'archer',x:(TWC+(r1.a+r1.b)/2)*T,y:r1.ty*T-16,st});}   // l'archer guette depuis la 1re plateforme
-    if(st>=2){const n=Math.min(3,st-1),r2=pr[1];for(let i=0;i<n;i++)icicles.push({x:(TWC+r2.a+1+i*2)*T+8,y:(F-11)*T,len:12,fy:0,vy:0,state:'idle',t:0});}   // stalactites au-dessus de la 2e plateforme
+    if(st>=2&&st<TWN-1){const r1=pr[0];spawns.push({kind:'archer',x:(TWC+(r1.a+r1.b)/2)*T,y:r1.ty*T-16,st});}   // l'archer guette depuis la 1re plateforme
+    if(st>=2&&st<TWN-1){const n=Math.min(3,st-1),r2=pr[1];for(let i=0;i<n;i++)icicles.push({x:(TWC+r2.a+1+i*2)*T+8,y:(F-11)*T,len:12,fy:0,vy:0,state:'idle',t:0});}   // stalactites au-dessus de la 2e plateforme
   }
   const FN=TWB-TWR*TWN;   // la chambre du roi : deux corniches pour esquiver, et le rebord de la fenêtre à droite
-  for(const [a,b,dy] of [[8,11,3],[13,16,6],[20,23,3]]){const rec={a,b,ty:FN-dy,state:'ok',t:0,frag:false};for(let tx=a;tx<=b;tx++)plat.set(twKey(TWC+tx,rec.ty),rec);recs.push(rec);}
-  return {grid,plat,recs,spikes,icicles,spawns,t:0,maxStage:0,saveEn:null,savePk:null,back:null,kingDead:false,bars:false,win:false};
+  for(const [a,b,dy] of [[7,10,3],[13,16,3],[20,23,3]]){const rec={a,b,ty:FN-dy,state:'ok',t:0,frag:false};for(let tx=a;tx<=b;tx++)plat.set(twKey(TWC+tx,rec.ty),rec);recs.push(rec);}
+  return {grid,plat,recs,spikes,icicles,spawns,t:0,maxStage:0,saveEn:null,savePk:null,back:null,kingDead:false,bars:false,win:false,door:{tx:2.5,y:TWB-TWR*(TWN-1)}};
 }
 function twFloorY(x,y){const tx=Math.floor(x/T);for(let ty=Math.floor(y/T);ty<TWB+2;ty++)if(solidTile(tx,ty)||oneWay(tx,ty))return ty*T;return TWB*T;}
 function twEnter(cs){
   const p=player;
   tw=buildTw();tw.back={x:cs.cx*T+8-cs.sg*46-5,y:cs.floor*T-14,sg:cs.sg};
-  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];
+  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];tcards=[];
   for(const sp of tw.spawns){
     const hp=sp.kind==='knight'?5+Math.floor(sp.st/2):3+(sp.st>=4?1:0),dir=Math.random()<0.5?1:-1;
     enemies.push(sp.kind==='knight'
@@ -2917,9 +2943,13 @@ function twEnter(cs){
 }
 function twLeave(){
   const b=tw.back,win=tw.win;enemies=tw.saveEn||[];pickups=tw.savePk||[];tw=null;bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];
-  if(win){b.x+=b.sg*174;}   // sortie par la fenêtre : on atterrit de l'autre côté du château
+  if(win){   // sortie par la fenêtre : le monde nuage
+    b.x=b.sg*(CLOUD_TX+6)*T;colCache.clear();b.y=column(b.sg*(CLOUD_TX+6)).g*T-14;
+    if(!anarchyOn){shop.cloud=b.sg;if(!shop.ice)shop.ice=b.sg;if(!shop.swamp)shop.swamp=b.sg;if(!shop.beach)shop.beach=b.sg;saveShop();refreshCp();}
+  }
   Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null,face:win?b.sg:-b.sg});
-  player.safe={x:b.x,y:b.y};twCd=2.5;snapCamera();
+  player.safe={x:b.x,y:b.y};twCd=2.5;tcards=[];snapCamera();
+  if(win){floatText(player.x+5,player.y-34,'LE MONDE NUAGE','#ffffff');floatText(player.x+5,player.y-24,'CHECKPOINT !','#7ff0e8');sfx.heal();}
 }
 function twDoorCheck(dt){   // la porte du château : on y entre en marchant dedans
   if(twCd>0)twCd-=dt;
@@ -2930,7 +2960,7 @@ function twDoorCheck(dt){   // la porte du château : on y entre en marchant ded
 }
 function stepTwTr(dt){
   twTr.t+=dt;
-  if(!twTr.sw&&twTr.t>=0.7){twTr.sw=true;if(twTr.dir==='in')twEnter(twTr.cs);else twLeave();}
+  if(!twTr.sw&&twTr.t>=0.7){twTr.sw=true;if(twTr.dir==='in')twEnter(twTr.cs);else if(twTr.dir==='room'){const FN=(TWB-TWR*TWN)*T,p=player;Object.assign(p,{x:(TWC+3)*T,y:FN-14,vx:0,vy:0,onGround:true,invuln:2,stun:0,dash:null,face:1});p.safe={x:p.x,y:p.y};cam.y=FN+T-VH;camLY=0;startKing();}else twLeave();}
   if(twTr.t>=1.5)twTr=null;
 }
 function drawTwFade(){const t=twTr.t,a=t<0.7?t/0.7:clamp(1-(t-0.9)/0.6,0,1);ctx.fillStyle='rgba(0,0,0,'+a.toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}
@@ -2971,7 +3001,7 @@ function stepTw(dt){
     else if(st>=1){floatText(p.x+5,p.y-30,'ÉTAGE '+st,'#bfe9ff');sfx.heal();}
   }
   {const FN=(TWB-TWR*TWN)*T,cxp=p.x+5;
-   if(!king&&!tw.kingDead&&p.onGround&&Math.abs(p.y+p.h-FN)<2&&(cxp<(TWC+3)*T||cxp>(TWC+8)*T))startKing();   // on pose le pied dans la chambre : le roi apparaît et la trappe se ferme
+   {const dy=tw.door.y*T;if(!king&&!tw.kingDead&&!twTr&&p.onGround&&Math.abs(p.y+p.h-dy)<2&&Math.abs(cxp-(TWC+tw.door.tx)*T)<14){twTr={t:0,dir:'room',sw:false};sfx.gate();}}   // la porte du dernier étage : elle téléporte dans la chambre du roi
    if(tw.kingDead&&!twTr&&cxp>(TWC+20)*T&&p.y+p.h<=FN-3*T+2&&p.y+p.h>=FN-11*T){tw.win=true;twTr={t:0,dir:'out',sw:false};sfx.gate();}}   // le roi est tombé : on saute par la fenêtre
   if(tw.t>1&&!twTr&&p.onGround&&p.y>(TWB-5)*T&&Math.abs(p.x+5-(TWC+2.5)*T)<14){twTr={t:0,dir:'out',sw:false};sfx.gate();}   // la porte du rez-de-chaussée : retour dehors
   twCamera(dt);
@@ -2982,9 +3012,8 @@ function kingRect(){const k=king;if(!k||k.state!=='fight')return null;return [k.
 function startKing(){
   const F=TWB-TWR*TWN,p=player;
   king={x:(TWC+17)*T+8,y:F*T,hp:KING_HP,maxHp:KING_HP,state:'intro',t:0,intro:1.6,rage:false,flash:0,face:-1,mode:'idle',mt:1.2,tgt:(TWC+17)*T+8,addT:4.5,n:3,dieT:0};
-  for(let tx=4;tx<=7;tx++)tw.grid[(F-TWTOP)*TWW+tx]=1;   // la trappe se referme sous nos pieds
-  tw.bars=true;shake=0.5;sfx.bossSpawn();sfx.gate();
-  floatText(p.x+5,p.y-34,'LE ROI','#ffd23f');
+  shake=0.5;sfx.bossSpawn();sfx.gate();
+  floatText(p.x+5,p.y-34,'ROI CACAMILLE 2','#ffd23f');
 }
 function hitKing(dmg){
   const k=king;if(!k||k.state!=='fight')return;
@@ -3003,13 +3032,13 @@ function killKing(){
   k.hp=0;k.state='dying';k.dieT=2.6;kingBalls=[];
   for(const e of enemies)if(e.state==='alive'&&(e.kind==='knight'||e.kind==='archer')&&e.y<(F+1)*T){e.state='dead';e.t=0;e.vy=-120;e.vx=0;burst(e.x+e.w/2,e.y+e.h/2,'#e8eefc',8,90);}   // les chevaliers du roi s'effondrent avec lui
   tw.kingDead=true;tw.bars=false;
-  for(let tx=4;tx<=7;tx++)tw.grid[(F-TWTOP)*TWW+tx]=0;   // la trappe se rouvre
   kills++;shake=0.8;sfx.bossDie();
   const again=!!shop.bossSouls.king&&!anarchyOn,gs=soulReward('king',2),gold=again?30:300;shop.gold+=gold;saveShop();
   const cx=k.x,cy=k.y-60;
   if(gs){floatText(cx,cy-12,'+2 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy+30,t:0});soulFx.push({x:cx+10,y:cy+30,t:0.15});}
   floatText(cx,cy,'+'+gold+' OR','#ffd23f');
   floatText(cx,cy+11,'PAR LA FENÊTRE !','#7ff0e8');
+  if(!shop.tarotOwned&&!anarchyOn){shop.tarotOwned=true;saveShop();floatText(cx,cy+22,'JEU DE TAROT OBTENU !','#ffd23f');floatText(cx,cy+33,'ÉQUIPE-LE DANS ARMES','#ffffff');}
   burst(cx,cy+30,'#e8c8ff',30,170);burst(cx,cy+30,'#ffd23f',18,120);
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:F*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
 }
@@ -3192,6 +3221,13 @@ function drawTwBg(cy){
   ctx.fillStyle='#8fc8ec';ctx.fillRect(x0+T,door-5*T+1,3*T,5*T-1);ctx.fillStyle='#e8fbff';ctx.fillRect(x0+T+4,door-5*T+4,3*T-8,5*T-5);
   ctx.fillStyle='#14182c';ctx.fillRect(x0+T+2*T-1,door-5*T+4,2,5*T-5);
   if(time%1<0.7){ctx.fillStyle='#14182c';ctx.fillRect(x0+T+6,door-5*T+22,2,5);}
+  {const dy=tw.door.y*T,dx=x0+(tw.door.tx-1.5)*T;   // la porte du roi (dernier étage) : bois sombre, liseré d'or, lueur violette
+    if(dy<cy+VH+30&&dy>cy-6*T){
+      ctx.fillStyle='#14182c';ctx.fillRect(dx-2,dy-5*T-2,3*T+4,5*T+2);ctx.fillRect(dx+4,dy-5*T-7,3*T-8,6);
+      ctx.fillStyle='#ffd23f';ctx.fillRect(dx,dy-5*T,3*T,5*T);ctx.fillStyle='#4a2a6a';ctx.fillRect(dx+2,dy-5*T+2,3*T-4,5*T-2);
+      const g=0.55+0.25*Math.sin(time*3);ctx.fillStyle='rgba(190,120,255,'+g.toFixed(2)+')';ctx.fillRect(dx+5,dy-5*T+5,3*T-10,5*T-5);
+      ctx.fillStyle='#14182c';ctx.fillRect(dx+3*T/2-1,dy-5*T+2,2,5*T-2);ctx.fillStyle='#ffd23f';ctx.fillRect(dx+3*T/2-5,dy-2*T,3,3);ctx.fillRect(dx+3*T/2+2,dy-2*T,3,3);
+    }}
   const rf=(TWB-TWR*TWN)*T;   // la chambre du roi
   if(rf<cy+VH+40&&rf>cy-13*T){
     ctx.fillStyle='#3a2a5a';ctx.fillRect(x0,rf-12*T,W,12*T);   // murs tendus de velours
@@ -3260,7 +3296,7 @@ function renderTw(){
   ctx.fillStyle='#000000';ctx.fillRect(0,0,VW,VH);
   let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
   ctx.save();ctx.translate(-cx+sx,-cy+sy);
-  drawTwBg(cy);drawTwTiles(cy);drawTwHaz();drawScepterFx();
+  drawTwBg(cy);drawTwTiles(cy);drawTwHaz();drawScepterFx();drawCards();
   for(const e of enemies){
     if(e.y+30<cy||e.y-30>cy+VH)continue;
     drawEnemy(e);
@@ -3405,7 +3441,7 @@ function stepMilk(dt){
 function drawMilk(){for(const m of milk){ctx.fillStyle='#d8e4f0';ctx.fillRect(Math.round(m.x)-2,Math.round(m.y)-2,4,4);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(m.x)-1,Math.round(m.y)-2,3,3);}}
 /* ===== Zone secrète : tirer 6 fois sur une plateforme à pilier ouvre l'arène du boss « 6 » ===== */
 let hole=null;const RZC=1<<21,RZW=12,RZG=20,SIX_HP=800;   // arène d'un écran, loin du monde
-let rz=null,six=null,sixShots=[],sixJet=[],rzTr=null,sixCd=0;
+let rz=null,six=null,sixShots=[],sixJet=[],rzTr=null,sixCd=0,tcards=[],tarotCd=0;
 const RZ_FLOOR={g:RZG,pit:false,beach:false,tun:null,swamp:false},RZ_WALL={g:RZG-40,pit:false,beach:false,tun:null,swamp:false};
 const rzIn=tx=>!!rz&&tx>RZC-60&&tx<RZC+60;
 function rzEnter(){
@@ -3514,6 +3550,85 @@ function drawRz(cx,cy){   // fond noir, sol réduit à un liseré blanc, chiffre
   ctx.globalAlpha=1;
 }
 /* l'arme n°6 : un jet de chiffres en arc, comme le lait de la vache */
+/* ---------- Jeu de tarot : une carte tirée en ligne droite. Silver Chariot : 3 cartes en éventail. Star Platinum : cartes étoilées qui rebondissent d'ennemi en ennemi ---------- */
+const TAROT_ICON=spr(["xxxxxxxxx","xwwwwwwwx","xwwwywwwx","xwwwywwwx","xwyyyyywx","xwwyyywwx","xwwywywwx","xwwwwwwwx","xwrrwrrwx","xwwwwwwwx","xwwwwwwwx","xxxxxxxxx"],{x:'#14182c',w:'#f4f1e6',y:'#ffd23f',r:'#c0392b'});
+const STAR_ICON=spr([".....y.....","....yWy....","....yWy....","yyyyyWyyyyy",".yyWWWWWyy.","..yyWWWyy..","..yyWWWyy..",".yyy.W.yyy.",".yy..y..yy.","yy.......yy"],{y:'#ffd23f',W:'#fff6b0'});
+const TXUP={chariot:{name:'Silver Chariot',desc:'Lance 3 cartes d\'un coup, en éventail (une seule fois).',cost:500},star:{name:'Star Platinum',desc:'Des cartes étoilées qui rebondissent vers les autres ennemis après un impact (une seule fois).',cost:1000}};
+const TX_KEYS=['chariot','star'];
+const CARD_DMG=4,CARD_CD=0.35,CARD_V=270;
+function stepTarot(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  if(tarotCd>0)tarotCd-=dt;
+  throwAnim=Math.max(0,throwAnim-dt);
+  if((fireBuf>0||inp.fire||aim.auto)&&tarotCd<=0&&p.stun<=0&&state==='play'){
+    fireBuf=0;tarotCd=CARD_CD;throwAnim=0.12;
+    const len=Math.hypot(aim.x,aim.y)||1,a0=Math.atan2(aim.y/len,aim.x/len),n=shop.tx.chariot?3:1;
+    for(let i=0;i<n;i++){
+      const a=a0+(n===1?0:(i-1)*0.2);
+      tcards.push({x:p.x+5+Math.cos(a)*8,y:p.y+6+Math.sin(a)*8,vx:Math.cos(a)*CARD_V,vy:Math.sin(a)*CARD_V,t:0,life:1.1,star:!!shop.tx.star,bn:0,hit:new Set(),sp:Math.random()*6});
+    }
+    sfx.hit&&sfx.hit();
+  }
+}
+function stepCards(dt){
+  if(!tcards.length)return;
+  for(const c of tcards){
+    c.t+=dt;c.x+=c.vx*dt;c.y+=c.vy*dt;
+    if(c.t>c.life||solidAt(c.x,c.y)){c.dead=true;parts.push({x:c.x,y:c.y,vx:(Math.random()-0.5)*50,vy:-30,g:300,life:0.3,col:c.star?'#ffd23f':'#f4f1e6',sz:2});continue;}
+    for(const t of allTargets()){
+      const key=t.e||('s'+t.r[2]+'x'+t.r[3]);
+      if(c.hit.has(key)||!rectsOverlap(c.x-3,c.y-3,6,6,t.r[0],t.r[1],t.r[2],t.r[3]))continue;
+      t.hit(CARD_DMG);c.hit.add(key);burst(c.x,c.y,c.star?'#ffd23f':'#f4f1e6',6,70);
+      let best=null,bd=130*130;
+      if(c.star&&c.bn<4)for(const u of allTargets()){   // Star Platinum : la carte repart vers l'ennemi le plus proche qu'elle n'a pas encore touché
+        const k2=u.e||('s'+u.r[2]+'x'+u.r[3]);if(c.hit.has(k2))continue;
+        const ux=u.r[0]+u.r[2]/2,uy=u.r[1]+u.r[3]/2,d=(ux-c.x)**2+(uy-c.y)**2;
+        if(d<bd){bd=d;best={x:ux,y:uy};}
+      }
+      if(best){const a=Math.atan2(best.y-c.y,best.x-c.x);c.vx=Math.cos(a)*CARD_V*1.15;c.vy=Math.sin(a)*CARD_V*1.15;c.bn++;c.t=Math.min(c.t,c.life-0.6);}
+      else c.dead=true;
+      break;
+    }
+  }
+  tcards=tcards.filter(c=>!c.dead);
+}
+function drawCards(){
+  for(const c of tcards){
+    ctx.save();ctx.translate(Math.round(c.x),Math.round(c.y));ctx.rotate(c.sp+c.t*16);
+    if(c.star)ctx.drawImage(STAR_ICON,-5,-5);
+    else{ctx.fillStyle='#14182c';ctx.fillRect(-3,-5,6,10);ctx.fillStyle='#f4f1e6';ctx.fillRect(-2,-4,4,8);ctx.fillStyle='#c0392b';ctx.fillRect(-1,-1,2,2);}
+    ctx.restore();
+  }
+}
+function drawTarotHeld(hx,hy){ctx.drawImage(TAROT_ICON,Math.round(hx)-4,Math.round(hy)-8);}
+function renderTarot(){
+  shopList.textContent='';
+  for(const key of TX_KEYS){
+    const u=TXUP[key],own=shop.tx[key];
+    const card=document.createElement('div');card.className='card';
+    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;
+    {const g=ic.getContext('2d');g.imageSmoothingEnabled=false;const im=key==='star'?STAR_ICON:TAROT_ICON;g.drawImage(im,Math.round((12-im.width)/2),Math.round((12-im.height)/2));}
+    ic.setAttribute('aria-hidden','true');card.appendChild(ic);
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
+    const val=document.createElement('div');val.className='val';val.textContent=u.desc;card.appendChild(val);
+    const pr=document.createElement('div');pr.className='pr';
+    if(own)pr.textContent='ACHETÉ';
+    else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost;pr.appendChild(sp);}
+    card.appendChild(pr);
+    const b=document.createElement('button');b.className='sbtn';b.type='button';
+    if(own){b.textContent='ACHETÉ';b.disabled=true;}
+    else if(shop.gold>=u.cost){b.textContent='ACHETER';b.addEventListener('click',()=>buyTx(key));}
+    else{b.textContent='IL MANQUE '+(u.cost-shop.gold);b.disabled=true;}
+    b.setAttribute('aria-label',u.name+' : '+b.textContent);
+    card.appendChild(b);shopList.appendChild(card);
+  }
+}
+function buyTx(key){
+  const u=TXUP[key];
+  if(!shop.tarotOwned||shop.tx[key]||shop.gold<u.cost)return;
+  shop.gold-=u.cost;shop.tx[key]=true;saveShop();sfx.heal();renderShop();
+}
 function stepSixGun(dt){
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
@@ -3541,7 +3656,8 @@ function stepSixJet(dt){
   }
   sixJet=sixJet.filter(m=>!m.dead);
 }
-function drawSixJet(){   // skins visuels : RGB, rouge, rotation
+function drawSixJet(){
+  drawCards();   // skins visuels : RGB, rouge, rotation
   const o=shop.sxOn;
   for(const m of sixJet){
     const im=o.red?RNG_DIGITS_C[0][m.d]:o.rgb?RNG_DIGITS_C[m.c][m.d]:RNG_DIGITS[m.d];
@@ -3888,6 +4004,14 @@ function update(dt){
       if(hit&&lockMsgT<=0){lockMsgT=2.5;floatText(player.x+5,player.y-26,'PLUS DE RETOUR EN ARRIÈRE','#ff8a8a');floatText(player.x+5,player.y-16,'BATS LE CHÂTEAU DE SABLE','#ffe14d');}
     }
   }
+  if(!anarchyOn&&!shop.cloud){   // le monde nuage n'est accessible que par la fenêtre du roi : mur invisible avant
+    const sg=player.x<0?-1:1,lim=(CLOUD_TX-1)*T;
+    if(sg>0&&player.x+10>lim){player.x=lim-10;if(player.vx>0)player.vx=0;}
+    else if(sg<0&&-player.x>lim){player.x=-lim;if(player.vx<0)player.vx=0;}
+  }
+  if(!anarchyOn&&!shop.cloud&&inCloud(Math.floor((player.x+5)/T))){   // (sécurité) monde nuage atteint
+    shop.cloud=player.x<0?-1:1;saveShop();refreshCp();
+  }
   if(!anarchyOn&&!shop.ice&&inIce(Math.floor((player.x+5)/T))){   // la glacière est atteinte : 3e checkpoint
     shop.ice=player.x<0?-1:1;if(!shop.swamp)shop.swamp=shop.ice;if(!shop.beach)shop.beach=shop.ice;saveShop();sfx.heal();shake=Math.max(shake,0.3);
     floatText(player.x+5,player.y-32,'CHECKPOINT !','#7ff0e8');
@@ -3955,9 +4079,10 @@ const clouds=[{x:40,y:30,s:1,par:.10},{x:200,y:52,s:2,par:.16},{x:330,y:24,s:1,p
 
 const BG_GRASS={sky:SKY,sea:'#46a0e4',seaTop:'#78c4f4',spark:'#bfe6ff',h1:'#6fa7a0',h1t:'#8cc2b6',h2:'#3f9a5c',h2t:'#63bd72'};
 const BG_BEACH={sky:['#4db3ee','#5fc3f2','#76d0f5','#92dcf6','#b0e7f7','#cff1f6','#ecf8ef','#fdf6d8'],sea:'#2ec6cf',seaTop:'#9ff4ee',spark:'#d6fffb',h1:'#e6c987',h1t:'#f3deaa',h2:'#d9b877',h2t:'#f0d9a0'};
-let bzView=0,swView=0,iceView=0;
+let bzView=0,swView=0,iceView=0,clView=0;
 const BG_SWAMP={sky:['#4f6a5e','#5a7666','#668270','#738d7a','#839a86','#95a893','#a8b6a0','#bcc4ad'],sea:'#3c6b5a',seaTop:'#6f9a86',spark:'#a9cdb9',h1:'#4f6b55',h1t:'#62806a',h2:'#35503a',h2t:'#4a6b4c'};   // 0 = herbe, 1 = plage (fondu progressif à la sortie de l'arène)
 const BG_ICE={sky:['#8ec9ee','#a4d6f3','#bbe3f7','#d0edfa','#e0f4fc','#ecf8fe','#f4fbff','#fbfdff'],sea:'#8cc4e8',seaTop:'#e8f8ff',spark:'#ffffff',h1:'#b4d6ec',h1t:'#e8f6ff',h2:'#88b4d6',h2t:'#d8eefa'};   // glacière : ciel pâle, mer gelée, montagnes de glace
+const BG_CLOUD={sky:['#4aa0f0','#62b0f4','#7cc0f7','#98d0f9','#b6e0fb','#d2eefc','#ecf8fe','#fff6e2'],sea:'#f2f7ff',seaTop:'#ffffff',spark:'#ffe9a8',h1:'#e4edfb',h1t:'#ffffff',h2:'#c4d6f0',h2t:'#f4f8ff'};   // monde nuage : ciel haut et lumineux, mer de nuages
 function drawSnow(a){   // neige qui tombe + aurore boréale
   ctx.globalAlpha=0.16*a;
   for(let x=0;x<VW;x+=4){const y=14+Math.sin(x*0.035+time*0.5)*12;ctx.fillStyle='#7dffc8';ctx.fillRect(x,Math.round(y),4,26+Math.round(Math.sin(x*0.07+time)*6));}
@@ -4003,8 +4128,8 @@ function drawBackground(cx,cy,P){
 function drawWater(cx,cy){
   const wy=WATER_ROW*T;
   if(wy>cy+VH+4)return;
-  ctx.fillStyle=iceView>0.5?'#8cc4e8':swView>0.5?'#2f5a4a':bzView>0.5?'#1fb3bd':'#2b78cf';ctx.fillRect(cx-8,wy+3,VW+16,Math.max(0,cy+VH-wy));
-  ctx.fillStyle=iceView>0.5?'#e8f8ff':swView>0.5?'#5c8a74':bzView>0.5?'#4fd4d6':'#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
+  ctx.fillStyle=clView>0.5?'#f2f7ff':iceView>0.5?'#8cc4e8':swView>0.5?'#2f5a4a':bzView>0.5?'#1fb3bd':'#2b78cf';ctx.fillRect(cx-8,wy+3,VW+16,Math.max(0,cy+VH-wy));
+  ctx.fillStyle=clView>0.5?'#ffffff':iceView>0.5?'#e8f8ff':swView>0.5?'#5c8a74':bzView>0.5?'#4fd4d6':'#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
   ctx.fillStyle='#d8f1ff';
   for(let x=Math.floor(cx/4)*4;x<cx+VW+4;x+=4){ctx.fillRect(x,wy+(Math.sin(time*3+x*0.15)>0?0:1),4,2);}
 }
@@ -4054,10 +4179,11 @@ function drawTiles(cx,cy){
         if(ty===col.g){
           if(col.ar&&col.ar.type!=='castle'&&col.ar.type!=='eskimo'&&col.dx>=-13&&col.dx<=12)ctx.drawImage(STONE_TOP,tx*T,ty*T);
           else if(sand)ctx.drawImage(SANDTOP[dec<5?0:dec-4][v],tx*T,ty*T-6);
+          else if(col.cloud)ctx.drawImage(CLOUDTOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
           else if(col.ice)ctx.drawImage(ICETOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
           else ctx.drawImage((col.swamp?SGRASS:GRASS)[dec<5?0:dec-4][v],tx*T,ty*T-6);
         }
-        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2;ctx.drawImage((sand?SAND:col.ice?ICE:col.swamp?SDIRT:DIRT)[sh][mod(tx*7+ty*3,3)],tx*T,ty*T);}
+        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2;ctx.drawImage((sand?SAND:col.cloud?CLOUD:col.ice?ICE:col.swamp?SDIRT:DIRT)[sh][mod(tx*7+ty*3,3)],tx*T,ty*T);}
         if(tun&&ty>col.g){   // bords éclairés / ombrés des parois de sable
           if(!solidTile(tx,ty-1)){ctx.fillStyle='#f6e2ac';ctx.fillRect(tx*T,ty*T,T,2);}
           if(!solidTile(tx,ty+1)){ctx.fillStyle='#6e5026';ctx.fillRect(tx*T,ty*T+T-2,T,2);}
@@ -4086,7 +4212,7 @@ function drawTiles(cx,cy){
         let flat=true;for(let k=l;k<=r&&flat;k++){const ck=column(k);if(ck.pit||ck.g!==col.g)flat=false;}   // pilier seulement si le sol est plat sur toute la largeur de la plateforme
         if(flat&&tx===((l+r)>>1)&&!col.pit){const by=col.g*T,x=tx*T-4;ctx.fillStyle='#1e2420';ctx.fillRect(x-1,ty*T+6,26,by-ty*T-6);ctx.fillStyle='#6a7366';ctx.fillRect(x,ty*T+6,24,by-ty*T-6);ctx.fillStyle='#7c8577';ctx.fillRect(x,ty*T+6,3,by-ty*T-6);ctx.fillStyle='#545c51';for(let yy=ty*T+10,r=0;yy<by;yy+=8,r++){ctx.fillRect(x,yy,24,1);ctx.fillRect(x+(r%2?8:16),yy-7,1,7);}ctx.fillStyle='#4f7a3a';ctx.fillRect(x,by-7,4,7);ctx.fillRect(x+19,by-5,5,5);if(by-ty*T>30){ctx.fillStyle='#1e2420';ctx.fillRect(x+10,ty*T+14,4,7);ctx.fillRect(x+11,ty*T+13,2,1);}}
         ctx.drawImage(STONE_PLAT,tx*T,ty*T);
-      } else ctx.drawImage(col.ice?ICE_PLAT:PLANK,tx*T,ty*T);
+      } else ctx.drawImage(col.cloud||col.ice?ICE_PLAT:PLANK,tx*T,ty*T);
     }
   }
 }
@@ -4191,6 +4317,7 @@ function drawPlayer(){
   else if(shop.weapon==='dagger')drawDaggersHeld(hx,hy);
   else if(shop.weapon==='six')ctx.drawImage(RNG_DIGITS['6'],Math.round(hx)-4,Math.round(hy)-7);
   else if(shop.weapon==='scepter')drawScepterHeld(hx,hy);
+  else if(shop.weapon==='tarot')drawTarotHeld(hx,hy);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
     const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
@@ -4641,7 +4768,7 @@ function drawHUD(){
   txt(sl,VW-6,42,'#ff7a88','right');
   ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),40);
   const bb=king&&king.state!=='dying'
-    ?{name:'LE ROI',hp:king.hp,max:king.maxHp,ticks:[0.5],name_c:king.rage?'#ff6a6a':'#ffd23f',col:king.rage?'#ff4a4a':'#b04ad8',dark:'#2a1040',hi:'#e8c8ff'}
+    ?{name:'ROI CACAMILLE 2',hp:king.hp,max:king.maxHp,ticks:[0.5],name_c:king.rage?'#ff6a6a':'#ffd23f',col:king.rage?'#ff4a4a':'#b04ad8',dark:'#2a1040',hi:'#e8c8ff'}
     :eskimo&&eskimo.state!=='dying'
     ?{name:'ESQUIMAU',hp:eskimo.hp,max:eskimo.maxHp,ticks:[0.5],name_c:eskimo.rage?'#ff6a6a':'#bfe9ff',col:eskimo.rage?'#ff7a5a':'#5ec8f0',dark:'#143a5a',hi:'#e8fbff'}
     :witch&&witch.state!=='dying'
@@ -4690,12 +4817,13 @@ function render(){
   if(rz){renderRz();return;}
   if(tw){renderTw();return;}
   const cx=Math.round(cam.x),cy=Math.round(cam.y);
-  {const cc=Math.round((cx+VW/2)/T),tb=inBeach(cc)?1:0,ts=inSwamp(cc)?1:0,ti=inIce(cc)?1:0;iceView+=(ti-iceView)*0.06;if(Math.abs(ti-iceView)<0.01)iceView=ti;   // fondu d'une zone à l'autre
+  {const cc=Math.round((cx+VW/2)/T),tb=inBeach(cc)?1:0,ts=inSwamp(cc)?1:0,ti=inIce(cc)?1:0,tc=inCloud(cc)?1:0;iceView+=(ti-iceView)*0.06;if(Math.abs(ti-iceView)<0.01)iceView=ti;clView+=(tc-clView)*0.06;if(Math.abs(tc-clView)<0.01)clView=tc;   // fondu d'une zone à l'autre
    bzView+=(tb-bzView)*0.06;if(Math.abs(tb-bzView)<0.01)bzView=tb;swView+=(ts-swView)*0.06;if(Math.abs(ts-swView)<0.01)swView=ts;}
   if(bzView<1)drawBackground(cx,cy,BG_GRASS);
   if(bzView>0){ctx.globalAlpha=bzView;drawBackground(cx,cy,BG_BEACH);ctx.globalAlpha=1;}
   if(swView>0){ctx.globalAlpha=swView;drawBackground(cx,cy,BG_SWAMP);ctx.globalAlpha=1;}
   if(iceView>0){ctx.globalAlpha=iceView;drawBackground(cx,cy,BG_ICE);ctx.globalAlpha=1;drawSnow(iceView);}
+  if(clView>0){ctx.globalAlpha=clView;drawBackground(cx,cy,BG_CLOUD);ctx.globalAlpha=1;}
   if(nightA>0.01){ctx.fillStyle='rgba(70,0,12,'+(0.62*nightA).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel rouge sang
   if(skyCur[3]>0.005){ctx.fillStyle='rgba('+Math.round(skyCur[0])+','+Math.round(skyCur[1])+','+Math.round(skyCur[2])+','+skyCur[3].toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel d'anarchie
   if(octo){ctx.fillStyle=octo.rage?'rgba(110,10,25,'+(0.22+0.08*Math.sin(time*6)).toFixed(2)+')':'rgba(25,8,50,0.38)';ctx.fillRect(0,0,VW,VH);}
@@ -4762,7 +4890,7 @@ function setShopBtn(mode){   // en pause : le bouton BOUTIQUE devient RETOUR MEN
 }
 function drawOvChar(){ovCtx.clearRect(0,0,16,16);ovCtx.imageSmoothingEnabled=false;ovCtx.drawImage(curSkin().spr.idle,0,0);}   // le skin équipé au centre des menus
 const OV_TEXT0=ovText.textContent,OV_TITLE0=ovTitle.textContent,ovCp=$('ov-cp');
-function refreshCp(){ovCp.hidden=!shop.beach;ovCp.textContent=shop.ice?'★ CHECKPOINT : LA GLACIÈRE ★':shop.swamp?'★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT : LA PLAGE ★';}
+function refreshCp(){ovCp.hidden=!shop.beach;ovCp.textContent=shop.cloud?'★ CHECKPOINT : LE MONDE NUAGE ★':shop.ice?'★ CHECKPOINT : LA GLACIÈRE ★':shop.swamp?'★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT : LA PLAGE ★';}
 function showTitle(){   // retour à l'écran titre (après un reset de la save par exemple)
   paused=false;initTitle();
   overlayVisible=true;ov.classList.add('show');
@@ -4774,7 +4902,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  tcards=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -4797,11 +4925,11 @@ function startGame(){
   resetWorld();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
   if(rodLocked()&&shop.weapon==='rod'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
-  if(shop.ice&&!anarchyOn){   // checkpoint de la glacière : poulpe, château, méduse et sorcière derrière soi
-    const sg=shop.ice;
+  if((shop.ice||shop.cloud)&&!anarchyOn){   // checkpoint de la glacière / du monde nuage : poulpe, château, méduse et sorcière derrière soi
+    const sg=shop.cloud||shop.ice;
     for(const tx of[sg*ARENA_START*(VW/T),sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)),sg*(SWAMP_TX+WITCH_AFTER*(VW/T))]){const ar=arenaAt(tx);if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}}
     bossSpawned=true;octoRun=true;castleRun=true;jellySpawned=true;witchRun=true;
-    placePlayer(sg*(ICE_TX+10)*T);
+    placePlayer(sg*((shop.cloud?CLOUD_TX:ICE_TX)+10)*T);
   } else if(shop.swamp&&!anarchyOn){   // checkpoint des marécages : poulpe, château et méduse derrière soi
     const sg=shop.swamp;
     for(const tx of[sg*ARENA_START*(VW/T),sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T))]){const ar=arenaAt(tx);if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}}
@@ -5096,6 +5224,7 @@ const WEAPONS=[
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
+  {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Silver Chariot en lance 3, Star Platinum les fait rebondir d\'ennemi en ennemi. Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
 let weapOpen=false,weapSel=null;
@@ -5117,7 +5246,7 @@ function renderWeap(){
   const w=WEAPONS.find(x=>x.id===weapSel);
   const big=$('weap-big');big.textContent='';big.appendChild(weapImg(w,64));
   $('weap-name').textContent=w.owned()?w.name:'???';
-  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':w.id==='scepter'?'Vaincs l\'esquimau dans la glacière.':'Débloquée en atteignant la plage.');
+  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':w.id==='scepter'?'Vaincs l\'esquimau dans la glacière.':w.id==='tarot'?'Le roi tout en haut du château de glace en détient un…':'Débloquée en atteignant la plage.');
   const eb=$('weap-eq');
   eb.disabled=!w.owned()||shop.weapon===w.id||(w.locked&&w.locked());
   eb.textContent=!w.owned()?'VERROUILLÉE':shop.weapon===w.id?'ÉQUIPÉE':(w.locked&&w.locked())?'INDISPONIBLE':'ÉQUIPER';
