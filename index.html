@@ -679,10 +679,12 @@ function spawnBlend(tx){
 }
 function pitInfo(cell){
   if(cell===-1||cell===0) return null;
-  if(hash2(cell,77)>=0.5) return null;
+  const cl=inCloud(cell*22+11);   // monde nuage : trous presque partout et bien plus larges (5 à 9 cases), à franchir par les nuages
+  if(hash2(cell,77)>=(cl?0.88:0.5)) return null;
   for(const o of[-12,11,34])if(castleAt(cell*22+o))return null;   // pas de trou autour du château
   const s=cell*22+6+Math.floor(hash2(cell,78)*9);
-  const w=2+Math.floor(hash2(cell,79)*2);
+  if(cl&&Math.abs(s)<CLOUD_TX+30)return null;   // l'arrivée par la fenêtre reste sur du plat
+  const w=cl?5+Math.floor(hash2(cell,79)*5):2+Math.floor(hash2(cell,79)*2);
   const hl=Math.round(spawnBlend(s-3)), hr=Math.round(spawnBlend(s+w+2));
   if(Math.abs(hl-hr)>2) return null;
   if(inBeach(s)){   // pas de trou à côté d'un tunnel
@@ -787,7 +789,7 @@ function column(tx){
   if(twIn(tx))return TW_COL;   // la tour du château de glace
   if(hole&&tx<=hole.e&&!rzIn(tx)){   // 3 écrans à gauche du départ (ou du checkpoint) : le trou secret puis un mur, le vrai chemin est à droite
     const g0=hole.g;
-    return !hole.shut&&tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false}:{g:g0,pit:false,beach:false,tun:null,swamp:false};
+    return !hole.shut&&tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false,ice:inIce(tx),cloud:inCloud(tx)}:{g:g0,pit:false,beach:false,tun:null,swamp:false,ice:inIce(tx),cloud:inCloud(tx)};
   }
   if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
   let c=colCache.get(tx); if(c!==undefined) return c;
@@ -840,8 +842,8 @@ const pkey=(tx,ty)=>tx*512+ty+200;
 function genCloudGear(x0,cx){
   const r=mulberry32((SEED^Math.imul(cx,40503)^0x77)|0),roll=r();
   const ok=t=>{const c=column(t);return !c.pit&&!c.tun&&!c.ar&&!c.cf&&!c.hole;};
-  const tx=x0+2+Math.floor(r()*4);
-  for(let k=0;k<14;k++)if(!ok(x0+k))return;
+  let tx=-1;for(let a=x0+1;a<=x0+6;a++){let good=true;for(let k=0;k<10;k++)if(!ok(a+k)){good=false;break;}if(good){tx=a;break;}}
+  if(tx<0)return;
   const g=column(tx+5).g,addP=(a,b,row)=>{const keys=[];for(let t=a;t<=b;t++){plat.add(pkey(t,row));keys.push(pkey(t,row));}return keys;};
   if(roll<0.28){   // nuage mobile : va et vient, horizontal ou vertical
     const hor=r()<0.6;
@@ -916,11 +918,21 @@ function genChunk(cx){
   if(ca&&Math.abs(x0+8-ca.cx)<=30)return;   // rien à l'intérieur ni autour de l'arène
   if(cowFieldAt(x0)||cowFieldAt(x0+15))return;   // pré de la vache : vide
   const iceC=inIce(x0+8),cloudC=inCloud(x0+8),e0=enemies.length;
-  if(cloudC&&Math.abs(x0)>=CLOUD_TX+16)genCloudGear(x0,cx);   // zone glacière : plus de plateformes, dauphins de glace et mini ours
+  if(cloudC&&Math.abs(x0)>=CLOUD_TX+16){
+    genCloudGear(x0,cx);
+    for(let cell=Math.floor(x0/22);cell<=Math.floor((x0+15)/22);cell++){   // ponts de nuages au-dessus des grands trous
+      const pp=pitInfo(cell);if(!pp||pp.s<x0||pp.s>=x0+16)continue;
+      const row=pp.hl-3,rr=mulberry32((SEED^Math.imul(cell,7919)^0x31)|0);
+      if(pp.w>=7&&rr()<0.5){movers.push({bx:(pp.s+pp.w/2-1.5)*T,by:row*T,w:3*T,h:6,ax:pp.w*T/2-30,ay:0,sp:1+rr()*0.4,ph:rr()*6,x:0,y:0,px:0,py:0,init:false});continue;}
+      const n=Math.ceil(pp.w/3.5);
+      for(let i=0;i<n;i++){const a=pp.s+Math.round((i+0.5)*pp.w/n)-1,rw=i%2?row-2:row;for(let t=a;t<=a+1;t++)plat.add(pkey(t,rw));}
+    }
+  }   // zone glacière : plus de plateformes, dauphins de glace et mini ours
   const beachC=inBeach(x0+8);   // zone plage : pas de plateformes, pas de dauphins bleus ni volants
   let nChains=rng()<0.72?1:0; if(rng()<0.25) nChains++;
   if(beachC)nChains=0;
   if(iceC)nChains+=1;
+  if(cloudC)nChains+=2;   // monde nuage : beaucoup plus de plateformes
   for(let c=0;c<nChains;c++){
     let px=x0+Math.floor(rng()*16), dir=rng()<0.5?1:-1;
     const len=1+Math.floor(rng()*5)+(rng()<0.2?2:0);
