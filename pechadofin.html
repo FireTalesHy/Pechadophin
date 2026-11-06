@@ -737,7 +737,7 @@ function beachGround(tx){
   return{g:Math.round(lerp(base,t.G,1-d/TFLAT)),tun:d===0?t:null};
 }
 /* Château de glace : une porte au bout de la glacière mène à une tour verticale (zone à part, loin du monde, comme l'arène secrète) */
-const TWC=1<<22,TWW=24,TWB=24,TWN=6,TWR=12,TWTOP=TWB-TWN*TWR-14;   // 24 cases de large, 6 étages de 12 cases, salle du boss tout en haut
+const TWC=0,TWW=24,TWB=24,TWN=6,TWR=12,TWTOP=TWB-TWN*TWR-14;   // 24 cases de large, 6 étages de 12 cases, salle du boss tout en haut
 let tw=null,twTr=null,twCd=0;
 const twIn=tx=>!!tw&&tx>=TWC-3&&tx<TWC+TWW+3;
 const TW_COL={g:TWB,pit:false,beach:false,tun:null,swamp:false,ice:false};
@@ -782,11 +782,11 @@ function arenaAt(tx){
   return ar;
 }
 function column(tx){
+  if(twIn(tx))return TW_COL;   // la tour du château de glace
   if(hole&&tx<=hole.e&&!rzIn(tx)){   // 3 écrans à gauche du départ (ou du checkpoint) : le trou secret puis un mur, le vrai chemin est à droite
     const g0=hole.g;
     return !hole.shut&&tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false}:{g:g0,pit:false,beach:false,tun:null,swamp:false};
   }
-  if(twIn(tx))return TW_COL;   // la tour du château de glace
   if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
   let c=colCache.get(tx); if(c!==undefined) return c;
   const ar=arenaAt(tx);
@@ -3104,7 +3104,9 @@ function drawTwTiles(cy){
 }
 function drawTwHaz(){
   for(const s of tw.spikes){
-    for(let i=0;i<3;i++){const sx=s.x+i*5;ctx.fillStyle='#14305a';ctx.fillRect(sx-1,s.y+5,7,4);ctx.fillRect(sx,s.y+2,5,3);ctx.fillRect(sx+1,s.y-1,3,3);ctx.fillStyle='#4aa8e8';ctx.fillRect(sx,s.y+6,5,3);ctx.fillRect(sx+1,s.y+3,3,3);ctx.fillRect(sx+2,s.y,1,3);ctx.fillStyle='#e8fbff';ctx.fillRect(sx,s.y+6,1,3);ctx.fillRect(sx+1,s.y+3,1,3);ctx.fillRect(sx+2,s.y,1,2);}
+    const pu=0.5+0.5*Math.sin(time*5+s.x);
+    ctx.fillStyle='#14182c';ctx.fillRect(s.x-1,s.y+9,s.w+2,2);   // socle sombre
+    for(let i=0;i<3;i++){const sx=s.x+i*5;ctx.fillStyle='#14182c';ctx.fillRect(sx-1,s.y+4,7,6);ctx.fillRect(sx,s.y+1,5,4);ctx.fillRect(sx+1,s.y-2,3,4);ctx.fillStyle='#d92b3a';ctx.fillRect(sx,s.y+5,5,4);ctx.fillRect(sx+1,s.y+2,3,3);ctx.fillRect(sx+2,s.y-1,1,3);ctx.fillStyle=pu>0.5?'#ffd23f':'#ff8a3d';ctx.fillRect(sx+2,s.y-1,1,2);ctx.fillStyle='#ffb0a0';ctx.fillRect(sx,s.y+5,1,4);ctx.fillRect(sx+1,s.y+2,1,3);}
   }
   for(const ic of tw.icicles){
     if(ic.state==='gone')continue;
