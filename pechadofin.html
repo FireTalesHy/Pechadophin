@@ -834,6 +834,75 @@ const palmPlat=(tx,ty)=>{   // la couronne de feuilles d'un cocotier sert de pla
   return false;
 };
 const oneWay=(tx,ty)=>twIn(tx)?twOne(tx,ty):!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty));
+/* ---------- Monde nuage : éléments de plateforme (nuages mobiles, nuages friables, ressorts, courants ascendants) ---------- */
+const movers=[],fragMap=new Map(),fragList=[],springs=new Set(),springAnim=new Map(),drafts=[];
+const pkey=(tx,ty)=>tx*512+ty+200;
+function genCloudGear(x0,cx){
+  const r=mulberry32((SEED^Math.imul(cx,40503)^0x77)|0),roll=r();
+  const ok=t=>{const c=column(t);return !c.pit&&!c.tun&&!c.ar&&!c.cf&&!c.hole;};
+  const tx=x0+2+Math.floor(r()*4);
+  for(let k=0;k<14;k++)if(!ok(x0+k))return;
+  const g=column(tx+5).g,addP=(a,b,row)=>{const keys=[];for(let t=a;t<=b;t++){plat.add(pkey(t,row));keys.push(pkey(t,row));}return keys;};
+  if(roll<0.28){   // nuage mobile : va et vient, horizontal ou vertical
+    const hor=r()<0.6;
+    movers.push({bx:(tx+4)*T,by:(g-(hor?4:6))*T,w:3*T,h:6,ax:hor?64:0,ay:hor?0:44,sp:0.9+r()*0.5,ph:r()*6,x:0,y:0,px:0,py:0,init:false});
+  } else if(roll<0.55){   // chaîne de nuages friables : ils se délitent quand on les pose dessus
+    for(let k=0;k<3;k++){const a=tx+k*5,keys=addP(a,a+2,g-3-3*k),rec={keys,st:'ok',t:0};fragList.push(rec);for(const kk of keys)fragMap.set(kk,rec);}
+  } else if(roll<0.75){   // ressort : propulse très haut vers un nuage perché
+    springs.add(pkey(tx+1,g));addP(tx+4,tx+8,g-9);
+  } else if(roll<0.9){   // courant ascendant : il faut s'y laisser porter, puis se jeter sur la corniche
+    drafts.push({x:(tx+1)*T,w:3*T,y0:g*T,y1:(g-12)*T});addP(tx+5,tx+8,g-11);
+  }
+}
+function stepCloudGear(dt){
+  const p=player;
+  for(const m of movers){
+    if(Math.abs(m.bx-p.x)>500)continue;
+    const t=time;m.px=m.x;m.py=m.y;
+    m.x=m.bx+m.ax*Math.sin(t*m.sp+m.ph);m.y=m.by+m.ay*Math.sin(t*m.sp+m.ph);
+    if(!m.init){m.init=true;m.px=m.x;m.py=m.y;}
+    const dx=m.x-m.px,dy=m.y-m.py;
+    if(p.onGround&&Math.abs(p.y+p.h-m.py)<=2.5&&p.x+p.w>m.px&&p.x<m.px+m.w){moveX(p,dx);p.y+=dy;}   // on voyage sur le nuage
+  }
+  for(const d of drafts){
+    if(p.x+p.w>d.x&&p.x<d.x+d.w&&p.y+p.h>d.y1&&p.y<d.y0)p.vy=Math.max(p.vy-1500*dt,-115);
+    if(Math.random()<0.5)parts.push({x:d.x+Math.random()*d.w,y:d.y0-Math.random()*20,vx:0,vy:-60-Math.random()*40,g:0,life:0.9,col:'#ffffff',sz:1});
+  }
+  if(p.onGround)p.spring=false;
+  if(p.onGround){
+    const ft=Math.round((p.y+p.h)/T),tx=Math.floor((p.x+5)/T);
+    if(springs.has(pkey(tx,ft))){p.vy=-JUMPV*1.65;p.spring=true;p.onGround=false;p.coyote=0;springAnim.set(pkey(tx,ft),0.25);sfx.jump();burst(p.x+5,p.y+p.h,'#ff9ad0',8,90);}
+  }
+  for(const rec of fragList){
+    const k0=rec.keys[0],tx0=Math.floor(k0/512),row=k0-tx0*512-200,rx=tx0*T;
+    if(Math.abs(rx-p.x)>400)continue;
+    const w=rec.keys.length*T;
+    if(rec.st==='ok'){if(p.onGround&&Math.abs(p.y+p.h-row*T)<2&&p.x+p.w>rx&&p.x<rx+w){rec.st='crack';rec.t=0;sfx.hit();}}
+    else if(rec.st==='crack'){rec.t+=dt;if(rec.t>0.6){rec.st='gone';rec.t=0;for(const kk of rec.keys)plat.delete(kk);burst(rx+w/2,row*T+3,'#ffffff',10,90);}}
+    else{rec.t+=dt;if(rec.t>2.8&&!rectsOverlap(p.x,p.y,p.w,p.h,rx,row*T-2,w,8)){rec.st='ok';for(const kk of rec.keys)plat.add(kk);}}
+  }
+  for(const [k,v] of springAnim){if(v<=dt)springAnim.delete(k);else springAnim.set(k,v-dt);}
+}
+function drawCloudGear(cx,cy){
+  for(const m of movers){
+    if(m.x+m.w<cx-20||m.x>cx+VW+20)continue;
+    const x=Math.round(m.x),y=Math.round(m.y);
+    for(let i=0;i<3;i++)ctx.drawImage(CLOUD_PLAT,x+i*T,y-4);
+    ctx.fillStyle='#8fb4e8';ctx.fillRect(x+2,y+5,m.w-4,2);ctx.fillStyle='#5a86d0';ctx.fillRect(x+m.w/2-3,y+6,6,2);   // liseré : plateforme mobile
+  }
+  for(const d of drafts){
+    if(d.x+d.w<cx||d.x>cx+VW)continue;
+    ctx.fillStyle='rgba(255,255,255,0.16)';ctx.fillRect(d.x,d.y1,d.w,d.y0-d.y1);
+    ctx.fillStyle='rgba(255,255,255,0.5)';
+    for(let i=0;i<6;i++){const yy=d.y0-mod(time*70+i*37,d.y0-d.y1);ctx.fillRect(d.x+4+((i*13)%(d.w-10)),Math.round(yy),1,6);}
+  }
+  for(const k of springs){
+    const tx=Math.floor(k/512),g=k-tx*512-200;if(tx*T<cx-20||tx*T>cx+VW+20)continue;
+    const a=springAnim.get(k)||0,h=a>0?2:6,x=tx*T,y=g*T;
+    ctx.fillStyle='#14182c';ctx.fillRect(x+1,y-h-1,T-2,h+1);ctx.fillStyle='#ff6fb5';ctx.fillRect(x+2,y-h,T-4,h);ctx.fillStyle='#ffc2e0';ctx.fillRect(x+2,y-h,T-4,1);
+    if(a>0){ctx.fillStyle='#ffffff';ctx.fillRect(x+7,y-h-6-Math.round(a*20),2,2);}
+  }
+}
 const solidAt=(x,y)=>solidTile(Math.floor(x/T),Math.floor(y/T));
 const supportAt=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T);return solidTile(tx,ty)||oneWay(tx,ty);};
 
@@ -846,7 +915,8 @@ function genChunk(cx){
   if(castleAt(x0)||castleAt(x0+15))return;   // rien devant le château
   if(ca&&Math.abs(x0+8-ca.cx)<=30)return;   // rien à l'intérieur ni autour de l'arène
   if(cowFieldAt(x0)||cowFieldAt(x0+15))return;   // pré de la vache : vide
-  const iceC=inIce(x0+8),cloudC=inCloud(x0+8),e0=enemies.length;   // zone glacière : plus de plateformes, dauphins de glace et mini ours
+  const iceC=inIce(x0+8),cloudC=inCloud(x0+8),e0=enemies.length;
+  if(cloudC&&Math.abs(x0)>=CLOUD_TX+16)genCloudGear(x0,cx);   // zone glacière : plus de plateformes, dauphins de glace et mini ours
   const beachC=inBeach(x0+8);   // zone plage : pas de plateformes, pas de dauphins bleus ni volants
   let nChains=rng()<0.72?1:0; if(rng()<0.25) nChains++;
   if(beachC)nChains=0;
@@ -1401,6 +1471,9 @@ function makeCloudTop(dec,v){
 }
 const CLOUD_PLAT=(()=>{const c=mk(T,T),g=c.getContext('2d');
   g.fillStyle='#bccbe6';g.fillRect(1,6,14,3);g.fillStyle='#ffffff';g.fillRect(0,4,T,4);g.fillRect(2,2,5,3);g.fillRect(8,1,5,4);g.fillStyle='#e6eefb';g.fillRect(1,7,14,1);return c;})();
+const CLOUD_FRAG=(()=>{const c=mk(T,T),g=c.getContext('2d');
+  g.fillStyle='#8a9bbd';g.fillRect(1,6,14,3);g.fillStyle='#dfe7f6';g.fillRect(0,4,T,4);g.fillRect(2,2,5,3);g.fillRect(8,1,5,4);
+  g.fillStyle='#8a9bbd';g.fillRect(4,4,1,3);g.fillRect(5,7,1,2);g.fillRect(10,3,1,4);g.fillRect(9,7,1,2);return c;})();
 const CLOUDTOP=[0,1,2,3,4].map(d=>[0,1,2].map(v=>makeCloudTop(d,v)));
 function makeIceTop(dec,v){
   const c=mk(T,T+6),g=c.getContext('2d');
@@ -1772,6 +1845,7 @@ function moveY(e,dy){
     for(let ty=r0;ty<=r1;ty++)for(let tx=tx0;tx<=tx1;tx++){
       if(solidTile(tx,ty)||(oneWay(tx,ty)&&ty*T>=prevBottom-0.01)){e.y=ty*T-e.h;e.vy=0;e.onGround=true;return;}
     }
+    if(e===player)for(const m of movers){if(e.x+e.w>m.x&&e.x<m.x+m.w&&prevBottom<=m.y+3&&e.y+e.h>=m.y){e.y=m.y-e.h;e.vy=0;e.onGround=true;return;}}   // nuages mobiles
   } else {
     const r1=Math.floor((prevTop-0.001)/T),r0=Math.floor(e.y/T);
     for(let ty=r1;ty>=r0;ty--)for(let tx=tx0;tx<=tx1;tx++) if(solidTile(tx,ty)){e.y=(ty+1)*T;e.vy=0;return;}
@@ -1879,7 +1953,7 @@ function stepPlayer(dt){
   if(aim.active&&Math.abs(aim.x)>0.25&&p.stun<=0)p.face=aim.x>0?1:-1;   // le pêcheur regarde du côté où il vise
   if(p.onGround)p.coyote=0.1;else p.coyote-=dt;
   if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*(shop.weapon==='dagger'&&!glockOn?Math.sqrt(dagV('jump')):1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
-  if(!inp.jump&&p.vy<-140&&p.stun<=0&&!p.boost)p.vy=-140;
+  if(!inp.jump&&p.vy<-140&&p.stun<=0&&!p.boost&&!p.spring)p.vy=-140;
   p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
   {
     const vx0=p.vx,x0=p.x,y0=p.y;
@@ -3994,6 +4068,7 @@ function update(dt){
     return;
   }
   ensureChunks();
+  stepCloudGear(dt);
   stepPlayer(dt);
   if(state!=='play')return;
   if(anarchyOn){   // anarchie : impossible de revenir en arrière, seul le château de sable ouvre le retour vers la première zone
@@ -4214,7 +4289,7 @@ function drawTiles(cx,cy){
         let flat=true;for(let k=l;k<=r&&flat;k++){const ck=column(k);if(ck.pit||ck.g!==col.g)flat=false;}   // pilier seulement si le sol est plat sur toute la largeur de la plateforme
         if(flat&&tx===((l+r)>>1)&&!col.pit){const by=col.g*T,x=tx*T-4;ctx.fillStyle='#1e2420';ctx.fillRect(x-1,ty*T+6,26,by-ty*T-6);ctx.fillStyle='#6a7366';ctx.fillRect(x,ty*T+6,24,by-ty*T-6);ctx.fillStyle='#7c8577';ctx.fillRect(x,ty*T+6,3,by-ty*T-6);ctx.fillStyle='#545c51';for(let yy=ty*T+10,r=0;yy<by;yy+=8,r++){ctx.fillRect(x,yy,24,1);ctx.fillRect(x+(r%2?8:16),yy-7,1,7);}ctx.fillStyle='#4f7a3a';ctx.fillRect(x,by-7,4,7);ctx.fillRect(x+19,by-5,5,5);if(by-ty*T>30){ctx.fillStyle='#1e2420';ctx.fillRect(x+10,ty*T+14,4,7);ctx.fillRect(x+11,ty*T+13,2,1);}}
         ctx.drawImage(STONE_PLAT,tx*T,ty*T);
-      } else ctx.drawImage(col.cloud?CLOUD_PLAT:col.ice?ICE_PLAT:PLANK,tx*T,ty*T);
+      } else {const fr=col.cloud&&fragMap.get(pkey(tx,ty));ctx.drawImage(col.cloud?(fr?CLOUD_FRAG:CLOUD_PLAT):col.ice?ICE_PLAT:PLANK,tx*T+(fr&&fr.st==='crack'&&Math.random()<0.5?1:0),ty*T);}
     }
   }
 }
@@ -4838,7 +4913,7 @@ function render(){
   drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();
   drawPalms(cx,cy);
   drawSwampTowers(cx);
-  drawTiles(cx,cy);
+  drawTiles(cx,cy);drawCloudGear(cx,cy);
   if(hole&&!hole.shut&&cx<(hole.r+1)*T&&cx+VW>hole.l*T){const gy=hole.g*T;ctx.fillStyle='#000000';ctx.fillRect(hole.l*T,gy,(hole.r-hole.l+1)*T,VH*3);if(Math.sin(time*3)>0.6){ctx.globalAlpha=0.5;ctx.drawImage(RNG_DIGITS['6'],(hole.l+1)*T+4,gy+10);ctx.globalAlpha=1;}}   // le trou secret
   drawPuddles(cx);
   drawTents();
@@ -4903,7 +4978,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 }
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
-  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
+  colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
   tcards=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
