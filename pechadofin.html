@@ -550,7 +550,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
+'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -678,6 +678,7 @@ function spawnBlend(tx){
 function pitInfo(cell){
   if(cell===-1||cell===0) return null;
   if(hash2(cell,77)>=0.5) return null;
+  for(const o of[-12,11,34])if(castleAt(cell*22+o))return null;   // pas de trou autour du château
   const s=cell*22+6+Math.floor(hash2(cell,78)*9);
   const w=2+Math.floor(hash2(cell,79)*2);
   const hl=Math.round(spawnBlend(s-3)), hr=Math.round(spawnBlend(s+w+2));
@@ -735,6 +736,23 @@ function beachGround(tx){
   if(d>=TFLAT)return{g:Math.round(base),tun:null};
   return{g:Math.round(lerp(base,t.G,1-d/TFLAT)),tun:d===0?t:null};
 }
+/* Château de glace : une porte au bout de la glacière mène à une tour verticale (zone à part, loin du monde, comme l'arène secrète) */
+const TWC=1<<22,TWW=24,TWB=24,TWN=6,TWR=12,TWTOP=TWB-TWN*TWR-14;   // 24 cases de large, 6 étages de 12 cases, salle du boss tout en haut
+let tw=null,twTr=null,twCd=0;
+const twIn=tx=>!!tw&&tx>=TWC-3&&tx<TWC+TWW+3;
+const TW_COL={g:TWB,pit:false,beach:false,tun:null,swamp:false,ice:false};
+const csCache=new Map();
+function castleAt(tx){   // classique : un château de glace 62 cases après l'arène de l'esquimau, de chaque côté
+  if(anarchyOn)return null;
+  const sg=tx<0?-1:1,cx=sg*(ICE_TX+ICE_SCREENS*(VW/T)+80);
+  if(Math.abs(tx-cx)>34)return null;
+  let c=csCache.get(sg);
+  if(!c){c={cx,sg,floor:clamp(Math.round(gBase(cx)),14,24)};csCache.set(sg,c);}
+  return c;
+}
+const twSolid=(tx,ty)=>{if(tx<TWC||tx>=TWC+TWW||ty<TWTOP||ty>=TWB)return true;return tw.grid[(ty-TWTOP)*TWW+(tx-TWC)]===1;};
+const twKey=(tx,ty)=>tx*4096+(ty+2048);
+const twOne=(tx,ty)=>{const r=tw.plat.get(twKey(tx,ty));return !!r&&r.state!=='gone';};
 /* Arène : 22 cases de large, murs de 2 cases, 2 portes (une de chaque côté), esplanade plate de 6 cases autour */
 function arenaAt(tx){
   const s=tx/(VW/T),a=Math.abs(s);
@@ -768,6 +786,7 @@ function column(tx){
     const g0=hole.g;
     return !hole.shut&&tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false}:{g:g0,pit:false,beach:false,tun:null,swamp:false};
   }
+  if(twIn(tx))return TW_COL;   // la tour du château de glace
   if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
   let c=colCache.get(tx); if(c!==undefined) return c;
   const ar=arenaAt(tx);
@@ -776,6 +795,8 @@ function column(tx){
     c={g:Math.round(lerp(spawnBlend(tx),ar.floor,w)),pit:false,ar,dx,wall:(dx>=-13&&dx<=-12)||(dx>=11&&dx<=12),beach:inBeach(tx),swamp:inSwamp(tx),ice:inIce(tx)};
     colCache.set(tx,c);return c;
   }
+  const cst=castleAt(tx);
+  if(cst){const dx=tx-cst.cx,w=clamp(1-(Math.abs(dx)-14)/20,0,1);c={g:Math.round(lerp(spawnBlend(tx),cst.floor,w)),pit:false,beach:false,swamp:false,ice:true,cs:cst,dx};colCache.set(tx,c);return c;}   // esplanade plate devant le château
   const cf=cowFieldAt(tx);
   if(cf){const d=Math.abs(Math.abs(tx)-cf.fc),w=clamp(1-(d-10)/4,0,1);c={g:Math.round(lerp(spawnBlend(tx),cf.floor,w)),pit:false,beach:false,swamp:true,cf};colCache.set(tx,c);return c;}
   const p=pitInfo(Math.floor(tx/22));
@@ -789,6 +810,7 @@ function column(tx){
   c={g,pit,beach,tun,swamp:inSwamp(tx),ice:inIce(tx)}; colCache.set(tx,c); return c;
 }
 function solidTile(tx,ty){
+  if(tw&&twIn(tx))return twSolid(tx,ty);
   const c=column(tx);
   if(c.tun){const r=tunCarve(c.tun,tx,ty);if(r===1)return false;if(r===2)return true;}
   if(!c.pit&&ty>=c.g)return true;
@@ -809,7 +831,7 @@ const palmPlat=(tx,ty)=>{   // la couronne de feuilles d'un cocotier sert de pla
   for(let d=-1;d<=1;d++){const pm=palmAt(tx+d);if(pm&&ty===pm.g-2&&(pm.flip?d===1||d===0:d===0||d===-1))return true;}
   return false;
 };
-const oneWay=(tx,ty)=>!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty));
+const oneWay=(tx,ty)=>twIn(tx)?twOne(tx,ty):!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty));
 const solidAt=(x,y)=>solidTile(Math.floor(x/T),Math.floor(y/T));
 const supportAt=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T);return solidTile(tx,ty)||oneWay(tx,ty);};
 
@@ -819,6 +841,7 @@ function genChunk(cx){
   const rng=mulberry32((SEED^Math.imul(cx,2654435761))|0);
   const x0=cx*16, myPlats=[];
   const ca=arenaAt(x0+8);
+  if(castleAt(x0)||castleAt(x0+15))return;   // rien devant le château
   if(ca&&Math.abs(x0+8-ca.cx)<=30)return;   // rien à l'intérieur ni autour de l'arène
   if(cowFieldAt(x0)||cowFieldAt(x0+15))return;   // pré de la vache : vide
   const iceC=inIce(x0+8),e0=enemies.length;   // zone glacière : plus de plateformes, dauphins de glace et mini ours
@@ -1770,7 +1793,7 @@ function hitEnemy(e,dmg){
     e.state='dead';e.t=0;e.vy=-170;e.vx=-e.dir*30;
     kills++; shake=Math.max(shake,0.08); sfx.kill();
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
-    const gold=(e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
+    const gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
     shop.gold+=gold;
     if(e.kind==='worm'){   // les vers débloquent les tridents multiples
       const was=shop.wormKills;shop.wormKills++;
@@ -2201,7 +2224,7 @@ function stepEnemies(dt){
       if(e.frostT<=0){e.frostT=0.5;hitEnemy(e,scV('dmg'));parts.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:(Math.random()-0.5)*40,vy:-30,g:0,life:0.4,col:'#bfe9ff',sz:2});if(e.state==='dead')continue;}
     }
     const edt=e.frost>0?dt*(1-(e.fslow||45)/100):dt;
-    if(e.kind==='gull')aiGull(e,edt);else if(e.kind==='mcow')aiMcow(e,edt);else if(e.kind==='fly')aiFly(e,edt);else if(e.kind==='worm')aiWorm(e,edt);else if(e.kind==='bear')aiBear(e,edt);else aiHop(e,edt);
+    if(e.kind==='gull')aiGull(e,edt);else if(e.kind==='mcow')aiMcow(e,edt);else if(e.kind==='fly')aiFly(e,edt);else if(e.kind==='worm')aiWorm(e,edt);else if(e.kind==='bear')aiBear(e,edt);else if(e.kind==='knight')aiKnight(e,edt);else if(e.kind==='archer')aiArcher(e,edt);else aiHop(e,edt);
     if(state==='play'&&p.invuln<=0&&e.state==='alive'&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,e.x,e.y,e.w,e.h)&&!tryParry()) hurtPlayer(e.x+e.w/2);
   }
   enemies=enemies.filter(e=>!(e.state==='dead'&&(e.y>(WATER_ROW+4)*T||e.t>3))&&Math.abs(e.x-p.x)<2400);
@@ -2748,7 +2771,7 @@ function castScepterLasers(){
   if(!cand.length)return false;
   const xs=[];
   for(const c of cand){if(xs.length>=n)break;if(xs.every(x=>Math.abs(x-c.x)>26))xs.push(c.x);}
-  for(const x of xs)scepBeams.push({x,gy:column(Math.floor(x/T)).g*T,state:'warn',t:0});
+  for(const x of xs)scepBeams.push({x,gy:tw?twFloorY(x,player.y):column(Math.floor(x/T)).g*T,state:'warn',t:0});
   sfx.slam();
   return true;
 }
@@ -2844,6 +2867,307 @@ function buyScUp(key){
   if(!shop.scepterOwned||lv>=5||shop.gold<u.cost[lv])return;
   shop.gold-=u.cost[lv];shop.sc[key]=lv+1;
   saveShop();sfx.heal();renderShop();
+}
+/* ---------- Château de glace : la tour (6 étages à gravir, obstacles, chevaliers dauphins, salle du boss en haut) ---------- */
+function buildTw(){
+  const H=TWB-TWTOP+1,grid=new Uint8Array(TWW*H),plat=new Map(),recs=[],spikes=[],icicles=[],spawns=[];
+  const set=(tx,ty)=>{grid[(ty-TWTOP)*TWW+tx]=1;};
+  for(let sl=1;sl<=TWN;sl++){   // dalles d'1 case d'épaisseur (2 cases de marge au-dessus des plateformes), avec un trou de 4 cases (à droite aux étages impairs, à gauche aux pairs)
+    const F=TWB-TWR*sl,gx=sl%2?16:4;
+    for(let tx=0;tx<TWW;tx++){if(tx>=gx&&tx<gx+4)continue;set(tx,F);}
+  }
+  for(let ty=TWTOP;ty<=TWTOP+1;ty++)for(let tx=0;tx<TWW;tx++)set(tx,ty);   // plafond de la salle du boss
+  const mir=(a,b,right)=>right?[a,b]:[TWW-1-b,TWW-1-a],mx=(x,right)=>right?x:TWW-1-x;
+  const P=[[12,17],[4,10],[13,20]];
+  for(let st=0;st<TWN;st++){
+    const F=TWB-TWR*st,right=st%2===0,pr=[];
+    for(let k=0;k<3;k++){   // trois plateformes en zigzag, 3 cases d'écart
+      const [a,b]=mir(P[k][0],P[k][1],right),ty=F-3*(k+1),rec={a,b,ty,state:'ok',t:0,frag:(st>=2&&k===1)||(st>=4&&k===0)};
+      for(let tx=a;tx<=b;tx++)plat.set(twKey(TWC+tx,ty),rec);
+      recs.push(rec);pr.push(rec);
+    }
+    if(st>=1){const sx=mx(9,right);for(let i=0;i<2;i++)spikes.push({x:(TWC+sx+i)*T+1,y:F*T-9,w:14,h:9});}   // pointes de glace sur la dalle
+    const kn=st===0?[14]:st<4?[st%2?10:15]:[9,17];
+    for(const x of kn)spawns.push({kind:'knight',x:(TWC+mx(x,right))*T,y:F*T-18,st});
+    if(st>=2){const r1=pr[0];spawns.push({kind:'archer',x:(TWC+(r1.a+r1.b)/2)*T,y:r1.ty*T-16,st});}   // l'archer guette depuis la 1re plateforme
+    if(st>=2){const n=Math.min(3,st-1),r2=pr[1];for(let i=0;i<n;i++)icicles.push({x:(TWC+r2.a+1+i*2)*T+8,y:(F-11)*T,len:12,fy:0,vy:0,state:'idle',t:0});}   // stalactites au-dessus de la 2e plateforme
+  }
+  return {grid,plat,recs,spikes,icicles,spawns,t:0,maxStage:0,saveEn:null,savePk:null,back:null};
+}
+function twFloorY(x,y){const tx=Math.floor(x/T);for(let ty=Math.floor(y/T);ty<TWB+2;ty++)if(solidTile(tx,ty)||oneWay(tx,ty))return ty*T;return TWB*T;}
+function twEnter(cs){
+  const p=player;
+  tw=buildTw();tw.back={x:cs.cx*T+8-cs.sg*46-5,y:cs.floor*T-14,sg:cs.sg};
+  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];
+  for(const sp of tw.spawns){
+    const hp=sp.kind==='knight'?5+Math.floor(sp.st/2):3+(sp.st>=4?1:0),dir=Math.random()<0.5?1:-1;
+    enemies.push(sp.kind==='knight'
+      ?{kind:'knight',x:sp.x,y:sp.y,w:12,h:18,vx:0,vy:0,dir,hp,maxHp:hp,tier:0,speed:24,state:'alive',t:0,flash:0,onGround:false,mode:'walk',mt:0,cdT:1+Math.random()}
+      :{kind:'archer',x:sp.x,y:sp.y,w:12,h:16,vx:0,vy:0,dir,hp,maxHp:hp,tier:0,speed:0,state:'alive',t:0,flash:0,onGround:false,fireCd:1+Math.random()*1.5,charge:0});
+  }
+  Object.assign(p,{x:(TWC+5)*T,y:TWB*T-14,vx:0,vy:0,onGround:true,invuln:1,stun:0,dash:null});
+  p.safe={x:p.x,y:p.y};
+  cam.x=TWC*T;cam.y=clamp(p.y+7-VH*0.58,TWTOP*T,(TWB+1)*T-VH);camLX=0;camLY=0;
+  floatText(p.x+5,p.y-30,'CHÂTEAU DE GLACE','#bfe9ff');
+}
+function twLeave(){
+  const b=tw.back;enemies=tw.saveEn||[];pickups=tw.savePk||[];tw=null;bossShots=[];hooks=[];tridents=[];scepBeams=[];
+  Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null,face:-b.sg});
+  player.safe={x:b.x,y:b.y};twCd=2.5;snapCamera();
+}
+function twDoorCheck(dt){   // la porte du château : on y entre en marchant dedans
+  if(twCd>0)twCd-=dt;
+  const p=player;
+  if(twCd>0||p.stun>0||!p.onGround)return;
+  const cs=castleAt(Math.floor((p.x+5)/T));
+  if(cs&&Math.abs(p.x+5-(cs.cx*T+8))<9){twTr={t:0,dir:'in',sw:false,cs};sfx.bossSpawn();}
+}
+function stepTwTr(dt){
+  twTr.t+=dt;
+  if(!twTr.sw&&twTr.t>=0.7){twTr.sw=true;if(twTr.dir==='in')twEnter(twTr.cs);else twLeave();}
+  if(twTr.t>=1.5)twTr=null;
+}
+function drawTwFade(){const t=twTr.t,a=t<0.7?t/0.7:clamp(1-(t-0.9)/0.6,0,1);ctx.fillStyle='rgba(0,0,0,'+a.toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}
+function twCamera(dt){const p=player;cam.x=TWC*T;const ty=clamp(p.y+7-VH*0.58,TWTOP*T,(TWB+1)*T-VH);cam.y+=(ty-cam.y)*(1-Math.exp(-6*dt));}
+function twHaz(dt){
+  const p=player;
+  if(state==='play'&&p.invuln<=0)for(const s of tw.spikes)if(rectsOverlap(p.x+2,p.y+5,p.w-4,p.h-5,s.x,s.y,s.w,s.h)){hurtPlayer(s.x+s.w/2);break;}
+  for(const ic of tw.icicles){   // stalactites : elles se décrochent quand on passe dessous
+    if(ic.state==='idle'){if(Math.abs(p.x+5-ic.x)<14&&p.y>ic.y+10&&p.y-ic.y<150){ic.state='shake';ic.t=0;}}
+    else if(ic.state==='shake'){ic.t+=dt;if(ic.t>0.5){ic.state='fall';ic.vy=0;sfx.slam();}}
+    else if(ic.state==='fall'){
+      ic.vy=Math.min(ic.vy+700*dt,330);ic.fy+=ic.vy*dt;
+      const top=ic.y+ic.fy,tip=top+ic.len;let hit=false;
+      if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+2,p.y+2,p.w-4,p.h-2,ic.x-3,top,6,ic.len)){hurtPlayer(ic.x);hit=true;}
+      const tx=Math.floor(ic.x/T),ty=Math.floor(tip/T);
+      if(hit||solidTile(tx,ty)||oneWay(tx,ty)){ic.state='gone';ic.t=0;burst(ic.x,tip,'#cfeeff',8,80);}
+    } else {ic.t+=dt;if(ic.t>4){ic.state='idle';ic.fy=0;}}
+  }
+  for(const r of tw.recs){   // plateformes friables : elles se fissurent puis cèdent, et reviennent plus tard
+    if(!r.frag)continue;
+    if(r.state==='ok'){if(p.onGround&&Math.abs(p.y+p.h-r.ty*T)<2&&p.x+p.w>(TWC+r.a)*T&&p.x<(TWC+r.b+1)*T){r.state='crack';r.t=0;sfx.hit();}}
+    else if(r.state==='crack'){r.t+=dt;if(r.t>0.55){r.state='gone';r.t=0;burst((TWC+(r.a+r.b+1)/2)*T,r.ty*T+3,'#cfeeff',10,90);}}
+    else{r.t+=dt;if(r.t>2.6&&!rectsOverlap(p.x,p.y,p.w,p.h,(TWC+r.a)*T,r.ty*T-2,(r.b-r.a+1)*T,8))r.state='ok';}
+  }
+}
+function stepTw(dt){
+  const p=player;
+  tw.t+=dt;
+  stepPlayer(dt);if(state!=='play')return;
+  stepHook(dt);
+  twHaz(dt);
+  stepEnemies(dt);stepBossShots(dt);stepScepterBeams(dt);stepSoulFx(dt);stepPickups(dt);stepFx(dt);
+  if(combo.n>0){combo.t-=dt;if(combo.t<=0){combo.n=0;combo.t=0;}}
+  const st=Math.floor((TWB*T-(p.y+p.h)+2)/(TWR*T));
+  if(st>tw.maxStage){
+    tw.maxStage=st;
+    if(st>=TWN){floatText(p.x+5,p.y-30,'SALLE DU BOSS','#ffe14d');floatText(p.x+5,p.y-20,'LA PORTE EST SCELLÉE','#bfe9ff');shake=Math.max(shake,0.3);sfx.bossSpawn();}
+    else if(st>=1){floatText(p.x+5,p.y-30,'ÉTAGE '+st,'#bfe9ff');sfx.heal();}
+  }
+  if(tw.t>1&&!twTr&&p.onGround&&p.y>(TWB-5)*T&&Math.abs(p.x+5-(TWC+2.5)*T)<14){twTr={t:0,dir:'out',sw:false};sfx.gate();}   // la porte du rez-de-chaussée : retour dehors
+  twCamera(dt);
+}
+/* ----- chevaliers dauphins ----- */
+function aiKnight(e,dt){
+  const p=player,front=e.dir>0?e.x+e.w+1:e.x-1;
+  e.vy=Math.min(e.vy+GRAV*dt,MAXFALL);
+  e.cdT-=dt;
+  if(e.mode==='wind'){   // l'épée se lève : la charge arrive
+    e.mt-=dt;e.dir=p.x>e.x?1:-1;
+    if(e.mt<=0){e.mode='lunge';e.mt=0.4;sfx.slam();}
+  } else if(e.mode==='lunge'){   // coup d'estoc en avançant
+    e.mt-=dt;
+    if(moveX(e,e.dir*150*dt)||(e.onGround&&!supportAt(front,e.y+e.h+2))||e.mt<=0){e.mode='rest';e.mt=0.7;}
+    const sx=e.dir>0?e.x+e.w:e.x-10;
+    if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,sx,e.y+3,10,7)&&!tryParry())hurtPlayer(e.x+e.w/2);
+  } else if(e.mode==='rest'){e.mt-=dt;if(e.mt<=0)e.mode='walk';}
+  else {   // patrouille, se tourne vers le joueur quand il est près
+    const dx=p.x-e.x,near=Math.abs(dx)<100&&Math.abs(p.y-e.y)<34;
+    if(near)e.dir=dx>0?1:-1;
+    if(moveX(e,e.dir*e.speed*(near?1.4:1)*dt))e.dir=-e.dir;
+    if(e.onGround&&!supportAt(front,e.y+e.h+2))e.dir=-e.dir;
+    if(near&&Math.abs(dx)<58&&e.cdT<=0){e.mode='wind';e.mt=0.5;e.cdT=2.2;}
+  }
+  moveY(e,e.vy*dt);
+}
+function aiArcher(e,dt){   // archer : arbalète qui tire des carreaux de glace
+  const p=player,dx=p.x-e.x,dy=p.y-e.y;
+  e.vy=Math.min(e.vy+GRAV*dt,MAXFALL);moveY(e,e.vy*dt);
+  e.dir=dx>0?1:-1;e.fireCd-=dt;
+  if(e.charge>0){
+    e.charge-=dt;
+    if(e.charge<=0){const sx=e.x+e.w/2+e.dir*8,sy=e.y+6,ang=Math.atan2(p.y+7-sy,p.x+5-sx);bossShots.push({x:sx,y:sy,vx:Math.cos(ang)*110,vy:Math.sin(ang)*110,life:3,t:0,ice:true});e.fireCd=2.4+Math.random();sfx.bossFire();}
+  } else if(e.fireCd<=0&&state==='play'&&Math.abs(dx)<230&&Math.abs(dy)<120)e.charge=0.55;
+}
+function drawKnight(e){
+  const dead=e.state==='dead',fl=e.flash>0,cx=Math.round(e.x+e.w/2);
+  ctx.save();
+  if(dead){ctx.translate(cx,Math.round(e.y+e.h/2));ctx.scale(e.dir>0?1:-1,-1);ctx.translate(0,e.h/2);}
+  else{ctx.translate(cx,Math.round(e.y+e.h));ctx.scale(e.dir>0?1:-1,1);}
+  const R=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
+  const body=fl?'#ffffff':'#3b8fd9',steel=fl?'#ffffff':'#aab4c8',hi=fl?'#ffffff':'#e8eefc';
+  R('#1c4f8a',-7,-4,4,2);R(body,-6,-5,3,2);   // nageoire de queue
+  R(body,-4,-15,8,13);R(fl?'#ffffff':'#d6ecff',0,-11,4,8);   // corps et ventre
+  R(body,3,-17,5,3);   // museau
+  R(steel,-4,-10,8,5);R(hi,-4,-10,8,1);R('#7d879c',-4,-6,8,1);   // plastron
+  R(steel,-4,-20,8,5);R(hi,-4,-20,8,1);R('#14182c',1,-17,4,1);   // heaume et visière
+  R(fl?'#ffffff':'#d92b3a',-1,-25,3,5);R(fl?'#ffffff':'#d92b3a',-3,-23,3,2);   // plumet
+  R(steel,-3,-3,3,3);R(steel,1,-3,3,3);   // jambières
+  if(e.mode==='wind'){R('#14182c',3,-27,3,17);R(hi,4,-26,1,15);R('#d4a017',2,-12,5,2);}   // épée levée
+  else if(e.mode==='lunge'){R('#14182c',4,-12,14,4);R(hi,5,-11,13,2);R('#d4a017',3,-14,2,8);}   // estoc
+  else{R('#14182c',5,-19,3,11);R(hi,6,-18,1,9);R('#d4a017',4,-9,5,2);}   // épée au repos
+  R('#8a1822',-8,-14,5,9);R('#d92b3a',-7,-13,3,7);R('#ffffff',-6,-11,1,3);R('#ffffff',-7,-10,3,1);   // bouclier
+  ctx.restore();
+}
+function drawArcher(e){
+  const dead=e.state==='dead',fl=e.flash>0,cx=Math.round(e.x+e.w/2);
+  ctx.save();
+  if(dead){ctx.translate(cx,Math.round(e.y+e.h/2));ctx.scale(e.dir>0?1:-1,-1);ctx.translate(0,e.h/2);}
+  else{ctx.translate(cx,Math.round(e.y+e.h));ctx.scale(e.dir>0?1:-1,1);}
+  const R=(c,x,y,w,h)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
+  const body=fl?'#ffffff':'#4aa0e0',steel=fl?'#ffffff':'#aab4c8';
+  R('#1c4f8a',-7,-3,4,2);R(body,-4,-13,8,11);R(fl?'#ffffff':'#d6ecff',0,-10,4,7);R(body,3,-15,5,3);
+  R(fl?'#ffffff':'#5a6b4a',-4,-9,8,4);R('#3d4a30',-4,-6,8,1);   // tunique verte
+  R(steel,-4,-18,8,4);R('#7d879c',-5,-15,10,1);R('#14182c',1,-15,4,1);   // casque à bord
+  R(steel,-3,-2,3,2);R(steel,1,-2,3,2);
+  R('#6b4a2b',3,-11,10,2);R('#8a6a43',10,-14,2,8);R('#e8eefc',3,-12,10,1);   // arbalète
+  if(e.charge>0){const k=1-e.charge/0.55;R('#7fd0ff',12,-11,2+Math.round(k*3),1);R('#e8fbff',14,-12,1,3);}   // carreau de glace qui se charge
+  ctx.restore();
+}
+/* ----- rendu ----- */
+function drawTwBg(cy){
+  const x0=TWC*T,W=TWW*T,y0=Math.floor(cy/12)*12-12;
+  ctx.fillStyle='#24395a';ctx.fillRect(x0,cy-16,W,VH+32);
+  for(let y=y0,row=0;y<cy+VH+16;y+=12,row++){
+    ctx.fillStyle='#2e4a72';ctx.fillRect(x0,y,W,1);
+    for(let x=x0+((Math.floor(y/12)&1)?12:0);x<x0+W;x+=24)ctx.fillRect(x,y,1,12);
+  }
+  for(let st=0;st<=TWN;st++){
+    const F=TWB-TWR*st,wy=(F-8)*T;
+    if(wy>cy+VH+30||wy<cy-60)continue;
+    for(const wx of[x0+2*T,x0+W-2*T-12]){   // fenêtres en ogive : un bout de ciel de neige
+      ctx.fillStyle='#14182c';ctx.fillRect(wx-1,wy-1,14,26);ctx.fillRect(wx+1,wy-3,10,2);
+      ctx.fillStyle='#9fd0f0';ctx.fillRect(wx,wy,12,24);ctx.fillRect(wx+2,wy-2,8,2);ctx.fillStyle='#d6efff';ctx.fillRect(wx,wy,12,8);
+      ctx.fillStyle='#14182c';ctx.fillRect(wx+5,wy-2,2,26);ctx.fillRect(wx,wy+10,12,2);
+      ctx.fillStyle='#ffffff';ctx.fillRect(wx+2+((time*8+wx)%7|0),wy+14+(wy%3),1,1);
+    }
+    const bx=x0+W/2-5;   // bannière au centre
+    ctx.fillStyle='#14182c';ctx.fillRect(bx-1,wy-4,12,2);
+    ctx.fillStyle='#2e7fd0';ctx.fillRect(bx,wy-2,10,24);ctx.fillRect(bx,wy+22,4,3);ctx.fillRect(bx+6,wy+22,4,3);
+    ctx.fillStyle='#e8fbff';ctx.fillRect(bx,wy-2,10,1);ctx.fillRect(bx+4,wy+3,2,10);ctx.fillRect(bx+2,wy+6,6,2);
+    for(const tx of[x0+4*T+4,x0+W-4*T-8]){   // torches de flamme bleue
+      const ty=wy+14;if(st===TWN)continue;
+      ctx.fillStyle='#3a2a1a';ctx.fillRect(tx,ty,4,12);ctx.fillStyle='#5a4a3a';ctx.fillRect(tx-2,ty-2,8,3);
+      const f=Math.floor(time*10+tx)%3;ctx.fillStyle='#3b9bff';ctx.fillRect(tx-1,ty-12-f,6,11+f);ctx.fillStyle='#8fcfff';ctx.fillRect(tx,ty-9-f,4,7);ctx.fillStyle='#ffffff';ctx.fillRect(tx+1,ty-6,2,4);
+    }
+  }
+  const door=TWB*T;   // la porte du rez-de-chaussée (sortie)
+  ctx.fillStyle='#14182c';ctx.fillRect(x0+T-1,door-5*T,3*T+2,5*T);ctx.fillRect(x0+T+3,door-5*T-4,3*T-6,5);
+  ctx.fillStyle='#8fc8ec';ctx.fillRect(x0+T,door-5*T+1,3*T,5*T-1);ctx.fillStyle='#e8fbff';ctx.fillRect(x0+T+4,door-5*T+4,3*T-8,5*T-5);
+  ctx.fillStyle='#14182c';ctx.fillRect(x0+T+2*T-1,door-5*T+4,2,5*T-5);
+  if(time%1<0.7){ctx.fillStyle='#14182c';ctx.fillRect(x0+T+6,door-5*T+22,2,5);}
+  const rf=(TWB-TWR*TWN)*T;   // la porte scellée de la salle du boss
+  if(rf<cy+VH+40&&rf>cy-8*T){
+    const bx=x0+W-6*T,by=rf-6*T;
+    ctx.fillStyle='#14182c';ctx.fillRect(bx-3,by-3,4*T+6,6*T+3);
+    ctx.fillStyle='#6a7a94';ctx.fillRect(bx,by,4*T,6*T);ctx.fillStyle='#8696b0';ctx.fillRect(bx,by,4*T,3);
+    ctx.fillStyle='#4e5c76';ctx.fillRect(bx+2*T-1,by,2,6*T);
+    for(let k=0;k<5;k++){ctx.fillStyle='#aab4c8';ctx.fillRect(bx+4,by+8+k*16,3,3);ctx.fillRect(bx+4*T-7,by+8+k*16,3,3);}
+    const glow=0.55+0.35*Math.sin(time*3);ctx.globalAlpha=glow;ctx.fillStyle='#7fd0ff';ctx.fillRect(bx+2*T-4,by+34,8,8);ctx.fillStyle='#ffffff';ctx.fillRect(bx+2*T-2,by+36,4,4);ctx.globalAlpha=1;
+    for(const tx of[bx-14,bx+4*T+10]){ctx.fillStyle='#3a2a1a';ctx.fillRect(tx,by+24,4,26);ctx.fillStyle='#5a4a3a';ctx.fillRect(tx-2,by+22,8,4);const f=Math.floor(time*10+tx)%3;ctx.fillStyle='#3b9bff';ctx.fillRect(tx-1,by+9-f,6,13+f);ctx.fillStyle='#8fcfff';ctx.fillRect(tx,by+12-f,4,9);ctx.fillStyle='#ffffff';ctx.fillRect(tx+1,by+15,2,4);}
+  }
+}
+function drawTwTiles(cy){
+  const y0=Math.max(Math.floor(cy/T)-1,TWTOP),y1=Math.min(Math.floor((cy+VH)/T)+1,TWB);
+  for(let ty=y0;ty<=y1;ty++)for(let k=0;k<TWW;k++){
+    const tx=TWC+k;
+    if(!twSolid(tx,ty))continue;
+    const x=tx*T,y=ty*T;
+    ctx.fillStyle='#6a9fc8';ctx.fillRect(x,y,T,T);
+    ctx.fillStyle='#5a8db8';ctx.fillRect(x,y+T-1,T,1);ctx.fillRect(x+((ty&1)?3:11),y,1,T-1);
+    ctx.fillStyle='#8cc3e4';ctx.fillRect(x,y,T,1);
+    if(!twSolid(tx,ty-1)){ctx.fillStyle='#f4fbff';ctx.fillRect(x,y,T,3);ctx.fillStyle='#bfe9ff';ctx.fillRect(x,y+3,T,1);if(((tx*7+ty)%5)===0)ctx.fillRect(x+4,y-1,6,1);}
+    if(!twSolid(tx,ty+1)){ctx.fillStyle='#3d6a94';ctx.fillRect(x,y+T-2,T,2);}
+  }
+  for(const r of tw.recs){   // plateformes de glace
+    if(r.state==='gone'||r.ty*T>cy+VH||r.ty*T<cy-20)continue;
+    const jx=r.state==='crack'?(Math.sin(time*60)>0?1:-1):0;
+    for(let tx=r.a;tx<=r.b;tx++){
+      const x=(TWC+tx)*T+jx,y=r.ty*T;
+      ctx.fillStyle=r.frag?'#c9e8f8':'#9fd2f0';ctx.fillRect(x,y,T,5);
+      ctx.fillStyle='#ffffff';ctx.fillRect(x,y,T,2);
+      ctx.fillStyle=r.frag?'#7aa6c8':'#5a8db8';ctx.fillRect(x,y+4,T,1);
+      if(r.frag){ctx.fillStyle='#3d6a94';ctx.fillRect(x+3,y+2,1,3);ctx.fillRect(x+4,y+4,2,1);ctx.fillRect(x+10,y+1,1,4);if(r.state==='crack'){ctx.fillStyle='#ff8a8a';ctx.fillRect(x+6,y+2,2,2);}}
+      else if(tx===r.a||tx===r.b){ctx.fillStyle='#e8fbff';ctx.fillRect(tx===r.a?x:x+T-2,y+5,2,2);}
+    }
+  }
+}
+function drawTwHaz(){
+  for(const s of tw.spikes){
+    for(let i=0;i<3;i++){const sx=s.x+i*5;ctx.fillStyle='#14305a';ctx.fillRect(sx-1,s.y+5,7,4);ctx.fillRect(sx,s.y+2,5,3);ctx.fillRect(sx+1,s.y-1,3,3);ctx.fillStyle='#4aa8e8';ctx.fillRect(sx,s.y+6,5,3);ctx.fillRect(sx+1,s.y+3,3,3);ctx.fillRect(sx+2,s.y,1,3);ctx.fillStyle='#e8fbff';ctx.fillRect(sx,s.y+6,1,3);ctx.fillRect(sx+1,s.y+3,1,3);ctx.fillRect(sx+2,s.y,1,2);}
+  }
+  for(const ic of tw.icicles){
+    if(ic.state==='gone')continue;
+    const jx=ic.state==='shake'?(Math.sin(time*80)>0?1:-1):0,x=Math.round(ic.x)+jx,y=Math.round(ic.y+ic.fy);
+    ctx.fillStyle='#cfeeff';ctx.fillRect(x-3,y,6,4);ctx.fillRect(x-2,y+4,4,4);ctx.fillRect(x-1,y+8,2,4);
+    ctx.fillStyle='#ffffff';ctx.fillRect(x-3,y,1,4);ctx.fillRect(x-2,y+4,1,4);ctx.fillStyle='#7fb4d8';ctx.fillRect(x+2,y,1,4);ctx.fillRect(x+1,y+4,1,4);
+  }
+}
+function renderTw(){
+  const cx=TWC*T,cy=Math.round(cam.y);
+  ctx.fillStyle='#000000';ctx.fillRect(0,0,VW,VH);
+  let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
+  ctx.save();ctx.translate(-cx+sx,-cy+sy);
+  drawTwBg(cy);drawTwTiles(cy);drawTwHaz();drawScepterFx();
+  for(const e of enemies){
+    if(e.y+30<cy||e.y-30>cy+VH)continue;
+    drawEnemy(e);
+    if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);}
+  }
+  drawPickups();drawBossShots();drawTridents();drawPlayer();drawReticle();drawSoulFx();drawFx();
+  ctx.restore();
+  if(state==='dying'&&dyingT<0.25){ctx.fillStyle='rgba(255,60,60,.28)';ctx.fillRect(0,0,VW,VH);}
+  if(twTr)drawTwFade();
+  if(state!=='title'&&!overlayVisible)drawHUD();
+  document.querySelectorAll('.pad').forEach(b=>b.classList.toggle('on',!!inp[b.dataset.k]));
+  const kd=(inp.right?1:0)-(inp.left?1:0),mx=(joyEl.offsetWidth||0)*0.31;
+  joyThumb.style.transform='translate('+Math.round(joy.active?joy.tx:kd*mx)+'px,'+Math.round(joy.active?joy.ty:0)+'px)';
+  $('merch-btn').hidden=true;
+  joyEl.classList.toggle('on',joy.active||kd!==0);
+  look2Thumb.style.transform='translate('+Math.round(look.tx)+'px,'+Math.round(look.ty)+'px)';
+  look2El.classList.toggle('on',look.active);
+}
+/* ----- la façade du château, au bout de la glacière ----- */
+function drawIceCastle(cx0){
+  for(const sg of[-1,1]){
+    const c=castleAt(sg*(ICE_TX+ICE_SCREENS*(VW/T)+80));
+    if(!c)continue;
+    const x=c.cx*T+8,fl=c.floor*T;
+    if(x+130<cx0||x-130>cx0+VW)continue;
+    const R=(col,a,b,w,h)=>{ctx.fillStyle=col;ctx.fillRect(a,b,w,h);};
+    for(const tx of[x-92,x+60]){   // tours
+      R('#14182c',tx-1,fl-181,34,182);R('#6fa6cf',tx,fl-180,32,180);
+      for(let y=fl-12,row=0;y>fl-180;y-=12,row++){R('#5a92bd',tx,y,32,1);for(let b=tx+(row%2?12:0);b<tx+32;b+=24)R('#5a92bd',b,y,1,12);R('#8cc3e4',tx,y+1,32,1);}
+      R('#14182c',tx+13,fl-140,6,16);R('#0e1830',tx+14,fl-139,4,14);R('#14182c',tx+13,fl-90,6,16);R('#0e1830',tx+14,fl-89,4,14);   // meurtrières
+      for(let b=0;b<4;b++){R('#14182c',tx-3+b*10,fl-190,8,10);R('#8cc3e4',tx-2+b*10,fl-189,6,9);R('#ffffff',tx-2+b*10,fl-189,6,2);}   // créneaux enneigés
+      ctx.fillStyle='#14182c';ctx.beginPath();ctx.moveTo(tx-6,fl-190);ctx.lineTo(tx+16,fl-228);ctx.lineTo(tx+38,fl-190);ctx.fill();   // toit pointu
+      ctx.fillStyle='#4a7fa8';ctx.beginPath();ctx.moveTo(tx-3,fl-191);ctx.lineTo(tx+16,fl-224);ctx.lineTo(tx+35,fl-191);ctx.fill();
+      ctx.fillStyle='#f4fbff';ctx.beginPath();ctx.moveTo(tx+8,fl-205);ctx.lineTo(tx+16,fl-224);ctx.lineTo(tx+24,fl-205);ctx.fill();
+      R('#14182c',tx+15,fl-244,2,20);R('#2e7fd0',tx+17,fl-244,10,6);R('#e8fbff',tx+17,fl-244,10,1);   // drapeau
+    }
+    R('#14182c',x-65,fl-125,130,126);R('#6fa6cf',x-64,fl-124,128,124);   // mur d'enceinte
+    for(let y=fl-12,row=0;y>fl-124;y-=12,row++){R('#5a92bd',x-64,y,128,1);for(let b=x-64+(row%2?12:0);b<x+64;b+=24)R('#5a92bd',b,y,1,12);R('#8cc3e4',x-64,y+1,128,1);}
+    for(let b=0;b<8;b++){R('#14182c',x-66+b*17,fl-136,12,12);R('#8cc3e4',x-65+b*17,fl-135,10,11);R('#ffffff',x-65+b*17,fl-135,10,3);}   // créneaux
+    R('#14182c',x-22,fl-62,44,63);R('#14182c',x-18,fl-68,36,8);R('#0e1830',x-20,fl-60,40,60);   // porte en arc
+    ctx.fillStyle='#0e1830';ctx.beginPath();ctx.arc(x,fl-60,20,Math.PI,0);ctx.fill();
+    for(let k=-16;k<=16;k+=8)R('#3a4a6a',x+k-1,fl-76,2,76);for(let y=fl-70;y<fl;y+=14)R('#3a4a6a',x-20,y,40,2);   // herse
+    R('#bfe9ff',x-22,fl-62,3,62);R('#bfe9ff',x+19,fl-62,3,62);
+    for(const tx of[x-34,x+30]){   // torches de flamme bleue
+      R('#3a2a1a',tx,fl-50,4,26);R('#5a4a3a',tx-2,fl-52,8,4);
+      const f=Math.floor(time*10+tx)%3;R('#3b9bff',tx-1,fl-64-f,6,12+f);R('#8fcfff',tx,fl-61-f,4,8);R('#ffffff',tx+1,fl-58,2,4);
+    }
+    const bn=0.5+0.5*Math.sin(time*2.5);ctx.globalAlpha=0.5+0.2*bn;R('#7fd0ff',x-1,fl-86,2,8);ctx.globalAlpha=1;   // lueur au-dessus de la porte
+  }
 }
 /* ---------- Vache géante : boss des marécages, elle roule sur le joueur ---------- */
 const COW_HP=600, COW_SCREENS=20;
@@ -3370,6 +3694,7 @@ function snapCamera(){camLX=0;camLY=0;cam.x=player.x+5-VW/2;cam.y=player.y+7-VH*
 function stepCamera(dt){
   const p=player;
   if(rz){cam.x=(RZC-RZW)*T;cam.y=RZG*T-173;return;}
+  if(tw){twCamera(dt);return;}
   const lk=octo&&octo.ar.state==='active'?octo.ar:castle&&castle.ar.state==='active'?castle.ar:witch&&witch.ar.state==='active'?witch.ar:eskimo&&eskimo.ar.state==='active'?eskimo.ar:null;
   if(lk){   // caméra verrouillée sur l'arène
     const ar=lk,k=1-Math.exp(-4*dt);
@@ -3397,6 +3722,9 @@ function update(dt){
     return;
   }
   if(state==='over'){stepFx(dt);return;}
+  if(!tw&&!twTr&&!rz&&!rzTr&&state==='play')twDoorCheck(dt);
+  if(twTr){stepTwTr(dt);stepFx(dt);return;}
+  if(tw){stepTw(dt);return;}
   if(!rz&&!rzTr&&state==='play'){const p=player,tx=Math.floor((p.x+5)/T);if(hole&&!hole.shut&&tx>=hole.l&&tx<=hole.r&&p.y>(hole.g+2)*T){rzTr={t:0,dir:'in',sw:false};sfx.bossSpawn();}}   // tombé dans le trou secret
   if(rzTr){stepRzTr(dt);stepFx(dt);return;}
   if(rz){   // arène secrète : rien d'autre ne vit ici
@@ -3667,6 +3995,8 @@ function drawEnemy(e){
   if(e.kind==='zombie'){drawZombie(e);return;}
   if(e.kind==='mcow'){drawMcow(e);return;}
   if(e.kind==='bear'){drawBear(e);return;}
+  if(e.kind==='knight'){drawKnight(e);return;}
+  if(e.kind==='archer'){drawArcher(e);return;}
   const dead=e.state==='dead';
   const img=e.ice?(e.kind==='hop'?(e.flash>0?DOLB_IW:DOLB_I):e.kind==='shoot'?(e.flash>0?DOLR_IW:DOLR_I):(e.flash>0?DOLP_IW:DOLP_I)):e.kind==='hop'?(e.flash>0?DOLB_W:DOLB):e.kind==='shoot'?(e.flash>0?DOLR_W:DOLR):(e.flash>0?DOLP_W:DOLP);
   const cx=Math.round(e.x+e.w/2),cy=Math.round(e.y+e.h/2);
@@ -4214,6 +4544,7 @@ function renderRz(){
 function render(){
   ctx.imageSmoothingEnabled=false;
   if(rz){renderRz();return;}
+  if(tw){renderTw();return;}
   const cx=Math.round(cam.x),cy=Math.round(cam.y);
   {const cc=Math.round((cx+VW/2)/T),tb=inBeach(cc)?1:0,ts=inSwamp(cc)?1:0,ti=inIce(cc)?1:0;iceView+=(ti-iceView)*0.06;if(Math.abs(ti-iceView)<0.01)iceView=ti;   // fondu d'une zone à l'autre
    bzView+=(tb-bzView)*0.06;if(Math.abs(tb-bzView)<0.01)bzView=tb;swView+=(ts-swView)*0.06;if(Math.abs(ts-swView)<0.01)swView=ts;}
@@ -4230,7 +4561,7 @@ function render(){
   drawWater(cx,cy);
   drawOcto();
   drawCastle();
-  drawCabin(cx,cy);drawIceHall(cx,cy);drawWitch();drawEskimo();
+  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();
   drawPalms(cx,cy);
   drawSwampTowers(cx);
   drawTiles(cx,cy);
@@ -4298,7 +4629,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 }
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
-  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();
+  colCache.clear();plat.clear();chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;
   enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
