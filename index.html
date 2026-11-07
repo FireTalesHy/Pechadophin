@@ -3024,7 +3024,7 @@ function twFloorY(x,y){const tx=Math.floor(x/T);for(let ty=Math.floor(y/T);ty<TW
 function twEnter(cs){
   const p=player;
   tw=buildTw();tw.back={x:cs.cx*T+8-cs.sg*46-5,y:cs.floor*T-14,sg:cs.sg};
-  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];tcards=[];harp=null;
+  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];tcards=[];harp=null;sixJet=[];
   for(const sp of tw.spawns){
     const hp=sp.kind==='knight'?5+Math.floor(sp.st/2):3+(sp.st>=4?1:0),dir=Math.random()<0.5?1:-1;
     enemies.push(sp.kind==='knight'
@@ -3043,7 +3043,7 @@ function twLeave(){
     if(!anarchyOn){shop.cloud=b.sg;if(!shop.ice)shop.ice=b.sg;if(!shop.swamp)shop.swamp=b.sg;if(!shop.beach)shop.beach=b.sg;saveShop();refreshCp();}
   }
   Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null,face:win?b.sg:-b.sg});
-  player.safe={x:b.x,y:b.y};twCd=2.5;tcards=[];harp=null;snapCamera();
+  player.safe={x:b.x,y:b.y};twCd=2.5;tcards=[];harp=null;sixJet=[];snapCamera();
   if(win){floatText(player.x+5,player.y-34,'LE MONDE NUAGE','#ffffff');floatText(player.x+5,player.y-24,'CHECKPOINT !','#7ff0e8');sfx.heal();}
 }
 function twDoorCheck(dt){   // la porte du château : on y entre en marchant dedans
@@ -3087,7 +3087,7 @@ function stepTw(dt){
   stepPlayer(dt);if(state!=='play')return;
   stepHook(dt);
   twHaz(dt);
-  stepEnemies(dt);stepKing(dt);stepKingBalls(dt);stepBossShots(dt);stepScepterBeams(dt);stepSoulFx(dt);stepPickups(dt);stepFx(dt);
+  stepSixJet(dt);stepEnemies(dt);stepKing(dt);stepKingBalls(dt);stepBossShots(dt);stepScepterBeams(dt);stepSoulFx(dt);stepPickups(dt);stepFx(dt);
   if(combo.n>0){combo.t-=dt;if(combo.t<=0){combo.n=0;combo.t=0;}}
   const st=Math.floor((TWB*T-(p.y+p.h)+2)/(TWR*T));
   if(st>tw.maxStage){
@@ -3391,13 +3391,13 @@ function renderTw(){
   ctx.fillStyle='#000000';ctx.fillRect(0,0,VW,VH);
   let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
   ctx.save();ctx.translate(-cx+sx,-cy+sy);
-  drawTwBg(cy);drawTwTiles(cy);drawTwHaz();drawScepterFx();drawCards();
+  drawTwBg(cy);drawTwTiles(cy);drawTwHaz();drawScepterFx();
   for(const e of enemies){
     if(e.y+30<cy||e.y-30>cy+VH)continue;
     drawEnemy(e);
     if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);}
   }
-  drawKing();drawPickups();drawBossShots();drawKingBalls();drawTridents();drawPlayer();drawReticle();drawSoulFx();drawFx();
+  drawKing();drawPickups();drawBossShots();drawKingBalls();drawTridents();drawPlayer();drawSixJet();drawReticle();drawSoulFx();drawFx();
   ctx.restore();
   if(state==='dying'&&dyingT<0.25){ctx.fillStyle='rgba(255,60,60,.28)';ctx.fillRect(0,0,VW,VH);}
   if(twTr)drawTwFade();
@@ -5160,7 +5160,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  tcards=[];harp=null;enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
