@@ -682,12 +682,12 @@ function spawnBlend(tx){
 }
 function pitInfo(cell){
   if(cell===-1||cell===0) return null;
-  const cl=inCloud(cell*22+11);   // monde nuage : trous presque partout et bien plus larges (5 à 9 cases), à franchir par les nuages
-  if(hash2(cell,77)>=(cl?0.88:0.5)) return null;
+  const cl=inCloud(cell*22+11);   // monde nuage : trous presque partout et très larges (7 à 12 cases), à franchir par les nuages
+  if(hash2(cell,77)>=(cl?0.95:0.5)) return null;
   for(const o of[-12,11,34])if(castleAt(cell*22+o))return null;   // pas de trou autour du château
   const s=cell*22+6+Math.floor(hash2(cell,78)*9);
   if(cl&&Math.abs(s)<CLOUD_TX+30)return null;   // l'arrivée par la fenêtre reste sur du plat
-  const w=cl?5+Math.floor(hash2(cell,79)*5):2+Math.floor(hash2(cell,79)*2);
+  const w=cl?7+Math.floor(hash2(cell,79)*6):2+Math.floor(hash2(cell,79)*2);
   const hl=Math.round(spawnBlend(s-3)), hr=Math.round(spawnBlend(s+w+2));
   if(Math.abs(hl-hr)>2) return null;
   if(inBeach(s)){   // pas de trou à côté d'un tunnel
@@ -4339,7 +4339,7 @@ const BG_BEACH={sky:['#4db3ee','#5fc3f2','#76d0f5','#92dcf6','#b0e7f7','#cff1f6'
 let bzView=0,swView=0,iceView=0,clView=0;
 const BG_SWAMP={sky:['#4f6a5e','#5a7666','#668270','#738d7a','#839a86','#95a893','#a8b6a0','#bcc4ad'],sea:'#3c6b5a',seaTop:'#6f9a86',spark:'#a9cdb9',h1:'#4f6b55',h1t:'#62806a',h2:'#35503a',h2t:'#4a6b4c'};   // 0 = herbe, 1 = plage (fondu progressif à la sortie de l'arène)
 const BG_ICE={sky:['#8ec9ee','#a4d6f3','#bbe3f7','#d0edfa','#e0f4fc','#ecf8fe','#f4fbff','#fbfdff'],sea:'#8cc4e8',seaTop:'#e8f8ff',spark:'#ffffff',h1:'#b4d6ec',h1t:'#e8f6ff',h2:'#88b4d6',h2t:'#d8eefa'};   // glacière : ciel pâle, mer gelée, montagnes de glace
-const BG_CLOUD={sky:['#4aa0f0','#62b0f4','#7cc0f7','#98d0f9','#b6e0fb','#d2eefc','#ecf8fe','#fff6e2'],sea:'#f2f7ff',seaTop:'#ffffff',spark:'#ffe9a8',h1:'#e4edfb',h1t:'#ffffff',h2:'#c4d6f0',h2t:'#f4f8ff'};   // monde nuage : ciel haut et lumineux, mer de nuages
+const BG_CLOUD={sky:['#4aa0f0','#62b0f4','#7cc0f7','#98d0f9','#b6e0fb','#d2eefc','#ecf8fe','#fff6e2'],sea:'#f2f7ff',seaTop:'#ffffff',spark:'#ffe9a8',h1:'#e4edfb',h1t:'#ffffff',h2:'#c4d6f0',h2t:'#f4f8ff',noHills:true};   // monde nuage : ciel haut et lumineux, mer de nuages
 function drawSnow(a){   // neige qui tombe + aurore boréale
   ctx.globalAlpha=0.16*a;
   for(let x=0;x<VW;x+=4){const y=14+Math.sin(x*0.035+time*0.5)*12;ctx.fillStyle='#7dffc8';ctx.fillRect(x,Math.round(y),4,26+Math.round(Math.sin(x*0.07+time)*6));}
@@ -4356,6 +4356,7 @@ function drawBackground(cx,cy,P){
   for(const c of clouds){
     cloud(mod(c.x-cx*c.par+time*(3+c.par*30),VW+220)-110,c.y-(cy-200)*0.04,c.s);
   }
+  if(P.noHills)return;   // monde nuage : un ciel pur, sans mer ni montagnes
   const seaTop=Math.round(VH*0.6-(cy-200)*0.10);
   if(seaTop<VH){
     const st=Math.max(0,seaTop);
