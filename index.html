@@ -1751,7 +1751,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1780,6 +1780,9 @@ function loadShop(){
       if(j.sc&&typeof j.sc==='object')for(const k of SC_KEYS)d.sc[k]=clamp(Math.floor(Number(j.sc[k]))||0,0,5);
       if(j.weapon==='scepter'&&d.scepterOwned)d.weapon='scepter';
       d.tarotOwned=j.tarotOwned===true;
+      d.harpoonOwned=j.harpoonOwned===true;
+      if(j.hu&&typeof j.hu==='object')for(const k of ['dmg','range','reel','chain'])d.hu[k]=clamp(Math.floor(Number(j.hu[k]))||0,0,3);
+      if(j.weapon==='harpoon'&&d.harpoonOwned)d.weapon='harpoon';
       if(j.tx&&typeof j.tx==='object')for(const k of ['chariot','star'])d.tx[k]=j.tx[k]===true;
       if(j.weapon==='tarot'&&d.tarotOwned)d.weapon='tarot';
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
@@ -2130,6 +2133,7 @@ function stepTrident(dt){
 }
 function stepHook(dt){
   stepCards(dt);
+  if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
   if(shop.weapon==='tarot'&&!glockOn){stepTarot(dt);return;}
   if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
   if(shop.weapon==='scepter'&&!glockOn){stepScepter(dt);return;}
@@ -3017,7 +3021,7 @@ function twFloorY(x,y){const tx=Math.floor(x/T);for(let ty=Math.floor(y/T);ty<TW
 function twEnter(cs){
   const p=player;
   tw=buildTw();tw.back={x:cs.cx*T+8-cs.sg*46-5,y:cs.floor*T-14,sg:cs.sg};
-  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];tcards=[];
+  tw.saveEn=enemies;tw.savePk=pickups;enemies=[];pickups=[];bossShots=[];hooks=[];tridents=[];scepBeams=[];king=null;kingBalls=[];tcards=[];harp=null;
   for(const sp of tw.spawns){
     const hp=sp.kind==='knight'?5+Math.floor(sp.st/2):3+(sp.st>=4?1:0),dir=Math.random()<0.5?1:-1;
     enemies.push(sp.kind==='knight'
@@ -3036,7 +3040,7 @@ function twLeave(){
     if(!anarchyOn){shop.cloud=b.sg;if(!shop.ice)shop.ice=b.sg;if(!shop.swamp)shop.swamp=b.sg;if(!shop.beach)shop.beach=b.sg;saveShop();refreshCp();}
   }
   Object.assign(player,{x:b.x,y:b.y,vx:0,vy:0,invuln:1.5,stun:0,dash:null,face:win?b.sg:-b.sg});
-  player.safe={x:b.x,y:b.y};twCd=2.5;tcards=[];snapCamera();
+  player.safe={x:b.x,y:b.y};twCd=2.5;tcards=[];harp=null;snapCamera();
   if(win){floatText(player.x+5,player.y-34,'LE MONDE NUAGE','#ffffff');floatText(player.x+5,player.y-24,'CHECKPOINT !','#7ff0e8');sfx.heal();}
 }
 function twDoorCheck(dt){   // la porte du château : on y entre en marchant dedans
@@ -3529,7 +3533,7 @@ function stepMilk(dt){
 function drawMilk(){for(const m of milk){ctx.fillStyle='#d8e4f0';ctx.fillRect(Math.round(m.x)-2,Math.round(m.y)-2,4,4);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(m.x)-1,Math.round(m.y)-2,3,3);}}
 /* ===== Zone secrète : tirer 6 fois sur une plateforme à pilier ouvre l'arène du boss « 6 » ===== */
 let hole=null;const RZC=1<<21,RZW=12,RZG=20,SIX_HP=800;   // arène d'un écran, loin du monde
-let rz=null,six=null,sixShots=[],sixJet=[],rzTr=null,sixCd=0,tcards=[],tarotCd=0;
+let rz=null,six=null,sixShots=[],sixJet=[],rzTr=null,sixCd=0,tcards=[],tarotCd=0,harp=null,harpCd=0;
 const RZ_FLOOR={g:RZG,pit:false,beach:false,tun:null,swamp:false},RZ_WALL={g:RZG-40,pit:false,beach:false,tun:null,swamp:false};
 const rzIn=tx=>!!rz&&tx>RZC-60&&tx<RZC+60;
 function rzEnter(){
@@ -3659,6 +3663,152 @@ function stepTarot(dt){
     sfx.hit&&sfx.hit();
   }
 }
+/* ---------- Harpon (acheté avec des âmes) : un harpon à câble. Sur un ennemi : il l'empale et le ramène à soi ; sur le décor : il tire le pêcheur jusqu'au point d'accroche ---------- */
+const HU={
+  dmg:{name:'Barbes',desc:'Dégâts du harpon (x3 sur un boss).',vals:[5,7,9,11],cost:[1,2,2],fmt:v=>v+' dégâts'},
+  range:{name:'Longueur du câble',desc:'Portée du harpon.',vals:[120,145,170,200],cost:[1,2,2],fmt:v=>fr1(v/16)+' cases'},
+  reel:{name:'Treuil',desc:'Vitesse du câble : ennemis ramenés et pêcheur tiré plus vite.',vals:[230,280,330,390],cost:[1,2,2],fmt:v=>fr1(v/16)+' cases/s'},
+  chain:{name:'Chaîne',desc:'Les ennemis proches de la cible harponnée subissent la moitié des dégâts.',vals:[0,40,56,72],cost:[1,2,2],fmt:v=>v?fr1(v/16)+' cases':'aucune'}
+};
+const HU_KEYS=['dmg','range','reel','chain'],HARPOON_COST=3;
+function drawHarpoonShape(x,y,a,flip){
+  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a);if(flip)ctx.scale(1,-1);
+  ctx.fillStyle='#14182c';ctx.fillRect(-3,-2,16,4);ctx.fillRect(13,-3,5,6);
+  ctx.fillStyle='#8a5a2a';ctx.fillRect(-2,-1,14,2);
+  ctx.fillStyle='#dfe8f0';ctx.fillRect(13,-1,4,2);ctx.fillRect(12,-2,2,4);ctx.fillStyle='#ffffff';ctx.fillRect(14,-1,3,1);
+  ctx.fillStyle='#9fb0c4';ctx.fillRect(10,-3,2,1);ctx.fillRect(10,2,2,1);
+  ctx.restore();
+}
+const HARPOON_ICON=(()=>{const c=mk(12,12),g=c.getContext('2d');
+  for(let i=0;i<9;i++){g.fillStyle='#14182c';g.fillRect(i,9-i,3,3);}
+  for(let i=0;i<8;i++){g.fillStyle='#8a5a2a';g.fillRect(i+1,9-i+1,1,1);}
+  g.fillStyle='#14182c';g.fillRect(7,0,5,5);g.fillStyle='#dfe8f0';g.fillRect(8,1,3,3);g.fillStyle='#ffffff';g.fillRect(9,1,2,1);
+  g.fillStyle='#9fb0c4';g.fillRect(6,3,2,1);g.fillRect(10,5,1,2);return c;})();
+function stepHarpoon(dt){
+  const p=player,L=shop.hu;
+  if(fireBuf>0)fireBuf-=dt;
+  if(harpCd>0)harpCd-=dt;
+  throwAnim=Math.max(0,throwAnim-dt);
+  const pcx=p.x+5,pcy=p.y+7;
+  if(!harp&&(fireBuf>0||inp.fire||aim.auto)&&harpCd<=0&&p.stun<=0&&state==='play'){
+    fireBuf=0;throwAnim=0.15;
+    const l=Math.hypot(aim.x,aim.y)||1,ux=aim.x/l,uy=aim.y/l;
+    harp={x:pcx+ux*8,y:pcy+uy*8,ux,uy,st:'fly',d:0,e:null,hit:new Set(),t:0,zt:0};sfx.trident();
+  }
+  const h=harp;if(!h)return;
+  const dmg=HU.dmg.vals[L.dmg],range=HU.range.vals[L.range],spd=HU.reel.vals[L.reel],chain=HU.chain.vals[L.chain];
+  h.t+=dt;
+  const dx=h.x-pcx,dy=h.y-pcy,dist=Math.hypot(dx,dy);
+  if(h.st==='fly'){
+    const step=430*dt;h.x+=h.ux*step;h.y+=h.uy*step;h.d+=step;
+    if(solidAt(h.x,h.y)){h.st='zip';h.zt=0;burst(h.x,h.y,'#dfe8f0',6,70);sfx.hit();}   // planté dans le décor : on se fait tirer
+    else{
+      for(const t of allTargets()){
+        if(!rectsOverlap(h.x-3,h.y-3,6,6,t.r[0],t.r[1],t.r[2],t.r[3]))continue;
+        if(t.e){
+          const e=t.e;t.hit(dmg);
+          if(e.state==='alive'){   // empalé : ramené vers le pêcheur
+            h.st='reel';h.e=e;h.t=0;burst(h.x,h.y,'#ffffff',6,80);
+            if(chain>0)for(const o of enemies)if(o!==e&&o.state==='alive'&&Math.hypot(o.x+o.w/2-(e.x+e.w/2),o.y+o.h/2-(e.y+e.h/2))<=chain){hitEnemy(o,Math.max(1,Math.ceil(dmg/2)));}
+          }else h.st='back';
+        } else {t.hit(dmg*3);h.st='back';burst(h.x,h.y,'#ffffff',8,90);}   // boss : coup lourd
+        break;
+      }
+      if(h.st==='fly'&&h.d>=range)h.st='back';
+    }
+  } else if(h.st==='reel'){
+    const e=h.e;
+    if(!e||e.state!=='alive')h.st='back';
+    else{
+      const ex=e.x+e.w/2,ey=e.y+e.h/2,tx=pcx-ex,ty=pcy-ey,td=Math.hypot(tx,ty)||1;
+      if(td<16||h.t>1.3){hitEnemy(e,dmg);h.st='back';}   // arrivé au pêcheur : second coup
+      else{
+        const sdt=spd*dt,nx=e.x+tx/td*sdt,ny=e.y+ty/td*sdt;
+        if(solidAt(nx+e.w/2,ny+e.h/2))h.st='back';
+        else{e.x=nx;e.y=ny;e.vx=0;if(e.vy>0)e.vy=0;h.x=e.x+e.w/2;h.y=e.y+e.h/2;}
+      }
+    }
+  } else if(h.st==='zip'){
+    h.zt+=dt;
+    let release=false,jump=false;
+    if(jumpBuf>0){release=true;jump=true;jumpBuf=0;}
+    if(dist<10||p.stun>0||h.zt>1.6)release=true;
+    const ux=dx/(dist||1),uy=dy/(dist||1);
+    if(!release){
+      const x0=p.x,y0=p.y,sdt=Math.min(spd*1.35*dt,dist);
+      moveX(p,ux*sdt);moveY(p,uy*sdt);p.vy=0;p.vx=0;
+      if(Math.abs(p.x-x0)+Math.abs(p.y-y0)<sdt*0.35)release=true;   // bloqué contre le décor
+      if(Math.random()<0.8)parts.push({x:p.x+5,y:p.y+7,vx:-ux*25,vy:-uy*25,g:0,life:0.2,col:'#dfe8f0',sz:1});
+      for(const t of allTargets()){   // on blesse ceux qu'on traverse
+        if(t.e&&!h.hit.has(t.e)&&rectsOverlap(p.x,p.y,p.w,p.h,t.r[0],t.r[1],t.r[2],t.r[3])){h.hit.add(t.e);t.hit(Math.max(1,Math.ceil(dmg/2)));}
+      }
+    }
+    if(release){
+      if(jump){p.vy=-JUMPV*0.95;p.vx=ux*150;p.onGround=false;p.coyote=0;sfx.jump();}
+      else{p.vx=ux*150;p.vy=uy*140;}
+      harp=null;harpCd=0.12;return;
+    }
+  }
+  if(h.st==='back'){
+    const sp=620*dt;
+    if(dist<=sp+8){harp=null;harpCd=0.12;return;}
+    h.x-=dx/dist*sp;h.y-=dy/dist*sp;
+  }
+}
+function drawHarpoon(){
+  const h=harp;if(!h)return;
+  const p=player,px=p.x+5,py=p.y+7;
+  ctx.strokeStyle='#d8c8a0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(Math.round(px)+0.5,Math.round(py)+0.5);ctx.lineTo(Math.round(h.x)+0.5,Math.round(h.y)+0.5);ctx.stroke();
+  const a=h.st==='back'||h.st==='reel'?Math.atan2(py-h.y,px-h.x)+Math.PI:Math.atan2(h.uy,h.ux);
+  drawHarpoonShape(h.x-Math.cos(a)*8,h.y-Math.sin(a)*8,a,false);
+}
+function renderHarpoon(){
+  shopList.textContent='';
+  const icons={dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg};
+  for(const key of HU_KEYS){
+    const u=HU[key],lv=shop.hu[key],max=lv>=3;
+    const card=document.createElement('div');card.className='card';
+    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,icons[key],true);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
+    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 3');
+    for(let i=0;i<3;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
+    card.appendChild(pips);
+    const val=document.createElement('div');val.className='val';
+    val.textContent=(max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]))+'. '+u.desc;
+    card.appendChild(val);
+    const pr=document.createElement('div');pr.className='pr';
+    if(max)pr.textContent='NIVEAU 3/3';
+    else{const gi=document.createElement('canvas');gi.width=7;gi.height=8;drawIcon(gi,SOUL);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
+    card.appendChild(pr);
+    const b=document.createElement('button');b.className='sbtn';b.type='button';
+    if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
+    else if(shop.souls>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyHu(key));}
+    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.souls)+' ÂME'+(u.cost[lv]-shop.souls>1?'S':'');b.disabled=true;}
+    b.setAttribute('aria-label',u.name+' : '+b.textContent);
+    card.appendChild(b);shopList.appendChild(card);
+  }
+}
+function renderWeapBuy(w){   // arme achetable avec des âmes
+  shopList.textContent='';
+  const card=document.createElement('div');card.className='card';
+  const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,w.icon(),true);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
+  const nm=document.createElement('div');nm.className='nm';nm.textContent=w.name;card.appendChild(nm);
+  const pr=document.createElement('div');pr.className='pr';
+  const gi=document.createElement('canvas');gi.width=7;gi.height=8;drawIcon(gi,SOUL);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=w.buy.souls;pr.appendChild(sp);card.appendChild(pr);
+  const b=document.createElement('button');b.className='sbtn';b.type='button';
+  if(shop.souls>=w.buy.souls){b.textContent='ACHETER';b.addEventListener('click',()=>buyWeapon(w));}
+  else{const m=w.buy.souls-shop.souls;b.textContent='IL MANQUE '+m+' ÂME'+(m>1?'S':'');b.disabled=true;}
+  card.appendChild(b);shopList.appendChild(card);
+}
+function buyWeapon(w){
+  if(w.owned()||shop.souls<w.buy.souls)return;
+  shop.souls-=w.buy.souls;w.buy.give();saveShop();sfx.heal();renderShop();renderWeap();
+}
+function buyHu(key){
+  const u=HU[key],lv=shop.hu[key];
+  if(!shop.harpoonOwned||lv>=3||shop.souls<u.cost[lv])return;
+  shop.souls-=u.cost[lv];shop.hu[key]=lv+1;saveShop();sfx.heal();renderShop();renderWeap();
+}
 function stepCards(dt){
   if(!tcards.length)return;
   for(const c of tcards){
@@ -3682,6 +3832,7 @@ function stepCards(dt){
   tcards=tcards.filter(c=>!c.dead);
 }
 function drawCards(){
+  drawHarpoon();
   for(const c of tcards){
     ctx.save();ctx.translate(Math.round(c.x),Math.round(c.y));ctx.rotate(c.sp+c.t*16);
     if(c.star)ctx.drawImage(STAR_ICON,-5,-5);
@@ -4407,6 +4558,7 @@ function drawPlayer(){
   else if(shop.weapon==='six')ctx.drawImage(RNG_DIGITS['6'],Math.round(hx)-4,Math.round(hy)-7);
   else if(shop.weapon==='scepter')drawScepterHeld(hx,hy);
   else if(shop.weapon==='tarot')drawTarotHeld(hx,hy);
+  else if(shop.weapon==='harpoon'){if(!harp)drawHarpoonShape(hx,hy,Math.atan2(aim.y,aim.x),aim.x<0);}
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
     const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
@@ -4991,7 +5143,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  tcards=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  tcards=[];harp=null;enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -5313,6 +5465,7 @@ const WEAPONS=[
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
+  {id:'harpoon',name:'Harpon',desc:'Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi pour un second coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.',icon:()=>HARPOON_ICON,owned:()=>shop.harpoonOwned,buy:{souls:HARPOON_COST,give:()=>{shop.harpoonOwned=true;}},render:()=>renderHarpoon()},
   {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Silver Chariot en lance 3, Star Platinum : étoiles perforantes, autoguidées après un premier impact. Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
@@ -5325,8 +5478,8 @@ function renderWeap(){
   for(const w of WEAPONS){
     const b=document.createElement('button');b.type='button';b.className='wsq'+(shop.weapon===w.id?' eq':'')+(w.owned()?'':' lock')+(weapSel===w.id?' sel':'');
     b.appendChild(weapImg(w,32));
-    const n=document.createElement('span');n.textContent=w.owned()?w.name:'???';b.appendChild(n);
-    b.setAttribute('aria-label',w.owned()?w.name:'Arme verrouillée');
+    const n=document.createElement('span');n.textContent=w.owned()||w.buy?w.name:'???';b.appendChild(n);
+    b.setAttribute('aria-label',w.owned()||w.buy?w.name:'Arme verrouillée');
     b.addEventListener('click',()=>{weapSel=weapSel===w.id?null:w.id;renderWeap();});
     weapGrid.appendChild(b);
   }
@@ -5334,13 +5487,13 @@ function renderWeap(){
   if(!weapSel)return;
   const w=WEAPONS.find(x=>x.id===weapSel);
   const big=$('weap-big');big.textContent='';big.appendChild(weapImg(w,64));
-  $('weap-name').textContent=w.owned()?w.name:'???';
-  $('weap-desc').textContent=w.owned()?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':w.id==='scepter'?'Vaincs l\'esquimau dans la glacière.':w.id==='tarot'?'Le roi tout en haut du château de glace en détient un…':'Débloquée en atteignant la plage.');
+  $('weap-name').textContent=w.owned()||w.buy?w.name:'???';
+  $('weap-desc').textContent=w.owned()||w.buy?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':w.id==='scepter'?'Vaincs l\'esquimau dans la glacière.':w.id==='tarot'?'Le roi tout en haut du château de glace en détient un…':'Débloquée en atteignant la plage.');
   const eb=$('weap-eq');
   eb.disabled=!w.owned()||shop.weapon===w.id||(w.locked&&w.locked());
-  eb.textContent=!w.owned()?'VERROUILLÉE':shop.weapon===w.id?'ÉQUIPÉE':(w.locked&&w.locked())?'INDISPONIBLE':'ÉQUIPER';
+  eb.textContent=!w.owned()?(w.buy?'À ACHETER':'VERROUILLÉE'):shop.weapon===w.id?'ÉQUIPÉE':(w.locked&&w.locked())?'INDISPONIBLE':'ÉQUIPER';
   const keep=shopList;shopList=$('weap-list');
-  try{if(w.owned())w.render();else shopList.textContent='';}finally{shopList=keep;}
+  try{if(w.owned())w.render();else if(w.buy)renderWeapBuy(w);else shopList.textContent='';}finally{shopList=keep;}
 }
 let weapMerch=false;
 function openWeap(merch){clearInputs();weapMerch=merch===true;weapOpen=true;weapEl.hidden=false;weapSel=weapMerch?shop.weapon:null;$('weap-title').textContent=weapMerch?'MARCHAND':'ARMES';renderWeap();try{$('weap-close').focus({preventScroll:true});}catch(e){}}
@@ -5352,7 +5505,7 @@ function closeWeap(){
 }
 $('weap-btn').addEventListener('click',()=>openWeap(false));$('weap-close').addEventListener('click',closeWeap);
 weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
-$('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
+$('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;harp=null;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
 function renderDagger(){
   shopList.textContent='';
   const locked=!shop.daggerOwned,icons={dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC};
