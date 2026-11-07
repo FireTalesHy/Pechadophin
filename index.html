@@ -102,9 +102,11 @@ body{
 .ov-big.weap{background:linear-gradient(#ff9a4a,#c8501f)}
 .ov-left{display:flex;flex-direction:column;gap:calc(var(--p)*4)}
 .ov-left .ov-big{height:calc(var(--p)*22)}
-#weap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;padding:3px}
+#weap-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:3px}
+.wsq-empty{border:2px dashed var(--btn-line);opacity:.35;border-radius:10px;min-height:84px}
 .wsq{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 4px;border:2px solid var(--btn-line);background:var(--btn);cursor:pointer;font:400 7px/1.4 var(--pf);color:inherit}
-.wsq canvas{width:48px;height:48px;image-rendering:pixelated;background:linear-gradient(#8fcdf4,#cfeafb);border:2px solid var(--btn-line)}
+.wsq{min-width:0}
+.wsq canvas{width:100%;max-width:48px;height:auto;aspect-ratio:1;image-rendering:pixelated;background:linear-gradient(#8fcdf4,#cfeafb);border:2px solid var(--btn-line)}
 .wsq.eq{border-color:var(--on);box-shadow:0 0 0 2px var(--on)}
 .wsq.sel{outline:3px solid #ff9a4a;outline-offset:1px}
 .wsq.lock canvas{filter:brightness(0) opacity(.45)}
@@ -5483,6 +5485,8 @@ const WEAPONS=[
   {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Silver Chariot en lance 3, Star Platinum : étoiles perforantes, autoguidées après un premier impact. Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
+const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
+WEAPONS.sort((a,b)=>WEAP_ORDER.indexOf(a.id)-WEAP_ORDER.indexOf(b.id));
 let weapOpen=false,weapSel=null;
 const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
 function weapImg(w,size){const c=document.createElement('canvas');c.width=size;c.height=size;const g=c.getContext('2d');g.imageSmoothingEnabled=false;const im=w.icon(),s=Math.max(1,Math.floor(Math.min(size/im.width,size/im.height)*0.9));g.drawImage(im,Math.round((size-im.width*s)/2),Math.round((size-im.height*s)/2),im.width*s,im.height*s);return c;}
@@ -5490,6 +5494,7 @@ function renderWeap(){
   $('weap-gold').textContent=shop.gold;
   weapGrid.textContent='';
   for(const w of WEAPONS){
+    if(w.id==='six')for(let k=0;k<2;k++){const em=document.createElement('div');em.className='wsq-empty';em.setAttribute('aria-hidden','true');weapGrid.appendChild(em);}   // 2 places réservées pour de futures armes
     const b=document.createElement('button');b.type='button';b.className='wsq'+(shop.weapon===w.id?' eq':'')+(w.owned()?'':' lock')+(weapSel===w.id?' sel':'');
     b.appendChild(weapImg(w,32));
     const n=document.createElement('span');n.textContent=w.owned()||w.buy?w.name:'???';b.appendChild(n);
