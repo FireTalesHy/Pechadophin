@@ -3673,7 +3673,7 @@ const HU={
   reel:{name:'Treuil',desc:'Vitesse du câble : ennemis ramenés et pêcheur tiré plus vite.',vals:[230,280,330,390],cost:[1,2,2],fmt:v=>fr1(v/16)+' cases/s'},
   chain:{name:'Chaîne',desc:'Les ennemis proches de la cible harponnée subissent la moitié des dégâts.',vals:[0,40,56,72],cost:[1,2,2],fmt:v=>v?fr1(v/16)+' cases':'aucune'}
 };
-const HU_KEYS=['dmg','range','reel','chain'],HARPOON_COST=3;
+const HU_KEYS=['dmg','range','reel','chain'],HARPOON_COST=13;
 function drawHarpoonShape(x,y,a,flip){
   ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a);if(flip)ctx.scale(1,-1);
   ctx.fillStyle='#14182c';ctx.fillRect(-3,-2,16,4);ctx.fillRect(13,-3,5,6);
