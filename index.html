@@ -3679,11 +3679,19 @@ function drawHarpoonShape(x,y,a,flip){
   ctx.fillStyle='#9fb0c4';ctx.fillRect(10,-3,2,1);ctx.fillRect(10,2,2,1);
   ctx.restore();
 }
-const HARPOON_ICON=(()=>{const c=mk(12,12),g=c.getContext('2d');
-  for(let i=0;i<9;i++){g.fillStyle='#14182c';g.fillRect(i,9-i,3,3);}
-  for(let i=0;i<8;i++){g.fillStyle='#8a5a2a';g.fillRect(i+1,9-i+1,1,1);}
-  g.fillStyle='#14182c';g.fillRect(7,0,5,5);g.fillStyle='#dfe8f0';g.fillRect(8,1,3,3);g.fillStyle='#ffffff';g.fillRect(9,1,2,1);
-  g.fillStyle='#9fb0c4';g.fillRect(6,3,2,1);g.fillRect(10,5,1,2);return c;})();
+function paintGun(g,loaded){   // pistolet à harpon : corps d'acier, crosse en bois, harpon engagé dans le canon
+  g.fillStyle='#14182c';g.fillRect(-2,-3,15,6);g.fillRect(0,3,6,7);
+  g.fillStyle='#6a7488';g.fillRect(-1,-2,13,4);g.fillStyle='#9fb0c4';g.fillRect(-1,-2,13,1);g.fillStyle='#4a5468';g.fillRect(-1,1,13,1);
+  g.fillStyle='#8a5a2a';g.fillRect(1,3,4,6);g.fillStyle='#b07a3a';g.fillRect(1,3,1,6);
+  g.fillStyle='#14182c';g.fillRect(6,3,1,3);   // pontet
+  g.fillStyle='#ffd23f';g.fillRect(3,-1,3,1);   // bobine de câble
+  g.fillStyle='#14182c';g.fillRect(12,-3,2,6);
+  if(loaded){g.fillStyle='#14182c';g.fillRect(13,-2,10,4);g.fillStyle='#8a5a2a';g.fillRect(13,-1,7,2);g.fillStyle='#dfe8f0';g.fillRect(19,-2,3,4);g.fillRect(22,-1,2,2);g.fillStyle='#ffffff';g.fillRect(20,-1,3,1);}
+}
+function drawHarpoonGun(x,y,a,flip,loaded){
+  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a);if(flip)ctx.scale(1,-1);paintGun(ctx,loaded);ctx.restore();
+}
+const HARPOON_ICON=(()=>{const c=mk(26,13),g=c.getContext('2d');g.translate(3,4);paintGun(g,true);return c;})();
 function stepHarpoon(dt){
   const p=player,L=shop.hu;
   if(fireBuf>0)fireBuf-=dt;
@@ -3757,7 +3765,7 @@ function stepHarpoon(dt){
 }
 function drawHarpoon(){
   const h=harp;if(!h)return;
-  const p=player,px=p.x+5,py=p.y+7;
+  const p=player,aa=Math.atan2(aim.y,aim.x),px=p.x+5+p.face*5+Math.cos(aa)*13,py=p.y+8+Math.sin(aa)*13;   // le câble part du canon
   ctx.strokeStyle='#d8c8a0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(Math.round(px)+0.5,Math.round(py)+0.5);ctx.lineTo(Math.round(h.x)+0.5,Math.round(h.y)+0.5);ctx.stroke();
   const a=h.st==='back'||h.st==='reel'?Math.atan2(py-h.y,px-h.x)+Math.PI:Math.atan2(h.uy,h.ux);
   drawHarpoonShape(h.x-Math.cos(a)*8,h.y-Math.sin(a)*8,a,false);
@@ -4558,7 +4566,7 @@ function drawPlayer(){
   else if(shop.weapon==='six')ctx.drawImage(RNG_DIGITS['6'],Math.round(hx)-4,Math.round(hy)-7);
   else if(shop.weapon==='scepter')drawScepterHeld(hx,hy);
   else if(shop.weapon==='tarot')drawTarotHeld(hx,hy);
-  else if(shop.weapon==='harpoon'){if(!harp)drawHarpoonShape(hx,hy,Math.atan2(aim.y,aim.x),aim.x<0);}
+  else if(shop.weapon==='harpoon')drawHarpoonGun(hx,hy,Math.atan2(aim.y,aim.x),aim.x<0,!harp);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
     const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
