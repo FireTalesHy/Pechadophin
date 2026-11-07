@@ -103,6 +103,7 @@ body{
 .ov-left{display:flex;flex-direction:column;gap:calc(var(--p)*4)}
 .ov-left .ov-big{height:calc(var(--p)*22)}
 #weap-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:3px}
+.wsq-title{grid-column:1/-1;font:400 8px/1.4 var(--pf);letter-spacing:.5px;opacity:.75;padding:2px 2px 0}
 .wsq-empty{border:2px dashed var(--btn-line);opacity:.35;border-radius:10px;min-height:84px}
 .wsq{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 4px;border:2px solid var(--btn-line);background:var(--btn);cursor:pointer;font:400 7px/1.4 var(--pf);color:inherit}
 .wsq{min-width:0}
@@ -537,7 +538,7 @@ const EN={
 'Passer en anglais':'Switch to English','Passer en français':'Switch to French','English':'English','Français':'Français',
 'ÉQUIPÉ':'EQUIPPED','ÉQUIPER':'EQUIP','ÉQUIPÉE':'EQUIPPED','ACHETER':'BUY','OFFERT':'FREE','POSSÉDÉ':'OWNED','OFFERTE':'FREE','AMÉLIORER':'UPGRADE','INDISPONIBLE':'UNAVAILABLE','NIVEAU MAX':'MAX LEVEL','NIVEAU 5/5':'LEVEL 5/5','NIVEAU 3/3':'LEVEL 3/3',
 'DÉBLOQUÉ À LA PLAGE':'UNLOCKED AT THE BEACH','VERROUILLÉ':'LOCKED','TRIDENT REQUIS':'TRIDENT REQUIRED','NIVEAUX CONSERVÉS':'LEVELS KEPT','MARCHAND':'MERCHANT',
-'Trident infernal':'Infernal trident','Perce les ennemis':'Pierces enemies','Canne à pêche':'Fishing rod','Remplacée par le trident':'Replaced by the trident','Arme de départ':'Starting weapon','Tridents multiples':'Multiple tridents',
+'Trident infernal':'Infernal trident','Perce les ennemis':'Pierces enemies','Armes d\'histoire':'Story weapons','Armes diverses':'Misc weapons','Canne à pêche':'Fishing rod','Remplacée par le trident':'Replaced by the trident','Arme de départ':'Starting weapon','Tridents multiples':'Multiple tridents',
 'Portée':'Range','Zone de dégâts':'Damage area','Vitesse de tir':'Fire rate','Dégâts':'Damage','Perforation':'Piercing','Points de vie':'Hit points',
 'Pêcheur':'Fisherman','Pirate':'Pirate','Ninja':'Ninja','Cow-boy':'Cowboy','Chevalier de l\'espace':'Space knight','Apprenti sorcier':'Sorcerer\'s apprentice','Super-héros':'Superhero','Astronaute':'Astronaut','Zombie':'Zombie','Plombier':'Plumber','Cuisinier':'Chef','Viking':'Viking','Robot':'Robot','Clown':'Clown','Fantôme':'Ghost','Pharaon':'Pharaoh','Costume de dino':'Dino costume','Roi':'King',
 'PERLES':'PEARLS','OR':'GOLD','ÂMES ROUGES':'RED SOULS',
@@ -5493,8 +5494,11 @@ function weapImg(w,size){const c=document.createElement('canvas');c.width=size;c
 function renderWeap(){
   $('weap-gold').textContent=shop.gold;
   weapGrid.textContent='';
+  const wTitle=t=>{const h=document.createElement('div');h.className='wsq-title';h.textContent=t;weapGrid.appendChild(h);};
+  wTitle('Armes d\'histoire');
   for(const w of WEAPONS){
-    if(w.id==='six')for(let k=0;k<2;k++){const em=document.createElement('div');em.className='wsq-empty';em.setAttribute('aria-hidden','true');weapGrid.appendChild(em);}   // 2 places réservées pour de futures armes
+    if(w.id==='six'){for(let k=0;k<2;k++){const em=document.createElement('div');em.className='wsq-empty';em.setAttribute('aria-hidden','true');weapGrid.appendChild(em);}   // 2 places réservées pour de futures armes
+      wTitle('Armes diverses');}
     const b=document.createElement('button');b.type='button';b.className='wsq'+(shop.weapon===w.id?' eq':'')+(w.owned()?'':' lock')+(weapSel===w.id?' sel':'');
     b.appendChild(weapImg(w,32));
     const n=document.createElement('span');n.textContent=w.owned()||w.buy?w.name:'???';b.appendChild(n);
