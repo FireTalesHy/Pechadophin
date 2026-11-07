@@ -3688,8 +3688,14 @@ function paintGun(g,loaded){   // pistolet à harpon : corps d'acier, crosse en 
   g.fillStyle='#14182c';g.fillRect(12,-3,2,6);
   if(loaded){g.fillStyle='#14182c';g.fillRect(13,-2,10,4);g.fillStyle='#8a5a2a';g.fillRect(13,-1,7,2);g.fillStyle='#dfe8f0';g.fillRect(19,-2,3,4);g.fillRect(22,-1,2,2);g.fillStyle='#ffffff';g.fillRect(20,-1,3,1);}
 }
+function paintGunSm(g,loaded){   // version tenue en main : plus petite
+  g.fillStyle='#14182c';g.fillRect(-1,-2,10,4);g.fillRect(0,2,4,4);
+  g.fillStyle='#6a7488';g.fillRect(0,-1,8,2);g.fillStyle='#9fb0c4';g.fillRect(0,-1,8,1);
+  g.fillStyle='#8a5a2a';g.fillRect(1,2,2,3);g.fillStyle='#ffd23f';g.fillRect(2,0,2,1);
+  if(loaded){g.fillStyle='#14182c';g.fillRect(9,-1,7,2);g.fillStyle='#8a5a2a';g.fillRect(9,0,4,1);g.fillStyle='#dfe8f0';g.fillRect(13,-1,2,2);g.fillRect(15,0,1,1);}
+}
 function drawHarpoonGun(x,y,a,flip,loaded){
-  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a);if(flip)ctx.scale(1,-1);paintGun(ctx,loaded);ctx.restore();
+  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a);if(flip)ctx.scale(1,-1);paintGunSm(ctx,loaded);ctx.restore();
 }
 const HARPOON_ICON=(()=>{const c=mk(26,13),g=c.getContext('2d');g.translate(3,4);paintGun(g,true);return c;})();
 function stepHarpoon(dt){
@@ -3765,7 +3771,7 @@ function stepHarpoon(dt){
 }
 function drawHarpoon(){
   const h=harp;if(!h)return;
-  const p=player,aa=Math.atan2(aim.y,aim.x),px=p.x+5+p.face*5+Math.cos(aa)*13,py=p.y+8+Math.sin(aa)*13;   // le câble part du canon
+  const p=player,aa=Math.atan2(aim.y,aim.x),px=p.x+5+p.face*5+Math.cos(aa)*9,py=p.y+8+Math.sin(aa)*9;   // le câble part du canon
   ctx.strokeStyle='#d8c8a0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(Math.round(px)+0.5,Math.round(py)+0.5);ctx.lineTo(Math.round(h.x)+0.5,Math.round(h.y)+0.5);ctx.stroke();
   const a=h.st==='back'||h.st==='reel'?Math.atan2(py-h.y,px-h.x)+Math.PI:Math.atan2(h.uy,h.ux);
   drawHarpoonShape(h.x-Math.cos(a)*8,h.y-Math.sin(a)*8,a,false);
