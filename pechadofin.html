@@ -1852,7 +1852,7 @@ function loadShop(){
       if(j.weapon==='scepter'&&d.scepterOwned)d.weapon='scepter';
       d.tarotOwned=j.tarotOwned===true;
       d.rb=clamp(Math.floor(Number(j.rb))||0,0,999);   // nombre de renaissances
-      if(j.tl&&typeof j.tl==='object')for(const k of ['dmg','chariot','star','sorc'])d.tl[k]=clamp(Math.floor(Number(j.tl[k]))||0,0,k==='chariot'?3:5);
+      if(j.tl&&typeof j.tl==='object')for(const k of ['dmg','chariot','star','sorc'])d.tl[k]=clamp(Math.floor(Number(j.tl[k]))||0,0,k==='chariot'||k==='star'?3:5);
       d.treeV=Math.floor(Number(j.treeV))||0;d.gv=Math.floor(Number(j.gv))||0;
       if(j.mc&&typeof j.mc==='object')for(const k in j.mc)if(j.mc[k]===true&&/^[a-z0-9]{1,12}$/.test(k))d.mc[k]=true;   // récompenses de missions déjà récupérées
       d.harpoonOwned=j.harpoonOwned===true;
@@ -3735,7 +3735,7 @@ const CARD_CD=0.35,CARD_V=270;
 const TARU={
  dmg:{name:'Dégâts',vals:[4,5,6,8,10,13],cost:[40,90,150,240,360],fmt:v=>v+' dégâts'},
  chariot:{name:'Silver Chariot',desc:'Plus de cartes lancées d\'un coup, en éventail.',vals:[1,2,3,4],cost:[80,180,320],fmt:v=>v+(v>1?' cartes':' carte')},
- star:{name:'Star Platinum',desc:'Des cartes étoilées perforantes : dès qu\'une touche un ennemi, elles deviennent autoguidées vers les autres.',vals:[0,150,190,230,270,320],cost:[150,250,380,550,800],fmt:v=>v?'Autoguidage '+fr1(v/16)+' cases':'Désactivé'},
+ star:{name:'Star Platinum',desc:'Des cartes étoilées perforantes : dès qu\'une touche un ennemi, elles deviennent autoguidées vers les autres.',vals:[0,170,230,300],cost:[150,300,550],fmt:v=>v?'Autoguidage '+fr1(v/16)+' cases':'Désactivé'},
  sorc:{name:'Sorcellerie',desc:'Chance qu\'une carte applique une potion au hasard sur l\'ennemi touché : brûlure, gel, poison ou étourdissement.',vals:[0,12,20,28,36,50],cost:[80,140,220,330,480],fmt:v=>v?v+' % de chance':'Aucun effet'}
 };
 const cardDmg=()=>TARU.dmg.vals[shop.tl.dmg];
@@ -5858,7 +5858,7 @@ const TREES={
  trident:{tab:()=>TUP,lv:()=>shop.tup,max:5,cur:'gold',keys:T_KEYS,block:()=>shop.tridentOwned?'':'TRIDENT REQUIS',icons:()=>({dmg:ICONS.dmg,pierce:ICONS.pierce,rate:ICONS.rate,range:ICONS.range})},
  dagger:{tab:()=>DUP,lv:()=>shop.dup,max:5,cur:'gold',keys:D_KEYS,block:()=>shop.daggerOwned?'':'DAGUES REQUISES',icons:()=>({dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC})},
  scepter:{tab:()=>SCUP,lv:()=>shop.sc,max:5,cur:'gold',keys:SC_KEYS,block:()=>shop.scepterOwned?'':'SCEPTRE REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg})},
- tarot:{tab:()=>TARU,lv:()=>shop.tl,max:5,bm:{chariot:3},cur:'gold',keys:['dmg','chariot','star','sorc'],block:()=>shop.tarotOwned?'':'TAROT REQUIS',icons:()=>({dmg:ICONS.dmg,chariot:TAROT_ICON,star:STAR_ICON,sorc:POTION_IC})},
+ tarot:{tab:()=>TARU,lv:()=>shop.tl,max:5,bm:{chariot:3,star:3},cur:'gold',keys:['dmg','chariot','star','sorc'],block:()=>shop.tarotOwned?'':'TAROT REQUIS',icons:()=>({dmg:ICONS.dmg,chariot:TAROT_ICON,star:STAR_ICON,sorc:POTION_IC})},
  harpoon:{tab:()=>HU,lv:()=>shop.hu,max:3,cur:'souls',keys:HU_KEYS,block:()=>shop.harpoonOwned?'':'HARPON REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg})}
 };
 const treeSel={};
