@@ -130,6 +130,7 @@ body{
 #overlay[data-mode="pause"] #weap-btn{display:none}   /* en pleine partie, on passe par le marchand */
 #shop.merchant .tabs{display:none}
 .ov-big.small{font-size:max(7px,calc(var(--p)*7))}
+.ov-big.rbb{background:linear-gradient(#ffd23f,#d8861f);font-size:max(7px,calc(var(--p)*7))}
 .ov-big.shopb{background:linear-gradient(#4a97ff,#1f62c8)}
 .ov-mid{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:calc(var(--p)*3);text-align:center}
 #ov-cp{margin:0;font:400 max(6px,calc(var(--p)*4.6))/1.4 var(--pf);color:#ffd23f}
@@ -380,7 +381,7 @@ body{
           <button class="go alt" id="ov-restart" type="button" hidden>RECOMMENCER</button>
           <p class="credits" id="credits">dev : L'taleshy et cocobat<br>testeurs : moustik, ofodile, wyzan et nad l'arnaque</p>
         </div>
-        <button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button>
+        <div class="ov-left"><button class="ov-big rbb" id="rb-btn" type="button" hidden>RENAISSANCE</button><button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button></div>
       </div>
     </div>
   </div>
@@ -463,7 +464,6 @@ body{
     <input type="range" id="set-joy" min="60" max="160" step="10" value="100" style="width:100%;accent-color:#ff8a3d">
     <p class="shop-note" id="ov-hint">Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).</p>
     <a class="sbtn" id="rng-link" href="https://rng-infinite.com/?ref=pechadophin" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">JOUE AUSSI À RNG∞</a>
-    <button class="go sm" id="rb-btn" type="button" hidden>RENAISSANCE</button>
     <button class="go alt sm" id="rst-btn" type="button">RÉINITIALISER LA SAVE</button>
     <p class="credits">dev : L'taleshy et cocobat<br>testeurs : moustik, ofodile, wyzan et nad l'arnaque</p>
     <button class="go" id="set-close" type="button">RETOUR</button>
@@ -5264,6 +5264,7 @@ function setShopBtn(mode){   // en pause : le bouton BOUTIQUE devient RETOUR MEN
   const b=$('shop-btn');
   b.textContent=mode==='pause'?'RETOUR MENU':'BOUTIQUE';
   b.classList.toggle('small',mode==='pause');
+  try{rbRefresh();}catch(e){}
   b.setAttribute('aria-label',mode==='pause'?'Retour au menu principal':'Boutique');
 }
 function drawOvChar(){ovCtx.clearRect(0,0,16,16);ovCtx.imageSmoothingEnabled=false;ovCtx.drawImage(curSkin().spr.idle,0,0);}   // le skin équipé au centre des menus
@@ -5365,7 +5366,7 @@ function showOver(){
 /* ---- Réinitialisation de la save : double confirmation ---- */
 const rstEl=$('rst');
 let rstOpen=false,rstStep=0,rstMode='reset';
-function rbRefresh(){const b=$('rb-btn');if(!b)return;b.hidden=!shop.bossSouls.king;b.textContent='RENAISSANCE'+(shop.rb?' (×'+shop.rb+')':'');}
+function rbRefresh(){const b=$('rb-btn');if(!b)return;b.hidden=!shop.bossSouls.king||ov.dataset.mode!=='title';b.textContent=(lang==='en'?'REBIRTH':'RENAISSANCE')+(shop.rb?' (×'+shop.rb+')':'');}
 function renderRst(){
   if(rstMode==='rebirth'){
     $('rst-title').textContent='RENAISSANCE ?';
@@ -5734,7 +5735,7 @@ function openMode(){clearInputs();modeOpen=true;modeEl.hidden=false;updateMode()
 function closeMode(){modeOpen=false;modeEl.hidden=true;try{$('skins-btn').focus({preventScroll:true});}catch(e){}}
 $('mode-classic').addEventListener('click',()=>setMode(false));$('mode-ana').addEventListener('click',()=>setMode(true));
 $('mode-close').addEventListener('click',closeMode);modeEl.addEventListener('pointerdown',e=>{if(e.target===modeEl)closeMode();});
-function openSet(){clearInputs();rbRefresh();setOpen=true;setEl.hidden=false;try{$('set-close').focus({preventScroll:true});}catch(e){}}
+function openSet(){clearInputs();setOpen=true;setEl.hidden=false;try{$('set-close').focus({preventScroll:true});}catch(e){}}
 function closeSet(){setOpen=false;setEl.hidden=true;try{$('set-btn').focus({preventScroll:true});}catch(e){}}
 $('mis-btn').addEventListener('click',openMis);$('mis-close').addEventListener('click',closeMis);
 $('set-btn').addEventListener('click',openSet);$('set-close').addEventListener('click',closeSet);
