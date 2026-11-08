@@ -151,6 +151,11 @@ body{
 #mis-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;touch-action:pan-y;min-height:0;padding:3px}
 .mis-row{border:2px solid var(--btn-line);background:var(--btn);padding:8px 10px;display:flex;flex-direction:column;gap:6px;font:400 9px/1.4 var(--pf)}
 .mis-row.done{border-color:var(--on)}
+.mis-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:8px;opacity:.9}
+.mis-foot .sbtn{width:auto;padding:5px 10px;font-size:8px}
+.ov-chip{position:relative}
+.rdot{position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;background:#ff3b3b;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.rdot[hidden]{display:none}
 .mis-top{display:flex;justify-content:space-between;gap:8px}
 .mis-bar{height:8px;background:var(--btn-shadow);border:1px solid var(--btn-line)}
 .mis-bar i{display:block;height:100%;background:#ff8a3d}
@@ -373,7 +378,7 @@ body{
     <button class="ov-big shopb" id="merch-btn" type="button" hidden>MARCHAND (E)</button>
     <div id="overlay" class="show" data-mode="title">
       <div class="ov-top">
-        <div class="ov-chips"><button class="ov-chip" id="mis-btn" type="button">MISSIONS</button><button class="ov-chip" id="lb-btn" type="button">TOP 10</button></div>
+        <div class="ov-chips"><button class="ov-chip" id="mis-btn" type="button">MISSIONS<span class="rdot" id="mis-dot" hidden></span></button><button class="ov-chip" id="lb-btn" type="button">TOP 10</button></div>
         <div class="ov-right">
           <button class="ov-gear ov-acc" id="acc-btn" type="button" aria-label="Compte Google" title="Compte Google"></button>
           <button class="ov-gear ov-lang" id="lang-btn" type="button" aria-label="English" title="English"></button>
@@ -580,7 +585,7 @@ const EN={
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
 "Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.":'Skins are bought with gold. Open the chests you find along the way to earn some.',
-'DAGUES OBTENUES !':'DAGGERS OBTAINED!','ARME N°6 OBTENUE !':'WEAPON N°6 OBTAINED!','LE NUMÉRO 6 !':'NUMBER 6!','Spray':'Spray','Cadence de tir des chiffres x2 (une seule fois).':'Digit fire rate x2 (one time only).','Rouge':'Red','Skin : chaque chiffre a une couleur différente.':'Skin: each digit has a different color.','Skin : tous les chiffres sont rouges.':'Skin: all digits are red.','Rotation':'Spin','Skin : les chiffres tournent sur eux-mêmes.':'Skin: digits spin around.','ACTIF':'ACTIVE','ACHETÉ':'BOUGHT','ACHETER':'BUY','ACTIVER':'ENABLE','DÉSACTIVER':'DISABLE','ÉQUIPE-LA DANS ARMES':'EQUIP IT IN WEAPONS','+3 ÂMES ROUGES':'+3 RED SOULS','+300 OR':'+300 GOLD','+30 OR':'+30 GOLD','ENRAGÉ !':'ENRAGED!','Numéro 6':'Number 6','Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.':'A continuous stream of digits falling in an arc, like the cow\'s milk. Dropped by boss n°6.','Un secret se cache dans les marécages…':'A secret hides in the swamps…','ÉQUIPE-LES DANS ARMES':'EQUIP THEM IN WEAPONS','LA VACHE GÉANTE !':'THE GIANT COW!','ENRAGÉE !':'ENRAGED!','VACHE GÉANTE':'GIANT COW','Vaincre la vache géante':'Defeat the giant cow','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
+'DAGUES OBTENUES !':'DAGGERS OBTAINED!','ARME N°6 OBTENUE !':'WEAPON N°6 OBTAINED!','LE NUMÉRO 6 !':'NUMBER 6!','Spray':'Spray','Cadence de tir des chiffres x2 (une seule fois).':'Digit fire rate x2 (one time only).','Rouge':'Red','Skin : chaque chiffre a une couleur différente.':'Skin: each digit has a different color.','Skin : tous les chiffres sont rouges.':'Skin: all digits are red.','Rotation':'Spin','Skin : les chiffres tournent sur eux-mêmes.':'Skin: digits spin around.','ACTIF':'ACTIVE','ACHETÉ':'BOUGHT','ACHETER':'BUY','ACTIVER':'ENABLE','DÉSACTIVER':'DISABLE','ÉQUIPE-LA DANS ARMES':'EQUIP IT IN WEAPONS','+3 ÂMES ROUGES':'+3 RED SOULS','+300 OR':'+300 GOLD','+30 OR':'+30 GOLD','ENRAGÉ !':'ENRAGED!','Numéro 6':'Number 6','Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.':'A continuous stream of digits falling in an arc, like the cow\'s milk. Dropped by boss n°6.','Un secret se cache dans les marécages…':'A secret hides in the swamps…','ÉQUIPE-LES DANS ARMES':'EQUIP THEM IN WEAPONS','LA VACHE GÉANTE !':'THE GIANT COW!','ENRAGÉE !':'ENRAGED!','VACHE GÉANTE':'GIANT COW','Vaincre la vache géante':'Defeat the giant cow','Vaincre la sorcière':'Defeat the witch','Vaincre l\'esquimau':'Defeat the eskimo','Vaincre le Roi Cacamille 2':'Defeat King Cacamille 2','Vaincre le dauphin des nuages':'Defeat the cloud dolphin','RÉCUPÉRER':'CLAIM','RÉCUPÉRÉE':'CLAIMED','Récompense : 100 or':'Reward: 100 gold','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
@@ -588,6 +593,8 @@ const EN={
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
+ [/^Récompense : (\d+) or$/,m=>'Reward: '+m[1]+' gold'],
+ [/^Récompense : (\d+) âmes? rouges?$/,m=>'Reward: '+m[1]+(m[1]==='1'?' red soul':' red souls')],
  [/^TAILLE DES JOYSTICKS : (\d+) %$/,m=>'JOYSTICK SIZE: '+m[1]+'%'],
  [/^RECORD À BATTRE : (\d+)$/,m=>'RECORD TO BEAT: '+m[1]],
  [/^SON : (OUI|NON)$/,m=>'SOUND: '+(m[1]==='OUI'?'ON':'OFF')],
@@ -1812,7 +1819,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,rb:0,treeV:1,hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,rb:0,treeV:1,mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1843,6 +1850,7 @@ function loadShop(){
       d.tarotOwned=j.tarotOwned===true;
       d.rb=clamp(Math.floor(Number(j.rb))||0,0,999);   // nombre de renaissances
       d.treeV=Math.floor(Number(j.treeV))||0;
+      if(j.mc&&typeof j.mc==='object')for(const k in j.mc)if(j.mc[k]===true&&/^[a-z0-9]{1,12}$/.test(k))d.mc[k]=true;   // récompenses de missions déjà récupérées
       d.harpoonOwned=j.harpoonOwned===true;
       if(j.hu&&typeof j.hu==='object')for(const k of ['dmg','range','reel','chain'])d.hu[k]=clamp(Math.floor(Number(j.hu[k]))||0,0,3);
       if(j.weapon==='harpoon'&&d.harpoonOwned)d.weapon='harpoon';
@@ -1872,7 +1880,7 @@ function soulReward(key,n){
   if(shop.bossSouls[key])return false;
   shop.bossSouls[key]=true;shop.souls+=n;return true;
 }
-function saveShop(){try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}cloudQueue();}
+function saveShop(){try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}cloudQueue();try{misDot();}catch(e){}}
 const maxLives=()=>SOUL_UP.hp.vals[shop.hp];
 const curSkin=()=>SKINS.find(x=>x.id===shop.equipped)||SKINS[0];
 
@@ -5281,7 +5289,8 @@ function setShopBtn(mode){   // en pause : le bouton BOUTIQUE devient RETOUR MEN
 function drawOvChar(){ovCtx.clearRect(0,0,16,16);ovCtx.imageSmoothingEnabled=false;ovCtx.drawImage(curSkin().spr.idle,0,0);}   // le skin équipé au centre des menus
 const OV_TEXT0=ovText.textContent,OV_TITLE0=ovTitle.textContent,ovCp=$('ov-cp');
 function refreshCp(){ovCp.hidden=!shop.beach;ovCp.textContent=shop.cloud?'★ CHECKPOINT : LE MONDE NUAGE ★':shop.ice?'★ CHECKPOINT : LA GLACIÈRE ★':shop.swamp?'★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT : LA PLAGE ★';}
-function showTitle(){   // retour à l'écran titre (après un reset de la save par exemple)
+function showTitle(){
+  try{misDot();}catch(e){}   // retour à l'écran titre (après un reset de la save par exemple)
   paused=false;initTitle();
   overlayVisible=true;ov.classList.add('show');
   ov.dataset.mode='title';drawOvChar();setShopBtn('title');
@@ -5583,24 +5592,36 @@ $('set-sound').addEventListener('click',toggleMute);
 /* ---- Missions et réglages (menus ouverts depuis l'écran titre, la pause et l'écran de mort) ---- */
 const misEl=$('mis'),setEl=$('set');
 let misOpen=false,setOpen=false,modeOpen=false,accOpen=false;
-function missionList(){
+function missionList(){   // [id, nom, progression, objectif, récompense {gold|souls}]
   const bs=shop.bossSouls||{},tupSum=T_KEYS.reduce((n,k)=>n+shop.tup[k],0);
   return [
-    ['Atteindre la plage',shop.beach?1:0,1],
-    ['Tuer 10 vers de sable',Math.min(shop.wormKills,WORM_UNLOCK),WORM_UNLOCK],
-    ['Vaincre le démon requin',bs.shark?1:0,1],
-    ['Vaincre le poulpe géant',bs.octo?1:0,1],
-    ['Vaincre la méduse',bs.jelly?1:0,1],
-    ['Vaincre le château de sable',bs.castle?1:0,1],
-    ['Vaincre la vache géante',bs.cow?1:0,1],
-    ['Posséder 10 skins',Math.min(shop.owned.length,10),10],
-    ['Trident : toutes les améliorations au maximum',tupSum,T_KEYS.length*5]
+    ['beach','Atteindre la plage',shop.beach?1:0,1,{gold:100}],
+    ['worm','Tuer 10 vers de sable',Math.min(shop.wormKills,WORM_UNLOCK),WORM_UNLOCK,{gold:150}],
+    ['shark','Vaincre le démon requin',bs.shark?1:0,1,{gold:200}],
+    ['octo','Vaincre le poulpe géant',bs.octo?1:0,1,{gold:300}],
+    ['jelly','Vaincre la méduse',bs.jelly?1:0,1,{gold:400}],
+    ['castle','Vaincre le château de sable',bs.castle?1:0,1,{gold:500}],
+    ['cow','Vaincre la vache géante',bs.cow?1:0,1,{souls:1}],
+    ['witch','Vaincre la sorcière',bs.witch?1:0,1,{gold:600}],
+    ['esk','Vaincre l\'esquimau',bs.eskimo?1:0,1,{gold:800}],
+    ['king','Vaincre le Roi Cacamille 2',bs.king?1:0,1,{souls:2}],
+    ['cloud','Vaincre le dauphin des nuages',bs.cloud?1:0,1,{souls:3}],
+    ['skins','Posséder 10 skins',Math.min(shop.owned.length,10),10,{gold:1000}],
+    ['tmax','Trident : toutes les améliorations au maximum',tupSum,T_KEYS.length*5,{souls:2}]
   ];
+}
+const misReady=()=>missionList().some(m=>m[2]>=m[3]&&!shop.mc[m[0]]);
+function misDot(){const d=$('mis-dot');if(d)d.hidden=!misReady();}
+function claimMis(id){
+  const m=missionList().find(x=>x[0]===id);
+  if(!m||m[2]<m[3]||shop.mc[id])return;
+  shop.mc[id]=true;if(m[4].gold)shop.gold+=m[4].gold;if(m[4].souls)shop.souls+=m[4].souls;
+  saveShop();sfx.heal();renderMis();
 }
 function renderMis(){
   const list=$('mis-list');list.textContent='';
-  for(const [name,cur,goal] of missionList()){
-    const done=cur>=goal,row=document.createElement('div');row.className='mis-row'+(done?' done':'');
+  for(const [id,name,cur,goal,rw] of missionList()){
+    const done=cur>=goal,got=!!shop.mc[id],row=document.createElement('div');row.className='mis-row'+(done?' done':'');
     const top=document.createElement('div');top.className='mis-top';
     const n=document.createElement('span');n.textContent=name;
     const c=document.createElement('span');c.textContent=done?'✓':cur+'/'+goal;
@@ -5608,8 +5629,15 @@ function renderMis(){
     const bar=document.createElement('div');bar.className='mis-bar';
     const fill=document.createElement('i');fill.style.width=Math.round(100*Math.min(1,cur/goal))+'%';bar.appendChild(fill);
     row.setAttribute('role','group');row.setAttribute('aria-label',name+' : '+(done?'terminée':cur+' sur '+goal));
-    row.appendChild(top);row.appendChild(bar);list.appendChild(row);
+    row.appendChild(top);row.appendChild(bar);
+    const foot=document.createElement('div');foot.className='mis-foot';
+    const rl=document.createElement('span');rl.textContent='Récompense : '+(rw.gold?rw.gold+' or':rw.souls+(rw.souls>1?' âmes rouges':' âme rouge'));foot.appendChild(rl);
+    const b=document.createElement('button');b.type='button';b.className='sbtn'+(done&&!got?' equip':'');
+    b.textContent=got?'RÉCUPÉRÉE':'RÉCUPÉRER';b.disabled=!done||got;
+    if(done&&!got)b.addEventListener('click',()=>claimMis(id));
+    foot.appendChild(b);row.appendChild(foot);list.appendChild(row);
   }
+  misDot();
 }
 function openMis(){clearInputs();misOpen=true;misEl.hidden=false;renderMis();try{$('mis-close').focus({preventScroll:true});}catch(e){}}
 function closeMis(){misOpen=false;misEl.hidden=true;try{$('mis-btn').focus({preventScroll:true});}catch(e){}}
