@@ -1852,7 +1852,7 @@ function loadShop(){
       if(j.weapon==='scepter'&&d.scepterOwned)d.weapon='scepter';
       d.tarotOwned=j.tarotOwned===true;
       d.rb=clamp(Math.floor(Number(j.rb))||0,0,999);   // nombre de renaissances
-      if(j.tl&&typeof j.tl==='object')for(const k of ['dmg','chariot','star','sorc'])d.tl[k]=clamp(Math.floor(Number(j.tl[k]))||0,0,5);
+      if(j.tl&&typeof j.tl==='object')for(const k of ['dmg','chariot','star','sorc'])d.tl[k]=clamp(Math.floor(Number(j.tl[k]))||0,0,k==='chariot'?3:5);
       d.treeV=Math.floor(Number(j.treeV))||0;d.gv=Math.floor(Number(j.gv))||0;
       if(j.mc&&typeof j.mc==='object')for(const k in j.mc)if(j.mc[k]===true&&/^[a-z0-9]{1,12}$/.test(k))d.mc[k]=true;   // récompenses de missions déjà récupérées
       d.harpoonOwned=j.harpoonOwned===true;
@@ -3734,7 +3734,7 @@ const TX_KEYS=['chariot','star'];
 const CARD_CD=0.35,CARD_V=270;
 const TARU={
  dmg:{name:'Dégâts',vals:[4,5,6,8,10,13],cost:[40,90,150,240,360],fmt:v=>v+' dégâts'},
- chariot:{name:'Silver Chariot',desc:'Plus de cartes lancées d\'un coup, en éventail.',vals:[1,2,3,4,5,6],cost:[60,120,200,300,450],fmt:v=>v+(v>1?' cartes':' carte')},
+ chariot:{name:'Silver Chariot',desc:'Plus de cartes lancées d\'un coup, en éventail.',vals:[1,2,3,4],cost:[80,180,320],fmt:v=>v+(v>1?' cartes':' carte')},
  star:{name:'Star Platinum',desc:'Des cartes étoilées perforantes : dès qu\'une touche un ennemi, elles deviennent autoguidées vers les autres.',vals:[0,150,190,230,270,320],cost:[150,250,380,550,800],fmt:v=>v?'Autoguidage '+fr1(v/16)+' cases':'Désactivé'},
  sorc:{name:'Sorcellerie',desc:'Chance qu\'une carte applique une potion au hasard sur l\'ennemi touché : brûlure, gel, poison ou étourdissement.',vals:[0,12,20,28,36,50],cost:[80,140,220,330,480],fmt:v=>v?v+' % de chance':'Aucun effet'}
 };
@@ -5611,7 +5611,7 @@ const misEl=$('mis'),setEl=$('set');
 let misOpen=false,setOpen=false,modeOpen=false,accOpen=false;
 function missionList(){   // [id, nom, progression, objectif, récompense {gold|souls}]
   const bs=shop.bossSouls||{};
-  let maxB=0;for(const nm in TREES){const T=TREES[nm],L=T.lv();maxB+=T.keys.filter(k=>L[k]>=T.max).length;}   // branches au niveau max, toutes armes confondues
+  let maxB=0;for(const nm in TREES){const T=TREES[nm],L=T.lv();maxB+=T.keys.filter(k=>L[k]>=bmax(T,k)).length;}   // branches au niveau max, toutes armes confondues
   const L=[
     ['beach','Atteindre la plage',shop.beach?1:0,1,{gold:50}],
     ['worm','Tuer 10 vers de sable',Math.min(shop.wormKills,WORM_UNLOCK),WORM_UNLOCK,{gold:75}],
@@ -5852,19 +5852,20 @@ function renderTrident(){renderTree('trident');}
 
 /* ---------- Arbre de compétences des armes : l'arme au sommet, 4 branches, 2 branches actives au maximum, chaque niveau est un nœud plus bas, remboursable ---------- */
 const TREE_MAXB=2;
+const bmax=(T,k)=>(T.bm&&T.bm[k])||T.max;   // niveau max d'une branche (par défaut celui de l'arme)
 const TREES={
  rod:{tab:()=>UP,lv:()=>shop.up,max:5,cur:'gold',keys:UP_KEYS,block:()=>rodLocked()?'INDISPONIBLE':'',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,rate:ICONS.rate,count:ICONS.count})},
  trident:{tab:()=>TUP,lv:()=>shop.tup,max:5,cur:'gold',keys:T_KEYS,block:()=>shop.tridentOwned?'':'TRIDENT REQUIS',icons:()=>({dmg:ICONS.dmg,pierce:ICONS.pierce,rate:ICONS.rate,range:ICONS.range})},
  dagger:{tab:()=>DUP,lv:()=>shop.dup,max:5,cur:'gold',keys:D_KEYS,block:()=>shop.daggerOwned?'':'DAGUES REQUISES',icons:()=>({dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC})},
  scepter:{tab:()=>SCUP,lv:()=>shop.sc,max:5,cur:'gold',keys:SC_KEYS,block:()=>shop.scepterOwned?'':'SCEPTRE REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg})},
- tarot:{tab:()=>TARU,lv:()=>shop.tl,max:5,cur:'gold',keys:['dmg','chariot','star','sorc'],block:()=>shop.tarotOwned?'':'TAROT REQUIS',icons:()=>({dmg:ICONS.dmg,chariot:TAROT_ICON,star:STAR_ICON,sorc:POTION_IC})},
+ tarot:{tab:()=>TARU,lv:()=>shop.tl,max:5,bm:{chariot:3},cur:'gold',keys:['dmg','chariot','star','sorc'],block:()=>shop.tarotOwned?'':'TAROT REQUIS',icons:()=>({dmg:ICONS.dmg,chariot:TAROT_ICON,star:STAR_ICON,sorc:POTION_IC})},
  harpoon:{tab:()=>HU,lv:()=>shop.hu,max:3,cur:'souls',keys:HU_KEYS,block:()=>shop.harpoonOwned?'':'HARPON REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg})}
 };
 const treeSel={};
 const treeActive=T=>{const L=T.lv();return T.keys.filter(k=>L[k]>0).length;};
 function treeBuy(name,key){
   const T=TREES[name],U=T.tab()[key],L=T.lv(),lv=L[key];
-  if(T.block()||lv>=T.max||shop[T.cur]<U.cost[lv])return;
+  if(T.block()||lv>=bmax(T,key)||shop[T.cur]<U.cost[lv])return;
   if(lv===0&&treeActive(T)>=TREE_MAXB)return;
   shop[T.cur]-=U.cost[lv];L[key]=lv+1;saveShop();sfx.heal();renderShop();
 }
@@ -5885,7 +5886,7 @@ function renderTree(name){
   const line=(x1,y1,x2,y2,lit)=>{const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);ln.setAttribute('class',lit?'lit':'');svg.appendChild(ln);};
   T.keys.forEach((k,c)=>{
     line('50%',26,cx(c),ny(1),L[k]>0);
-    for(let r=1;r<T.max;r++)line(cx(c),ny(r),cx(c),ny(r+1),L[k]>r);
+    for(let r=1;r<bmax(T,k);r++)line(cx(c),ny(r),cx(c),ny(r+1),L[k]>r);
   });
   wrap.appendChild(svg);
   const w=WEAPONS.find(x=>x.id===name);
@@ -5894,7 +5895,7 @@ function renderTree(name){
   wrap.appendChild(root);
   T.keys.forEach((k,c)=>{
     const u=U[k],lv=L[k],blocked=lv===0&&act>=TREE_MAXB;
-    for(let r=1;r<=T.max;r++){
+    for(let r=1;r<=bmax(T,k);r++){
       const b=document.createElement('button');b.type='button';
       b.className='tnode'+(lv>=r?' on':'')+(lv+1===r&&!blocked?' next':'')+(blocked||lv+1<r?' lock':'')+(k===sel?' sel':'')+(lv===r?' top':'');
       b.style.left='calc('+cx(c)+' - '+(NW/2)+'px)';b.style.top=(TOP+(r-1)*RH)+'px';
@@ -5907,15 +5908,15 @@ function renderTree(name){
     }
   });
   shopList.appendChild(wrap);
-  const u=U[sel],lv=L[sel],max=lv>=T.max,cur=shop[T.cur],branchBlocked=lv===0&&act>=TREE_MAXB;
+  const u=U[sel],lv=L[sel],BM=bmax(T,sel),max=lv>=BM,cur=shop[T.cur],branchBlocked=lv===0&&act>=TREE_MAXB;
   const det=document.createElement('div');det.className='card tdet';
-  const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name+' ('+lv+'/'+T.max+')';det.appendChild(nm);
+  const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name+' ('+lv+'/'+BM+')';det.appendChild(nm);
   const val=document.createElement('div');val.className='val';
   val.textContent=(max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]))+(u.desc?'. '+u.desc:'');det.appendChild(val);
   const hint=document.createElement('div');hint.className='val';hint.textContent='Branches actives : '+act+'/'+TREE_MAXB+'. Rembourser une amélioration te rend tout son prix.';det.appendChild(hint);
   const pr=document.createElement('div');pr.className='pr';
   const icn=()=>{const gi=document.createElement('canvas');if(T.cur==='souls'){gi.width=7;gi.height=8;drawIcon(gi,SOUL);}else{gi.width=7;gi.height=6;drawIcon(gi,GOLD);}return gi;};
-  if(max)pr.textContent='NIVEAU '+T.max+'/'+T.max;
+  if(max)pr.textContent='NIVEAU '+BM+'/'+BM;
   else{pr.appendChild(icn());const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
   det.appendChild(pr);
   const row=document.createElement('div');row.className='row';row.style.cssText='display:flex;gap:8px;width:100%';
