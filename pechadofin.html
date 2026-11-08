@@ -634,7 +634,7 @@ const WATER_ROW=31;
 const HOOK_V=340, HOOK_BACK=520, HOOK_SPREAD=0.2;
 const COMBO_TIME=10, HEAL_EVERY=15;
 const CASTLE_HP=500;   // château de sable : seau d'eau à viser ; classique : 22 écrans après la méduse (elle-même à 26 écrans du début du sable) ; anarchie : au milieu de chaque zone plage
-const OCTO_HP=300, ARENA_START=27, ARENA_EVERY=36, WALL_H=14, CASTLE_SCREEN=ARENA_START+18;   // arène du poulpe : 1re à 27 écrans, puis tous les 36 écrans, des deux côtés
+const OCTO_HP=300, ARENA_START=27, ARENA_EVERY=20, WALL_H=14, CASTLE_SCREEN=ARENA_START+18;   // arène du poulpe : 1re à 27 écrans, puis tous les 20 écrans en anarchie (boss aléatoire), des deux côtés
 const JELLY_HP=420, JELLY_SCREENS=37, JELLY_SCREENS_C=26, CASTLE_AFTER_JELLY=22, JELLY_BEAM_L=480;   // méduse : 420 PV, apparaît ~37 écrans après l'entrée de la plage
 const ICE_ACC=1000, ICE_FRIC=300, ESK_HP=700, ICE_SCREENS=34;   // glace : accélération / frottement du pêcheur ; esquimau : PV ; arène à 34 écrans de l'entrée de la glacière
 const WITCH_HP=650, WITCH_AFTER=40;   // sorcière : fin du marécage, 40 écrans après son entrée (20 écrans après la vache)
@@ -669,16 +669,21 @@ const zoneK=tx=>{const a=Math.abs(tx);return a<BEACH_TX?0:Math.floor((a-BEACH_TX
 const ZONES=[{id:'plain',beach:false,boss:'octo'},{id:'beach',beach:true,boss:'castle'},{id:'swamp',beach:false,swamp:true,boss:'octo'},{id:'ice',beach:false,ice:true,boss:'eskimo'}];
 const SWAMP_TX=BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)+13;   // classique : les marécages commencent à la sortie de l'arène du château de sable
 const ICE_TX=SWAMP_TX+WITCH_AFTER*(VW/T)+13;   // classique : la glacière commence à la sortie de la cabane de la sorcière
-const zoneDefK=k=>k<=0?ZONES[0]:ZONES[Math.min(ZONES.length-1,Math.floor(hash2(k,401)*ZONES.length))];
+/* Anarchie : tous les 20 écrans, un boss aléatoire. Les boss à structure (poulpe, château de sable, sorcière, esquimau) ont leur arène ; les autres surgissent en plein terrain. */
+const SLOT_POOL=['octo','castle','witch','eskimo','shark','jelly','cow','six'],SLOT_ARENA={octo:1,castle:1,witch:1,eskimo:1};
+const slotBoss=j=>SLOT_POOL[Math.floor(hash2(j,733)*SLOT_POOL.length)];
+const ZONE_OF={castle:1,jelly:1,witch:2,cow:2,eskimo:3};   // la zone qui précède le boss est du biome qui lui correspond
+const zoneDefK=k=>{if(k<=0)return ZONES[0];const i=ZONE_OF[slotBoss(k)];return i!==undefined?ZONES[i]:ZONES[Math.min(ZONES.length-1,Math.floor(hash2(k,401)*ZONES.length))];};
 const inBeach=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?zoneDefK(zoneK(tx)).beach:Math.abs(tx)<SWAMP_TX);
 const COW_FIELD_SCREENS=20,cowFields=new Map();
 function cowFieldAt(tx){   // grand pré plat (1 écran) où la vache géante attend, avec 2 plateformes volantes
   const a=Math.abs(tx),sg=tx<0?-1:1;let fc;
-  if(anarchyOn){const k=zoneK(tx);if(k<1||!zoneDefK(k).swamp)return null;fc=BEACH_TX+(k-1)*ZONE_W+12*(VW/T);}
+  let sj=0;
+  if(anarchyOn){sj=Math.round((a/(VW/T)-ARENA_START)/ARENA_EVERY);if(sj<0||slotBoss(sj)!=='cow')return null;fc=(ARENA_START+ARENA_EVERY*sj)*(VW/T);}
   else{if(a<SWAMP_TX)return null;fc=SWAMP_TX+COW_FIELD_SCREENS*(VW/T);}
   if(Math.abs(a-fc)>14)return null;
   const key=sg*fc;let f=cowFields.get(key);
-  if(!f){f={fc,sg,floor:clamp(Math.round(gBase(sg*fc)),16,23)};cowFields.set(key,f);}
+  if(!f){f={fc,sg,j:sj,floor:clamp(Math.round(gBase(sg*fc)),16,23)};cowFields.set(key,f);}
   return f;
 }
 const cowPlat=(tx,ty)=>{const f=cowFieldAt(tx);if(!f||ty!==f.floor-4)return false;const d=Math.abs(Math.abs(tx)-f.fc);return d>=3&&d<=6;};
@@ -802,7 +807,7 @@ function arenaAt(tx){
   const j=Math.round((a-ARENA_START)/ARENA_EVERY);
   if(j===0||anarchyOn){   // classique : une seule arène de poulpe par côté ; anarchie : une arène au bout de chaque zone, avec le boss de cette zone
     const c0=sg*(ARENA_START+ARENA_EVERY*j)*(VW/T);
-    if(Math.abs(tx-c0)<=39){cx=c0;id=sg*(j+1);if(anarchyOn)type=zoneDefK(j).boss;}
+    if(Math.abs(tx-c0)<=39&&(!anarchyOn||SLOT_ARENA[slotBoss(j)])){cx=c0;id=sg*(j+1);if(anarchyOn)type=slotBoss(j);}
   }
   if(cx===null&&!anarchyOn){   // classique : château de sable, 22 écrans après la méduse
     const c1=sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T));
@@ -1724,7 +1729,26 @@ let anarchyWant=false,anarchyOn=false,anaEnc=0,jellyDone=new Set();
 try{anarchyWant=localStorage.getItem(ANA_KEY)==='1';}catch(e){}
 anarchyOn=anarchyWant;
 const rodLocked=()=>false;   // plus aucune arme bloquée selon la zone
-let anaMul=1;
+let anaMul=1,anaWins={},anaSlotDone=new Set();
+const anaWin=t=>{if(anarchyOn)anaWins[t]=(anaWins[t]||0)+1;};   // anarchie : chaque boss vaincu revient plus résistant (x1,5 de PV par victoire sur ce même boss)
+function bossHp(base,t){
+  if(!anarchyOn)return base;
+  const w=anaWins[t]||0,m=Math.pow(1.5,w),h=Math.round(encHp(base)*m);
+  if(w>0)floatText(player.x+5,player.y-46,'RÉSISTANCE x'+(Math.round(m*10)/10).toString().replace('.',','),'#ff8a8a');
+  return h;
+}
+function slotFree(){   // anarchie : boss sans structure du créneau de 20 écrans où se trouve le joueur
+  if(!anarchyOn||!player)return null;
+  const tx=(player.x+5)/T,a=Math.abs(tx),sg=tx<0?-1:1,sc=VW/T;
+  if(a<ARENA_START*sc-30)return null;
+  const j=Math.round((a/sc-ARENA_START)/ARENA_EVERY);
+  if(j<0)return null;
+  const t=slotBoss(j);if(SLOT_ARENA[t])return null;
+  const c=(ARENA_START+ARENA_EVERY*j)*sc;
+  if(Math.abs(a-c)>14)return null;
+  const key=sg*(j+1);if(anaSlotDone.has(key))return null;
+  return {type:t,key};
+}
 /* PV des boss en anarchie : le facteur grandit à chaque rencontre (x1,5, puis x1,6, x1,7, ...) : croissance plus qu'exponentielle */
 const encHp=base=>{const m=anaMul;anaMul*=1.5+0.1*anaEnc;anaEnc++;return Math.round(base*m);};
 /* Difficulté exponentielle en anarchie : plus on a rencontré de boss dans la run, plus tout est dur (ennemis, tirs et déplacements des boss) */
@@ -2429,6 +2453,7 @@ function hitBoss(b,dmg){
   if(b.hp<=0)killBoss(b);else sfx.hit();
 }
 function killBoss(b){
+  anaWin('shark');
   b.hp=0;b.state='dead';b.t=0;b.vy=-120;b.charge=0;b.laser=0;
   bossDone.add(b.k);bossWins++;bossShots=[];
   kills++;shake=0.6;sfx.bossDie();
@@ -2441,18 +2466,22 @@ function killBoss(b){
 }
 function maybeSpawnBoss(){
   if(boss||octo||castle||witch||eskimo||cloudB||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
-  const p=player,k=Math.round(p.x/BOSS_EVERY);
-  if(k===0||bossDone.has(k))return;
-  const sx=k*BOSS_EVERY;
-  if(Math.abs(p.x-sx)>170)return;
-  if(!anarchyOn&&Math.abs(sx)>=BEACH_TX*T)return;   // classique : le requin reste dans la zone d'herbe
+  const p=player;let k,sx,slk=0;
+  if(anarchyOn){const sl=slotFree();if(!sl||sl.type!=='shark')return;slk=sl.key;k=sl.key*1000;sx=p.x+p.face*110;}
+  else{
+    k=Math.round(p.x/BOSS_EVERY);
+    if(k===0||bossDone.has(k))return;
+    sx=k*BOSS_EVERY;
+    if(Math.abs(p.x-sx)>170)return;
+    if(Math.abs(sx)>=BEACH_TX*T)return;   // classique : le requin reste dans la zone d'herbe
+  }
   const w=38,h=18,bx=sx-w/2;
   let by=p.y-64;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
-  const bhp=anarchyOn?encHp(BOSS_HP):Math.round(BOSS_HP*Math.pow(1.5,bossWins));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
+  const bhp=anarchyOn?bossHp(BOSS_HP,'shark'):Math.round(BOSS_HP*Math.pow(1.5,bossWins));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
   boss={kind:'boss',k,x:bx,y:by,w,h,vx:0,vy:0,dir:p.x>sx?1:-1,hp:bhp,maxHp:bhp,state:'alive',spawnT:1.4,t:0,flash:0,fireCd:3,charge:0,laser:0,la:0,upT:0,onGround:false};
   bossSpawned=true;
-  if(anarchyOn){anaSky++;night=SKY_NIGHT[anaSky%5];}   // anarchie : nouveau ciel à chaque requin
+  if(anarchyOn){anaSlotDone.add(slk);anaSky++;night=SKY_NIGHT[anaSky%5];}   // anarchie : nouveau ciel à chaque requin
   else night=true;   // la nuit tombe, rouge sang, jusqu'au poulpe
   shake=0.6;sfx.bossSpawn();
 }
@@ -2470,6 +2499,7 @@ function hitOcto(t,dmg){
   if(o.hp<=0)killOcto();else sfx.hit();
 }
 function killOcto(){
+  anaWin('octo');
   const o=octo,ar=o.ar;
   o.hp=0;o.state='dying';o.dieT=2.4;
   ar.state='won';ar.gateL=false;ar.gateR=false;
@@ -2500,7 +2530,7 @@ function maybeStartArena(){
   ar.state='active';ar.gateL=true;ar.gateR=true;      // les portes se referment : plus de sortie possible
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
-  const oh=anarchyOn?encHp(OCTO_HP):OCTO_HP;
+  const oh=anarchyOn?bossHp(OCTO_HP,'octo'):OCTO_HP;
   octo={ar,hp:oh,maxHp:oh,state:'intro',t:0,intro:2.2,rage:false,flash:0,nextT:1,sway:0,dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
@@ -2511,7 +2541,7 @@ function startCastle(ar,il,ir){
   ar.state='active';ar.gateL=true;ar.gateR=true;
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
-  const ch=anarchyOn?encHp(CASTLE_HP):CASTLE_HP;
+  const ch=anarchyOn?bossHp(CASTLE_HP,'castle'):CASTLE_HP;
   castle={ar,hp:ch,maxHp:ch,state:'intro',t:0,intro:2.2,rage:false,flash:0,waves:[],nextW:2.2,nextG:7,bx:ar.cx*T+8+64,bf:0,hitCd:0,dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
@@ -2539,6 +2569,7 @@ function hitCastle(dmg){   // le seau doit être touché 2 fois (peu importe les
   if(c.hp<=0)killCastle();else{relocBucket(c);sfx.slam();}
 }
 function killCastle(){
+  anaWin('castle');
   const c=castle,ar=c.ar;
   c.hp=0;c.state='dying';c.dieT=2.6;c.waves=[];
   ar.state='won';ar.gateL=false;ar.gateR=false;
@@ -2655,7 +2686,8 @@ function startWitch(ar,il,ir){
   ar.state='active';ar.gateL=true;ar.gateR=true;
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
-  witch={ar,hp:WITCH_HP,maxHp:WITCH_HP,state:'intro',t:0,intro:2.4,phase:1,flash:0,side:1,nextP:1.8,pot:null,last:'',burst:0,throwT:0,tt:0,cat:null,potions:[],zones:[],dieT:0};
+  const wh=anarchyOn?bossHp(WITCH_HP,'witch'):WITCH_HP;
+  witch={ar,hp:wh,maxHp:wh,state:'intro',t:0,intro:2.4,phase:1,flash:0,side:1,nextP:1.8,pot:null,last:'',burst:0,throwT:0,tt:0,cat:null,potions:[],zones:[],dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
 function witchHand(w,mode){   // position de la main qui lance
@@ -2689,6 +2721,7 @@ function spawnWitchCat(){
   shake=0.4;sfx.slam();burst(h.x,h.y,'#c9a0ff',14,110);
 }
 function killWitch(){
+  anaWin('witch');
   const w=witch,ar=w.ar;
   w.hp=0;w.state='dying';w.dieT=2.6;w.potions=[];w.zones=[];w.pot=null;
   ar.state='won';ar.gateL=false;ar.gateR=false;
@@ -2810,7 +2843,7 @@ function startEskimo(ar,il,ir){
   ar.state='active';ar.gateL=true;ar.gateR=true;
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
-  const hp=anarchyOn?encHp(ESK_HP):ESK_HP,cx=ar.cx*T+8;
+  const hp=anarchyOn?bossHp(ESK_HP,'eskimo'):ESK_HP,cx=ar.cx*T+8;
   eskimo={ar,hp,maxHp:hp,state:'intro',t:0,intro:2.4,rage:false,flash:0,x:cx+(player.x<cx?100:-100),face:player.x<cx?-1:1,tgt:cx,tgtT:1.5,nextB:2.4,nextL:3.5,cast:0,beams:[],lures:[],dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
@@ -2827,6 +2860,7 @@ function hitEskimo(dmg){
   else{if(!e.rage&&e.hp<=e.maxHp/2){e.rage=true;shake=0.7;sfx.bossSpawn();floatText(e.x,fl-80,'ENRAGÉ !','#ff4a4a');}else sfx.hit();}
 }
 function killEskimo(){
+  anaWin('eskimo');
   const e=eskimo,ar=e.ar;
   e.hp=0;e.state='dying';e.dieT=2.6;e.beams=[];e.lures=[];
   const needPed=!anarchyOn&&!shop.scepterOwned;   // classique : un piédestal donne le sceptre de glace, les portes restent fermées tant qu'on ne l'a pas pris
@@ -3472,9 +3506,9 @@ function maybeSpawnCow(){
   const p=player,tx=Math.floor((p.x+5)/T),f=cowFieldAt(tx);
   if(!f||Math.abs(Math.abs(tx)-f.fc)>9)return;
   let key;
-  if(anarchyOn){key=f.sg*zoneK(tx);if(cowDone.has(key))return;}
+  if(anarchyOn){key=f.sg*(f.j+1);if(cowDone.has(key))return;}
   else if(cowSpawned)return;
-  const w=44,h=30,ctx0=f.sg*f.fc,side=(tx-ctx0)>=0?-1:1,bx=(ctx0+side*8)*T+8-w/2,ch=anarchyOn?encHp(COW_HP):COW_HP;
+  const w=44,h=30,ctx0=f.sg*f.fc,side=(tx-ctx0)>=0?-1:1,bx=(ctx0+side*8)*T+8-w/2,ch=anarchyOn?bossHp(COW_HP,'cow'):COW_HP;
   cow={x:bx,y:f.floor*T-h-80,w,h,vy:0,dir:-side,hp:ch,maxHp:ch,state:'alive',spawnT:1.2,mode:'walk',mt:0,rot:0,flash:0,t:0,rage:false,sx:0,spit:0};
   cowSpawned=true;if(key!==undefined)cowDone.add(key);shake=0.6;sfx.bossSpawn();
   floatText(p.x+5,p.y-34,'LA VACHE GÉANTE !','#ffffff');
@@ -3492,6 +3526,7 @@ function hitCow(dmg){
   if(b.hp<=0)killCow();else sfx.hit();
 }
 function killCow(){
+  anaWin('cow');
   const b=cow;b.hp=0;b.state='dead';b.t=0;b.vy=-160;
   kills++;shake=0.6;sfx.bossDie();
   const cx=b.x+b.w/2,cy=b.y+b.h/2;
@@ -3583,8 +3618,8 @@ function stepRzTr(dt){   // fondu au noir puis téléportation
 }
 function maybeSpawnSix(dt){   // anarchie : le 6 ailé peut surgir n'importe où
   if(!anarchyOn||six||boss||octo||castle||witch||eskimo||jelly||cow)return;
-  if(Math.random()>=dt/600)return;   // rare : en moyenne une fois toutes les 10 minutes
-  const p=player,h=anarchyOn?encHp(SIX_HP):SIX_HP;
+  const sl=slotFree();if(!sl||sl.type!=='six')return;anaSlotDone.add(sl.key);
+  const p=player,h=bossHp(SIX_HP,'six');
   six={x:p.x-14,y:p.y-110,w:28,h:36,hp:h,maxHp:h,state:'alive',spawnT:1.4,t:0,cd:1.8,flash:0,rage:false,n:0,bx:p.x+5,by:p.y-100,world:true};
   shake=0.4;sfx.bossSpawn();floatText(p.x+5,p.y-30,'LE NUMÉRO 6 !','#ffffff');
 }
@@ -3598,6 +3633,7 @@ function hitSix(dmg){
   if(b.hp<=0)killSix();else sfx.hit();
 }
 function killSix(){
+  anaWin('six');
   const b=six;b.hp=0;b.state='dead';b.t=0;b.vy=-120;
   kills++;shake=0.7;sfx.bossDie();
   const cx=b.x+b.w/2,cy=b.y+b.h/2;
@@ -4113,6 +4149,7 @@ function hitJelly(b,dmg){
   if(b.hp<=0)killJelly(b);else sfx.hit();
 }
 function killJelly(b){
+  anaWin('jelly');
   b.hp=0;b.state='dead';b.t=0;b.vy=-90;b.charge=0;b.fire=0;
   kills++;shake=0.7;sfx.bossDie();
   const cx=b.x+b.w/2,cy=b.y+b.h/2;
@@ -4128,15 +4165,15 @@ function maybeSpawnJelly(){
   let key;
   if(anarchyOn){   // anarchie : une méduse tous les 37 écrans après l'entrée de la plage, tant qu'aucun autre boss n'est là
     if(boss)return;
-    const k=Math.floor((Math.abs(tx)-BEACH_TX)/per);
-    if(k<1||jellyDone.has(side*k))return;
-    key=side*k;
+    const sl=slotFree();
+    if(!sl||sl.type!=='jelly')return;
+    key=sl.key;anaSlotDone.add(sl.key);
   } else {
     if(jellySpawned)return;
     if(Math.abs(tx)<BEACH_TX+JELLY_SCREENS_C*(VW/T))return;   // classique : 26 écrans après le début du sable (ou du checkpoint)
     if(!inBeach(tx))return;
   }
-  const w=30,h=20,bx=p.x+5+p.face*150-w/2,jh=anarchyOn?encHp(JELLY_HP):JELLY_HP;
+  const w=30,h=20,bx=p.x+5+p.face*150-w/2,jh=anarchyOn?bossHp(JELLY_HP,'jelly'):JELLY_HP;
   let by=p.y-72;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
   jelly={kind:'jelly',x:bx,y:by,w,h,vx:0,vy:0,hp:jh,maxHp:jh,state:'alive',spawnT:1.6,t:0,flash:0,rot:0,fireCd:3,charge:0,fire:0,baseA:0,sweep:0,upT:0,onGround:false};
@@ -5257,7 +5294,7 @@ function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
   cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
-  anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
+  anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
 function placePlayer(sx){
