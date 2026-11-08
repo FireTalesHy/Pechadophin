@@ -5608,11 +5608,11 @@ function missionList(){   // [id, nom, progression, objectif, récompense {gold|
     ['cow','Vaincre la vache géante',bs.cow?1:0,1,{souls:1}],
     ['witch','Vaincre la sorcière',bs.witch?1:0,1,{gold:300}],
     ['esk','Vaincre l\'esquimau',bs.eskimo?1:0,1,{gold:400}],
-    ['king','Vaincre le Roi Cacamille 2',bs.king?1:0,1,{souls:1}],
-    ['cloud','Vaincre le dauphin des nuages',bs.cloud?1:0,1,{souls:2}],
+    ['king','Vaincre le Roi Cacamille 2',bs.king?1:0,1,{souls:2}],
+    ['cloud','Vaincre le dauphin des nuages',bs.cloud?1:0,1,{souls:3}],
     ['skins','Posséder 10 skins',Math.min(shop.owned.length,10),10,{gold:500}],
-    ['bmax','Mettre une branche au niveau max sur une arme',Math.min(maxB,1),1,{souls:1}],
-    ['bmax3','Mettre 3 branches au niveau max (toutes armes)',Math.min(maxB,3),3,{souls:2}],
+    ['bmax','Mettre une branche au niveau max sur une arme',Math.min(maxB,1),1,{souls:2}],
+    ['bmax3','Mettre 3 branches au niveau max (toutes armes)',Math.min(maxB,3),3,{souls:3}],
     ['dagger','Obtenir les dagues',shop.daggerOwned?1:0,1,{gold:75}],
     ['six','Obtenir le Numéro 6',shop.sixOwned?1:0,1,{gold:150}],
     ['scep','Obtenir le sceptre de glace',shop.scepterOwned?1:0,1,{gold:200}],
@@ -5622,7 +5622,7 @@ function missionList(){   // [id, nom, progression, objectif, récompense {gold|
     ['star','Débloquer Star Platinum',shop.tx.star?1:0,1,{gold:300}],
     ['hp','Monter les points de vie au maximum',shop.hp,5,{souls:1}],
     ['skins15','Posséder 15 skins',Math.min(shop.owned.length,15),15,{gold:1000}],
-    ['rebirth','Renaître une fois',Math.min(shop.rb||0,1),1,{souls:1}]
+    ['rebirth','Renaître une fois',Math.min(shop.rb||0,1),1,{souls:2}]
   ];
 }
 const misReady=()=>missionList().some(m=>m[2]>=m[3]&&!shop.mc[m[0]]);
