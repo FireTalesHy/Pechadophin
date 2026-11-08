@@ -1730,11 +1730,11 @@ try{anarchyWant=localStorage.getItem(ANA_KEY)==='1';}catch(e){}
 anarchyOn=anarchyWant;
 const rodLocked=()=>false;   // plus aucune arme bloquée selon la zone
 let anaMul=1,anaWins={},anaSlotDone=new Set();
-const anaWin=t=>{if(anarchyOn)anaWins[t]=(anaWins[t]||0)+1;};   // anarchie : chaque boss vaincu revient plus résistant (x1,5 de PV par victoire sur ce même boss)
+const anaWin=t=>{if(anarchyOn)anaWins[t]=(anaWins[t]||0)+1;};   // anarchie : chaque boss vaincu revient plus résistant (x1,05 de PV par victoire sur ce même boss)
 function bossHp(base,t){
   if(!anarchyOn)return base;
-  const w=anaWins[t]||0,m=Math.pow(1.5,w),h=Math.round(encHp(base)*m);
-  if(w>0)floatText(player.x+5,player.y-46,'RÉSISTANCE x'+(Math.round(m*10)/10).toString().replace('.',','),'#ff8a8a');
+  const w=anaWins[t]||0,m=Math.pow(1.05,w),h=Math.round(encHp(base)*m);
+  if(w>0)floatText(player.x+5,player.y-46,'RÉSISTANCE x'+(Math.round(m*100)/100).toString().replace('.',','),'#ff8a8a');
   return h;
 }
 function slotFree(){   // anarchie : boss sans structure du créneau de 20 écrans où se trouve le joueur
