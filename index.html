@@ -130,7 +130,10 @@ body{
 #overlay[data-mode="pause"] #weap-btn{display:none}   /* en pleine partie, on passe par le marchand */
 #shop.merchant .tabs{display:none}
 .ov-big.small{font-size:max(7px,calc(var(--p)*7))}
-.ov-big.rbb{background:linear-gradient(#ffd23f,#d8861f);font-size:max(7px,calc(var(--p)*7))}
+.ov-mini{display:flex;gap:calc(var(--p)*4);justify-content:flex-end;min-height:calc(var(--p)*22)}
+.ov-sq{flex:none;width:calc(var(--p)*22);height:calc(var(--p)*22);cursor:pointer;font:400 max(10px,calc(var(--p)*12))/1 var(--pf);color:#fff;-webkit-text-stroke:calc(var(--p)*1.2) #14182c;paint-order:stroke fill;border:calc(var(--p)*2) solid #14182c;border-radius:calc(var(--p)*5);box-shadow:0 calc(var(--p)*3) 0 #14182c;background:linear-gradient(#ffd23f,#d8861f);padding:0}
+.ov-sq:active{transform:translateY(calc(var(--p)*1.5))}
+.ov-sq[hidden]{display:none}
 .ov-big.shopb{background:linear-gradient(#4a97ff,#1f62c8)}
 .ov-mid{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:calc(var(--p)*3);text-align:center}
 #ov-cp{margin:0;font:400 max(6px,calc(var(--p)*4.6))/1.4 var(--pf);color:#ffd23f}
@@ -381,7 +384,7 @@ body{
           <button class="go alt" id="ov-restart" type="button" hidden>RECOMMENCER</button>
           <p class="credits" id="credits">dev : L'taleshy et cocobat<br>testeurs : moustik, ofodile, wyzan et nad l'arnaque</p>
         </div>
-        <div class="ov-left"><button class="ov-big rbb" id="rb-btn" type="button" hidden>RENAISSANCE</button><button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button></div>
+        <div class="ov-left"><div class="ov-mini" id="ov-mini"><button class="ov-sq rbb" id="rb-btn" type="button" hidden aria-label="Renaissance" title="Renaissance">↻</button></div><button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button></div>
       </div>
     </div>
   </div>
@@ -5366,7 +5369,7 @@ function showOver(){
 /* ---- Réinitialisation de la save : double confirmation ---- */
 const rstEl=$('rst');
 let rstOpen=false,rstStep=0,rstMode='reset';
-function rbRefresh(){const b=$('rb-btn');if(!b)return;b.hidden=!shop.bossSouls.king||ov.dataset.mode!=='title';b.textContent=(lang==='en'?'REBIRTH':'RENAISSANCE')+(shop.rb?' (×'+shop.rb+')':'');}
+function rbRefresh(){const b=$('rb-btn');if(!b)return;b.hidden=!shop.bossSouls.king||ov.dataset.mode!=='title';b.title=(lang==='en'?'Rebirth':'Renaissance')+(shop.rb?' (×'+shop.rb+')':'');}
 function renderRst(){
   if(rstMode==='rebirth'){
     $('rst-title').textContent='RENAISSANCE ?';
