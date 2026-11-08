@@ -652,7 +652,8 @@ const EN={
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
-'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).'
+'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).',
+'Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille deux fois plus puissante. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a big slash twice as strong. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Un seul à la fois. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. One at a time. Bought with gold.','Katana : 8 dégâts par coup, 16 sur la grande taille.':'Katana: 8 damage per hit, 16 on the big slash.','Boomerang : 6 dégâts à l\'aller et au retour.':'Boomerang: 6 damage on the way out and back.'
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -1882,7 +1883,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1918,6 +1919,9 @@ function loadShop(){
       d.harpoonOwned=j.harpoonOwned===true;
       if(j.hu&&typeof j.hu==='object')for(const k of ['dmg','range','reel','chain'])d.hu[k]=clamp(Math.floor(Number(j.hu[k]))||0,0,3);
       if(j.weapon==='harpoon'&&d.harpoonOwned)d.weapon='harpoon';
+      d.katanaOwned=j.katanaOwned===true;d.boomOwned=j.boomOwned===true;
+      if(j.weapon==='katana'&&d.katanaOwned)d.weapon='katana';
+      if(j.weapon==='boomerang'&&d.boomOwned)d.weapon='boomerang';
       if(j.tx&&typeof j.tx==='object')for(const k of ['chariot','star'])d.tx[k]=j.tx[k]===true;
       if(j.weapon==='tarot'&&d.tarotOwned)d.weapon='tarot';
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
@@ -2286,10 +2290,105 @@ function stepTrident(dt){
   }
   tridents=tridents.filter(h=>!h.done);
 }
+/* ---------- Katana (8 âmes) : coup de sabre en arc, combo en 3 coups ---------- */
+const KATANA_COST=8,KAT={cd:0.4,dmg:8,R:30,arc:1.15,combo:3};
+const KATANA_ICON=spr(["........w",".......ww","......ww.",".....ww..","....ww...","..yyw....",".byy.....","bb......."],{w:'#dfe6f5',y:'#ffd23f',b:'#6b3f1c'},true);
+let katCd=0,katN=0,katReset=0,katFx=null;
+function stepKatana(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  if(katCd>0)katCd-=dt;
+  if(katReset>0){katReset-=dt;if(katReset<=0)katN=0;}
+  if(katFx){katFx.t+=dt;if(katFx.t>=katFx.life)katFx=null;}
+  throwAnim=Math.max(0,throwAnim-dt);
+  if(!((fireBuf>0||inp.fire||aim.auto)&&katCd<=0&&p.stun<=0&&state==='play'))return;
+  fireBuf=0;katN=(katN%KAT.combo)+1;
+  const big=katN===KAT.combo;
+  katCd=big?KAT.cd*1.5:KAT.cd;katReset=1.1;throwAnim=0.16;
+  const len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len,a0=Math.atan2(uy,ux);
+  if(Math.abs(ux)>0.2)p.face=ux>0?1:-1;
+  const cx=p.x+5,cy=p.y+6,R=big?Math.round(KAT.R*1.4):KAT.R,dmg=big?KAT.dmg*2:KAT.dmg;
+  katFx={a:a0,R,big,t:0,life:0.16,dir:katN%2?1:-1,x:cx,y:cy};
+  for(const t of allTargets()){
+    const dist=rectDist(cx,cy,t.r[0],t.r[1],t.r[2],t.r[3]);
+    if(dist>R)continue;
+    let da=Math.atan2(t.r[1]+t.r[3]/2-cy,t.r[0]+t.r[2]/2-cx)-a0;da=Math.atan2(Math.sin(da),Math.cos(da));
+    if(Math.abs(da)>KAT.arc&&dist>6)continue;
+    t.hit(dmg);burst(t.r[0]+t.r[2]/2,t.r[1]+t.r[3]/2,big?'#ffd23f':'#ffffff',big?10:6,90);
+  }
+  sfx.trident();
+}
+function drawKatanaFx(){
+  const f=katFx;if(!f)return;
+  const k=f.t/f.life,sw=Math.min(1,k*1.5+0.2);
+  ctx.save();ctx.globalAlpha=Math.max(0.15,1-k*0.7);
+  for(let i=0;i<=16;i++){
+    const u=i/16;if(u>sw)break;
+    const ang=f.a+f.dir*(u-0.5)*2*KAT.arc;
+    ctx.fillStyle=f.big?'#ffd23f':'#e8f4ff';
+    ctx.fillRect(Math.round(f.x+Math.cos(ang)*f.R*0.85),Math.round(f.y+Math.sin(ang)*f.R*0.85),2,2);
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(Math.round(f.x+Math.cos(ang)*f.R*0.65),Math.round(f.y+Math.sin(ang)*f.R*0.65),1,1);
+  }
+  ctx.restore();
+}
+function drawKatanaHeld(hx,hy){
+  let a;
+  if(katFx){const k=katFx.t/katFx.life;a=katFx.a+katFx.dir*(k-0.5)*2*KAT.arc;}
+  else a=player.face>0?-0.9:-Math.PI+0.9;
+  ctx.save();ctx.translate(Math.round(hx),Math.round(hy));ctx.rotate(a+Math.PI/4);
+  ctx.drawImage(KATANA_ICON,0,-KATANA_ICON.height);
+  ctx.restore();
+}
+/* ---------- Boomerang (500 or) : aller-retour, blesse à l'aller et au retour ---------- */
+const BOOM_COST=500,BOOM={cd:0.5,dmg:6,range:130,spd:300};
+const BOOM_ICON=spr(["bb.......",".bbb.....","..bbb....","...bby...",".....bbb.","......bbb",".......bb"],{b:'#c58a45',y:'#ffd23f'},true);
+let boom=null,boomCd=0;
+function stepBoomerang(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  if(boomCd>0)boomCd-=dt;
+  throwAnim=Math.max(0,throwAnim-dt);
+  if(!boom&&(fireBuf>0||inp.fire||aim.auto)&&boomCd<=0&&p.stun<=0&&state==='play'){
+    fireBuf=0;throwAnim=0.12;
+    const len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len;
+    boom={x:p.x+5+ux*10,y:p.y+6+uy*10,ux,uy,d:0,back:false,hit:new Set(),sp:0,t:0};
+    sfx.trident();
+  }
+  const b=boom;if(!b)return;
+  b.t+=dt;b.sp+=dt*22;
+  if(!b.back){
+    const st=BOOM.spd*dt;b.x+=b.ux*st;b.y+=b.uy*st;b.d+=st;
+    if(solidAt(b.x+b.ux*5,b.y+b.uy*5)||b.d>=BOOM.range){b.back=true;b.hit=new Set();}
+  }else{
+    const tx=p.x+5-b.x,ty=p.y+6-b.y,l=Math.hypot(tx,ty),st=BOOM.spd*1.15*dt;
+    if(l<=st+6||b.t>3){boom=null;boomCd=BOOM.cd;return;}
+    b.x+=tx/l*st;b.y+=ty/l*st;
+  }
+  for(const t of allTargets()){
+    const key=t.e||('s'+t.r[2]+'x'+t.r[3]);
+    if(b.hit.has(key)||!rectsOverlap(b.x-5,b.y-5,10,10,t.r[0],t.r[1],t.r[2],t.r[3]))continue;
+    b.hit.add(key);t.hit(BOOM.dmg);burst(b.x,b.y,'#e8b86a',5,60);
+  }
+}
+function drawBoomerang(){
+  if(!boom)return;
+  ctx.save();ctx.translate(Math.round(boom.x),Math.round(boom.y));ctx.rotate(boom.sp);
+  ctx.drawImage(BOOM_ICON,-Math.round(BOOM_ICON.width/2),-Math.round(BOOM_ICON.height/2));
+  ctx.restore();
+}
+function renderFixedWeapon(txt){   // armes sans arbre : une simple fiche de stats
+  shopList.textContent='';
+  const card=document.createElement('div');card.className='card';
+  const val=document.createElement('div');val.className='val';val.textContent=txt;card.appendChild(val);
+  shopList.appendChild(card);
+}
 function stepHook(dt){
   stepCloudBalls(dt);
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
+  if(shop.weapon==='katana'&&!glockOn){stepKatana(dt);return;}
+  if(shop.weapon==='boomerang'&&!glockOn){stepBoomerang(dt);return;}
   if(shop.weapon==='tarot'&&!glockOn){stepTarot(dt);return;}
   if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
   if(shop.weapon==='scepter'&&!glockOn){stepScepter(dt);return;}
@@ -3946,21 +4045,24 @@ function drawHarpoon(){
   drawHarpoonShape(h.x-Math.cos(a)*8,h.y-Math.sin(a)*8,a,false);
 }
 function renderHarpoon(){renderTree('harpoon');}
-function renderWeapBuy(w){   // arme achetable avec des âmes
+function renderWeapBuy(w){   // arme achetable avec des âmes ou de l'or
   shopList.textContent='';
+  const isSouls=w.buy.souls!=null,cost=isSouls?w.buy.souls:w.buy.gold,have=isSouls?shop.souls:shop.gold;
   const card=document.createElement('div');card.className='card';
   const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,w.icon(),true);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
   const nm=document.createElement('div');nm.className='nm';nm.textContent=w.name;card.appendChild(nm);
   const pr=document.createElement('div');pr.className='pr';
-  const gi=document.createElement('canvas');gi.width=7;gi.height=8;drawIcon(gi,SOUL);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=w.buy.souls;pr.appendChild(sp);card.appendChild(pr);
+  const gi=document.createElement('canvas');gi.width=7;gi.height=isSouls?8:6;drawIcon(gi,isSouls?SOUL:GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=cost;pr.appendChild(sp);card.appendChild(pr);
   const b=document.createElement('button');b.className='sbtn';b.type='button';
-  if(shop.souls>=w.buy.souls){b.textContent='ACHETER';b.addEventListener('click',()=>buyWeapon(w));}
-  else{const m=w.buy.souls-shop.souls;b.textContent='IL MANQUE '+m+' ÂME'+(m>1?'S':'');b.disabled=true;}
+  if(have>=cost){b.textContent='ACHETER';b.addEventListener('click',()=>buyWeapon(w));}
+  else{const m=cost-have;b.textContent=isSouls?'IL MANQUE '+m+' ÂME'+(m>1?'S':''):'IL MANQUE '+m;b.disabled=true;}
   card.appendChild(b);shopList.appendChild(card);
 }
 function buyWeapon(w){
-  if(w.owned()||shop.souls<w.buy.souls)return;
-  shop.souls-=w.buy.souls;w.buy.give();saveShop();sfx.heal();renderShop();renderWeap();
+  const isSouls=w.buy.souls!=null,cost=isSouls?w.buy.souls:w.buy.gold;
+  if(w.owned()||(isSouls?shop.souls:shop.gold)<cost)return;
+  if(isSouls)shop.souls-=cost;else shop.gold-=cost;
+  w.buy.give();saveShop();sfx.heal();renderShop();renderWeap();
 }
 function buyHu(key){
   const u=HU[key],lv=shop.hu[key];
@@ -4086,6 +4188,7 @@ function stepCards(dt){
 }
 function drawCards(){
   drawHarpoon();
+  drawKatanaFx();drawBoomerang();
   for(const c of tcards){
     ctx.save();ctx.translate(Math.round(c.x),Math.round(c.y));ctx.rotate(c.sp+c.t*16);
     if(c.star)ctx.drawImage(STAR_ICON,-5,-5);
@@ -4787,6 +4890,8 @@ function drawPlayer(){
   else if(shop.weapon==='six')ctx.drawImage(RNG_DIGITS['6'],Math.round(hx)-4,Math.round(hy)-7);
   else if(shop.weapon==='scepter')drawScepterHeld(hx,hy);
   else if(shop.weapon==='tarot')drawTarotHeld(hx,hy);
+  else if(shop.weapon==='katana')drawKatanaHeld(hx,hy);
+  else if(shop.weapon==='boomerang'){if(!boom)ctx.drawImage(BOOM_ICON,Math.round(hx)-4,Math.round(hy)-8);}
   else if(shop.weapon==='harpoon')drawHarpoonGun(hx,hy,Math.atan2(aim.y,aim.x),aim.x<0,!harp);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
@@ -5387,7 +5492,7 @@ function placePlayer(sx){
   const cp=sx!==undefined,g=cp?column(Math.floor((sx+5)/T)).g:column(0).g;
   Object.assign(player,{x:cp?sx:-5,y:g*T-14,vx:0,vy:0,face:cp?(sx<0?-1:1):1,onGround:true,coyote:0,invuln:0,stun:0,poison:0,poisonT:0,dizzy:0});
   player.safe={x:player.x,y:player.y};
-  hooks=[];tridents=[];castCd=0;throwAnim=0;
+  hooks=[];tridents=[];castCd=0;throwAnim=0;boom=null;boomCd=0;katCd=0;katFx=null;katN=0;
   ensureChunks();snapCamera();
 }
 function initTitle(){
@@ -5772,10 +5877,12 @@ const WEAPONS=[
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
   {id:'harpoon',name:'Harpon',desc:'Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi pour un second coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.',icon:()=>HARPOON_ICON,owned:()=>shop.harpoonOwned,buy:{souls:HARPOON_COST,give:()=>{shop.harpoonOwned=true;}},render:()=>renderHarpoon()},
+  {id:'katana',name:'Katana',desc:'Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille deux fois plus puissante. S\'achète avec des âmes rouges.',icon:()=>KATANA_ICON,owned:()=>shop.katanaOwned,buy:{souls:KATANA_COST,give:()=>{shop.katanaOwned=true;}},render:()=>renderFixedWeapon('Katana : 8 dégâts par coup, 16 sur la grande taille.')},
+  {id:'boomerang',name:'Boomerang',desc:'Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Un seul à la fois. S\'achète avec de l\'or.',icon:()=>BOOM_ICON,owned:()=>shop.boomOwned,buy:{gold:BOOM_COST,give:()=>{shop.boomOwned=true;}},render:()=>renderFixedWeapon('Boomerang : 6 dégâts à l\'aller et au retour.')},
   {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
-const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
+const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon','katana','boomerang'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
 WEAPONS.sort((a,b)=>WEAP_ORDER.indexOf(a.id)-WEAP_ORDER.indexOf(b.id));
 let weapOpen=false,weapSel=null;
 const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
@@ -5817,7 +5924,7 @@ function closeWeap(){
 }
 $('weap-btn').addEventListener('click',()=>openWeap(false));$('weap-close').addEventListener('click',closeWeap);
 weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
-$('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;harp=null;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
+$('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;harp=null;hooks=[];tridents=[];boom=null;katFx=null;saveShop();sfx.heal();renderWeap();});
 function renderDagger(){renderTree('dagger');}
 function renderSix(){
   shopList.textContent='';
