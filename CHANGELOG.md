@@ -2,6 +2,19 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.4.7] - 2026-11-08
+
+### Ajouté
+- **Anarchie : un boss aléatoire tous les 20 écrans.** Les boss à structure (poulpe géant, château de sable, sorcière, esquimau) sont dans leur arène, les autres (requin, méduse, vache géante, Numéro 6) surgissent en plein terrain. N'importe quel boss peut tomber dans n'importe quel biome.
+  - Chaque victoire sur un même boss le rend un peu plus résistant (x1,05 de PV).
+- **Récompenses de missions** : chaque mission donne de l'or ou des âmes rouges, à récupérer depuis le menu MISSIONS. Un point rouge s'affiche sur l'onglet quand une récompense est disponible, et une notification apparaît à chaque mission réussie.
+- **11 nouvelles missions** : sorcière, esquimau, Roi Cacamille 2, dauphin des nuages, obtenir chaque arme (dagues, Numéro 6, sceptre de glace, tarot, harpon), débloquer Silver Chariot et Star Platinum, points de vie au maximum, 15 skins, renaître une fois, et mettre 3 branches au niveau max.
+
+### Modifié
+- La mission « Trident : toutes les améliorations au maximum » devient « Mettre une branche au niveau max sur une arme » (n'importe quelle arme).
+- **Renaissance** : les boss redonnent leurs récompenses (âmes et or) comme la première fois, et le bouton se débloque en sortant par la fenêtre du château, à chaque renaissance.
+- L'or de tous les joueurs est divisé par 2 et les missions réussies sont remises à zéro (leurs récompenses sont de nouveau à récupérer).
+
 ## [V0.4.5] - 2026-11-08
 
 ### Ajouté
