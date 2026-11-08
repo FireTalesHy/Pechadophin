@@ -496,6 +496,7 @@ body{
 <div id="mis" hidden role="dialog" aria-modal="true" aria-labelledby="mis-title">
   <div class="shop-panel dev-panel">
     <div class="shop-head"><h2 id="mis-title">MISSIONS</h2></div>
+    <button class="sbtn equip" id="mis-all" type="button">TOUT RÉCUPÉRER</button>
     <div id="mis-list"></div>
     <button class="go" id="mis-close" type="button">RETOUR</button>
   </div>
@@ -653,7 +654,7 @@ const EN={
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).',
-'Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
+'TOUT RÉCUPÉRER':'CLAIM ALL','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -666,6 +667,7 @@ const EN_RULES=[
  [/^AKIMBO GLOCK 18 : (OUI|NON)$/,m=>'AKIMBO GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^Niveau (\d+) sur (\d+)$/,m=>'Level '+m[1]+' of '+m[2]],
  [/^([\d,]+) (coups|lancers)\/s$/,m=>m[1].replace(',','.')+(m[2]==='coups'?' hits/s':' throws/s')],
+ [/^TOUT RÉCUPÉRER \((\d+)\)$/,m=>'CLAIM ALL ('+m[1]+')'],
  [/^MAX : (.+)$/,m=>'MAX: '+trStr(m[1])],
  [/^IL MANQUE (\d+)$/,m=>'NEED '+m[1]+' MORE'],
  [/^VER (\d+\/\d+)$/,m=>'WORM '+m[1]],
@@ -5880,8 +5882,20 @@ function claimMis(id){
   shop.mc[id]=true;if(m[4].gold)shop.gold+=m[4].gold;if(m[4].souls)shop.souls+=m[4].souls;
   saveShop();sfx.heal();renderMis();
 }
+function claimAllMis(){   // récupère d'un coup toutes les récompenses disponibles
+  let n=0;
+  for(const m of missionList()){
+    if(m[2]<m[3]||shop.mc[m[0]])continue;
+    shop.mc[m[0]]=true;n++;
+    if(m[4].gold)shop.gold+=m[4].gold;if(m[4].souls)shop.souls+=m[4].souls;
+  }
+  if(!n)return;
+  saveShop();sfx.heal();renderMis();
+}
 function renderMis(){
   const list=$('mis-list');list.textContent='';
+  {const nb=missionList().filter(m=>m[2]>=m[3]&&!shop.mc[m[0]]).length,ab=$('mis-all');
+   ab.textContent=nb?'TOUT RÉCUPÉRER ('+nb+')':'TOUT RÉCUPÉRER';ab.disabled=!nb;}
   for(const [id,name,cur,goal,rw] of missionList()){
     const done=cur>=goal,got=!!shop.mc[id],row=document.createElement('div');row.className='mis-row'+(done?' done':'');
     const top=document.createElement('div');top.className='mis-top';
@@ -5901,6 +5915,7 @@ function renderMis(){
   }
   misDot();
 }
+$('mis-all').addEventListener('click',claimAllMis);
 function openMis(){clearInputs();misOpen=true;misEl.hidden=false;renderMis();try{$('mis-close').focus({preventScroll:true});}catch(e){}}
 function closeMis(){misOpen=false;misEl.hidden=true;try{$('mis-btn').focus({preventScroll:true});}catch(e){}}
 const modeEl=$('mode');
