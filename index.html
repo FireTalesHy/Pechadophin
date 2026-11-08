@@ -964,7 +964,9 @@ function genCloudGear(x0,cx){
   } else if(roll<0.55){   // chaîne de nuages friables : ils se délitent quand on les pose dessus
     for(let k=0;k<3;k++){const a=tx+k*5,keys=addP(a,a+2,g-3-3*k),rec={keys,st:'ok',t:0};fragList.push(rec);for(const kk of keys)fragMap.set(kk,rec);}
   } else if(roll<0.75){   // ressort : propulse très haut vers un nuage perché
-    springs.add(pkey(tx+1,g));addP(tx+4,tx+8,g-9);
+    let st=-1;   // le ressort est posé sur un morceau de sol plat (même hauteur de chaque côté), à la hauteur réelle du sol
+    for(let a=tx;a<=tx+3;a++){const cg=column(a).g,l=column(a-1),rr2=column(a+1);if(l.g===cg&&rr2.g===cg&&!l.pit&&!rr2.pit){st=a;break;}}
+    if(st>=0){const sg=column(st).g;let free=true;for(let t=st+3;t<=st+7;t++)if(column(t).g-(sg-9)<3)free=false;if(free){springs.add(pkey(st,sg));addP(st+3,st+7,sg-9);}}
   } else if(roll<0.9){   // courant ascendant : il faut s'y laisser porter, puis se jeter sur la corniche
     drafts.push({x:(tx+1)*T,w:3*T,y0:g*T,y1:(g-12)*T});addP(tx+5,tx+8,g-11);
   }
