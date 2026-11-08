@@ -217,6 +217,17 @@ body{
 .bal{display:flex;align-items:center;gap:6px;font:400 11px/1 var(--pf)}
 .bal canvas{width:21px;height:18px;image-rendering:pixelated}
 .shop-note{margin:0;font:400 8px/1.6 var(--pf);opacity:.78}
+.tree{grid-column:1/-1;position:relative;width:100%;max-width:420px;margin:0 auto}
+.tlines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tlines line{stroke:var(--btn-line);stroke-width:4;stroke-linecap:round;opacity:.5}
+.tlines line.lit{stroke:#ffd23f;opacity:1}
+.tnode{position:absolute;width:62px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px 2px;border:2px solid var(--btn-line);background:var(--btn);cursor:pointer;border-radius:12px;color:inherit}
+.tnode canvas{width:36px;height:36px;image-rendering:pixelated;background:linear-gradient(#8fcdf4,#cfeafb);border:2px solid var(--btn-line);border-radius:8px}
+.tnode .pips{gap:2px}.tnode .pip{width:7px;height:7px;border-width:1px}
+.tnode.on{border-color:#ffd23f}.tnode.max{box-shadow:0 0 0 2px #ffd23f}
+.tnode.lock{opacity:.45;filter:grayscale(.8)}
+.tnode.sel{outline:3px solid #ff8a3d;outline-offset:2px}
+.tdet{grid-column:1/-1}
 #shop-list{
   overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch;min-height:0;padding:3px;
   display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px;
@@ -2983,35 +2994,7 @@ function drawScepterFx(){
     ctx.restore();
   }
 }
-function renderScepter(){
-  shopList.textContent='';
-  const icons={dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg};
-  for(const key of SC_KEYS){
-    const u=SCUP[key],lv=shop.sc[key],max=lv>=5;
-    const card=document.createElement('div');card.className='card';
-    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,icons[key],true);ic.setAttribute('aria-hidden','true');
-    card.appendChild(ic);
-    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
-    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 5');
-    for(let i=0;i<5;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
-    card.appendChild(pips);
-    const val=document.createElement('div');val.className='val';
-    val.textContent=max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]);
-    card.appendChild(val);
-    const pr=document.createElement('div');pr.className='pr';
-    if(max){pr.textContent='NIVEAU 5/5';}
-    else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
-    card.appendChild(pr);
-    const b=document.createElement('button');b.className='sbtn';b.type='button';
-    if(!shop.scepterOwned){b.textContent='SCEPTRE REQUIS';b.disabled=true;}
-    else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
-    else if(shop.gold>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyScUp(key));}
-    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.gold);b.disabled=true;}
-    b.setAttribute('aria-label',u.name+' : '+b.textContent);
-    card.appendChild(b);
-    shopList.appendChild(card);
-  }
-}
+function renderScepter(){renderTree('scepter');}
 function buyScUp(key){
   const u=SCUP[key],lv=shop.sc[key];
   if(!shop.scepterOwned||lv>=5||shop.gold<u.cost[lv])return;
@@ -3805,32 +3788,7 @@ function drawHarpoon(){
   const a=h.st==='back'||h.st==='reel'?Math.atan2(py-h.y,px-h.x)+Math.PI:Math.atan2(h.uy,h.ux);
   drawHarpoonShape(h.x-Math.cos(a)*8,h.y-Math.sin(a)*8,a,false);
 }
-function renderHarpoon(){
-  shopList.textContent='';
-  const icons={dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg};
-  for(const key of HU_KEYS){
-    const u=HU[key],lv=shop.hu[key],max=lv>=3;
-    const card=document.createElement('div');card.className='card';
-    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,icons[key],true);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
-    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
-    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 3');
-    for(let i=0;i<3;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
-    card.appendChild(pips);
-    const val=document.createElement('div');val.className='val';
-    val.textContent=(max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]))+'. '+u.desc;
-    card.appendChild(val);
-    const pr=document.createElement('div');pr.className='pr';
-    if(max)pr.textContent='NIVEAU 3/3';
-    else{const gi=document.createElement('canvas');gi.width=7;gi.height=8;drawIcon(gi,SOUL);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
-    card.appendChild(pr);
-    const b=document.createElement('button');b.className='sbtn';b.type='button';
-    if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
-    else if(shop.souls>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyHu(key));}
-    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.souls)+' ÂME'+(u.cost[lv]-shop.souls>1?'S':'');b.disabled=true;}
-    b.setAttribute('aria-label',u.name+' : '+b.textContent);
-    card.appendChild(b);shopList.appendChild(card);
-  }
-}
+function renderHarpoon(){renderTree('harpoon');}
 function renderWeapBuy(w){   // arme achetable avec des âmes
   shopList.textContent='';
   const card=document.createElement('div');card.className='card';
@@ -5671,35 +5629,7 @@ function closeWeap(){
 $('weap-btn').addEventListener('click',()=>openWeap(false));$('weap-close').addEventListener('click',closeWeap);
 weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
 $('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;harp=null;hooks=[];tridents=[];saveShop();sfx.heal();renderWeap();});
-function renderDagger(){
-  shopList.textContent='';
-  const locked=!shop.daggerOwned,icons={dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC};
-  for(const key of D_KEYS){
-    const u=DUP[key],lv=shop.dup[key],max=lv>=5;
-    const card=document.createElement('div');card.className='card';
-    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,icons[key],true);ic.setAttribute('aria-hidden','true');
-    card.appendChild(ic);
-    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
-    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 5');
-    for(let i=0;i<5;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
-    card.appendChild(pips);
-    const val=document.createElement('div');val.className='val';
-    val.textContent=max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]);
-    card.appendChild(val);
-    const pr=document.createElement('div');pr.className='pr';
-    if(max){pr.textContent='NIVEAU 5/5';}
-    else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
-    card.appendChild(pr);
-    const b=document.createElement('button');b.className='sbtn';b.type='button';
-    if(locked){b.textContent='DAGUES REQUISES';b.disabled=true;}
-    else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
-    else if(shop.gold>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyDUp(key));}
-    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.gold);b.disabled=true;}
-    b.setAttribute('aria-label',u.name+' : '+b.textContent);
-    card.appendChild(b);
-    shopList.appendChild(card);
-  }
-}
+function renderDagger(){renderTree('dagger');}
 function renderSix(){
   shopList.textContent='';
   for(const key of SX_KEYS){
@@ -5763,34 +5693,7 @@ function renderShop(){
   $('shop-note').textContent=shopMerchant?"Le marchand améliore ton arme équipée contre de l'or. Ton score n'est pas touché et le jeu est en pause.":notes[shopTab];
   if(shopTab==='dagger')renderDagger();else if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
 }
-function renderRod(){
-  shopList.textContent='';
-  for(const key of UP_KEYS){
-    const u=UP[key],lv=shop.up[key],max=lv>=5;
-    const card=document.createElement('div');card.className='card';
-    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,ICONS[key],true);ic.setAttribute('aria-hidden','true');
-    card.appendChild(ic);
-    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
-    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 5');
-    for(let i=0;i<5;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
-    card.appendChild(pips);
-    const val=document.createElement('div');val.className='val';
-    val.textContent=max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]);
-    card.appendChild(val);
-    const pr=document.createElement('div');pr.className='pr';
-    if(max){pr.textContent='NIVEAU 5/5';}
-    else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
-    card.appendChild(pr);
-    const b=document.createElement('button');b.className='sbtn';b.type='button';
-    if(rodLocked()){b.textContent='INDISPONIBLE';b.disabled=true;}   // plage atteinte : plus d'amélioration de canne
-    else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
-    else if(shop.gold>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyUp(key));}
-    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.gold);b.disabled=true;}
-    b.setAttribute('aria-label',u.name+' : '+b.textContent);
-    card.appendChild(b);
-    shopList.appendChild(card);
-  }
-}
+function renderRod(){renderTree('rod');}
 function renderSouls(){
   shopList.textContent='';
   const u=SOUL_UP.hp,lv=shop.hp,max=lv>=5;
@@ -5816,34 +5719,66 @@ function renderSouls(){
   card.appendChild(b);
   shopList.appendChild(card);
 }
-function renderTrident(){
+function renderTrident(){renderTree('trident');}
+
+/* ---------- Arbre de compétences des armes ---------- */
+const TREES={
+ rod:{name:'Canne',tab:()=>UP,lv:()=>shop.up,max:5,cur:'gold',keys:UP_KEYS,buy:k=>buyUp(k),block:()=>rodLocked()?'INDISPONIBLE':'',
+  pos:{dmg:[1,0],rate:[0,1],range:[2,1],count:[1,2]},par:{rate:'dmg',range:'dmg',count:'rate'},icons:()=>({dmg:ICONS.dmg,range:ICONS.range,rate:ICONS.rate,count:ICONS.count})},
+ trident:{name:'Trident',tab:()=>TUP,lv:()=>shop.tup,max:5,cur:'gold',keys:T_KEYS,buy:k=>buyTUp(k),block:()=>shop.tridentOwned?'':'TRIDENT REQUIS',
+  pos:{dmg:[1,0],pierce:[0,1],rate:[2,1],range:[1,2]},par:{pierce:'dmg',rate:'dmg',range:'pierce'},icons:()=>({dmg:ICONS.dmg,pierce:ICONS.pierce,rate:ICONS.rate,range:ICONS.range})},
+ dagger:{name:'Dagues',tab:()=>DUP,lv:()=>shop.dup,max:5,cur:'gold',keys:D_KEYS,buy:k=>buyDUp(k),block:()=>shop.daggerOwned?'':'DAGUES REQUISES',
+  pos:{dmg:[1,0],dist:[0,1],parry:[2,1],jump:[0,2]},par:{dist:'dmg',parry:'dmg',jump:'dist'},icons:()=>({dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC})},
+ scepter:{name:'Sceptre de glace',tab:()=>SCUP,lv:()=>shop.sc,max:5,cur:'gold',keys:SC_KEYS,buy:k=>buyScUp(k),block:()=>shop.scepterOwned?'':'SCEPTRE REQUIS',
+  pos:{dmg:[1,0],range:[0,1],slow:[2,1],laser:[2,2]},par:{range:'dmg',slow:'dmg',laser:'slow'},icons:()=>({dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg})},
+ harpoon:{name:'Harpon',tab:()=>HU,lv:()=>shop.hu,max:3,cur:'souls',keys:HU_KEYS,buy:k=>buyHu(k),block:()=>shop.harpoonOwned?'':'HARPON REQUIS',
+  pos:{dmg:[1,0],range:[0,1],reel:[2,1],chain:[0,2]},par:{range:'dmg',reel:'dmg',chain:'range'},icons:()=>({dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg})}
+};
+const treeSel={};
+function treeOpen(T,key){const L=T.lv(),p=T.par[key];return !p||L[p]>0||L[key]>0;}   // un nœud s'ouvre quand son parent a au moins 1 niveau
+function renderTree(name){
+  const T=TREES[name],U=T.tab(),L=T.lv(),ics=T.icons(),blk=T.block(),RH=92,NS='http://www.w3.org/2000/svg';
   shopList.textContent='';
-  const locked=!shop.tridentOwned;
-  for(const key of T_KEYS){
-    const u=TUP[key],lv=shop.tup[key],max=lv>=5;
-    const card=document.createElement('div');card.className='card';
-    const ic=document.createElement('canvas');ic.className='ic';ic.width=12;ic.height=12;drawIcon(ic,ICONS[key],true);ic.setAttribute('aria-hidden','true');
-    card.appendChild(ic);
-    const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;card.appendChild(nm);
-    const pips=document.createElement('div');pips.className='pips';pips.setAttribute('role','img');pips.setAttribute('aria-label','Niveau '+lv+' sur 5');
-    for(let i=0;i<5;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
-    card.appendChild(pips);
-    const val=document.createElement('div');val.className='val';
-    val.textContent=max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]);
-    card.appendChild(val);
-    const pr=document.createElement('div');pr.className='pr';
-    if(max){pr.textContent='NIVEAU 5/5';}
-    else{const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
-    card.appendChild(pr);
-    const b=document.createElement('button');b.className='sbtn';b.type='button';
-    if(locked){b.textContent='TRIDENT REQUIS';b.disabled=true;}
-    else if(max){b.textContent='NIVEAU MAX';b.disabled=true;}
-    else if(shop.gold>=u.cost[lv]){b.textContent='AMÉLIORER';b.addEventListener('click',()=>buyTUp(key));}
-    else{b.textContent='IL MANQUE '+(u.cost[lv]-shop.gold);b.disabled=true;}
-    b.setAttribute('aria-label',u.name+' : '+b.textContent);
-    card.appendChild(b);
-    shopList.appendChild(card);
+  if(!treeSel[name]||!T.keys.includes(treeSel[name]))treeSel[name]=T.keys.find(k=>!T.par[k])||T.keys[0];
+  const sel=treeSel[name];
+  const wrap=document.createElement('div');wrap.className='tree';wrap.style.height=(3*RH)+'px';
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('class','tlines');svg.setAttribute('aria-hidden','true');
+  const cx=c=>((c+0.5)/3*100)+'%',cy=r=>(r*RH+RH/2-8);
+  for(const k of T.keys){const p=T.par[k];if(!p)continue;
+    const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',cx(T.pos[p][0]));ln.setAttribute('y1',cy(T.pos[p][1]));ln.setAttribute('x2',cx(T.pos[k][0]));ln.setAttribute('y2',cy(T.pos[k][1]));
+    ln.setAttribute('class',L[p]>0?'lit':'');svg.appendChild(ln);}
+  wrap.appendChild(svg);
+  for(const k of T.keys){
+    const u=U[k],lv=L[k],open=treeOpen(T,k),max=lv>=T.max;
+    const b=document.createElement('button');b.type='button';
+    b.className='tnode'+(lv>0?' on':'')+(max?' max':'')+(!open?' lock':'')+(k===sel?' sel':'');
+    b.style.left='calc('+cx(T.pos[k][0])+' - 31px)';b.style.top=(T.pos[k][1]*RH+4)+'px';
+    const ic=document.createElement('canvas');ic.width=12;ic.height=12;drawIcon(ic,ics[k],true);ic.setAttribute('aria-hidden','true');b.appendChild(ic);
+    const pips=document.createElement('div');pips.className='pips';
+    for(let i=0;i<T.max;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
+    b.appendChild(pips);
+    b.setAttribute('aria-label',u.name+' : niveau '+lv+' sur '+T.max+(open?'':' (verrouillé)'));
+    b.addEventListener('click',()=>{treeSel[name]=k;renderShop();});
+    wrap.appendChild(b);
   }
+  shopList.appendChild(wrap);
+  const u=U[sel],lv=L[sel],max=lv>=T.max,open=treeOpen(T,sel),cur=shop[T.cur];
+  const det=document.createElement('div');det.className='card tdet';
+  const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;det.appendChild(nm);
+  const val=document.createElement('div');val.className='val';
+  val.textContent=(max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]))+(u.desc?'. '+u.desc:'');det.appendChild(val);
+  const pr=document.createElement('div');pr.className='pr';
+  if(max)pr.textContent='NIVEAU '+T.max+'/'+T.max;
+  else{const gi=document.createElement('canvas');if(T.cur==='souls'){gi.width=7;gi.height=8;drawIcon(gi,SOUL);}else{gi.width=7;gi.height=6;drawIcon(gi,GOLD);}pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
+  det.appendChild(pr);
+  const bt=document.createElement('button');bt.className='sbtn';bt.type='button';
+  if(blk){bt.textContent=blk;bt.disabled=true;}
+  else if(!open){const par=U[T.par[sel]];bt.textContent='DÉBLOQUE « '+par.name.toUpperCase()+' » D\'ABORD';bt.disabled=true;}
+  else if(max){bt.textContent='NIVEAU MAX';bt.disabled=true;}
+  else if(cur>=u.cost[lv]){bt.textContent='AMÉLIORER';bt.addEventListener('click',()=>{if(treeOpen(T,sel))T.buy(sel);});}
+  else{const m=u.cost[lv]-cur;bt.textContent=T.cur==='souls'?'IL MANQUE '+m+' ÂME'+(m>1?'S':''):'IL MANQUE '+m;bt.disabled=true;}
+  bt.setAttribute('aria-label',u.name+' : '+bt.textContent);
+  det.appendChild(bt);shopList.appendChild(det);
 }
 function renderMulti(locked){
   const lv=shop.tmulti,max=lv>=3;
