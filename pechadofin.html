@@ -221,12 +221,15 @@ body{
 .tlines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .tlines line{stroke:var(--btn-line);stroke-width:4;stroke-linecap:round;opacity:.5}
 .tlines line.lit{stroke:#ffd23f;opacity:1}
-.tnode{position:absolute;width:62px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px 2px;border:2px solid var(--btn-line);background:var(--btn);cursor:pointer;border-radius:12px;color:inherit}
-.tnode canvas{width:36px;height:36px;image-rendering:pixelated;background:linear-gradient(#8fcdf4,#cfeafb);border:2px solid var(--btn-line);border-radius:8px}
-.tnode .pips{gap:2px}.tnode .pip{width:7px;height:7px;border-width:1px}
-.tnode.on{border-color:#ffd23f}.tnode.max{box-shadow:0 0 0 2px #ffd23f}
-.tnode.lock{opacity:.45;filter:grayscale(.8)}
+.tnode{position:absolute;width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border:2px solid var(--btn-line);background:var(--btn);cursor:pointer;border-radius:50%;color:inherit;font:400 10px/1 var(--pf)}
+.tnode canvas{width:30px;height:30px;image-rendering:pixelated;background:linear-gradient(#8fcdf4,#cfeafb);border-radius:50%}
+.tnode.on{border-color:#a67c00;background:#ffd23f;color:#14182c}
+.tnode.next{border-color:#ff8a3d;box-shadow:0 0 0 2px rgba(255,138,61,.45)}
+.tnode.lock{filter:grayscale(.7) brightness(.92);border-style:dashed;color:#8a93a8}
+.tnode.lock.next{box-shadow:none}
 .tnode.sel{outline:3px solid #ff8a3d;outline-offset:2px}
+.troot{position:absolute;left:calc(50% - 20px);top:6px;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.troot canvas{width:40px;height:40px;border-radius:8px}
 .tdet{grid-column:1/-1}
 #shop-list{
   overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch;min-height:0;padding:3px;
@@ -5721,64 +5724,87 @@ function renderSouls(){
 }
 function renderTrident(){renderTree('trident');}
 
-/* ---------- Arbre de compétences des armes ---------- */
+/* ---------- Arbre de compétences des armes : l'arme au sommet, 4 branches, 2 branches actives au maximum, chaque niveau est un nœud plus bas, remboursable ---------- */
+const TREE_MAXB=2;
 const TREES={
- rod:{name:'Canne',tab:()=>UP,lv:()=>shop.up,max:5,cur:'gold',keys:UP_KEYS,buy:k=>buyUp(k),block:()=>rodLocked()?'INDISPONIBLE':'',
-  pos:{dmg:[1,0],rate:[0,1],range:[2,1],count:[1,2]},par:{rate:'dmg',range:'dmg',count:'rate'},icons:()=>({dmg:ICONS.dmg,range:ICONS.range,rate:ICONS.rate,count:ICONS.count})},
- trident:{name:'Trident',tab:()=>TUP,lv:()=>shop.tup,max:5,cur:'gold',keys:T_KEYS,buy:k=>buyTUp(k),block:()=>shop.tridentOwned?'':'TRIDENT REQUIS',
-  pos:{dmg:[1,0],pierce:[0,1],rate:[2,1],range:[1,2]},par:{pierce:'dmg',rate:'dmg',range:'pierce'},icons:()=>({dmg:ICONS.dmg,pierce:ICONS.pierce,rate:ICONS.rate,range:ICONS.range})},
- dagger:{name:'Dagues',tab:()=>DUP,lv:()=>shop.dup,max:5,cur:'gold',keys:D_KEYS,buy:k=>buyDUp(k),block:()=>shop.daggerOwned?'':'DAGUES REQUISES',
-  pos:{dmg:[1,0],dist:[0,1],parry:[2,1],jump:[0,2]},par:{dist:'dmg',parry:'dmg',jump:'dist'},icons:()=>({dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC})},
- scepter:{name:'Sceptre de glace',tab:()=>SCUP,lv:()=>shop.sc,max:5,cur:'gold',keys:SC_KEYS,buy:k=>buyScUp(k),block:()=>shop.scepterOwned?'':'SCEPTRE REQUIS',
-  pos:{dmg:[1,0],range:[0,1],slow:[2,1],laser:[2,2]},par:{range:'dmg',slow:'dmg',laser:'slow'},icons:()=>({dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg})},
- harpoon:{name:'Harpon',tab:()=>HU,lv:()=>shop.hu,max:3,cur:'souls',keys:HU_KEYS,buy:k=>buyHu(k),block:()=>shop.harpoonOwned?'':'HARPON REQUIS',
-  pos:{dmg:[1,0],range:[0,1],reel:[2,1],chain:[0,2]},par:{range:'dmg',reel:'dmg',chain:'range'},icons:()=>({dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg})}
+ rod:{tab:()=>UP,lv:()=>shop.up,max:5,cur:'gold',keys:UP_KEYS,block:()=>rodLocked()?'INDISPONIBLE':'',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,rate:ICONS.rate,count:ICONS.count})},
+ trident:{tab:()=>TUP,lv:()=>shop.tup,max:5,cur:'gold',keys:T_KEYS,block:()=>shop.tridentOwned?'':'TRIDENT REQUIS',icons:()=>({dmg:ICONS.dmg,pierce:ICONS.pierce,rate:ICONS.rate,range:ICONS.range})},
+ dagger:{tab:()=>DUP,lv:()=>shop.dup,max:5,cur:'gold',keys:D_KEYS,block:()=>shop.daggerOwned?'':'DAGUES REQUISES',icons:()=>({dmg:ICONS.dmg,dist:ICONS.range,jump:ICONS.rate,parry:SHIELD_IC})},
+ scepter:{tab:()=>SCUP,lv:()=>shop.sc,max:5,cur:'gold',keys:SC_KEYS,block:()=>shop.scepterOwned?'':'SCEPTRE REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg})},
+ harpoon:{tab:()=>HU,lv:()=>shop.hu,max:3,cur:'souls',keys:HU_KEYS,block:()=>shop.harpoonOwned?'':'HARPON REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg})}
 };
 const treeSel={};
-function treeOpen(T,key){const L=T.lv(),p=T.par[key];return !p||L[p]>0||L[key]>0;}   // un nœud s'ouvre quand son parent a au moins 1 niveau
+const treeActive=T=>{const L=T.lv();return T.keys.filter(k=>L[k]>0).length;};
+function treeBuy(name,key){
+  const T=TREES[name],U=T.tab()[key],L=T.lv(),lv=L[key];
+  if(T.block()||lv>=T.max||shop[T.cur]<U.cost[lv])return;
+  if(lv===0&&treeActive(T)>=TREE_MAXB)return;
+  shop[T.cur]-=U.cost[lv];L[key]=lv+1;saveShop();sfx.heal();renderShop();
+}
+function treeRefund(name,key){
+  const T=TREES[name],U=T.tab()[key],L=T.lv(),lv=L[key];
+  if(T.block()||lv<=0)return;
+  shop[T.cur]+=U.cost[lv-1];L[key]=lv-1;saveShop();sfx.heal();renderShop();
+}
 function renderTree(name){
-  const T=TREES[name],U=T.tab(),L=T.lv(),ics=T.icons(),blk=T.block(),RH=92,NS='http://www.w3.org/2000/svg';
+  const T=TREES[name],U=T.tab(),L=T.lv(),ics=T.icons(),blk=T.block(),NS='http://www.w3.org/2000/svg';
+  const RH=58,NW=46,TOP=60,n=T.keys.length,H=TOP+T.max*RH+8,act=treeActive(T);
   shopList.textContent='';
-  if(!treeSel[name]||!T.keys.includes(treeSel[name]))treeSel[name]=T.keys.find(k=>!T.par[k])||T.keys[0];
+  if(!treeSel[name]||!T.keys.includes(treeSel[name]))treeSel[name]=T.keys[0];
   const sel=treeSel[name];
-  const wrap=document.createElement('div');wrap.className='tree';wrap.style.height=(3*RH)+'px';
+  const wrap=document.createElement('div');wrap.className='tree';wrap.style.height=H+'px';
+  const cx=c=>((c+0.5)/n*100)+'%',ny=r=>TOP+(r-1)*RH+NW/2;   // r = niveau (1..max)
   const svg=document.createElementNS(NS,'svg');svg.setAttribute('class','tlines');svg.setAttribute('aria-hidden','true');
-  const cx=c=>((c+0.5)/3*100)+'%',cy=r=>(r*RH+RH/2-8);
-  for(const k of T.keys){const p=T.par[k];if(!p)continue;
-    const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',cx(T.pos[p][0]));ln.setAttribute('y1',cy(T.pos[p][1]));ln.setAttribute('x2',cx(T.pos[k][0]));ln.setAttribute('y2',cy(T.pos[k][1]));
-    ln.setAttribute('class',L[p]>0?'lit':'');svg.appendChild(ln);}
+  const line=(x1,y1,x2,y2,lit)=>{const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);ln.setAttribute('class',lit?'lit':'');svg.appendChild(ln);};
+  T.keys.forEach((k,c)=>{
+    line('50%',26,cx(c),ny(1),L[k]>0);
+    for(let r=1;r<T.max;r++)line(cx(c),ny(r),cx(c),ny(r+1),L[k]>r);
+  });
   wrap.appendChild(svg);
-  for(const k of T.keys){
-    const u=U[k],lv=L[k],open=treeOpen(T,k),max=lv>=T.max;
-    const b=document.createElement('button');b.type='button';
-    b.className='tnode'+(lv>0?' on':'')+(max?' max':'')+(!open?' lock':'')+(k===sel?' sel':'');
-    b.style.left='calc('+cx(T.pos[k][0])+' - 31px)';b.style.top=(T.pos[k][1]*RH+4)+'px';
-    const ic=document.createElement('canvas');ic.width=12;ic.height=12;drawIcon(ic,ics[k],true);ic.setAttribute('aria-hidden','true');b.appendChild(ic);
-    const pips=document.createElement('div');pips.className='pips';
-    for(let i=0;i<T.max;i++){const pp=document.createElement('span');pp.className='pip'+(i<lv?' on':'');pips.appendChild(pp);}
-    b.appendChild(pips);
-    b.setAttribute('aria-label',u.name+' : niveau '+lv+' sur '+T.max+(open?'':' (verrouillé)'));
-    b.addEventListener('click',()=>{treeSel[name]=k;renderShop();});
-    wrap.appendChild(b);
-  }
+  const w=WEAPONS.find(x=>x.id===name);
+  const root=document.createElement('div');root.className='troot';
+  if(w)root.appendChild(weapImg(w,32));
+  wrap.appendChild(root);
+  T.keys.forEach((k,c)=>{
+    const u=U[k],lv=L[k],blocked=lv===0&&act>=TREE_MAXB;
+    for(let r=1;r<=T.max;r++){
+      const b=document.createElement('button');b.type='button';
+      b.className='tnode'+(lv>=r?' on':'')+(lv+1===r&&!blocked?' next':'')+(blocked||lv+1<r?' lock':'')+(k===sel?' sel':'')+(lv===r?' top':'');
+      b.style.left='calc('+cx(c)+' - '+(NW/2)+'px)';b.style.top=(TOP+(r-1)*RH)+'px';
+      if(r===1){const ic=document.createElement('canvas');ic.width=12;ic.height=12;drawIcon(ic,ics[k],true);ic.setAttribute('aria-hidden','true');b.appendChild(ic);}
+      else{const t=document.createElement('span');t.textContent=r;b.appendChild(t);}
+      b.title=u.name;
+      b.setAttribute('aria-label',u.name+' : niveau '+r+(lv>=r?' (obtenu)':''));
+      b.addEventListener('click',()=>{treeSel[name]=k;renderShop();});
+      wrap.appendChild(b);
+    }
+  });
   shopList.appendChild(wrap);
-  const u=U[sel],lv=L[sel],max=lv>=T.max,open=treeOpen(T,sel),cur=shop[T.cur];
+  const u=U[sel],lv=L[sel],max=lv>=T.max,cur=shop[T.cur],branchBlocked=lv===0&&act>=TREE_MAXB;
   const det=document.createElement('div');det.className='card tdet';
-  const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name;det.appendChild(nm);
+  const nm=document.createElement('div');nm.className='nm';nm.textContent=u.name+' ('+lv+'/'+T.max+')';det.appendChild(nm);
   const val=document.createElement('div');val.className='val';
   val.textContent=(max?'MAX : '+u.fmt(u.vals[lv]):u.fmt(u.vals[lv])+' > '+u.fmt(u.vals[lv+1]))+(u.desc?'. '+u.desc:'');det.appendChild(val);
+  const hint=document.createElement('div');hint.className='val';hint.textContent='Branches actives : '+act+'/'+TREE_MAXB+'. Rembourser une amélioration te rend tout son prix.';det.appendChild(hint);
   const pr=document.createElement('div');pr.className='pr';
+  const icn=()=>{const gi=document.createElement('canvas');if(T.cur==='souls'){gi.width=7;gi.height=8;drawIcon(gi,SOUL);}else{gi.width=7;gi.height=6;drawIcon(gi,GOLD);}return gi;};
   if(max)pr.textContent='NIVEAU '+T.max+'/'+T.max;
-  else{const gi=document.createElement('canvas');if(T.cur==='souls'){gi.width=7;gi.height=8;drawIcon(gi,SOUL);}else{gi.width=7;gi.height=6;drawIcon(gi,GOLD);}pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
+  else{pr.appendChild(icn());const sp=document.createElement('span');sp.textContent=u.cost[lv];pr.appendChild(sp);}
   det.appendChild(pr);
-  const bt=document.createElement('button');bt.className='sbtn';bt.type='button';
+  const row=document.createElement('div');row.className='row';row.style.cssText='display:flex;gap:8px;width:100%';
+  const bt=document.createElement('button');bt.className='sbtn';bt.type='button';bt.style.flex='1';
   if(blk){bt.textContent=blk;bt.disabled=true;}
-  else if(!open){const par=U[T.par[sel]];bt.textContent='DÉBLOQUE « '+par.name.toUpperCase()+' » D\'ABORD';bt.disabled=true;}
   else if(max){bt.textContent='NIVEAU MAX';bt.disabled=true;}
-  else if(cur>=u.cost[lv]){bt.textContent='AMÉLIORER';bt.addEventListener('click',()=>{if(treeOpen(T,sel))T.buy(sel);});}
+  else if(branchBlocked){bt.textContent='2 BRANCHES MAX';bt.disabled=true;}
+  else if(cur>=u.cost[lv]){bt.textContent='AMÉLIORER';bt.addEventListener('click',()=>treeBuy(name,sel));}
   else{const m=u.cost[lv]-cur;bt.textContent=T.cur==='souls'?'IL MANQUE '+m+' ÂME'+(m>1?'S':''):'IL MANQUE '+m;bt.disabled=true;}
   bt.setAttribute('aria-label',u.name+' : '+bt.textContent);
-  det.appendChild(bt);shopList.appendChild(det);
+  row.appendChild(bt);
+  const rf=document.createElement('button');rf.className='sbtn alt';rf.type='button';rf.style.flex='1';
+  rf.textContent=lv>0?'REMBOURSER +'+u.cost[lv-1]:'REMBOURSER';rf.disabled=!!blk||lv<=0;
+  if(!rf.disabled)rf.addEventListener('click',()=>treeRefund(name,sel));
+  row.appendChild(rf);
+  det.appendChild(row);shopList.appendChild(det);
 }
 function renderMulti(locked){
   const lv=shop.tmulti,max=lv>=3;
