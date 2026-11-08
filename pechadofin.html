@@ -5227,8 +5227,8 @@ function drawHUD(){
     ctx.fillStyle='#14182c';ctx.fillRect(5,28,52,5);
     ctx.fillStyle='#ff8a3d';ctx.fillRect(6,29,Math.round(50*combo.t/COMBO_TIME),3);
   }
-  ctx.drawImage(DOLB,4,VH-17);
-  txt((kills%HEAL_EVERY)+'/'+HEAL_EVERY,25,VH-16,'#e4f4ff');
+  ctx.drawImage(HEART_OFF,5,VH-15);
+  txt((kills%HEAL_EVERY)+'/'+HEAL_EVERY,20,VH-15,'#e4f4ff');
   txt('SCORE '+pad6(score),VW-6,6,'#ffffff','right');
   txt('BEST '+pad6(Math.max(best,score)),VW-6,18,'#bfe0ff','right');
   const gt='x'+shop.gold;
