@@ -643,7 +643,7 @@ const GRAV=900, JUMPV=345, MAXV=112, MAXFALL=480, HOPV=200;
 const WATER_ROW=31;
 const HOOK_V=340, HOOK_BACK=520, HOOK_SPREAD=0.2;
 const COMBO_TIME=10, HEAL_EVERY=15;
-const CASTLE_HP=500;   // château de sable : seau d'eau à viser ; classique : 22 écrans après la méduse (elle-même à 26 écrans du début du sable) ; anarchie : au milieu de chaque zone plage
+const CASTLE_HP=500,BUCKET_DMG=50;   // château de sable : seau d'eau à viser ; classique : 22 écrans après la méduse (elle-même à 26 écrans du début du sable) ; anarchie : au milieu de chaque zone plage
 const OCTO_HP=300, ARENA_START=27, ARENA_EVERY=20, WALL_H=14, CASTLE_SCREEN=ARENA_START+18;   // arène du poulpe : 1re à 27 écrans, puis tous les 20 écrans en anarchie (boss aléatoire), des deux côtés
 const JELLY_HP=420, JELLY_SCREENS=37, JELLY_SCREENS_C=26, CASTLE_AFTER_JELLY=22, JELLY_BEAM_L=480;   // méduse : 420 PV, apparaît ~37 écrans après l'entrée de la plage
 const ICE_ACC=1000, ICE_FRIC=300, ESK_HP=700, ICE_SCREENS=34;   // glace : accélération / frottement du pêcheur ; esquimau : PV ; arène à 34 écrans de l'entrée de la glacière
@@ -2572,15 +2572,15 @@ function relocBucket(c){
   for(let i=0;i<14;i++){const nx=lo+Math.random()*(hi-lo);if(Math.abs(nx-c.bx)>80){c.bx=nx;return;}}
   c.bx=c.bx>ar.cx*T?lo+10:hi-10;
 }
-function hitCastle(dmg){   // le seau doit être touché 2 fois (peu importe les dégâts) pour s'activer et se vider sur le château
+function hitCastle(dmg){   // le seau doit être touché 2 fois (peu importe l'arme) et fait toujours BUCKET_DMG dégâts pour s'activer et se vider sur le château
   const c=castle;if(!c||c.state!=='fight'||c.hitCd>0)return;
   const fl=c.ar.floor*T;
-  c.hitCd=0.3;c.bf=0.3;c.acc=(c.acc||0)+dmg;c.bh=(c.bh||0)+1;
+  c.hitCd=0.3;c.bf=0.3;c.bh=(c.bh||0)+1;
   if(c.bh<2){
     floatText(c.bx,fl-28,'SEAU 1/2','#9fe3ff');burst(c.bx,fl-14,'#7fd4ff',8,80);sfx.hit();
     return;
   }
-  const d=c.acc;c.acc=0;c.bh=0;
+  const d=BUCKET_DMG;c.bh=0;   // dégâts précis, indépendants de l'arme
   const removed=Math.min(d,c.hp);
   c.hp-=d;c.flash=0.3;
   combo.n++;combo.t=COMBO_TIME;
