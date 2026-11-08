@@ -2210,6 +2210,7 @@ function stepDagger(dt){
   if(p.parryT>0)p.parryT-=dt;
   if(p.dashCd>0)p.dashCd-=dt;
   if(p.dashWait&&p.onGround&&!p.dash){p.dashWait=false;p.dashCd=1;}   // recharge de 1 s qui démarre au contact du sol
+  if(p.dashWait||p.dashCd>0)reloadBar=p.dashCd>0?1-p.dashCd:0;
   if(fireBuf>0)fireBuf-=dt;
   if(castCd>0)castCd-=dt;
   if(throwAnim>0)throwAnim-=dt;
@@ -2363,6 +2364,24 @@ const BOOM_COST=500,BOOM={spd:300};
 const btV=k=>BTUP[k].vals[shop.bt[k]||0];
 const BOOM_ICON=spr(["bb.......",".bbb.....","..bbb....","...bby...",".....bbb.","......bbb",".......bb"],{b:'#c58a45',y:'#ffd23f'},true);
 let booms=[],boomCd=0;
+let reloadBar=-1;   // progression (0..1) de la barre de recharge au-dessus du joueur, -1 = cachée ; seules les armes à délai > 1 s l'utilisent
+function drawReloadBar(cx,py,v){
+  const w=16,x=cx-8,y=Math.round(py)-8;
+  ctx.fillStyle='#14182c';ctx.fillRect(x-1,y-1,w+2,5);
+  ctx.fillStyle='#4a5068';ctx.fillRect(x,y,w,3);
+  ctx.fillStyle=v>=0.85?'#7dff9a':'#ffd23f';ctx.fillRect(x,y,Math.round(w*clamp(v,0,1)),3);
+}
+function boomReload(){   // barre de recharge : durée totale d'un cycle (aller + retour + relance), affichée seulement si > 1 s
+  const range=btV('range'),flight=range/BOOM.spd+range/(BOOM.spd*1.15),cyc=flight+btV('rate');
+  if(cyc<=1)return -1;
+  if(booms.length){
+    let pr=1;
+    for(const b of booms)pr=Math.min(pr,b.back?0.5+0.5*(1-clamp(Math.hypot(player.x+5-b.x,player.y+6-b.y)/Math.max(1,b.dm||1),0,1)):0.5*clamp(b.d/range,0,1));
+    return pr*flight/cyc;
+  }
+  if(boomCd>0)return (flight+btV('rate')-boomCd)/cyc;
+  return -1;
+}
 function stepBoomerang(dt){
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
@@ -2377,13 +2396,13 @@ function stepBoomerang(dt){
     }
     sfx.trident();
   }
-  if(!booms.length)return;
+  if(!booms.length){reloadBar=boomReload();return;}
   const dmg=btV('dmg'),range=btV('range');
   for(const b of booms){
     b.t+=dt;b.sp+=dt*22;
     if(!b.back){
       const st=BOOM.spd*dt;b.x+=b.ux*st;b.y+=b.uy*st;b.d+=st;
-      if(solidAt(b.x+b.ux*5,b.y+b.uy*5)||b.d>=range){b.back=true;b.hit=new Set();}
+      if(solidAt(b.x+b.ux*5,b.y+b.uy*5)||b.d>=range){b.back=true;b.hit=new Set();b.dm=Math.hypot(p.x+5-b.x,p.y+6-b.y);}
     }else{
       const tx=p.x+5-b.x,ty=p.y+6-b.y,l=Math.hypot(tx,ty),st=BOOM.spd*1.15*dt;
       if(l<=st+6||b.t>3){b.dead=true;continue;}
@@ -2397,6 +2416,7 @@ function stepBoomerang(dt){
   }
   booms=booms.filter(b=>!b.dead);
   if(!booms.length)boomCd=btV('rate');
+  reloadBar=boomReload();
 }
 function drawBoomerang(){
   for(const b of booms){
@@ -2406,6 +2426,7 @@ function drawBoomerang(){
   }
 }
 function stepHook(dt){
+  reloadBar=-1;
   stepCloudBalls(dt);
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
@@ -4899,6 +4920,7 @@ function drawPlayer(){
   else{ctx.translate(cx,0);ctx.scale(p.face,1);ctx.drawImage(sp,-8,Math.round(p.y)-2);}
   ctx.restore();
   if(state==='dying')return;
+  if(reloadBar>=0&&state==='play')drawReloadBar(cx,p.y,reloadBar);
   const isTri=shop.weapon==='trident',tip=rodTip(isTri?throwAnim>0:hooks.length>0),hx=p.x+5+p.face*5,hy=p.y+8;
   if(glockOn){   // pistolet tenu dans la direction de la visée
     const a=Math.atan2(aim.y,aim.x);ctx.save();ctx.translate(Math.round(hx),Math.round(hy-1));ctx.rotate(a);if(aim.x<0)ctx.scale(1,-1);
