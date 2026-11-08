@@ -553,7 +553,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','LE MONDE NUAGE':'THE CLOUD WORLD','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
+'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','DAUPHIN DES NUAGES':'CLOUD DOLPHIN','LE MONDE NUAGE':'THE CLOUD WORLD','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -667,6 +667,21 @@ const cowPlat=(tx,ty)=>{const f=cowFieldAt(tx);if(!f||ty!==f.floor-4)return fals
 const inSwamp=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?!!zoneDefK(zoneK(tx)).swamp:(Math.abs(tx)>=SWAMP_TX&&Math.abs(tx)<ICE_TX));
 const CLOUD_TX=ICE_TX+ICE_SCREENS*(VW/T)+120;   // classique : le monde nuage commence après le château de glace (on y accède par la fenêtre du roi)
 const inCloud=tx=>!anarchyOn&&Math.abs(tx)>=CLOUD_TX;
+const SKY_CX=CLOUD_TX+170,SKY_G=16,SKY_P=[   // arène du dauphin des nuages : des plateformes fixes au-dessus du vide [dx début, dx fin, hauteur en cases]
+  [-22,-19,2],[-14,-11,2],[-6,-3,2],[2,5,2],[10,13,2],[18,21,2],
+  [-18,-15,5],[-10,-7,5],[-2,1,5],[6,9,5],[14,17,5],
+  [-14,-11,8],[-6,-3,8],[2,5,8],[10,13,8],
+  [-10,-7,11],[-2,1,11],[6,9,11]];
+const skyDx=tx=>{if(anarchyOn)return null;const a=Math.abs(tx);if(a<SKY_CX-46||a>SKY_CX+46)return null;const sg=tx<0?-1:1,dx=(tx-sg*SKY_CX)*sg;return {dx,sg};};
+const skyPlat=(tx,ty)=>{const a=Math.abs(tx);if(a<SKY_CX-24||a>SKY_CX+24||anarchyOn)return false;const sg=tx<0?-1:1,dx=(tx-sg*SKY_CX)*sg;for(const q of SKY_P)if(dx>=q[0]&&dx<=q[1]&&ty===SKY_G-q[2])return true;return false;};
+function skyCol(tx,dx){
+  let c=colCache.get(tx);if(c)return c;
+  const ad=Math.abs(dx),base={pit:false,beach:false,tun:null,swamp:false,ice:false,cloud:true};
+  if(ad<=24)c={...base,g:SKY_G,pit:true};
+  else if(ad<=30)c={...base,g:SKY_G};
+  else c={...base,g:Math.round(lerp(spawnBlend(tx),SKY_G,clamp(1-(ad-30)/16,0,1)))};
+  colCache.set(tx,c);return c;
+}
 const inIce=tx=>anarchyOn?(Math.abs(tx)>=BEACH_TX&&!!zoneDefK(zoneK(tx)).ice):(Math.abs(tx)>=ICE_TX&&Math.abs(tx)<CLOUD_TX);
 const TCELL=56, TFLAT=8;                              // un tunnel possible par cellule de 56 cases, 8 cases de raccord avec le relief
 const plat=new Set();      // plateformes traversables par le dessous
@@ -795,6 +810,7 @@ function column(tx){
     return !hole.shut&&tx>=hole.l&&tx<=hole.r?{g:g0,pit:true,beach:false,tun:null,swamp:false,hole:true}:tx<hole.l-6?{g:g0-40,pit:false,beach:false,tun:null,swamp:false,ice:inIce(tx),cloud:inCloud(tx)}:{g:g0,pit:false,beach:false,tun:null,swamp:false,ice:inIce(tx),cloud:inCloud(tx)};
   }
   if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
+  {const sk=skyDx(tx);if(sk)return skyCol(tx,sk.dx);}   // arène du dauphin des nuages
   let c=colCache.get(tx); if(c!==undefined) return c;
   const ar=arenaAt(tx);
   if(ar){
@@ -838,7 +854,7 @@ const palmPlat=(tx,ty)=>{   // la couronne de feuilles d'un cocotier sert de pla
   for(let d=-1;d<=1;d++){const pm=palmAt(tx+d);if(pm&&ty===pm.g-2&&(pm.flip?d===1||d===0:d===0||d===-1))return true;}
   return false;
 };
-const oneWay=(tx,ty)=>twIn(tx)?twOne(tx,ty):!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty));
+const oneWay=(tx,ty)=>twIn(tx)?twOne(tx,ty):!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty)||skyPlat(tx,ty));
 /* ---------- Monde nuage : éléments de plateforme (nuages mobiles, nuages friables, ressorts, courants ascendants) ---------- */
 const movers=[],fragMap=new Map(),fragList=[],springs=new Set(),springAnim=new Map(),drafts=[];
 const pkey=(tx,ty)=>tx*512+ty+200;
@@ -918,6 +934,7 @@ function genChunk(cx){
   const x0=cx*16, myPlats=[];
   const ca=arenaAt(x0+8);
   if(castleAt(x0)||castleAt(x0+15))return;   // rien devant le château
+  if(skyDx(x0)||skyDx(x0+15))return;   // rien autour de l'arène des nuages : ses plateformes ne changent jamais
   if(ca&&Math.abs(x0+8-ca.cx)<=30)return;   // rien à l'intérieur ni autour de l'arène
   if(cowFieldAt(x0)||cowFieldAt(x0+15))return;   // pré de la vache : vide
   const iceC=inIce(x0+8),cloudC=inCloud(x0+8),e0=enemies.length;
@@ -1773,7 +1790,7 @@ function loadShop(){
       d.cloud=(j.cloud===1||j.cloud===-1)?1:0;   // checkpoint du monde nuage (mode classique)
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
-      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
+      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king','cloud'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
@@ -2007,6 +2024,7 @@ function allTargets(){
   if(castle&&castle.state==='fight')targets.push({r:bucketRect(castle),hit:d=>hitCastle(d)});
   {const wr=witchRect();if(wr)targets.push({r:wr,hit:d=>hitWitch(d)});}
   {const er=eskRect();if(er)targets.push({r:er,hit:d=>hitEskimo(d)});}
+  {const cr=cloudRect();if(cr)targets.push({r:cr,hit:d=>hitCloudBoss(d)});}
   {const kr=kingRect();if(kr)targets.push({r:kr,hit:d=>hitKing(d)});}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)targets.push({r:[cow.x,cow.y,cow.w,cow.h],hit:d=>hitCow(d)});
   if(six&&six.state==='alive'&&six.spawnT<=0)targets.push({r:[six.x,six.y,six.w,six.h],hit:d=>hitSix(d)});
@@ -2063,6 +2081,7 @@ function stepDagger(dt){
   if(castle&&castle.state==='fight')tryHit(castle,bucketRect(castle),x=>hitCastle(x));
   {const wr=witchRect();if(wr)tryHit(witch,wr,x=>hitWitch(x));}
   {const er=eskRect();if(er)tryHit(eskimo,er,x=>hitEskimo(x));}
+  {const cr=cloudRect();if(cr)tryHit(cloudB,cr,x=>hitCloudBoss(x));}
   {const kr=kingRect();if(kr)tryHit(king,kr,x=>hitKing(x));}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)tryHit(cow,[cow.x,cow.y,cow.w,cow.h],x=>hitCow(x));
   if(six&&six.state==='alive'&&six.spawnT<=0)tryHit(six,[six.x,six.y,six.w,six.h],x=>hitSix(x));
@@ -2124,6 +2143,7 @@ function stepTrident(dt){
       if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(t);hitOcto(t,dmg);h.n++;if(h.n>=pierce)break;}
     }
     {const wr=witchRect();if(h.n<pierce&&wr&&!h.hit.has(witch)&&rectsOverlap(h.x-5,h.y-5,10,10,wr[0],wr[1],wr[2],wr[3])){h.hit.add(witch);hitWitch(dmg);h.n++;}}
+    {const cr=cloudRect();if(h.n<pierce&&cr&&!h.hit.has(cloudB)&&rectsOverlap(h.x-5,h.y-5,10,10,cr[0],cr[1],cr[2],cr[3])){h.hit.add(cloudB);hitCloudBoss(dmg);h.n++;}}
     {const er=eskRect();if(h.n<pierce&&er&&!h.hit.has(eskimo)&&rectsOverlap(h.x-5,h.y-5,10,10,er[0],er[1],er[2],er[3])){h.hit.add(eskimo);hitEskimo(dmg);h.n++;}}
     {const kr=kingRect();if(h.n<pierce&&kr&&!h.hit.has(king)&&rectsOverlap(h.x-5,h.y-5,10,10,kr[0],kr[1],kr[2],kr[3])){h.hit.add(king);hitKing(dmg);h.n++;}}
     if(h.n<pierce&&castle&&castle.state==='fight'&&!h.hit.has(castle)){const r=bucketRect(castle);if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(castle);hitCastle(dmg);h.n++;}}
@@ -2135,6 +2155,7 @@ function stepTrident(dt){
   tridents=tridents.filter(h=>!h.done);
 }
 function stepHook(dt){
+  stepCloudBalls(dt);
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
   if(shop.weapon==='tarot'&&!glockOn){stepTarot(dt);return;}
@@ -2390,7 +2411,7 @@ function killBoss(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnBoss(){
-  if(boss||octo||castle||witch||eskimo||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
+  if(boss||octo||castle||witch||eskimo||cloudB||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
   const p=player,k=Math.round(p.x/BOSS_EVERY);
   if(k===0||bossDone.has(k))return;
   const sx=k*BOSS_EVERY;
@@ -3446,7 +3467,7 @@ function drawIceCastle(cx0){
 const COW_HP=600, COW_SCREENS=20;
 let cow=null,cowSpawned=false,cowDone=new Set(),milk=[];
 function maybeSpawnCow(){
-  if(cow||boss||octo||castle||witch||eskimo||jelly||six)return;
+  if(cow||boss||octo||castle||witch||eskimo||cloudB||jelly||six)return;
   const p=player,tx=Math.floor((p.x+5)/T),f=cowFieldAt(tx);
   if(!f||Math.abs(Math.abs(tx)-f.fc)>9)return;
   let key;
@@ -3826,6 +3847,101 @@ function buyHu(key){
   if(!shop.harpoonOwned||lv>=3||shop.souls<u.cost[lv])return;
   shop.souls-=u.cost[lv];shop.hu[key]=lv+1;saveShop();sfx.heal();renderShop();renderWeap();
 }
+/* ---------- Boss du monde nuage : le dauphin des nuages (arène de plateformes fixes au-dessus du vide) ---------- */
+const CLOUDB_HP=900;
+let cloudB=null,cloudBalls=[],cloudDone=false;
+function cloudRect(){const b=cloudB;if(!b||b.state!=='fight')return null;return [b.x-24,b.y-15,48,30];}
+function startCloudBoss(sg){
+  const cx=sg*SKY_CX*T+8,hp=CLOUDB_HP;
+  enemies=enemies.filter(e=>Math.abs(e.x-cx)>46*T);
+  cloudB={sg,cx,hp,maxHp:hp,state:'intro',t:0,intro:2.2,rage:false,flash:0,x:clamp(player.x+9*T,cx-20*T,cx+20*T),y:clamp(player.y-5*T,(SKY_G-10)*T,(SKY_G-4)*T),face:-1,tx:cx,ty:(SKY_G-8)*T,mt:2,nextB:2.5,nextS:4,nextR:7,dieT:0};
+  cloudBalls=[];shake=0.6;sfx.gate();sfx.bossSpawn();
+  floatText(player.x+5,player.y-34,'DAUPHIN DES NUAGES','#ffffff');
+}
+function hitCloudBoss(dmg){
+  const b=cloudB;if(!b||b.state!=='fight')return;
+  const removed=Math.min(dmg,b.hp);
+  b.hp-=dmg;b.flash=0.12;
+  combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;
+  score+=pts;
+  floatText(b.x,b.y-26,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  burst(b.x,b.y,'#ffffff',8,90);
+  if(b.hp<=0)killCloudBoss();
+  else{if(!b.rage&&b.hp<=b.maxHp/2){b.rage=true;shake=0.7;sfx.bossSpawn();floatText(b.x,b.y-40,'ENRAGÉ !','#ff4a4a');b.nextS=Math.min(b.nextS,1.5);}else sfx.hit();}
+}
+function killCloudBoss(){
+  const b=cloudB;
+  b.hp=0;b.state='dying';b.dieT=2.6;cloudBalls=[];cloudDone=true;
+  for(const e of enemies)if(e.cb&&e.state==='alive'){e.state='dead';e.t=0;e.vy=-120;e.vx=0;burst(e.x+e.w/2,e.y+e.h/2,'#ffffff',8,90);}
+  kills++;shake=0.8;sfx.bossDie();sfx.gate();
+  const again=!!shop.bossSouls.cloud&&!anarchyOn,gs=soulReward('cloud',3),gold=again?40:400;shop.gold+=gold;saveShop();
+  const cx=b.x,cy=b.y-50;
+  if(gs){floatText(cx,cy-12,'+3 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-14,y:cy+40,t:0});soulFx.push({x:cx,y:cy+40,t:0.15});soulFx.push({x:cx+14,y:cy+40,t:0.3});}
+  floatText(cx,cy,'+'+gold+' OR','#ffd23f');
+  floatText(cx,cy+11,'LA ROUTE EST LIBRE !','#7ff0e8');
+  burst(cx,b.y,'#ffffff',30,170);burst(cx,b.y,'#7fc4ff',18,120);
+  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:(SKY_G-3)*T,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+}
+function cloudShoot(n,spread,sp){
+  const b=cloudB,p=player,ox=b.x+b.face*22,oy=b.y+2,a0=Math.atan2(p.y+7-oy,p.x+5-ox);
+  for(let i=0;i<n;i++){const a=n===1?a0:a0+(i-(n-1)/2)*spread;cloudBalls.push({x:ox,y:oy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,t:0});}
+  sfx.bossFire();
+}
+function stepCloudBoss(dt){
+  const p=player;
+  if(!cloudB&&!cloudDone&&state==='play'&&!anarchyOn){const sk=skyDx(Math.floor((p.x+5)/T));if(sk&&sk.dx>-23&&sk.dx<=24)startCloudBoss(sk.sg);}
+  const b=cloudB;if(!b)return;
+  b.t+=dt;if(b.flash>0)b.flash-=dt;
+  if(b.state==='dying'){
+    b.dieT-=dt;b.y+=34*dt;b.face=p.x>b.x?1:-1;
+    if(Math.random()<0.6)burst(b.x+(Math.random()-0.5)*40,b.y+(Math.random()-0.5)*20,'#ffffff',3,60);
+    if(b.dieT<=0)cloudB=null;
+    return;
+  }
+  {const lim=26*T;p.x=clamp(p.x,b.cx-lim,b.cx+lim-10);}   // verrou : on ne quitte pas l'arène tant qu'il est là
+  b.face=p.x+5>b.x?1:-1;
+  if(b.state==='intro'){b.intro-=dt;if(b.intro<=0){b.state='fight';}return;}
+  const sp=b.rage?70:42;
+  b.mt-=dt;if(b.mt<=0){b.mt=b.rage?1.8:2.6;b.tx=clamp(p.x+(Math.random()*2-1)*7*T,b.cx-20*T,b.cx+20*T);b.ty=clamp(p.y-(2+Math.random()*3)*T,(SKY_G-10)*T,(SKY_G-4)*T);}
+  b.x+=clamp(b.tx-b.x,-sp*dt,sp*dt);b.y+=clamp(b.ty-b.y,-sp*0.7*dt,sp*0.7*dt);
+  b.nextB-=dt;if(b.nextB<=0){b.nextB=b.rage?1.5:2.3;cloudShoot(b.rage?5:3,0.24,b.rage?118:96);}
+  if(b.rage){b.nextR-=dt;if(b.nextR<=0){b.nextR=6;for(let i=0;i<10;i++){const a=i/10*Math.PI*2;cloudBalls.push({x:b.x,y:b.y,vx:Math.cos(a)*72,vy:Math.sin(a)*72,t:0});}sfx.bossFire();}}
+  b.nextS-=dt;if(b.nextS<=0){
+    b.nextS=b.rage?5:7.5;
+    let alive=0;for(const e of enemies)if(e.cb&&e.state==='alive')alive++;
+    const room=(b.rage?6:4)-alive;
+    for(let i=0;i<Math.min(2,room);i++){const e=mkEnemy('fly',b.x+(i?30:-30),b.y+10);e.cb=true;enemies.push(e);burst(e.x+e.w/2,e.y+e.h/2,'#ffffff',8,80);}
+    if(room>0)sfx.gate();
+  }
+}
+function stepCloudBalls(dt){
+  const p=player;
+  for(const c of cloudBalls){
+    c.t+=dt;c.x+=c.vx*dt;c.y+=c.vy*dt;
+    if(c.t>6||solidAt(c.x,c.y)){c.dead=true;burst(c.x,c.y,'#ffffff',4,50);continue;}
+    if(state==='play'&&p.invuln<=0&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-1,c.x-5,c.y-5,10,10)){c.dead=true;hurtPlayer(c.x);burst(c.x,c.y,'#ffffff',8,80);}
+  }
+  cloudBalls=cloudBalls.filter(c=>!c.dead);
+}
+function drawCloudBoss(){
+  for(const c of cloudBalls){
+    const x=Math.round(c.x),y=Math.round(c.y);
+    ctx.fillStyle='#8fa8c8';disc(x,y,6);ctx.fillStyle='#e4edfa';disc(x,y,5);ctx.fillStyle='#ffffff';disc(x-1,y-1,3);disc(x+3,y+1,2);
+  }
+  const b=cloudB;if(!b)return;
+  const dead=b.state==='dying',img=b.flash>0?DOLP_IW:DOLP_I,by=Math.round(b.y+(dead?0:Math.sin(time*2)*3));
+  ctx.save();ctx.translate(Math.round(b.x),by);
+  if(dead&&Math.floor(time*20)%2)ctx.globalAlpha=0.6;
+  ctx.scale(b.face*3,dead?-3:3);
+  ctx.drawImage(img,-9,-5);
+  const f=Math.floor(time*8)%2;ctx.fillStyle='#14182c';ctx.fillRect(-6,-9+f*2,8,4);ctx.fillStyle='#ffffff';ctx.fillRect(-5,-8+f*2,6,2);
+  ctx.restore();
+  ctx.fillStyle='#ffffff';   // bouffées de nuage autour du boss
+  for(let i=0;i<5;i++){const a=time*1.3+i*1.26,r=24+(i%2)*6;ctx.globalAlpha=0.9;disc(Math.round(b.x+Math.cos(a)*r),Math.round(by+Math.sin(a)*r*0.6+6),3+(i%3));}
+  ctx.globalAlpha=1;
+  if(b.rage&&!dead){ctx.fillStyle='rgba(255,60,40,.22)';disc(Math.round(b.x),by,26);}
+}
 function stepCards(dt){
   if(!tcards.length)return;
   for(const c of tcards){
@@ -4031,7 +4147,7 @@ function killJelly(b){
   if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
 }
 function maybeSpawnJelly(){
-  if(jelly||octo||castle||witch||eskimo||cow||six)return;
+  if(jelly||octo||castle||witch||eskimo||cloudB||cow||six)return;
   const p=player,tx=Math.floor((p.x+5)/T),side=tx<0?-1:1,per=JELLY_SCREENS*(VW/T);
   let key;
   if(anarchyOn){   // anarchie : une méduse tous les 37 écrans après l'entrée de la plage, tant qu'aucun autre boss n'est là
@@ -4299,7 +4415,7 @@ function update(dt){
   maybeSpawnSix(dt);stepSix(dt);
   stepOcto(dt);
   stepCastle(dt);
-  stepWitch(dt);stepPoison(dt);stepEskimo(dt);stepScepterBeams(dt);stepPedestal(dt);
+  stepWitch(dt);stepPoison(dt);stepEskimo(dt);stepCloudBoss(dt);stepScepterBeams(dt);stepPedestal(dt);
   stepBossShots(dt);
   stepSoulFx(dt);
   stepPickups(dt);
@@ -5025,7 +5141,9 @@ function drawHUD(){
   const sl='x'+shop.souls;
   txt(sl,VW-6,42,'#ff7a88','right');
   ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),40);
-  const bb=king&&king.state!=='dying'
+  const bb=cloudB&&cloudB.state!=='dying'
+    ?{name:'DAUPHIN DES NUAGES',hp:cloudB.hp,max:cloudB.maxHp,ticks:[0.5],name_c:cloudB.rage?'#ff6a6a':'#ffffff',col:cloudB.rage?'#ff7a5a':'#7fc4ff',dark:'#1a3a6a',hi:'#e8f6ff'}
+    :king&&king.state!=='dying'
     ?{name:'ROI CACAMILLE 2',hp:king.hp,max:king.maxHp,ticks:[0.5],name_c:king.rage?'#ff6a6a':'#ffd23f',col:king.rage?'#ff4a4a':'#b04ad8',dark:'#2a1040',hi:'#e8c8ff'}
     :eskimo&&eskimo.state!=='dying'
     ?{name:'ESQUIMAU',hp:eskimo.hp,max:eskimo.maxHp,ticks:[0.5],name_c:eskimo.rage?'#ff6a6a':'#bfe9ff',col:eskimo.rage?'#ff7a5a':'#5ec8f0',dark:'#143a5a',hi:'#e8fbff'}
@@ -5091,7 +5209,7 @@ function render(){
   drawWater(cx,cy);
   drawOcto();
   drawCastle();
-  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();
+  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();drawCloudBoss();
   drawPalms(cx,cy);
   drawSwampTowers(cx);
   drawTiles(cx,cy);drawCloudGear(cx,cy);
@@ -5160,7 +5278,7 @@ function showTitle(){   // retour à l'écran titre (après un reset de la save 
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -5339,6 +5457,7 @@ function assistTarget(cx,cy,a0){
   if(castle&&castle.state==='fight'){const r=bucketRect(castle);c.push([r[0]+r[2]/2,r[1]+r[3]/2]);}
   {const wr=witchRect();if(wr)c.push([wr[0]+wr[2]/2,wr[1]+wr[3]/2]);}
   {const er=eskRect();if(er)c.push([er[0]+er[2]/2,er[1]+er[3]/2]);}
+  {const cr=cloudRect();if(cr)c.push([cr[0]+cr[2]/2,cr[1]+cr[3]/2]);}
   {const kr=kingRect();if(kr)c.push([kr[0]+kr[2]/2,kr[1]+kr[3]/2]);}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)c.push([cow.x+cow.w/2,cow.y+cow.h/2]);
   if(six&&six.state==='alive'&&six.spawnT<=0)c.push([six.x+six.w/2,six.y+six.h/2]);
