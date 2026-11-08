@@ -5219,42 +5219,41 @@ function txt(s,x,y,col,align){
 }
 const pad6=n=>String(n).padStart(6,'0');
 const hudSil=new Map();
-function hudIcon(im,x,y){   // icône cernée d'un contour sombre (lisible sur tous les fonds)
+function hudIcon(im,x,y,k){   // icône agrandie, ombre portée légère (sans bordure)
+  k=k||1.5;const w=Math.round(im.width*k),h=Math.round(im.height*k);
   let sil=hudSil.get(im);if(!sil){sil=tint(im,'#14182c');hudSil.set(im,sil);}
-  for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]])ctx.drawImage(sil,x+dx,y+dy);
-  ctx.drawImage(im,x,y);
+  ctx.globalAlpha=.5;ctx.drawImage(sil,x+1,y+1,w,h);ctx.globalAlpha=1;
+  ctx.drawImage(im,x,y,w,h);
 }
-function hudTxt(t,x,y,col,align){   // texte avec contour sombre complet
+function hudTxt(t,x,y,col,align){   // texte avec ombre portée légère (sans bordure)
   ctx.textAlign=align||'left';ctx.textBaseline='top';t=trStr(t);
-  ctx.fillStyle='#14182c';
-  for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1],[2,2]])ctx.fillText(t,x+dx,y+dy);
+  ctx.globalAlpha=.5;ctx.fillStyle='#14182c';ctx.fillText(t,x+1,y+1);ctx.globalAlpha=1;
   ctx.fillStyle=col;ctx.fillText(t,x,y);
 }
 let bbGhost=1,bbName='',bbLast=0;
 function drawHUD(){
-  ctx.font="8px 'Press Start 2P', monospace";
+  ctx.font="10px 'Press Start 2P', monospace";
   if(godMode)hudTxt('INVINCIBLE',VW/2,5,'#7ff0e8','center');
-  const ml=maxLives();
-  for(let i=0;i<ml;i++)hudIcon(i<lives?HEART:HEART_OFF,5+i*11,5);
-  let ly=20;
+  const ml=maxLives(),hw=Math.round(HEART.width*1.5)+2;
+  for(let i=0;i<ml;i++)hudIcon(i<lives?HEART:HEART_OFF,5+i*hw,5);
+  let ly=5+Math.round(HEART.height*1.5)+4;
   if(combo.n>0){
-    hudTxt('COMBO x'+Math.min(combo.n,10),6,ly+1,'#ffe14d');
-    ctx.fillStyle='#14182c';ctx.fillRect(4,ly+11,60,7);
-    ctx.fillStyle='#3a2a1a';ctx.fillRect(5,ly+12,58,5);
-    ctx.fillStyle='#ff8a3d';ctx.fillRect(5,ly+12,Math.round(58*combo.t/COMBO_TIME),5);
-    ctx.fillStyle='rgba(255,255,255,.45)';ctx.fillRect(5,ly+12,Math.round(58*combo.t/COMBO_TIME),1);
-    ly+=22;
+    hudTxt('COMBO x'+Math.min(combo.n,10),6,ly,'#ffe14d');
+    ctx.globalAlpha=.35;ctx.fillStyle='#14182c';ctx.fillRect(6,ly+13,64,5);ctx.globalAlpha=1;
+    ctx.fillStyle='#ff8a3d';ctx.fillRect(6,ly+13,Math.round(64*combo.t/COMBO_TIME),5);
+    ctx.fillStyle='rgba(255,255,255,.45)';ctx.fillRect(6,ly+13,Math.round(64*combo.t/COMBO_TIME),1);
+    ly+=24;
   }
-  hudIcon(DOLB,4,ly);
-  hudTxt((kills%HEAL_EVERY)+'/'+HEAL_EVERY,25,ly+1,'#ffffff');
+  hudIcon(DOLB,5,ly);
+  hudTxt((kills%HEAL_EVERY)+'/'+HEAL_EVERY,5+Math.round(DOLB.width*1.5)+4,ly+3,'#ffffff');
   hudTxt('SCORE '+pad6(score),VW-6,6,'#ffffff','right');
-  hudTxt('BEST '+pad6(Math.max(best,score)),VW-6,18,'#bfe0ff','right');
+  hudTxt('BEST '+pad6(Math.max(best,score)),VW-6,20,'#bfe0ff','right');
   const gt='x'+shop.gold;
-  hudTxt(gt,VW-6,31,'#ffd23f','right');
-  hudIcon(GOLD,Math.round(VW-6-ctx.measureText(gt).width-10),30);
+  hudTxt(gt,VW-6,35,'#ffd23f','right');
+  hudIcon(GOLD,Math.round(VW-6-ctx.measureText(gt).width-GOLD.width*1.5-3),34);
   const sl='x'+shop.souls;
-  hudTxt(sl,VW-6,43,'#ff8f9b','right');
-  hudIcon(SOUL,Math.round(VW-6-ctx.measureText(sl).width-13),41);
+  hudTxt(sl,VW-6,50,'#ff8f9b','right');
+  hudIcon(SOUL,Math.round(VW-6-ctx.measureText(sl).width-SOUL.width*1.5-3),48);
   const bb=cloudB&&cloudB.state!=='dying'
     ?{name:'DAUPHIN DES NUAGES',hp:cloudB.hp,max:cloudB.maxHp,ticks:[0.5],name_c:cloudB.rage?'#ff6a6a':'#ffffff',col:cloudB.rage?'#ff7a5a':'#7fc4ff',dark:'#1a3a6a',hi:'#e8f6ff'}
     :king&&king.state!=='dying'
@@ -5278,7 +5277,7 @@ function drawHUD(){
     if(bbGhost<fr)bbGhost=fr;else bbGhost=Math.max(fr,bbGhost-dtg*0.35);   // traînée blanche : les dégâts récents
     const nw=Math.min(bw,ctx.measureText(trStr(bb.name)).width+22);
     hudTxt(bb.name,VW/2,by-13,bb.name_c,'center');
-    ctx.fillStyle='#14182c';ctx.fillRect(Math.round(VW/2-nw/2)+3,by-10,5,5);ctx.fillRect(Math.round(VW/2+nw/2)-8,by-10,5,5);ctx.fillStyle=bb.name_c;ctx.fillRect(Math.round(VW/2-nw/2)+4,by-9,3,3);ctx.fillRect(Math.round(VW/2+nw/2)-7,by-9,3,3);
+    ctx.fillStyle=bb.name_c;ctx.fillRect(Math.round(VW/2-nw/2)+4,by-9,3,3);ctx.fillRect(Math.round(VW/2+nw/2)-7,by-9,3,3);
     ctx.fillStyle='#14182c';ctx.fillRect(bx-3,by-3,bw+6,14);
     ctx.fillStyle='#46537a';ctx.fillRect(bx-2,by-2,bw+4,12);
     ctx.fillStyle='#14182c';ctx.fillRect(bx-1,by-1,bw+2,10);
