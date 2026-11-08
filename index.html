@@ -554,7 +554,7 @@ const EN={
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan et nad l\'arnaque':'testers: moustik, ofodile, wyzan and nad l\'arnaque',
 'BOUTIQUE':'SHOP','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
-'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
+'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
 'ALLER À L\'ARÈNE DU POULPE':'GO TO THE OCTOPUS ARENA','FERMER':'CLOSE','SAUT':'JUMP','PÊCHE':'FISH',
 'Zone de jeu : un pêcheur affronte des dauphins':'Game area: a fisherman fights dolphins','Réglages':'Settings','Perles':'Pearls','Or':'Gold','Âmes rouges':'Red souls','Rayons de la boutique':'Shop sections',
@@ -5389,11 +5389,11 @@ function showOver(){
 /* ---- Réinitialisation de la save : double confirmation ---- */
 const rstEl=$('rst');
 let rstOpen=false,rstStep=0,rstMode='reset';
-function rbRefresh(){const b=$('rb-btn');if(!b)return;b.hidden=!shop.bossSouls.king||ov.dataset.mode!=='title';b.title=(lang==='en'?'Rebirth':'Renaissance')+(shop.rb?' (×'+shop.rb+')':'');}
+function rbRefresh(){const b=$('rb-btn');if(!b)return;b.hidden=!shop.cloud||ov.dataset.mode!=='title';b.title=(lang==='en'?'Rebirth':'Renaissance')+(shop.rb?' (×'+shop.rb+')':'');}
 function renderRst(){
   if(rstMode==='rebirth'){
     $('rst-title').textContent='RENAISSANCE ?';
-    $('rst-text').textContent="Le mode classique recommence depuis le début : checkpoints effacés. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.";
+    $('rst-text').textContent="Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.";
     $('rst-yes').textContent='RENAÎTRE';
     return;
   }
@@ -5423,8 +5423,9 @@ function resetSave(){
 $('rst-btn').addEventListener('click',openRst);
 function openRb(){rstMode='rebirth';clearInputs();rstOpen=true;rstStep=1;rstEl.hidden=false;renderRst();try{$('rst-no').focus({preventScroll:true});}catch(e){}}
 function doRebirth(){
-  if(!shop.bossSouls.king)return;
-  shop.beach=0;shop.swamp=0;shop.ice=0;shop.cloud=0;shop.rb=(shop.rb||0)+1;
+  if(!shop.cloud)return;
+  shop.beach=0;shop.swamp=0;shop.ice=0;shop.cloud=0;shop.bossSouls={};   // les boss comptent de nouveau comme vaincus pour la 1re fois (âmes et or complets)
+  shop.rb=(shop.rb||0)+1;
   if(shop.weapon==='rod'&&shop.tridentOwned&&rodLocked())shop.weapon='trident';
   saveShop();closeRst();try{closeSet();}catch(e){}rbRefresh();showTitle();
 }
@@ -5598,7 +5599,7 @@ let misOpen=false,setOpen=false,modeOpen=false,accOpen=false;
 function missionList(){   // [id, nom, progression, objectif, récompense {gold|souls}]
   const bs=shop.bossSouls||{};
   let maxB=0;for(const nm in TREES){const T=TREES[nm],L=T.lv();maxB+=T.keys.filter(k=>L[k]>=T.max).length;}   // branches au niveau max, toutes armes confondues
-  return [
+  const L=[
     ['beach','Atteindre la plage',shop.beach?1:0,1,{gold:50}],
     ['worm','Tuer 10 vers de sable',Math.min(shop.wormKills,WORM_UNLOCK),WORM_UNLOCK,{gold:75}],
     ['shark','Vaincre le démon requin',bs.shark?1:0,1,{gold:100}],
@@ -5624,6 +5625,8 @@ function missionList(){   // [id, nom, progression, objectif, récompense {gold|
     ['skins15','Posséder 15 skins',Math.min(shop.owned.length,15),15,{gold:1000}],
     ['rebirth','Renaître une fois',Math.min(shop.rb||0,1),1,{souls:2}]
   ];
+  for(const m of L)if(shop.mc[m[0]])m[2]=m[3];   // une mission déjà récupérée reste réussie, même après une renaissance
+  return L;
 }
 const misReady=()=>missionList().some(m=>m[2]>=m[3]&&!shop.mc[m[0]]);
 function misDot(){const d=$('mis-dot');if(d)d.hidden=!misReady();}
