@@ -5218,40 +5218,25 @@ function txt(s,x,y,col,align){
   ctx.fillStyle=col;ctx.fillText(s,x,y);
 }
 const pad6=n=>String(n).padStart(6,'0');
-function hudPlate(x,y,w,h,a){   // fond translucide à coins coupés, filet clair
-  ctx.fillStyle='rgba(8,16,30,'+(a||0.5)+')';ctx.fillRect(x+1,y,w-2,h);ctx.fillRect(x,y+1,w,h-2);
-  ctx.fillStyle='rgba(255,255,255,.2)';ctx.fillRect(x+1,y,w-2,1);ctx.fillRect(x+1,y+h-1,w-2,1);ctx.fillRect(x,y+1,1,h-2);ctx.fillRect(x+w-1,y+1,1,h-2);
-}
-let bbGhost=1,bbName='',bbLast=0;
 function drawHUD(){
   ctx.font="8px 'Press Start 2P', monospace";
   if(godMode)txt('INVINCIBLE',VW/2,5,'#7ff0e8','center');
-  const ml=maxLives();
-  hudPlate(2,2,ml*11+7,15,0.5);
-  for(let i=0;i<ml;i++)ctx.drawImage(i<lives?HEART:HEART_OFF,5+i*11,5);
-  let ly=20;
+  for(let i=0;i<maxLives();i++)ctx.drawImage(i<lives?HEART:HEART_OFF,5+i*11,5);
   if(combo.n>0){
-    hudPlate(2,ly,64,20,0.5);
-    txt('COMBO x'+Math.min(combo.n,10),6,ly+3,'#ffe14d');
-    ctx.fillStyle='#14182c';ctx.fillRect(5,ly+13,58,5);
-    ctx.fillStyle='#ff8a3d';ctx.fillRect(6,ly+14,Math.round(56*combo.t/COMBO_TIME),3);
-    ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillRect(6,ly+14,Math.round(56*combo.t/COMBO_TIME),1);
-    ly+=23;
+    txt('COMBO x'+Math.min(combo.n,10),6,18,'#ffe14d');
+    ctx.fillStyle='#14182c';ctx.fillRect(5,28,52,5);
+    ctx.fillStyle='#ff8a3d';ctx.fillRect(6,29,Math.round(50*combo.t/COMBO_TIME),3);
   }
-  hudPlate(2,ly,60,13,0.5);
-  ctx.drawImage(DOLB,4,ly+2);
-  txt((kills%HEAL_EVERY)+'/'+HEAL_EVERY,25,ly+3,'#e4f4ff');
-  const pw=106,px=VW-2-pw;
-  hudPlate(px,2,pw,52,0.5);
+  ctx.drawImage(DOLB,4,38);
+  txt((kills%HEAL_EVERY)+'/'+HEAL_EVERY,25,39,'#e4f4ff');
   txt('SCORE '+pad6(score),VW-6,6,'#ffffff','right');
   txt('BEST '+pad6(Math.max(best,score)),VW-6,18,'#bfe0ff','right');
-  ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(px+4,28,pw-8,1);
   const gt='x'+shop.gold;
-  txt(gt,VW-6,32,'#ffd23f','right');
-  ctx.drawImage(GOLD,Math.round(VW-6-ctx.measureText(gt).width-9),31);
+  txt(gt,VW-6,30,'#ffd23f','right');
+  ctx.drawImage(GOLD,Math.round(VW-6-ctx.measureText(gt).width-9),29);
   const sl='x'+shop.souls;
-  txt(sl,VW-6,43,'#ff7a88','right');
-  ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),41);
+  txt(sl,VW-6,42,'#ff7a88','right');
+  ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),40);
   const bb=cloudB&&cloudB.state!=='dying'
     ?{name:'DAUPHIN DES NUAGES',hp:cloudB.hp,max:cloudB.maxHp,ticks:[0.5],name_c:cloudB.rage?'#ff6a6a':'#ffffff',col:cloudB.rage?'#ff7a5a':'#7fc4ff',dark:'#1a3a6a',hi:'#e8f6ff'}
     :king&&king.state!=='dying'
@@ -5270,22 +5255,12 @@ function drawHUD(){
     :boss?{name:'DÉMON REQUIN',hp:boss.hp,max:boss.maxHp,ticks:[0.2,0.4,0.6,0.8],name_c:'#ff6a6a',col:'#e0202c',dark:'#4a0a10',hi:'#ff6a5a'}:null;
   if(bb){
     const bw=240,bx=Math.round((VW-bw)/2),by=VH-16,fr=clamp(bb.hp/bb.max,0,1);
-    if(bbName!==bb.name){bbName=bb.name;bbGhost=fr;bbLast=time;}
-    const dtg=Math.min(0.1,Math.max(0,time-bbLast));bbLast=time;
-    if(bbGhost<fr)bbGhost=fr;else bbGhost=Math.max(fr,bbGhost-dtg*0.35);   // traînée blanche : les dégâts récents
-    const nw=Math.min(bw,ctx.measureText(trStr(bb.name)).width+22);
-    hudPlate(Math.round(VW/2-nw/2),by-16,nw,13,0.55);
     txt(bb.name,VW/2,by-13,bb.name_c,'center');
-    ctx.fillStyle=bb.name_c;ctx.fillRect(Math.round(VW/2-nw/2)+4,by-10,3,3);ctx.fillRect(Math.round(VW/2+nw/2)-7,by-10,3,3);
-    ctx.fillStyle='#14182c';ctx.fillRect(bx-3,by-3,bw+6,14);
-    ctx.fillStyle='#46537a';ctx.fillRect(bx-2,by-2,bw+4,12);
-    ctx.fillStyle='#14182c';ctx.fillRect(bx-1,by-1,bw+2,10);
+    ctx.fillStyle='#14182c';ctx.fillRect(bx-2,by-2,bw+4,12);
     ctx.fillStyle=bb.dark;ctx.fillRect(bx,by,bw,8);
-    ctx.fillStyle='rgba(255,255,255,.55)';ctx.fillRect(bx,by,Math.round(bw*bbGhost),8);
     const w=Math.round(bw*fr);
     ctx.fillStyle=bb.col;ctx.fillRect(bx,by,w,8);
     ctx.fillStyle=bb.hi;ctx.fillRect(bx,by,w,2);
-    ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(bx,by+6,w,2);
     ctx.fillStyle='#14182c';
     for(const tk of bb.ticks)ctx.fillRect(bx+Math.round(bw*tk),by,1,8);
   }
