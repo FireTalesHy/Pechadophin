@@ -2,6 +2,15 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.4.9] - 2026-11-08
+
+### Ajouté
+- **Katana** (8 âmes rouges, armes diverses) : un sabre qui tranche en arc devant toi. Les coups s'enchaînent en combo de 3 : le 3e est une grande taille, plus large et bien plus puissante.
+  - Arbre de compétences : **Dégâts**, **Allonge**, **Vitesse de coup** et **Grande taille** (multiplicateur de dégâts du 3e coup, jusqu'à x5).
+- **Boomerang** (500 or, armes diverses) : lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois.
+  - Arbre de compétences : **Dégâts**, **Portée**, **Relance** et **Multi-boomerang** (jusqu'à 3 boomerangs lancés en éventail).
+- **Barre de recharge** au-dessus de la tête du joueur pour les armes qui mettent plus d'une seconde à être de nouveau prêtes (dagues, boomerang).
+
 ## [V0.4.8] - 2026-11-08
 
 ### Ajouté
