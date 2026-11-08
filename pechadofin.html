@@ -672,8 +672,7 @@ const ICE_TX=SWAMP_TX+WITCH_AFTER*(VW/T)+13;   // classique : la glacière comme
 /* Anarchie : tous les 20 écrans, un boss aléatoire. Les boss à structure (poulpe, château de sable, sorcière, esquimau) ont leur arène ; les autres surgissent en plein terrain. */
 const SLOT_POOL=['octo','castle','witch','eskimo','shark','jelly','cow','six'],SLOT_ARENA={octo:1,castle:1,witch:1,eskimo:1};
 const slotBoss=j=>SLOT_POOL[Math.floor(hash2(j,733)*SLOT_POOL.length)];
-const ZONE_OF={castle:1,jelly:1,witch:2,cow:2,eskimo:3};   // la zone qui précède le boss est du biome qui lui correspond
-const zoneDefK=k=>{if(k<=0)return ZONES[0];const i=ZONE_OF[slotBoss(k)];return i!==undefined?ZONES[i]:ZONES[Math.min(ZONES.length-1,Math.floor(hash2(k,401)*ZONES.length))];};
+const zoneDefK=k=>k<=0?ZONES[0]:ZONES[Math.min(ZONES.length-1,Math.floor(hash2(k,401)*ZONES.length))];   // le biome est indépendant du boss
 const inBeach=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?zoneDefK(zoneK(tx)).beach:Math.abs(tx)<SWAMP_TX);
 const COW_FIELD_SCREENS=20,cowFields=new Map();
 function cowFieldAt(tx){   // grand pré plat (1 écran) où la vache géante attend, avec 2 plateformes volantes
