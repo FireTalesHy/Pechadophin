@@ -2,6 +2,22 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.4.8] - 2026-11-08
+
+### Ajouté
+- **Arbre de compétences du jeu de tarot** : le tarot passe lui aussi à l'arbre, avec 4 branches (2 actives maximum, remboursables).
+  - **Dégâts** : plus de dégâts par carte.
+  - **Silver Chariot** : plus de cartes lancées en éventail (3 niveaux).
+  - **Star Platinum** : étoiles perforantes autoguidées (3 niveaux).
+  - **Sorcellerie** (nouvelle) : chaque carte a une chance d'appliquer une potion au hasard sur l'ennemi touché, brûlure, gel, poison ou étourdissement. Chaque niveau augmente la chance (12 %, 20 %, 28 %, 36 %, puis 50 %).
+- **Nouvelle mission** : débloquer la Sorcellerie.
+- **Refonte de l'interface** : boutons, panneaux et menus redessinés, avec un **thème clair et un thème sombre** qui suivent le réglage de ton appareil.
+- **Bannière « SKILL TREE UPDATE »** sous le titre, sur l'écran d'accueil.
+
+### Modifié
+- **Château de sable** : le seau d'eau inflige maintenant des dégâts fixes, qui ne dépendent plus de l'arme utilisée.
+- Le compteur de kills (0/15) pour regagner de la vie passe en bas à gauche de l'écran, avec un cœur grisé à la place du dauphin.
+
 ## [V0.4.7] - 2026-11-08
 
 ### Ajouté
