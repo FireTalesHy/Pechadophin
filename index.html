@@ -1789,7 +1789,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,rb:0,hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,rb:0,treeV:1,hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1819,6 +1819,7 @@ function loadShop(){
       if(j.weapon==='scepter'&&d.scepterOwned)d.weapon='scepter';
       d.tarotOwned=j.tarotOwned===true;
       d.rb=clamp(Math.floor(Number(j.rb))||0,0,999);   // nombre de renaissances
+      d.treeV=Math.floor(Number(j.treeV))||0;
       d.harpoonOwned=j.harpoonOwned===true;
       if(j.hu&&typeof j.hu==='object')for(const k of ['dmg','range','reel','chain'])d.hu[k]=clamp(Math.floor(Number(j.hu[k]))||0,0,3);
       if(j.weapon==='harpoon'&&d.harpoonOwned)d.weapon='harpoon';
@@ -1829,6 +1830,15 @@ function loadShop(){
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
       if(Array.isArray(j.owned))for(const id of j.owned)if(SKINS.some(x=>x.id===id)&&!d.owned.includes(id))d.owned.push(id);
       if(d.owned.includes(j.equipped))d.equipped=j.equipped;
+      if(d.treeV<1){   // V0.4.5 : nouvel arbre de compétences : toutes les améliorations d'armes sont remises à zéro et intégralement remboursées
+        const sum=(c,lv)=>{let t=0;for(let i=0;i<lv;i++)t+=c[i]||0;return t;};
+        const G={up:[[20,45,80,130,200],[40,85,140,220,330],[25,55,95,150,230],[30,65,110,170,260]],tup:[[40,90,150,240,360],[45,95,160,250,380],[35,75,130,200,300],[25,55,95,150,220]],dup:[[40,90,150,240,360],[35,75,130,200,300],[30,65,110,170,260],[80,140,210,300,420]],sc:[[60,130,220,340,500],[50,110,190,290,420],[45,100,170,260,390],[100,200,320,480,700]]};
+        const K={up:UP_KEYS,tup:T_KEYS,dup:D_KEYS,sc:SC_KEYS};
+        for(const g in G)K[g].forEach((k,i)=>{d.gold+=sum(G[g][i],d[g][k]);d[g][k]=0;});
+        for(const k of ['dmg','range','reel','chain']){d.souls+=sum([1,2,2],d.hu[k]);d.hu[k]=0;}
+        d.treeV=1;
+        try{localStorage.setItem(SHOP_KEY,JSON.stringify(d));}catch(e){}
+      }
     }
   }catch(e){}
   return d;

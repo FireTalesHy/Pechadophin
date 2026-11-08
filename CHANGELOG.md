@@ -2,6 +2,29 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.4.5] - 2026-11-08
+
+### Ajouté
+- **Boss du monde nuage : le dauphin des nuages**. Un énorme dauphin qui vole au-dessus de l'arène, tire des boules de nuages (salves de 3, puis de 5 et un anneau de 10 une fois enragé à 50 % de vie) et fait apparaître des dauphins volants normaux. 900 PV.
+  - Son arène est faite de 18 plateformes de nuages sur 4 niveaux qui ne changent jamais, au-dessus d'un grand vide.
+  - Récompense : 3 âmes rouges (première victoire) et de l'or.
+- **Arbre de compétences des armes** : les améliorations de la canne, du trident, des dagues, du sceptre de glace et du harpon se choisissent maintenant dans un arbre qui part de l'arme.
+  - 4 branches en sortent (une par amélioration) et on ne peut en activer que 2.
+  - Chaque niveau supplémentaire d'une branche est un nœud plus bas.
+  - Les améliorations sont remboursables intégralement, niveau par niveau.
+- **Renaissance** (mode Classique) : une fois le Roi Cacamille 2 vaincu, un petit bouton au-dessus de la boutique permet de recommencer le jeu depuis le début. Les checkpoints sont effacés, mais tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.
+- **Harpon** : nouvelle arme en forme de pistolet, achetable avec des âmes (13). Elle empale les ennemis pour les ramener à toi, ou te tire jusqu'au point d'accroche sur le décor. Coup lourd sur les boss.
+  - Quatre améliorations en âmes : barbes (dégâts), longueur du câble, treuil et chaîne.
+- Nouveau menu ARMES réorganisé : une ligne d'armes d'histoire (canne, trident, dagues, sceptre de glace, avec deux places libres) et une ligne d'armes diverses.
+- Nad l'arnaque rejoint les testeurs dans les crédits.
+
+### Modifié
+- **Monde nuage** : un vrai ciel sans mer ni montagnes en arrière-plan, et encore moins de sol, avec des trous de 7 à 12 cases.
+- Toutes les améliorations d'armes sont remises à zéro à cause du nouvel arbre : tout ce que tu avais dépensé (or et âmes) t'est rendu automatiquement à ta prochaine connexion.
+
+### Corrigé
+- Certaines armes (comme le Numéro 6) ne pouvaient pas tirer dans le château.
+
 ## [V0.4.0] - 2026-11-06
 
 ### Ajouté

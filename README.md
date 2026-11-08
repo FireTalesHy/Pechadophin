@@ -1,6 +1,6 @@
 # 🎣 Pechadophin 
 
-**Version V0.3.9**
+**Version V0.4.5**
 
 Un jeu de plateforme en pixel art, [jouable directement dans le navigateur](https://firetaleshy.github.io/Pechadophin/) : tu es un pêcheur qui affronte des dauphins, un démon requin, un poulpe géant, une méduse et un château de sable, dans un monde généré aléatoirement à chaque partie.
 
