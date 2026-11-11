@@ -2237,8 +2237,10 @@ function stepPlayer(dt){
   }
   if(aim.active&&Math.abs(aim.x)>0.25&&p.stun<=0)p.face=aim.x>0?1:-1;   // le pêcheur regarde du côté où il vise
   if(p.onGround)p.coyote=0.1;else p.coyote-=dt;
-  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*(shop.weapon==='dagger'&&!glockOn?Math.sqrt(dagV('jump')):1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();}
-  if(!inp.jump&&p.vy<-140&&p.stun<=0&&!p.boost&&!p.spring)p.vy=-140;
+  const tjm=shop.weapon==='tentacle'&&!glockOn?Math.sqrt(1.25):1;   // Tentacules : elles prennent appui sur le sol et boostent le saut (hauteur x1,25)
+  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*tjm*(shop.weapon==='dagger'&&!glockOn?Math.sqrt(dagV('jump')):1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();
+    if(tjm>1){teJump={x:p.x+5,gy:p.y+p.h,t:0};burst(p.x+5,p.y+p.h,'#c9b48a',6,70);}}
+  if(!inp.jump&&p.vy<-140*tjm&&p.stun<=0&&!p.boost&&!p.spring)p.vy=-140*tjm;
   p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
   {
     const vx0=p.vx,x0=p.x,y0=p.y;
@@ -2460,7 +2462,7 @@ function drawKatanaHeld(hx,hy){
 const TENT_COST=10,TENT_N=4;
 const teV=k=>TNUP[k].vals[shop.te[k]||0];
 const TENT_ICON=spr(["....rrr..","...rRRRr.","..rRp.rR.",".rRp...r.",".rR......","..rR.....","...rRr...",".....rr.."],{r:'#7a1020',R:'#c4202e',p:'#ff6a6a'},true);
-let teCd=0,teFx=[],teLast=-1,teZip=null;   // teZip : accrochée au décor, elle nous tire jusqu'au point d'accroche
+let teCd=0,teFx=[],teLast=-1,teZip=null,teJump=null;   // teZip : accrochée au décor, elle nous tire jusqu'au point d'accroche
 const grapAt=(x,y)=>solidAt(x,y)||oneWay(Math.floor(x/T),Math.floor(y/T));
 const hexMix=(c,t,k)=>{const n=parseInt(c.slice(1),16),m=parseInt(t.slice(1),16),f=(sh)=>Math.round(((n>>sh)&255)*(1-k)+((m>>sh)&255)*k);return '#'+((1<<24)+(f(16)<<16)+(f(8)<<8)+f(0)).toString(16).slice(1);};
 function tentCols(sk){   // couleur des tentacules : la couleur majeure du skin (sauf l'Humain, qui garde le rouge)
@@ -2479,6 +2481,7 @@ function stepTentacle(dt){
   if(fireBuf>0)fireBuf-=dt;
   if(teCd>0)teCd-=dt;
   for(const f of teFx)f.t+=dt;
+  if(teJump){teJump.t+=dt;if(teJump.t>0.34)teJump=null;}
   teFx=teFx.filter(f=>f.t<f.life);
   throwAnim=Math.max(0,throwAnim-dt);
   if(teZip){
@@ -2536,7 +2539,7 @@ function drawTentChain(an,ex,ey,seed,cols,th){   // une tentacule ondulante de l
 }
 function drawTentWeapon(sk,p){   // tentacules de l'arme, dessinées derrière le personnage à la manière du skin
   if(state==='dying')return;
-  const f=p.face,an=tentAnchor(p),mv=clamp(p.vx/120,-1,1)*f,cols=tentCols(sk),busy=new Set(teFx.map(e=>e.slot));if(teZip)busy.add(teZip.slot);
+  const f=p.face,an=tentAnchor(p),mv=clamp(p.vx/120,-1,1)*f,cols=tentCols(sk),busy=new Set(teFx.map(e=>e.slot));if(teZip)busy.add(teZip.slot);if(teJump)for(let i=0;i<3;i++)busy.add(i);
   for(let i=0;i<TENT_N;i++){   // au repos
     if(busy.has(i))continue;   // celle qui frappe est dessinée plus bas : elles ondulent dans le dos
     const base=-0.95+i*(1.7/(TENT_N-1));let x=an.x,y=an.y;
@@ -2545,6 +2548,13 @@ function drawTentWeapon(sk,p){   // tentacules de l'arme, dessinées derrière l
       x+=-f*Math.cos(ang)*2.3;y+=Math.sin(ang)*2.3-0.25;
       const sz=s<4?3:s<8?2:1;
       ctx.fillStyle=cols[s<4?0:s<8?1:2];ctx.fillRect(Math.round(x)-1,Math.round(y)-1,sz,sz);
+    }
+  }
+  if(teJump){   // saut : trois tentacules prennent appui sur le sol, poussent, puis se rétractent
+    const k=teJump.t/0.34;
+    for(let i=0;i<3;i++){
+      const ex=teJump.x+(i-1)*6-f*2*(i-1),ey=teJump.gy,dx=ex-an.x,dy=ey-an.y,L=Math.hypot(dx,dy)||1,cap=(k<0.7?30:30*(1-(k-0.7)/0.3))+2,m=Math.min(1,cap/L);
+      drawTentChain(an,an.x+dx*m,an.y+dy*m,i*2.3,cols,3);
     }
   }
   if(teZip)drawTentChain(an,teZip.x,teZip.y,teZip.slot*1.9,cols,3);   // accrochée au décor
@@ -5927,7 +5937,7 @@ function showTitle(){
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];teFx=[];teCd=0;teZip=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
