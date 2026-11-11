@@ -449,7 +449,7 @@ body{
       </div>
       <div class="ov-logo">
         <h1 id="ov-title">PECHADOPHIN</h1>
-        <p id="ov-tag">SKILL TREE UPDATE</p>
+        <p id="ov-tag">FANTASY SKINS</p>
         <p id="ov-text">Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.</p>
       </div>
       <div class="ov-center">
@@ -654,7 +654,7 @@ const EN={
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).',
-'TOUT RÉCUPÉRER':'CLAIM ALL','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
+'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -1238,7 +1238,48 @@ const SKINS=[
   pal:{g:'#ffd23f',r:'#d63a3a',b:'#6a2fa8',B:'#3e1a6e',p:'#3e1a6e',n:'#ffd23f'},
   hat:["....g..g..g.....",".....gggggg.....","....kgrgrgrk....","...kgggggggk....","..kkkkkkkkkkk..."],
   face:["...kssssssssk...","...kssssskssk...","..kwwssssswwk...","..kwwwwwwwwk...."],
-  torso:["..kwwwwwwwwwwk..","...kbbbbbbbbssk.","...kBBBBBBBBk..."]}
+  torso:["..kwwwwwwwwwwk..","...kbbbbbbbbssk.","...kBBBBBBBBk..."]},
+ /* Skins fantaisie : costumes hors du commun, certains laissent une traînée d'effets (fx) */
+ {id:'unicorn',name:'Licorne',price:20,rod:'rainbow',glow:'#ffffff',fx:'rainbow',
+  pal:{h:'#ff9ad8',H:'#b48cff',w:'#ffffff',g:'#ffd23f',b:'#ffffff',B:'#d8cfff',r:'#ff5a8a',c:'#5ad8ff',p:'#ffffff',n:'#ff9ad8',s:'#fff0e6',S:'#f0cfc4'},
+  hat:['.......gg.......','......kggk......','....khhhwhhhk...','...khhHHhHHhhk..','..kHHhhHHhhHHHk.'],
+  face:['...kssssssssk...','...kssssskssk...','...kssrssssrSk..','....kkssssskk...'],
+  torso:['...kbbbbbbbbk...','...kbbbbbbbbssk.','...krgcrgcrgk...']},
+ {id:'pumpkin',name:'Citrouille',price:24,rod:'#ff8a1e',glow:'#ffe14d',fx:'ember',
+  pal:{g:'#4a8f2a',h:'#ff8a1e',H:'#d9650e',y:'#ffe14d',b:'#3a2a5e',B:'#241a3e',p:'#2a1f46',n:'#14101f',s:'#ff8a1e',S:'#d9650e'},
+  hat:['.......gg.......','......kggk......','....kkhhhhkk....','...khhhhhhhhk...','..khhHhhhhHhhk..'],
+  face:['..khhhhhhhhhhk..','..khyyhhhhyyhk..','..khyyhHHhyyhk..','...kyHyyyyHyk...'],
+  torso:['...kbbbbbbbbk...','...kbbyBbbbbbk..','...kBBBBBBBBk...']},
+ {id:'shroom',name:'Champignon',price:28,rod:'#c9a27a',glow:'#fff2a8',fx:'spore',
+  pal:{r:'#e0383a',w:'#ffffff',b:'#f4e6c8',B:'#c9a27a',p:'#c9a27a',n:'#8a6a46',s:'#f6d9b8',S:'#d9b08a'},
+  hat:['.....kkkkkk.....','...kkrrwrrrkk...','..krrrrrrrwrrk..','.krwrrrrrrrrrrk.','kkrrrrrwrrrrrkk.'],
+  face:['...kssssssssk...','...kssssskssk...','...ksssssssSk...','....kkssssskk...'],
+  torso:['...kbbbbbbbbk...','...kbbbbbbbbssk.','...kBBBBBBBBk...']},
+ {id:'disco',name:'Boule disco',price:40,rod:'rainbow',glow:'#ffffff',fx:'disco',
+  pal:{h:'#d9e2f2',H:'#9aa8c4',w:'#ffffff',c:'#5ad8ff',r:'#ff5ad8',g:'#ffe14d',b:'#ffd23f',B:'#c98a10',p:'#2a2a44',n:'#ffd23f',s:'#d9e2f2',S:'#9aa8c4'},
+  hat:['................','.....kkkkkk.....','....khwhHhwk....','...kwhHwhHwhk...','..khHwhHwhHwhk..'],
+  face:['..kwhHwhHwhHwk..','..kHwkHwhHwkHk..','..kwhHwhHwhHwk..','...kkHwhHwHkk...'],
+  torso:['...kbgbgbgbbk...','...kgbbwbbgbssk.','...kBBBBBBBBk...']},
+ {id:'dragon',name:'Dragon',price:55,rod:'#ff6a1e',glow:'#ffd23f',fx:'flame',
+  pal:{h:'#3fae4a',H:'#2a7a34',y:'#fff2c8',r:'#ff6a1e',g:'#ffd23f',b:'#3fae4a',B:'#2a7a34',p:'#2a7a34',n:'#14401c',s:'#3fae4a',S:'#2a7a34'},
+  hat:['..y..........y..','..ky........yk..','.....kkkkkk.....','....khhhhhhk....','...khHhhhhHhk...'],
+  face:['...kssssssssk...','...kgkssssgksk..','...ksSssssSsk...','....kkyssykk....'],
+  torso:['...kbBbBbBbBk...','...kbBbBbBbBssk.','...kBBBBBBBBk...']},
+ {id:'alien',name:'Alien',price:32,rod:'#7dff9a',glow:'#d6ffe0',fx:'alien',
+  pal:{g:'#7dff9a',h:'#58d86e',H:'#2a9a46',s:'#7dff9a',S:'#4ec46a',b:'#6a5acd',B:'#3e3290',p:'#3e3290',n:'#241c60',r:'#ff5ad8',y:'#d6ffe0'},
+  hat:['..r..........r..','..k..........k..','..kk.kkkkkk.kk..','...khhhhhhhhk...','..khhhhhhhhhhk..'],
+  face:['..khssssssssHk..','..kkkkssssskkk..','..kkkkkssskkkk..','...kHssssssHk...'],
+  torso:['...kbbbbbbbbk...','...kbbyybbbbbk..','...kBBBBBBBBk...']},
+ {id:'icecream',name:'Cornet de glace',price:36,rod:'#ffb0d8',glow:'#ffffff',fx:'sugar',
+  pal:{r:'#ff6fa8',w:'#fff6ee',h:'#8af0d0',H:'#ff9ac8',y:'#fff2a8',b:'#e0b070',B:'#b8844a',p:'#b8844a',n:'#8a5a2e',s:'#f6c19a',S:'#d98f66'},
+  hat:['......kk........','......krk.......','....kkwwwwkk....','...khhhhhhhhk...','..kHrrrrrrrrHk..'],
+  face:['...kssssssssk...','...kssssskssk...','...kssrssssSk...','....kkssssskk...'],
+  torso:['...kbBbBbBbBk...','...kBbBbBbBbssk.','...kbBbBbBbBk...']},
+ {id:'mermaid',name:'Sirène',price:48,rod:'#5ee6ff',glow:'#d6fbff',fx:'bubbles',
+  pal:{h:'#2fd0c0',H:'#1a9a9a',y:'#ffb0d0',w:'#fff6ee',b:'#2fd0c0',B:'#1a9a9a',p:'#1a9a9a',n:'#0e6a78',g:'#ffe14d',s:'#f6d0b0',S:'#d9a888'},
+  hat:['......y.y.......','....kkyyyykk....','...khhhhhhhhk...','..khhHhhhhHhhk..','..khHhhhhhhHhk..'],
+  face:['..khssssssssHk..','..khsskssksshk..','..kHsssssssSHk..','...kkHsssssHkk..'],
+  torso:['...kwbbbbbbwk...','...kbBbBbBbBssk.','...kBBBBBBBBk...']}
 ];
 /* =====================================================================================================
    KIT DE LA COLLAB  RNG∞ × Canne & Dauphins  (pour Firetail, de la part de Sacha, rng-infinite.com)
@@ -2429,8 +2470,29 @@ function drawBoomerang(){
     ctx.restore();
   }
 }
+/* ---------- Skins fantaisie : effets visuels qui accompagnent certains costumes (aucun effet sur le jeu) ---------- */
+const skinRod=sk=>sk.rod==='rainbow'?'hsl('+Math.floor(time*180%360)+',90%,62%)':sk.rod;   // canne arc-en-ciel : la couleur défile
+const SKIN_FX=(()=>{
+  const R=Math.random,pick=a=>a[Math.floor(R()*a.length)],hue=()=>'hsl('+Math.floor(R()*360)+',90%,65%)';
+  return {
+    rainbow:(p,mv,em)=>{if(mv&&em(45))parts.push({x:p.x+5-p.face*5+(R()-.5)*4,y:p.y+p.h-3+(R()-.5)*6,vx:-p.face*(10+R()*25),vy:-8-R()*22,g:30,life:0.55,col:hue(),sz:2});if(em(7))parts.push({x:p.x+5+(R()-.5)*18,y:p.y+7+(R()-.5)*22,vx:0,vy:-10,g:0,life:0.35,col:'#ffffff',sz:1});},
+    ember:(p,mv,em)=>{if(em(mv?32:12))parts.push({x:p.x+5+(R()-.5)*8,y:p.y+4+R()*5,vx:(R()-.5)*20,vy:-25-R()*35,g:-40,life:0.5,col:pick(['#ff8a1e','#ffd23f','#ff5a1e']),sz:R()<0.4?2:1});},
+    spore:(p,mv,em)=>{if(em(9))parts.push({x:p.x+5+(R()-.5)*16,y:p.y+(R()-.5)*6,vx:(R()-.5)*14,vy:-6-R()*10,g:-6,life:1.1,col:pick(['#fff2a8','#d6ffb0','#ffffff']),sz:1});},
+    disco:(p,mv,em)=>{if(em(30))parts.push({x:p.x+5+(R()-.5)*26,y:p.y+7+(R()-.5)*26,vx:(R()-.5)*8,vy:(R()-.5)*8,g:0,life:0.22+R()*0.15,col:hue(),sz:R()<0.5?2:1});},
+    flame:(p,mv,em)=>{if(em(mv?55:18))parts.push({x:p.x+5-p.face*7+(R()-.5)*3,y:p.y+6+(R()-.5)*6,vx:-p.face*(20+R()*35),vy:-R()*25,g:-30,life:0.38,col:pick(['#ff6a1e','#ffd23f','#ff3b2f']),sz:R()<0.5?2:1});},
+    alien:(p,mv,em)=>{if(em(13))parts.push({x:p.x+5+(R()-.5)*14,y:p.y+2+R()*10,vx:(R()-.5)*16,vy:-14-R()*16,g:-8,life:0.7,col:pick(['#7dff9a','#d6ffe0','#ff5ad8']),sz:R()<0.4?2:1});},
+    sugar:(p,mv,em)=>{if(em(15))parts.push({x:p.x+5+(R()-.5)*14,y:p.y-1+R()*4,vx:(R()-.5)*22,vy:-12-R()*14,g:70,life:0.8,col:pick(['#ff9ac8','#ffffff','#8af0d0','#fff2a8']),sz:R()<0.5?2:1});},
+    bubbles:(p,mv,em)=>{if(em(mv?20:12))parts.push({x:p.x+5+(R()-.5)*14,y:p.y+4+R()*8,vx:(R()-.5)*10,vy:-22-R()*24,g:-10,life:0.95,col:pick(['#d6fbff','#ffffff','#8fe8ff']),sz:2});}
+  };
+})();
+function stepSkinFx(dt){
+  const sk=curSkin(),f=sk.fx&&SKIN_FX[sk.fx];
+  if(!f||state!=='play'||paused||parts.length>400)return;
+  f(player,Math.abs(player.vx)>12||!player.onGround,per=>Math.random()<per*dt);
+}
 function stepHook(dt){
   reloadBar=-1;
+  stepSkinFx(dt);
   stepCloudBalls(dt);
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
@@ -4943,7 +5005,7 @@ function drawPlayer(){
   else if(shop.weapon==='harpoon')drawHarpoonGun(hx,hy,Math.atan2(aim.y,aim.x),aim.x<0,!harp);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
   else{
-    const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,sk.rod);if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
+    const sk=curSkin();pixLine(hx,hy,tip.x,tip.y,skinRod(sk));if(sk.glow)pixLine(hx,hy-1,tip.x,tip.y-1,sk.glow);
     ctx.fillStyle='#ffe0a0';ctx.fillRect(Math.round(tip.x),Math.round(tip.y),1,1);
   }
   if(hooks.length){
