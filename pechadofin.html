@@ -2430,7 +2430,7 @@ function drawKatanaHeld(hx,hy){
 const TENT_COST=10,TENT_N=4;
 const teV=k=>TNUP[k].vals[shop.te[k]||0];
 const TENT_ICON=spr(["....rrr..","...rRRRr.","..rRp.rR.",".rRp...r.",".rR......","..rR.....","...rRr...",".....rr.."],{r:'#7a1020',R:'#c4202e',p:'#ff6a6a'},true);
-let teCd=0,teFx=[];
+let teCd=0,teFx=[],teLast=-1;
 const tentCols=sk=>(sk&&sk.tc)||['#7a1020','#c4202e','#ff6a6a'];
 const tentAnchor=p=>({x:Math.round(p.x+p.w/2)-p.face*4,y:Math.round(p.y)+6});
 function stepTentacle(dt){
@@ -2444,10 +2444,12 @@ function stepTentacle(dt){
   fireBuf=0;teCd=teV('rate');throwAnim=0.12;
   const len=Math.hypot(aim.x,aim.y)||1,a0=Math.atan2(aim.y/len,aim.x/len);
   if(Math.abs(aim.x/len)>0.2)p.face=aim.x>0?1:-1;
-  const m=teV('multi'),R=teV('reach'),dmg=teV('dmg'),an=tentAnchor(p),hit=new Set();
+  const m=teV('multi'),R=teV('reach'),dmg=teV('dmg'),an=tentAnchor(p),hit=new Set(),taken=[];
   for(let i=0;i<m;i++){
+    let slot;do{slot=Math.floor(Math.random()*TENT_N);}while(taken.includes(slot)||(slot===teLast&&TENT_N-taken.length>1));   // chaque coup : une tentacule différente, au hasard
+    taken.push(slot);
     const a=a0+(i-(m-1)/2)*0.42,ux=Math.cos(a),uy=Math.sin(a);
-    teFx.push({a,R,t:0,life:0.24,i});
+    teFx.push({a,R,t:0,life:0.24,i,slot});
     for(const t of allTargets()){
       if(hit.has(t))continue;
       for(let d=6;d<=R+4;d+=6){
@@ -2455,6 +2457,7 @@ function stepTentacle(dt){
       }
     }
   }
+  teLast=taken[taken.length-1];
   sfx.trident();
 }
 function drawTentChain(an,ex,ey,seed,cols,th){   // une tentacule ondulante de l'ancre (an) vers (ex,ey)
@@ -2467,8 +2470,9 @@ function drawTentChain(an,ex,ey,seed,cols,th){   // une tentacule ondulante de l
 }
 function drawTentWeapon(sk,p){   // tentacules de l'arme, dessinées derrière le personnage à la manière du skin
   if(state==='dying')return;
-  const f=p.face,an=tentAnchor(p),mv=clamp(p.vx/120,-1,1)*f,cols=tentCols(sk),used=teFx.length?teV('multi'):0;
-  for(let i=used;i<TENT_N;i++){   // au repos : elles ondulent dans le dos
+  const f=p.face,an=tentAnchor(p),mv=clamp(p.vx/120,-1,1)*f,cols=tentCols(sk),busy=new Set(teFx.map(e=>e.slot));
+  for(let i=0;i<TENT_N;i++){   // au repos
+    if(busy.has(i))continue;   // celle qui frappe est dessinée plus bas : elles ondulent dans le dos
     const base=-0.95+i*(1.7/(TENT_N-1));let x=an.x,y=an.y;
     for(let s=0;s<11;s++){
       const k=s/10,ang=base+Math.sin(time*3.2+i*1.7+s*0.55)*0.38*(0.4+k)+mv*0.35;
@@ -2479,7 +2483,7 @@ function drawTentWeapon(sk,p){   // tentacules de l'arme, dessinées derrière l
   }
   for(const e of teFx){   // coup de fouet : la tentacule s'allonge vers la visée puis se rétracte
     const k=e.t/e.life,ext=k<0.4?k/0.4:1-(k-0.4)/0.6;
-    drawTentChain(an,an.x+Math.cos(e.a)*e.R*ext,an.y+Math.sin(e.a)*e.R*ext,e.i*1.9,cols,3);
+    drawTentChain(an,an.x+Math.cos(e.a)*e.R*ext,an.y+Math.sin(e.a)*e.R*ext,e.slot*1.9,cols,3);
   }
 }
 /* ---------- Boomerang (500 or) : aller-retour, blesse à l'aller et au retour ---------- */
