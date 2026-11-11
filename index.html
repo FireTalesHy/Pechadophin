@@ -407,6 +407,16 @@ body{
  66%{border-color:#3b8bff;box-shadow:0 0 0 2px #3b8bff,0 0 12px 2px #3b8bff}
  100%{border-color:#ff3b3b;box-shadow:0 0 0 2px #ff3b3b,0 0 12px 2px #ff3b3b}}
 @media (prefers-reduced-motion:reduce){.card.rgb{animation:none;border-color:#b44bff}}
+/* le fond de la case est rouge clair, et les boutons ACHETER / ÉQUIPER passent aussi par toutes les couleurs */
+.card.rgb,.card.rgb.eq{background:linear-gradient(180deg,#ffdede,#ffb3b3)}
+.card.rgb .nm,.card.rgb .pr{color:#4a1a1a}
+.card.rgb .sbtn:not(:disabled){color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.45);animation:rgbbtn 2.4s linear infinite}
+@keyframes rgbbtn{
+ 0%{background:linear-gradient(#ff7a7a,#e02828 55%,#a81414);border-color:#5a0b0b;box-shadow:0 3px 0 #5a0b0b,inset 0 1px 0 rgba(255,255,255,.4)}
+ 33%{background:linear-gradient(#7aff9a,#22c04a 55%,#12882e);border-color:#0b4a1a;box-shadow:0 3px 0 #0b4a1a,inset 0 1px 0 rgba(255,255,255,.4)}
+ 66%{background:linear-gradient(#7ab4ff,#2870e0 55%,#1444a8);border-color:#0b1f5a;box-shadow:0 3px 0 #0b1f5a,inset 0 1px 0 rgba(255,255,255,.4)}
+ 100%{background:linear-gradient(#ff7a7a,#e02828 55%,#a81414);border-color:#5a0b0b;box-shadow:0 3px 0 #5a0b0b,inset 0 1px 0 rgba(255,255,255,.4)}}
+@media (prefers-reduced-motion:reduce){.card.rgb .sbtn:not(:disabled){animation:none;background:linear-gradient(#c58aff,#8a3be0)}}
 .sbtn{border-radius:10px;border:2px solid #14182c;background:linear-gradient(#ffa968,#ff8a3d 55%,#e8702a);color:#1a0d02;box-shadow:0 3px 0 #14182c,inset 0 1px 0 rgba(255,255,255,.45);padding:8px 8px}
 .sbtn.equip{background:linear-gradient(#2fd0d3,#12a5a8 55%,#0d8588);color:#fff;border-color:#0b3b3d;box-shadow:0 3px 0 #0b3b3d,inset 0 1px 0 rgba(255,255,255,.4)}
 .sbtn.alt{background:linear-gradient(var(--hi),var(--btn));color:var(--panel-ink)}
