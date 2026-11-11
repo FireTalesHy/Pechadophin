@@ -6277,25 +6277,18 @@ $('set-sound').addEventListener('click',toggleMute);
 const misEl=$('mis'),setEl=$('set');
 let misOpen=false,setOpen=false,modeOpen=false,accOpen=false;
 const BOSS_MIS=[['shark','shark','Vaincre le démon requin',{gold:100}],['octo','octo','Vaincre le poulpe géant',{gold:150}],['jelly','jelly','Vaincre la méduse',{gold:200}],['castle','castle','Vaincre le château de sable',{gold:250}],['cow','cow','Vaincre la vache géante',{souls:1}],['witch','witch','Vaincre la sorcière',{gold:300}],['esk','eskimo','Vaincre l\'esquimau',{gold:400}],['king','king','Vaincre le Roi Cacamille 2',{souls:2}],['cloud','cloud','Vaincre le dauphin des nuages',{souls:3}]];
-const MIS_CHAINS=[['shark','octo','jelly','castle','cow','witch','esk','king','cloud'],['beach','worm'],['skins','skins15'],['dagger','six','scep','tarot','harp'],['chariot','star','sorc'],['bmax','bmax3']];   // chaînes de missions
+const MIS_CHAINS=[['shark','octo','jelly','castle','cow','witch','esk','king','cloud'],['beach','worm'],['skins','skins15'],['dagger','six','scep','tarot','harp']];   // chaînes de missions
 function missionList(){   // [id, nom, progression, objectif, récompense {gold|souls}]
   const bs=shop.bossSouls||{};
-  let maxB=0;for(const nm in TREES){const T=TREES[nm],L=T.lv();maxB+=T.keys.filter(k=>L[k]>=bmax(T,k)).length;}   // branches au niveau max, toutes armes confondues
   const L=[
     ['beach','Atteindre la plage',shop.beach?1:0,1,{gold:50}],
     ['worm','Tuer 10 vers de sable',Math.min(shop.wormKills,WORM_UNLOCK),WORM_UNLOCK,{gold:75}],
     ['skins','Posséder 10 skins',Math.min(shop.owned.length,10),10,{gold:500}],
-    ['bmax','Mettre une branche au niveau max sur une arme',Math.min(maxB,1),1,{souls:2}],
-    ['bmax3','Mettre 3 branches au niveau max (toutes armes)',Math.min(maxB,3),3,{souls:3}],
     ['dagger','Obtenir les dagues',shop.daggerOwned?1:0,1,{gold:75}],
     ['six','Obtenir le Numéro 6',shop.sixOwned?1:0,1,{gold:150}],
     ['scep','Obtenir le sceptre de glace',shop.scepterOwned?1:0,1,{gold:200}],
     ['tarot','Obtenir le jeu de tarot',shop.tarotOwned?1:0,1,{gold:250}],
     ['harp','Acheter le harpon',shop.harpoonOwned?1:0,1,{gold:100}],
-    ['chariot','Débloquer Silver Chariot',shop.tl.chariot>0?1:0,1,{gold:150}],
-    ['star','Débloquer Star Platinum',shop.tl.star>0?1:0,1,{gold:300}],
-    ['sorc','Débloquer la Sorcellerie',shop.tl.sorc>0?1:0,1,{gold:100}],
-    ['hp','Monter les points de vie au maximum',shop.hp,5,{souls:1}],
     ['skins15','Posséder 15 skins',Math.min(shop.owned.length,15),15,{gold:1000}],
     ['rebirth','Renaître une fois',Math.min(shop.rb||0,1),1,{souls:2}]
   ];
