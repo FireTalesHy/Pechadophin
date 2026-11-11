@@ -412,6 +412,11 @@ body{
  0%,100%{border-color:#8a3be0;box-shadow:0 0 0 2px #8a3be0,0 0 8px 1px #8a3be0}
  50%{border-color:#d9a8ff;box-shadow:0 0 0 2px #d9a8ff,0 0 18px 4px #b44bff}}
 @media (prefers-reduced-motion:reduce){.card.vio{animation:none;border-color:#b44bff}}
+.card.vio .sbtn:not(:disabled){color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.45);animation:viobtn 2.2s ease-in-out infinite}
+@keyframes viobtn{
+ 0%,100%{background:linear-gradient(#b878ff,#8a3be0 55%,#5f1fb0);border-color:#2e0b5a;box-shadow:0 3px 0 #2e0b5a,0 0 6px 1px #8a3be0,inset 0 1px 0 rgba(255,255,255,.4)}
+ 50%{background:linear-gradient(#e8ccff,#b44bff 55%,#8a3be0);border-color:#4a1a8a;box-shadow:0 3px 0 #4a1a8a,0 0 14px 3px #b44bff,inset 0 1px 0 rgba(255,255,255,.5)}}
+@media (prefers-reduced-motion:reduce){.card.vio .sbtn:not(:disabled){animation:none;background:linear-gradient(#c58aff,#8a3be0)}}
 .prem-h{grid-column:1/-1;font:400 9px/1.4 var(--pf);letter-spacing:1px;padding:2px 2px 0}
 .prem-sep{grid-column:1/-1;height:0;border-top:2px solid var(--btn-line);margin:4px 0 2px}
 /* le fond de la case est rouge clair, et les boutons ACHETER / ÉQUIPER passent aussi par toutes les couleurs */
