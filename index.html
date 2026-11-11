@@ -654,7 +654,7 @@ const EN={
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).',
-'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
+'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -1279,7 +1279,12 @@ const SKINS=[
   pal:{h:'#2fd0c0',H:'#1a9a9a',y:'#ffb0d0',w:'#fff6ee',b:'#2fd0c0',B:'#1a9a9a',p:'#1a9a9a',n:'#0e6a78',g:'#ffe14d',s:'#f6d0b0',S:'#d9a888'},
   hat:['......y.y.......','....kkyyyykk....','...khhhhhhhhk...','..khhHhhhhHhhk..','..khHhhhhhhHhk..'],
   face:['..khssssssssHk..','..khsskssksshk..','..kHsssssssSHk..','...kkHsssssHkk..'],
-  torso:['...kwbbbbbbwk...','...kbBbBbBbBssk.','...kBBBBBBBBk...']}
+  torso:['...kwbbbbbbwk...','...kbBbBbBbBssk.','...kBBBBBBBBk...']},
+ {id:'ghoul',name:'Goule',price:38,rod:'#5fe3b0',glow:'#d6ffe8',fx:'wisp',back:'tendrils',
+  pal:{s:'#a9bfa4',S:'#7f987c',h:'#4a4254',H:'#2c2634',b:'#5a5266',B:'#2c2634',p:'#2c2634',n:'#14101a',y:'#ffe14d',w:'#f4f1e6'},
+  hat:['.....kkkkkk.....','....khhhhhhk....','...khhhHHhhhk...','..khhHHHHHHhhk..','..kHHHHHHHHHHk..'],
+  face:['..kHssssssssHk..','..kHskkssskkHk..','..kHsykssykkHk..','...kkswwswwskk..'],
+  torso:['...kbbbbbbbbk...','...kbBbbbbBbssk.','...kBBkBBkBBk...']}
 ];
 /* =====================================================================================================
    KIT DE LA COLLAB  RNG∞ × Canne & Dauphins  (pour Firetail, de la part de Sacha, rng-infinite.com)
@@ -2482,6 +2487,7 @@ const SKIN_FX=(()=>{
     flame:(p,mv,em)=>{if(em(mv?55:18))parts.push({x:p.x+5-p.face*7+(R()-.5)*3,y:p.y+6+(R()-.5)*6,vx:-p.face*(20+R()*35),vy:-R()*25,g:-30,life:0.38,col:pick(['#ff6a1e','#ffd23f','#ff3b2f']),sz:R()<0.5?2:1});},
     alien:(p,mv,em)=>{if(em(13))parts.push({x:p.x+5+(R()-.5)*14,y:p.y+2+R()*10,vx:(R()-.5)*16,vy:-14-R()*16,g:-8,life:0.7,col:pick(['#7dff9a','#d6ffe0','#ff5ad8']),sz:R()<0.4?2:1});},
     sugar:(p,mv,em)=>{if(em(15))parts.push({x:p.x+5+(R()-.5)*14,y:p.y-1+R()*4,vx:(R()-.5)*22,vy:-12-R()*14,g:70,life:0.8,col:pick(['#ff9ac8','#ffffff','#8af0d0','#fff2a8']),sz:R()<0.5?2:1});},
+    wisp:(p,mv,em)=>{if(em(10))parts.push({x:p.x+5-p.face*6+(R()-.5)*8,y:p.y+4+R()*8,vx:-p.face*(6+R()*10),vy:-8-R()*14,g:-6,life:0.8,col:pick(['#7ee8c0','#d6ffe8','#3fb58f']),sz:R()<0.4?2:1});},
     bubbles:(p,mv,em)=>{if(em(mv?20:12))parts.push({x:p.x+5+(R()-.5)*14,y:p.y+4+R()*8,vx:(R()-.5)*10,vy:-22-R()*24,g:-10,life:0.95,col:pick(['#d6fbff','#ffffff','#8fe8ff']),sz:2});}
   };
 })();
@@ -4974,6 +4980,20 @@ function drawEnemy(e){
     ctx.fillStyle='#ff5a5a';ctx.fillRect(bx,by,Math.max(1,Math.round(w*e.hp/e.maxHp)),2);
   }
 }
+function drawSkinBack(sk,p,cx){   // appendices dessinés derrière le personnage (skin « Goule » : tentacules spectraux qui ondulent)
+  if(sk.back!=='tendrils'||state==='dying')return;
+  const f=p.face,ax=cx-f*4,ay=Math.round(p.y)+6,mv=clamp(p.vx/120,-1,1)*f;   // en avançant, les tentacules se couchent vers l'arrière
+  const cols=['#2a7a64','#3fb58f','#7ee8c0'];
+  for(let i=0;i<4;i++){
+    const base=-0.95+i*0.55;let x=ax,y=ay;
+    for(let s=0;s<8;s++){
+      const k=s/7,ang=base+Math.sin(time*3.2+i*1.7+s*0.55)*0.38*(0.4+k)+mv*0.35;
+      x+=-f*Math.cos(ang)*3.2;y+=Math.sin(ang)*3.2-0.3;
+      const sz=s<3?3:s<6?2:1;
+      ctx.fillStyle=cols[s<3?0:s<6?1:2];ctx.fillRect(Math.round(x)-1,Math.round(y)-1,sz,sz);
+    }
+  }
+}
 function drawPlayer(){
   const p=player;
   if(state==='play'&&p.invuln>0&&Math.floor(time*18)%2)return;
@@ -4981,6 +5001,7 @@ function drawPlayer(){
   const SP=curSkin().spr;
   const sp=state==='dying'||!p.onGround?SP.jump:moving?(Math.floor(time*10)%2?SP.a:SP.b):SP.idle;
   const cx=Math.round(p.x+p.w/2);
+  drawSkinBack(curSkin(),p,cx);
   ctx.save();
   if(state==='dying'){ctx.translate(cx,Math.round(p.y+7));ctx.scale(p.face,-1);ctx.drawImage(sp,-8,-9);}
   else{ctx.translate(cx,0);ctx.scale(p.face,1);ctx.drawImage(sp,-8,Math.round(p.y)-2);}
