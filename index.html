@@ -713,8 +713,7 @@ const EN={
 'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
- [/^(Vaincre .+) (\d+) fois$/,m=>(EN[m[1]]||m[1])+' x'+m[2]],
- [/^SPEEDRUN · TENTATIVE (\d+)$/,m=>'SPEEDRUN · ATTEMPT '+m[1]],
+  [/^SPEEDRUN · TENTATIVE (\d+)$/,m=>'SPEEDRUN · ATTEMPT '+m[1]],
  [/^TENTATIVES : (\d+)(.*)$/,m=>'ATTEMPTS: '+m[1]+m[2].replace('MEILLEUR','BEST')],
  [/^MEILLEUR (\d+:\d\d\.\d\d)$/,m=>'BEST '+m[1]],
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -2023,7 +2022,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(fresh){
-  const d={bk:{},swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=fresh?null:JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -2043,8 +2042,6 @@ function loadShop(fresh){
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
       if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king','cloud'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
-      if(j.bk&&typeof j.bk==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king','cloud'])d.bk[k]=Math.max(0,Math.floor(Number(j.bk[k]))||0);   // nombre de victoires sur chaque boss (missions continues)
-      for(const k in d.bossSouls)if(d.bossSouls[k]&&!d.bk[k])d.bk[k]=1;   // un boss déjà vaincu compte au moins une victoire
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
@@ -2100,7 +2097,6 @@ function loadShop(fresh){
 let shop=loadShop();
 /* Les âmes rouges ne sont données qu'à la première mort de chaque boss (ensuite : de l'or seulement) */
 function soulReward(key,n){
-  shop.bk=shop.bk||{};shop.bk[key]=(shop.bk[key]||0)+1;   // une victoire de plus sur ce boss
   if(shop.bossSouls[key])return false;
   shop.bossSouls[key]=true;shop.souls+=n;return true;
 }
@@ -6279,8 +6275,8 @@ $('set-sound').addEventListener('click',toggleMute);
 /* ---- Missions et réglages (menus ouverts depuis l'écran titre, la pause et l'écran de mort) ---- */
 const misEl=$('mis'),setEl=$('set');
 let misOpen=false,setOpen=false,modeOpen=false,accOpen=false;
-const BM_GOALS=[1,3,5,10,20,40];
-const BOSS_MIS=[['shark','shark','Vaincre le démon requin',{gold:100},100],['octo','octo','Vaincre le poulpe géant',{gold:150},150],['jelly','jelly','Vaincre la méduse',{gold:200},200],['castle','castle','Vaincre le château de sable',{gold:250},250],['cow','cow','Vaincre la vache géante',{souls:1},200],['witch','witch','Vaincre la sorcière',{gold:300},300],['esk','eskimo','Vaincre l\'esquimau',{gold:400},400],['king','king','Vaincre le Roi Cacamille 2',{souls:2},500],['cloud','cloud','Vaincre le dauphin des nuages',{souls:3},600]];
+const BOSS_MIS=[['shark','shark','Vaincre le démon requin',{gold:100}],['octo','octo','Vaincre le poulpe géant',{gold:150}],['jelly','jelly','Vaincre la méduse',{gold:200}],['castle','castle','Vaincre le château de sable',{gold:250}],['cow','cow','Vaincre la vache géante',{souls:1}],['witch','witch','Vaincre la sorcière',{gold:300}],['esk','eskimo','Vaincre l\'esquimau',{gold:400}],['king','king','Vaincre le Roi Cacamille 2',{souls:2}],['cloud','cloud','Vaincre le dauphin des nuages',{souls:3}]];
+const MIS_CHAINS=[['shark','octo','jelly','castle','cow','witch','esk','king','cloud'],['beach','worm'],['skins','skins15'],['dagger','six','scep','tarot','harp'],['chariot','star','sorc'],['bmax','bmax3']];   // chaînes de missions
 function missionList(){   // [id, nom, progression, objectif, récompense {gold|souls}]
   const bs=shop.bossSouls||{};
   let maxB=0;for(const nm in TREES){const T=TREES[nm],L=T.lv();maxB+=T.keys.filter(k=>L[k]>=bmax(T,k)).length;}   // branches au niveau max, toutes armes confondues
@@ -6302,15 +6298,11 @@ function missionList(){   // [id, nom, progression, objectif, récompense {gold|
     ['skins15','Posséder 15 skins',Math.min(shop.owned.length,15),15,{gold:1000}],
     ['rebirth','Renaître une fois',Math.min(shop.rb||0,1),1,{souls:2}]
   ];
-  for(const [id,key,name,rw,g] of BOSS_MIS){   // missions continues : une fois la mission récupérée, elle est remplacée par la suivante (3, 5, 10, 20 puis 40 victoires)
-    for(let t=0;t<BM_GOALS.length;t++){
-      const tid=t?id+'_'+t:id;if(shop.mc[tid])continue;
-      L.push(t===0?[tid,name,bs[key]?1:0,1,rw]:[tid,name+' '+BM_GOALS[t]+' fois',Math.min((shop.bk&&shop.bk[key])||0,BM_GOALS[t]),BM_GOALS[t],{gold:g*(t+1)}]);
-      break;
-    }
-  }
+  for(const [id,key,name,rw] of BOSS_MIS)L.push([id,name,bs[key]?1:0,1,rw]);
   for(const m of L)if(shop.mc[m[0]])m[2]=m[3];   // une mission déjà récupérée reste réussie, même après une renaissance
-  return L;
+  const hide=new Set();   // missions en chaîne : une seule à la fois, la suivante remplace celle qui vient d'être récupérée
+  for(const ch of MIS_CHAINS){let shown=false;for(const id of ch){if(shop.mc[id])continue;if(shown)hide.add(id);else shown=true;}}
+  return L.filter(m=>!hide.has(m[0]));
 }
 const misReady=()=>missionList().some(m=>m[2]>=m[3]&&!shop.mc[m[0]]);
 function misDot(){const d=$('mis-dot');if(d)d.hidden=!misReady();}
