@@ -2431,7 +2431,17 @@ const TENT_COST=10,TENT_N=4;
 const teV=k=>TNUP[k].vals[shop.te[k]||0];
 const TENT_ICON=spr(["....rrr..","...rRRRr.","..rRp.rR.",".rRp...r.",".rR......","..rR.....","...rRr...",".....rr.."],{r:'#7a1020',R:'#c4202e',p:'#ff6a6a'},true);
 let teCd=0,teFx=[],teLast=-1;
-const tentCols=sk=>(sk&&sk.tc)||['#7a1020','#c4202e','#ff6a6a'];
+const hexMix=(c,t,k)=>{const n=parseInt(c.slice(1),16),m=parseInt(t.slice(1),16),f=(sh)=>Math.round(((n>>sh)&255)*(1-k)+((m>>sh)&255)*k);return '#'+((1<<24)+(f(16)<<16)+(f(8)<<8)+f(0)).toString(16).slice(1);};
+function tentCols(sk){   // couleur des tentacules : la couleur majeure du skin (sauf l'Humain, qui garde le rouge)
+  if(!sk)return ['#7a1020','#c4202e','#ff6a6a'];
+  if(sk.id==='human'&&sk.tc)return sk.tc;
+  if(sk._tw)return sk._tw;
+  const pal=Object.assign({},PAL_P,sk.pal),cnt={};
+  for(const row of sk.hat.concat(sk.face,sk.torso))for(const ch of row){if(ch==='.'||ch==='k'||ch==='s'||ch==='S'||!pal[ch])continue;cnt[ch]=(cnt[ch]||0)+1;}
+  let best=null;for(const ch in cnt)if(best===null||cnt[ch]>cnt[best])best=ch;
+  const base=best?pal[best]:'#c4202e';
+  return sk._tw=[hexMix(base,'#000000',0.35),base,hexMix(base,'#ffffff',0.45)];
+}
 const tentAnchor=p=>({x:Math.round(p.x+p.w/2)-p.face*4,y:Math.round(p.y)+6});
 function stepTentacle(dt){
   const p=player;
