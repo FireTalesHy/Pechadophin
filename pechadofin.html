@@ -2168,7 +2168,8 @@ function hitEnemy(e,dmg){
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
     if(shop.equipped==='clown'&&Math.random()<1/20)startClownFx(e);   // skin Clown : 1 chance sur 20 d'un gag de clown (+100 or)
     if(curSkin().grab&&Math.random()<1/5)startGrab(e);   // skins Humain et Goule : 1 chance sur 5 qu'une tentacule sorte du sol et emporte le cadavre
-    const gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
+    let gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
+    if(shop.equipped==='clown'){gold+=Math.max(1,Math.round(gold*0.5));clownKill(e);}   // skin Clown : +50 % d'or par élimination, et une mini animation
     shop.gold+=gold;
     if(e.kind==='worm'){   // les vers débloquent les tridents multiples
       const was=shop.wormKills;shop.wormKills++;
@@ -2667,7 +2668,7 @@ function drawGrabs(){
   }
 }
 /* ---------- Skin Clown : 1 chance sur 20 qu'un gag de clown emporte le cadavre (ballons, clown kamikaze ou boîte à surprise) : +100 or ---------- */
-let clownFx=[];
+let clownFx=[],miniFx=[];   // miniFx : petit ballon qui s'envole de chaque ennemi tué par le Clown
 const CONFETTI=['#ff3b3b','#ffd23f','#3bff6a','#3b8bff','#ff6ad5','#ffffff'];
 function confetti(x,y,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=60+Math.random()*130;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-70,g:260,life:0.7+Math.random()*0.6,col:CONFETTI[i%CONFETTI.length],sz:Math.random()<0.5?1:2});}}
 function startClownFx(e){
@@ -2686,7 +2687,13 @@ function clownPayout(c,x,y){
   confetti(x,y,34);burst(x,y,'#ffd23f',10,110);
   shake=Math.max(shake,0.12);try{sfx.bossDie();}catch(err){}
 }
+function clownKill(e){   // skin Clown : à chaque élimination, confettis + petit ballon qui monte puis éclate
+  const x=e.x+e.w/2,y=e.y+e.h/2;
+  confetti(x,y,10);
+  miniFx.push({x,y,t:0,col:CONFETTI[Math.floor(Math.random()*5)],seed:Math.random()*6});
+}
 function stepClownFx(dt){
+  if(miniFx.length){for(const m of miniFx){m.t+=dt;if(m.t>=0.7&&!m.popped){m.popped=true;confetti(m.x+Math.sin(m.seed+m.t*5)*3,m.y-26,10);}}miniFx=miniFx.filter(m=>m.t<0.72);}
   if(!clownFx.length)return;
   for(const c of clownFx){
     c.t+=dt;const e=c.e,t=c.t;if(c.boom>0)c.boom-=dt;
@@ -2707,6 +2714,12 @@ function stepClownFx(dt){
   clownFx=clownFx.filter(c=>!c.done||c.boom>0);
 }
 function drawClownFx(){
+  for(const m of miniFx){
+    const k=m.t/0.7,x=Math.round(m.x+Math.sin(m.seed+m.t*5)*3),y=Math.round(m.y-k*26);
+    ctx.fillStyle='#e8e8f0';ctx.fillRect(x,y+4,1,Math.round(5+k*3));
+    ctx.fillStyle=m.col;ctx.fillRect(x-2,y-3,5,6);ctx.fillRect(x-1,y-4,3,1);ctx.fillRect(x-1,y+3,3,1);
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.fillRect(x-1,y-2,1,2);
+  }
   if(!clownFx.length)return;
   const sk=SKINS.find(x=>x.id==='clown');
   for(const c of clownFx){
@@ -5875,7 +5888,7 @@ function showTitle(){
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];teFx=[];teCd=0;teZip=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];teFx=[];teCd=0;teZip=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
