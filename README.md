@@ -2,13 +2,15 @@
 
 **Version V0.5.5**
 
-Un jeu de plateforme en pixel art, [jouable directement dans le navigateur](https://firetaleshy.github.io/Pechadophin/) : tu es un pêcheur qui affronte des dauphins, un démon requin, un poulpe géant, une méduse et un château de sable, dans un monde généré aléatoirement à chaque partie.
+<h2 align="center">▶️ <a href="https://pechadophin.vercel.app/">JOUER MAINTENANT : pechadophin.vercel.app</a></h2>
+
+Un jeu de plateforme en pixel art, jouable directement dans le navigateur : tu es un pêcheur qui affronte des dauphins, un démon requin, un poulpe géant, une méduse et un château de sable, dans un monde généré aléatoirement à chaque partie.
 
 Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (hormis la police Google Fonts « Press Start 2P »).
 
 ## ▶️ Jouer
 
-- En ligne : **[https://pechadophin.vercel.app/](https://pechadophin.vercel.app/)** (aussi sur [GitHub Pages](https://firetaleshy.github.io/Pechadophin/))
+- En ligne : **[https://pechadophin.vercel.app/](https://pechadophin.vercel.app/)**
 - En local : télécharge le dépôt et ouvre `index.html` dans ton navigateur.
 
 ## 🎮 Commandes
