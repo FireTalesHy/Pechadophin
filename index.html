@@ -654,7 +654,7 @@ const EN={
 'Couper le son':'Mute sound','Son':'Sound','Activer le son':'Turn sound on','Joystick de caméra et de visée : oriente la caméra et la visée, avec aide à la visée':'Camera and aim joystick: steers the camera and your aim, with aim assist',
 'Joystick : caméra et visée (aide à la visée)':'Joystick: camera and aim (aim assist)','Sauter':'Jump','Lancer la canne à pêche':'Cast the fishing rod',
 'Passer en anglais':'Switch to English','Passer en français':'Switch to French','English':'English','Français':'Français',
-'SKINS PRÉMIUM':'PREMIUM SKINS','+100 OR':'+100 GOLD','ÉQUIPÉ':'EQUIPPED','ÉQUIPER':'EQUIP','ÉQUIPÉE':'EQUIPPED','ACHETER':'BUY','OFFERT':'FREE','POSSÉDÉ':'OWNED','OFFERTE':'FREE','AMÉLIORER':'UPGRADE','INDISPONIBLE':'UNAVAILABLE','NIVEAU MAX':'MAX LEVEL','NIVEAU 5/5':'LEVEL 5/5','NIVEAU 3/3':'LEVEL 3/3',
+'SKINS PREMIUM':'PREMIUM SKINS','+100 OR':'+100 GOLD','ÉQUIPÉ':'EQUIPPED','ÉQUIPER':'EQUIP','ÉQUIPÉE':'EQUIPPED','ACHETER':'BUY','OFFERT':'FREE','POSSÉDÉ':'OWNED','OFFERTE':'FREE','AMÉLIORER':'UPGRADE','INDISPONIBLE':'UNAVAILABLE','NIVEAU MAX':'MAX LEVEL','NIVEAU 5/5':'LEVEL 5/5','NIVEAU 3/3':'LEVEL 3/3',
 'DÉBLOQUÉ À LA PLAGE':'UNLOCKED AT THE BEACH','VERROUILLÉ':'LOCKED','TRIDENT REQUIS':'TRIDENT REQUIRED','NIVEAUX CONSERVÉS':'LEVELS KEPT','MARCHAND':'MERCHANT',
 'Trident infernal':'Infernal trident','Perce les ennemis':'Pierces enemies','Armes d\'histoire':'Story weapons','Armes diverses':'Misc weapons','Canne à pêche':'Fishing rod','Remplacée par le trident':'Replaced by the trident','Arme de départ':'Starting weapon','Tridents multiples':'Multiple tridents',
 'Portée':'Range','Zone de dégâts':'Damage area','Vitesse de tir':'Fire rate','Dégâts':'Damage','Perforation':'Piercing','Points de vie':'Hit points',
@@ -6598,7 +6598,7 @@ function renderSkins(){
   shopList.textContent='';
   const PREM=['clown',RNG_SKIN.id],prem=PREM.map(id=>SKINS.find(x=>x.id===id)).filter(Boolean),order=prem.concat(SKINS.filter(x=>!PREM.includes(x.id)));   // skins prémium en haut, puis les skins normaux
   for(const sk of order){
-    if(sk===prem[0]){const h=document.createElement('div');h.className='prem-h';h.textContent='SKINS PRÉMIUM';shopList.appendChild(h);}
+    if(sk===prem[0]){const h=document.createElement('div');h.className='prem-h';h.textContent='SKINS PREMIUM';shopList.appendChild(h);}
     else if(sk===order[prem.length]){const h=document.createElement('div');h.className='prem-sep';shopList.appendChild(h);}
     const owned=shop.owned.includes(sk.id),eq=shop.equipped===sk.id;
     const card=document.createElement('div');card.className='card'+(eq?' eq':'')+(sk.id==='clown'?' rgb':'')+(sk.id===RNG_SKIN.id?' vio':'');
