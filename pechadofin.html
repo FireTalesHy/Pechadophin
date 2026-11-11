@@ -642,7 +642,7 @@ const EN={
 'Couper le son':'Mute sound','Son':'Sound','Activer le son':'Turn sound on','Joystick de caméra et de visée : oriente la caméra et la visée, avec aide à la visée':'Camera and aim joystick: steers the camera and your aim, with aim assist',
 'Joystick : caméra et visée (aide à la visée)':'Joystick: camera and aim (aim assist)','Sauter':'Jump','Lancer la canne à pêche':'Cast the fishing rod',
 'Passer en anglais':'Switch to English','Passer en français':'Switch to French','English':'English','Français':'Français',
-'SKINS PRÉMIUM':'PREMIUM SKINS','ÉQUIPÉ':'EQUIPPED','ÉQUIPER':'EQUIP','ÉQUIPÉE':'EQUIPPED','ACHETER':'BUY','OFFERT':'FREE','POSSÉDÉ':'OWNED','OFFERTE':'FREE','AMÉLIORER':'UPGRADE','INDISPONIBLE':'UNAVAILABLE','NIVEAU MAX':'MAX LEVEL','NIVEAU 5/5':'LEVEL 5/5','NIVEAU 3/3':'LEVEL 3/3',
+'SKINS PRÉMIUM':'PREMIUM SKINS','+100 OR':'+100 GOLD','ÉQUIPÉ':'EQUIPPED','ÉQUIPER':'EQUIP','ÉQUIPÉE':'EQUIPPED','ACHETER':'BUY','OFFERT':'FREE','POSSÉDÉ':'OWNED','OFFERTE':'FREE','AMÉLIORER':'UPGRADE','INDISPONIBLE':'UNAVAILABLE','NIVEAU MAX':'MAX LEVEL','NIVEAU 5/5':'LEVEL 5/5','NIVEAU 3/3':'LEVEL 3/3',
 'DÉBLOQUÉ À LA PLAGE':'UNLOCKED AT THE BEACH','VERROUILLÉ':'LOCKED','TRIDENT REQUIS':'TRIDENT REQUIRED','NIVEAUX CONSERVÉS':'LEVELS KEPT','MARCHAND':'MERCHANT',
 'Trident infernal':'Infernal trident','Perce les ennemis':'Pierces enemies','Armes d\'histoire':'Story weapons','Armes diverses':'Misc weapons','Canne à pêche':'Fishing rod','Remplacée par le trident':'Replaced by the trident','Arme de départ':'Starting weapon','Tridents multiples':'Multiple tridents',
 'Portée':'Range','Zone de dégâts':'Damage area','Vitesse de tir':'Fire rate','Dégâts':'Damage','Perforation':'Piercing','Points de vie':'Hit points',
@@ -2166,6 +2166,7 @@ function hitEnemy(e,dmg){
     e.state='dead';e.t=0;e.vy=-170;e.vx=-e.dir*30;
     kills++; shake=Math.max(shake,0.08); sfx.kill();
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
+    if(shop.equipped==='clown'&&Math.random()<1/20)startClownFx(e);   // skin Clown : 1 chance sur 20 d'un gag de clown (+100 or)
     if(curSkin().grab&&Math.random()<1/5)startGrab(e);   // skins Humain et Goule : 1 chance sur 5 qu'une tentacule sorte du sol et emporte le cadavre
     const gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
     shop.gold+=gold;
@@ -2665,6 +2666,83 @@ function drawGrabs(){
     }
   }
 }
+/* ---------- Skin Clown : 1 chance sur 20 qu'un gag de clown emporte le cadavre (ballons, clown kamikaze ou boîte à surprise) : +100 or ---------- */
+let clownFx=[];
+const CONFETTI=['#ff3b3b','#ffd23f','#3bff6a','#3b8bff','#ff6ad5','#ffffff'];
+function confetti(x,y,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=60+Math.random()*130;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-70,g:260,life:0.7+Math.random()*0.6,col:CONFETTI[i%CONFETTI.length],sz:Math.random()<0.5?1:2});}}
+function startClownFx(e){
+  if(e.grab)return;
+  const cx=e.x+e.w/2;let gy=e.y+e.h;
+  for(let y=e.y+e.h;y<e.y+e.h+160;y+=4)if(solidAt(cx,y)){gy=Math.floor(y/T)*T;break;}
+  e.grab=true;e.vx=0;e.vy=0;
+  const kind=['balloons','clown','box'][Math.floor(Math.random()*3)],side=Math.random()<0.5?-1:1;
+  clownFx.push({k:kind,e,t:0,cx,gy,y0:e.y,x0:e.x,side,boom:0,paid:false,seed:Math.random()*6,done:false});
+  try{sfx.heal();}catch(err){}
+}
+function clownPayout(c,x,y){
+  if(c.paid)return;c.paid=true;
+  shop.gold+=100;saveShop();
+  floatText(x,y-8,'+100 OR','#ffd23f');
+  confetti(x,y,34);burst(x,y,'#ffd23f',10,110);
+  shake=Math.max(shake,0.12);try{sfx.bossDie();}catch(err){}
+}
+function stepClownFx(dt){
+  if(!clownFx.length)return;
+  for(const c of clownFx){
+    c.t+=dt;const e=c.e,t=c.t;if(c.boom>0)c.boom-=dt;
+    if(c.k==='balloons'){   // des ballons attachent le cadavre et l'emportent en l'air, puis éclatent
+      const k=Math.min(1,t/1.3);e.y=c.y0-80*(1-(1-k)*(1-k))+Math.sin(t*6+c.seed)*2;e.x=c.x0+Math.sin(t*3+c.seed)*4;
+      if(t>=1.4){clownPayout(c,e.x+e.w/2,e.y);e.t=99;c.done=true;}
+    } else if(c.k==='clown'){   // un clown accourt, attrape le cadavre, clignote… et explose avec
+      const RUN=0.55,HOLD=1.5;
+      c.cxx=t<RUN?c.cx+c.side*(1-t/RUN)*84:c.cx;
+      if(t>=RUN){e.x=c.cxx-e.w/2;e.y=c.gy-14-e.h+2+Math.abs(Math.sin(t*20))*(t<HOLD-0.5?1:2);e.flash=Math.floor(t*10)%2?0.1:0;}
+      if(t>=HOLD){clownPayout(c,c.cx,c.gy-14);c.boom=0.25;e.t=99;c.done=true;burst(c.cx,c.gy-12,'#ff8a2a',14,150);}
+    } else {   // boîte à surprise : le ressort projette le cadavre en l'air, il éclate en confettis
+      const lid=0.3;
+      if(t>lid){const k=Math.min(1,(t-lid)/1.0);e.y=c.y0-96*Math.sin(k*Math.PI/2)+Math.sin(t*14)*0.5;e.x=c.x0;}
+      if(t>=1.35){clownPayout(c,e.x+e.w/2,e.y+e.h/2);e.t=99;c.done=true;}
+    }
+  }
+  clownFx=clownFx.filter(c=>!c.done||c.boom>0);
+}
+function drawClownFx(){
+  if(!clownFx.length)return;
+  const sk=SKINS.find(x=>x.id==='clown');
+  for(const c of clownFx){
+    const e=c.e,t=c.t;
+    if(c.done){   // flash de l'explosion du clown
+      if(c.k==='clown'&&c.boom>0){const r=Math.round((1-c.boom/0.25)*26+4);ctx.fillStyle='rgba(255,240,170,'+(c.boom/0.25*0.8).toFixed(2)+')';ctx.beginPath();ctx.arc(Math.round(c.cx),Math.round(c.gy-12),r,0,Math.PI*2);ctx.fill();}
+      continue;
+    }
+    const ex=Math.round(e.x+e.w/2);
+    if(c.k==='balloons'){
+      const cols=['#ff3b3b','#ffd23f','#3b8bff','#3bff6a','#ff6ad5'];
+      for(let i=0;i<5;i++){
+        const ox=(i-2)*6+Math.sin(t*4+i+c.seed)*2,by=Math.round(e.y)-22-(i%2)*6+Math.sin(t*5+i)*1.5,bx=ex+ox;
+        ctx.fillStyle='#e8e8f0';ctx.fillRect(Math.round((ex+bx)/2),Math.round((by+e.y+4)/2),1,1);
+        ctx.strokeStyle='#e8e8f0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ex+0.5,Math.round(e.y)+2.5);ctx.lineTo(Math.round(bx)+0.5,by+4.5);ctx.stroke();
+        ctx.fillStyle=cols[i];ctx.fillRect(Math.round(bx)-3,by-4,7,8);ctx.fillRect(Math.round(bx)-2,by-5,5,1);ctx.fillRect(Math.round(bx)-2,by+4,5,1);
+        ctx.fillStyle='rgba(255,255,255,.7)';ctx.fillRect(Math.round(bx)-2,by-3,1,2);
+      }
+    } else if(c.k==='clown'){
+      if(!sk)continue;
+      const moving=t<0.55||Math.floor(t*10)%2,sp=moving?(Math.floor(t*12)%2?sk.spr.a:sk.spr.b):sk.spr.idle,face=t<0.55?-c.side:1;
+      ctx.save();ctx.translate(Math.round(c.cxx),0);ctx.scale(face,1);ctx.drawImage(sp,-8,Math.round(c.gy-14)-2);ctx.restore();
+      if(t>=0.55&&Math.floor(t*10)%2){ctx.fillStyle='#ff3b3b';ctx.fillRect(Math.round(c.cx)+4,Math.round(c.gy)-20,2,2);}   // mèche qui clignote
+    } else {
+      const bx=Math.round(c.x0+e.w/2)-8,by=Math.round(c.gy)-12,open=Math.min(1,Math.max(0,(t-0.2)/0.15)),spring=Math.min(1,Math.max(0,(t-0.3)/0.3));
+      const top=Math.round(Math.min(c.y0+e.h,by)-spring*Math.min(40,c.y0+e.h-e.y+8));
+      if(open>0){   // ressort et tête de clown
+        const hy=Math.round(Math.min(by-2,e.y+e.h+6));
+        for(let y=hy;y<by;y+=3){ctx.fillStyle=Math.floor(y/3)%2?'#c8c8d4':'#8a8a9a';ctx.fillRect(bx+6+(Math.floor(y/3)%2?1:-1),y,4,2);}
+        ctx.fillStyle='#fff6ee';ctx.fillRect(bx+3,hy-9,10,9);ctx.fillStyle='#ff8a2a';ctx.fillRect(bx+2,hy-11,12,3);ctx.fillStyle='#e0262e';ctx.fillRect(bx+7,hy-5,3,3);ctx.fillStyle='#14182c';ctx.fillRect(bx+5,hy-7,1,1);ctx.fillRect(bx+10,hy-7,1,1);
+      }
+      ctx.fillStyle='#7a4ad8';ctx.fillRect(bx,by,16,12);ctx.fillStyle='#ffd23f';ctx.fillRect(bx,by+4,16,2);ctx.fillStyle='#e0262e';ctx.fillRect(bx+6,by,4,12);ctx.fillStyle='#4a2a98';ctx.fillRect(bx,by+10,16,2);
+      ctx.fillStyle='#4a2a98';ctx.fillRect(bx-1,by-2-Math.round(open*3),18,2);   // couvercle
+    }
+  }
+}
 function stepSkinFx(dt){
   const sk=curSkin(),f=sk.fx&&SKIN_FX[sk.fx];
   if(!f||state!=='play'||paused||parts.length>400)return;
@@ -2672,7 +2750,7 @@ function stepSkinFx(dt){
 }
 function stepHook(dt){
   reloadBar=-1;
-  stepSkinFx(dt);stepGrabs(dt);
+  stepSkinFx(dt);stepGrabs(dt);stepClownFx(dt);
   stepCloudBalls(dt);
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
@@ -5742,7 +5820,7 @@ function render(){
     if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(e.x+e.w/2+Math.sin(time*9+e.x)*4),Math.round(e.y-2),1,2);}   // givre
     statusTint(e);
   }
-  drawGrabs();
+  drawGrabs();drawClownFx();
   drawBoss();
   drawJelly();
   drawCow();
@@ -5797,7 +5875,7 @@ function showTitle(){
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];teFx=[];teCd=0;teZip=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];teFx=[];teCd=0;teZip=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
