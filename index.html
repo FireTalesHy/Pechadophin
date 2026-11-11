@@ -407,6 +407,11 @@ body{
  66%{border-color:#3b8bff;box-shadow:0 0 0 2px #3b8bff,0 0 12px 2px #3b8bff}
  100%{border-color:#ff3b3b;box-shadow:0 0 0 2px #ff3b3b,0 0 12px 2px #ff3b3b}}
 @media (prefers-reduced-motion:reduce){.card.rgb{animation:none;border-color:#b44bff}}
+.card.vio{animation:viocard 2.2s ease-in-out infinite}   /* skin RNG∞ : halo violet qui pulse autour de la case */
+@keyframes viocard{
+ 0%,100%{border-color:#8a3be0;box-shadow:0 0 0 2px #8a3be0,0 0 8px 1px #8a3be0}
+ 50%{border-color:#d9a8ff;box-shadow:0 0 0 2px #d9a8ff,0 0 18px 4px #b44bff}}
+@media (prefers-reduced-motion:reduce){.card.vio{animation:none;border-color:#b44bff}}
 .prem-h{grid-column:1/-1;font:400 9px/1.4 var(--pf);letter-spacing:1px;padding:2px 2px 0}
 .prem-sep{grid-column:1/-1;height:0;border-top:2px solid var(--btn-line);margin:4px 0 2px}
 /* le fond de la case est rouge clair, et les boutons ACHETER / ÉQUIPER passent aussi par toutes les couleurs */
@@ -6589,7 +6594,7 @@ function renderSkins(){
     if(sk===prem[0]){const h=document.createElement('div');h.className='prem-h';h.textContent='SKINS PRÉMIUM';shopList.appendChild(h);}
     else if(sk===order[prem.length]){const h=document.createElement('div');h.className='prem-sep';shopList.appendChild(h);}
     const owned=shop.owned.includes(sk.id),eq=shop.equipped===sk.id;
-    const card=document.createElement('div');card.className='card'+(eq?' eq':'')+(sk.id==='clown'?' rgb':'');
+    const card=document.createElement('div');card.className='card'+(eq?' eq':'')+(sk.id==='clown'?' rgb':'')+(sk.id===RNG_SKIN.id?' vio':'');
     const pv=document.createElement('canvas');pv.width=16;pv.height=16;
     pv.getContext('2d').drawImage(sk.spr.idle,0,0);
     pv.setAttribute('aria-hidden','true');
