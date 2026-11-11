@@ -2685,7 +2685,7 @@ function startClownFx(e){
   const cx=e.x+e.w/2;let gy=e.y+e.h;
   for(let y=e.y+e.h;y<e.y+e.h+160;y+=4)if(solidAt(cx,y)){gy=Math.floor(y/T)*T;break;}
   e.grab=true;e.vx=0;e.vy=0;
-  const kind=['balloons','clown','box'][Math.floor(Math.random()*3)],side=Math.random()<0.5?-1:1;
+  const kind=['balloons','clown','box','tiger'][Math.floor(Math.random()*4)],side=Math.random()<0.5?-1:1;
   clownFx.push({k:kind,e,t:0,cx,gy,y0:e.y,x0:e.x,side,boom:0,paid:false,seed:Math.random()*6,done:false});
   try{sfx.heal();}catch(err){}
 }
@@ -2714,6 +2714,15 @@ function stepClownFx(dt){
       c.cxx=t<RUN?c.cx+c.side*(1-t/RUN)*84:c.cx;
       if(t>=RUN){e.x=c.cxx-e.w/2;e.y=c.gy-14-e.h+2+Math.abs(Math.sin(t*20))*(t<HOLD-0.5?1:2);e.flash=Math.floor(t*10)%2?0.1:0;}
       if(t>=HOLD){clownPayout(c,c.cx,c.gy-14);c.boom=0.25;e.t=99;c.done=true;burst(c.cx,c.gy-12,'#ff8a2a',14,150);}
+    } else if(c.k==='tiger'){   // un tigre accourt, attrape le cadavre et bondit avec dans l'arrière-plan
+      const RUN=0.6,LEAP=1.1;
+      if(t<RUN){c.tx=c.cx+c.side*(1-t/RUN)*100;const k=Math.min(1,t/0.4);e.y=c.y0+(c.gy-e.h-c.y0)*k*k;c.ty=0;c.ts=1;c.ta=1;}   // le cadavre tombe au sol pendant la course
+      else{
+        if(!c.hid){c.hid=true;e.t=99;try{sfx.hit();}catch(err){}}
+        const k=Math.min(1,(t-RUN)/LEAP);
+        c.tx=c.cx-c.side*k*70;c.ty=-Math.sin(k*Math.PI)*26-k*30;c.ts=1-0.6*k;c.ta=1-0.5*k;   // arc de saut, puis il rapetisse et s'enfonce dans le décor
+        if(k>=1){clownPayout(c,c.tx,c.gy+c.ty-8);c.done=true;burst(c.tx,c.gy+c.ty-8,'#f0a030',10,100);}
+      }
     } else {   // boîte à surprise : le ressort projette le cadavre en l'air, il éclate en confettis
       const lid=0.3;
       if(t>lid){const k=Math.min(1,(t-lid)/1.0);e.y=c.y0-96*Math.sin(k*Math.PI/2)+Math.sin(t*14)*0.5;e.x=c.x0;}
@@ -2721,6 +2730,21 @@ function stepClownFx(dt){
     }
   }
   clownFx=clownFx.filter(c=>!c.done||c.boom>0);
+}
+function drawTiger(x,y,face,s,a,ph,carry,col){   // petit tigre pixel-art (de profil, tourné vers la droite avant le miroir)
+  ctx.save();ctx.globalAlpha=a;ctx.translate(Math.round(x),Math.round(y));ctx.scale(face*s,s);
+  const O='#f0a030',D='#2a1a10',Wt='#fff2dc',l=Math.floor(ph*14)%2;
+  ctx.fillStyle=O;
+  if(carry){ctx.fillRect(-11,-6,3,2);ctx.fillRect(-7,-6,3,2);ctx.fillRect(5,-6,3,2);ctx.fillRect(9,-6,3,2);}   // pattes repliées en plein saut
+  else{ctx.fillRect(-11+l,-4,3,4);ctx.fillRect(-7-l,-4,3,4);ctx.fillRect(5-l,-4,3,4);ctx.fillRect(9+l,-4,3,4);}
+  ctx.fillRect(-12,-13,20,9);                                  // corps
+  ctx.fillStyle=D;for(let i=-9;i<=3;i+=4)ctx.fillRect(i,-13,1,6);
+  ctx.fillStyle=O;ctx.fillRect(8,-16,8,9);                      // tête
+  ctx.fillStyle=D;ctx.fillRect(9,-18,2,2);ctx.fillRect(13,-18,2,2);ctx.fillRect(12,-14,1,1);ctx.fillRect(10,-16,1,2);ctx.fillRect(14,-16,1,2);
+  ctx.fillStyle=Wt;ctx.fillRect(13,-11,3,3);
+  ctx.fillStyle=O;ctx.fillRect(-15,-12,3,2);ctx.fillRect(-17,-15,2,4);ctx.fillStyle=D;ctx.fillRect(-18,-17,2,2);   // queue
+  if(carry){ctx.fillStyle=col;ctx.fillRect(14,-11,9,5);ctx.fillRect(22,-12,3,2);ctx.fillRect(22,-7,3,2);ctx.fillStyle='rgba(255,255,255,.55)';ctx.fillRect(15,-8,6,1);ctx.fillStyle=D;ctx.fillRect(17,-10,1,1);}   // le cadavre dans la gueule
+  ctx.restore();
 }
 function drawClownFx(){
   for(const m of miniFx){
@@ -2752,6 +2776,8 @@ function drawClownFx(){
       const moving=t<0.55||Math.floor(t*10)%2,sp=moving?(Math.floor(t*12)%2?sk.spr.a:sk.spr.b):sk.spr.idle,face=t<0.55?-c.side:1;
       ctx.save();ctx.translate(Math.round(c.cxx),0);ctx.scale(face,1);ctx.drawImage(sp,-8,Math.round(c.gy-14)-2);ctx.restore();
       if(t>=0.55&&Math.floor(t*10)%2){ctx.fillStyle='#ff3b3b';ctx.fillRect(Math.round(c.cx)+4,Math.round(c.gy)-20,2,2);}   // mèche qui clignote
+    } else if(c.k==='tiger'){
+      drawTiger(c.tx,c.gy+c.ty,-c.side,c.ts,c.ta,t,t>=0.6,e.kind==='fly'?'#ff8ac8':e.kind==='shoot'?'#e04a3a':'#6aa8e0');
     } else {
       const bx=Math.round(c.x0+e.w/2)-8,by=Math.round(c.gy)-12,open=Math.min(1,Math.max(0,(t-0.2)/0.15)),spring=Math.min(1,Math.max(0,(t-0.3)/0.3));
       const top=Math.round(Math.min(c.y0+e.h,by)-spring*Math.min(40,c.y0+e.h-e.y+8));
