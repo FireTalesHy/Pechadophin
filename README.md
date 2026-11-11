@@ -1,6 +1,6 @@
 # 🎣 Pechadophin 
 
-**Version V0.5**
+**Version V0.5.5**
 
 Un jeu de plateforme en pixel art, [jouable directement dans le navigateur](https://firetaleshy.github.io/Pechadophin/) : tu es un pêcheur qui affronte des dauphins, un démon requin, un poulpe géant, une méduse et un château de sable, dans un monde généré aléatoirement à chaque partie.
 
@@ -31,7 +31,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 - La plage : une zone en sable avec des tunnels, des vers, un checkpoint et des cocotiers qui servent de plateformes, un boss volant (la méduse, lasers blancs et tentacules rotatives) et le château de sable (vagues de sable, seau d'eau à viser)
 - Les marécages : herbe sombre, flaques, tours en ruine qui servent de plateformes, mini zombies, mini vaches et la vache géante (roulades et crachats de lait)
 - Des coffres à ouvrir en chemin pour gagner de l'or
-- Deux modes de jeu : Classique et Anarchie (boss sans fin, zone tirée au hasard après chaque boss d'arène, ciel qui change à chaque requin)
+- Trois modes de jeu : Classique, Anarchie (boss sans fin, zone tirée au hasard après chaque boss d'arène, ciel qui change à chaque requin) et Speedrun (débloqué après la première renaissance : bats le Roi Cacamille 2 au chrono, arme au choix déjà au maximum, sans checkpoint)
 - Jeu en français ou en anglais (bouton drapeau)
 - Connexion avec un compte Google et sauvegarde cloud dans ton Google Drive (voir [privacy.html](privacy.html))
 - Collab avec le jeu RNG∞ : skin RNG∞ à débloquer avec le même compte Google

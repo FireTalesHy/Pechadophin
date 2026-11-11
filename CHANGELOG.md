@@ -2,6 +2,24 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.5.5] - 2026-11-11 · SPEEDRUN UPDATE
+
+### Ajouté
+- **Mode SPEEDRUN** (débloqué après ta première renaissance, dans le menu MODE) : bats le **Roi Cacamille 2** le plus vite possible.
+  - Au lancement, tu choisis une arme parmi **4** : trident infernal, jeu de tarot, dagues ou tentacules. Elle est **déjà améliorée au maximum** (2 branches : dégâts + vitesse de tir pour le trident, dégâts + Silver Chariot pour le tarot, dégâts + longueur du dash pour les dagues, dégâts + allonge pour les tentacules).
+  - **Chrono** en haut de l'écran, avec le numéro de tentative. On part du tout début, **sans checkpoint, sans boutique ni marchands** : si tu meurs, **tout recommence depuis le début**.
+  - **10 cœurs** : 5 cœurs dorés posés par-dessus les 5 cœurs rouges. Les dorés partent en premier, les rouges sont la dernière chance. Les cœurs de soin ne restaurent que les rouges.
+  - **Menu de fin** après la victoire : temps, pseudo, skin et arme du joueur, avec ton meilleur temps par arme (enregistré en local). La vraie sauvegarde n'est jamais touchée.
+- **Tentacules : saut boosté.** Quand tu sautes avec les tentacules, trois tentacules prennent appui sur le sol et te propulsent (hauteur de saut x1,25), avec leur animation.
+- **Skin Clown : nouveau gag du tigre.** Un tigre accourt, attrape le cadavre dans sa gueule et bondit dans l'arrière-plan avec lui.
+- Boutique : **halo violet animé**, bouton violet et fond violet pour la case du skin RNG∞.
+
+### Modifié
+- **Skin Clown** : l'animation spéciale sort maintenant à coup sûr **tous les 18 kills** (au lieu d'1 chance sur 20).
+- **Tentacules : grappin continu.** La vitesse monte progressivement, tu traverses le point d'accroche sans t'arrêter, et la vitesse est **conservée** à l'arrivée et en l'air.
+- Boutique : la catégorie s'appelle **PREMIUM SKINS** (en français comme en anglais).
+- Bannière de l'écran d'accueil : **SPEEDRUN UPDATE**.
+
 ## [V0.5] - 2026-11-11
 
 ### Ajouté
