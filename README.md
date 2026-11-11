@@ -46,4 +46,4 @@ Voir [CHANGELOG.md](CHANGELOG.md).
 ## 👥 Crédits
 
 - dev : L'taleshy et cocobat
-- testeurs : moustik, ofodile, wyzan et nad l'arnaque
+- testeurs : moustik, ofodile, wyzan, nad l'arnaque et bergoute
