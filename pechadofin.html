@@ -2231,7 +2231,9 @@ function stepPlayer(dt){
   const onIce=p.onGround&&!!column(Math.floor((p.x+5)/T)).ice;   // la glace glisse : on accélère et on freine moins vite
   if(jumpBuf>0)jumpBuf-=dt;
   const ax=inp.axis||0,d=ax!==0?ax:(inp.right?1:0)-(inp.left?1:0);
-  if(p.stun<=0){
+  if(p.onGround)p.mom=0;
+  if(p.mom>0)p.mom-=dt;
+  if(p.stun<=0&&!(p.mom>0)){
     if(d!==0){const sg=d>0?1:-1,lim=MAXV*Math.abs(d)*(p.boost?2:1)*(shop.weapon==='dagger'&&!glockOn?DAG.spd:1);p.vx+=sg*(p.onGround?(onIce?ICE_ACC:1500):900)*dt;p.vx=clamp(p.vx,-lim,lim);p.face=sg;}
     else{const f=(p.onGround?(onIce?ICE_FRIC:1400):350)*dt;p.vx=Math.abs(p.vx)<=f?0:p.vx-Math.sign(p.vx)*f;}
   }
@@ -2490,15 +2492,16 @@ function stepTentacle(dt){
     if(jumpBuf>0){release=true;jump=true;jumpBuf=0;}
     if(dist<10||p.stun>0||z.t>1.6||state!=='play')release=true;
     if(!release){
-      const x0=p.x,y0=p.y,sdt=Math.min(380*dt,dist);
+      z.sp=Math.min(380,z.sp+2400*dt);   // la vitesse monte en continu depuis celle qu'on avait au départ
+      const x0=p.x,y0=p.y,sdt=z.sp*dt;   // on ne s'arrête plus pile sur le point d'accroche : on le traverse en gardant la vitesse
       moveX(p,ux*sdt);moveY(p,uy*sdt);p.vy=0;p.vx=0;
       if(Math.abs(p.x-x0)+Math.abs(p.y-y0)<sdt*0.35)release=true;   // bloqué contre le décor
       if(Math.random()<0.8)parts.push({x:p.x+5,y:p.y+7,vx:-ux*25,vy:-uy*25,g:0,life:0.2,col:tentCols(curSkin())[2],sz:1});
     }
     if(release){
-      if(jump){p.vy=-JUMPV*0.95;p.vx=ux*150;p.onGround=false;p.coyote=0;sfx.jump();}
-      else{p.vx=ux*150;p.vy=uy*140;}
-      teZip=null;teCd=0.12;
+      if(jump){p.vy=Math.max(-560,uy*z.sp*0.6-JUMPV*0.95);p.vx=ux*z.sp;p.onGround=false;p.coyote=0;sfx.jump();}
+      else{p.vx=ux*z.sp;p.vy=uy*z.sp;p.onGround=false;}   // la vitesse du grappin est conservée à la sortie
+      p.mom=0.5;teZip=null;teCd=0.12;
     }
     return;
   }
@@ -2524,7 +2527,7 @@ function stepTentacle(dt){
     const fx=teFx.slice(-m),c=fx[Math.floor((m-1)/2)],ux=Math.cos(c.a),uy=Math.sin(c.a);
     for(let d=8;d<=R;d+=3){
       const x=an.x+ux*d,y=an.y+uy*d;
-      if(grapAt(x,y)){if(d>=14){teZip={x,y,t:0,slot:c.slot,plat:!solidAt(x,y)};burst(x,y,'#dfe8f0',6,70);sfx.hit();}break;}
+      if(grapAt(x,y)){if(d>=14){teZip={x,y,t:0,slot:c.slot,plat:!solidAt(x,y),sp:Math.max(150,Math.hypot(player.vx,player.vy))};burst(x,y,'#dfe8f0',6,70);sfx.hit();}break;}
     }
   }
   sfx.trident();
