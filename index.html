@@ -654,7 +654,7 @@ const EN={
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).',
-'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
+'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -1284,7 +1284,12 @@ const SKINS=[
   pal:{s:'#a9bfa4',S:'#7f987c',h:'#4a4254',H:'#2c2634',b:'#5a5266',B:'#2c2634',p:'#2c2634',n:'#14101a',y:'#ffe14d',w:'#f4f1e6'},
   hat:['.....kkkkkk.....','....khhhhhhk....','...khhhHHhhhk...','..khhHHHHHHhhk..','..kHHHHHHHHHHk..'],
   face:['..kHssssssssHk..','..kHskkssskkHk..','..kHsykssykkHk..','...kkswwswwskk..'],
-  torso:['...kbbbbbbbbk...','...kbBbbbbBbssk.','...kBBkBBkBBk...']}
+  torso:['...kbbbbbbbbk...','...kbBbbbbBbssk.','...kBBkBBkBBk...']},
+ {id:'human',name:'Humain',price:42,rod:'#c4202e',glow:'#ff9a9a',fx:'',back:'tendrils',tc:['#7a1020','#c4202e','#ff6a6a'],tn:5,
+  pal:{h:'#4a3626',H:'#2e2218',s:'#f0c7a0',S:'#d19a72',b:'#59607a',B:'#3a4058',p:'#3a4a7a',n:'#2a2a34',w:'#ffffff'},
+  hat:['................','.....kkkkkk.....','....khhhhhhk....','...khhhhhhhhk...','..kHhhhhhhhhHk..'],
+  face:['...kssssssssk...','...kssssskssk...','...ksssssssSk...','....kkssssskk...'],
+  torso:['...kbbbbbbbbk...','...kbbbbbbbbssk.','...kBBBBBBBBk...']}
 ];
 /* =====================================================================================================
    KIT DE LA COLLAB  RNG∞ × Canne & Dauphins  (pour Firetail, de la part de Sacha, rng-infinite.com)
@@ -4983,14 +4988,14 @@ function drawEnemy(e){
 function drawSkinBack(sk,p,cx){   // appendices dessinés derrière le personnage (skin « Goule » : tentacules spectraux qui ondulent)
   if(sk.back!=='tendrils'||state==='dying')return;
   const f=p.face,ax=cx-f*4,ay=Math.round(p.y)+6,mv=clamp(p.vx/120,-1,1)*f;   // en avançant, les tentacules se couchent vers l'arrière
-  const cols=['#2a7a64','#3fb58f','#7ee8c0'];
-  for(let i=0;i<4;i++){
-    const base=-0.95+i*0.55;let x=ax,y=ay;
-    for(let s=0;s<8;s++){
-      const k=s/7,ang=base+Math.sin(time*3.2+i*1.7+s*0.55)*0.38*(0.4+k)+mv*0.35;
-      x+=-f*Math.cos(ang)*3.2;y+=Math.sin(ang)*3.2-0.3;
-      const sz=s<3?3:s<6?2:1;
-      ctx.fillStyle=cols[s<3?0:s<6?1:2];ctx.fillRect(Math.round(x)-1,Math.round(y)-1,sz,sz);
+  const cols=sk.tc||['#2a7a64','#3fb58f','#7ee8c0'],n=sk.tn||4;
+  for(let i=0;i<n;i++){
+    const base=-0.95+i*(1.7/(n-1));let x=ax,y=ay;
+    for(let s=0;s<11;s++){
+      const k=s/10,ang=base+Math.sin(time*3.2+i*1.7+s*0.55)*0.38*(0.4+k)+mv*0.35;
+      x+=-f*Math.cos(ang)*2.3;y+=Math.sin(ang)*2.3-0.25;
+      const sz=s<4?3:s<8?2:1;
+      ctx.fillStyle=cols[s<4?0:s<8?1:2];ctx.fillRect(Math.round(x)-1,Math.round(y)-1,sz,sz);
     }
   }
 }
