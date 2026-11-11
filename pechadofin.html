@@ -177,7 +177,7 @@ body{
 #spd[hidden]{display:none}
 #spd-panel{max-height:94vh;overflow:auto;text-align:center}
 #spd .shop-note{font-size:8px;line-height:1.9;opacity:.85}
-#spd-w{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:8px 0}
+#spd-w{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0}
 #spd-w .sbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;font-size:9px}
 #spd-w small{font-size:7px;opacity:.8}
 #spd-t{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:25;font:400 18px/1 var(--pf);color:#fff;padding:7px 14px;border-radius:12px;background:rgba(14,20,44,.72);border:2px solid #ffd23f;text-shadow:0 2px 0 rgba(0,0,0,.6);letter-spacing:1px;pointer-events:none;text-align:center}
@@ -6518,7 +6518,8 @@ function openSpeedPick(){
   const h=document.createElement('div');h.className='shop-head';const t=document.createElement('h2');t.textContent='SPEEDRUN';h.appendChild(t);p.appendChild(h);
   const n=document.createElement('p');n.className='shop-note';n.textContent='Bats le Roi Cacamille 2 le plus vite possible. Ton arme est déjà améliorée au maximum. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence. Choisis ton arme :';p.appendChild(n);
   const g=document.createElement('div');g.id='spd-w';
-  for(const w of WEAPONS){
+  for(const id of ['trident','tarot','dagger','tentacle']){   // les 4 armes proposées en speedrun
+    const w=WEAPONS.find(x=>x.id===id);if(!w)continue;
     const b=document.createElement('button');b.type='button';b.className='sbtn';
     b.appendChild(weapImg(w,28));
     const nm=document.createElement('span');nm.textContent=w.name;b.appendChild(nm);
