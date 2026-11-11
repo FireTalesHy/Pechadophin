@@ -1280,16 +1280,16 @@ const SKINS=[
   hat:['......y.y.......','....kkyyyykk....','...khhhhhhhhk...','..khhHhhhhHhhk..','..khHhhhhhhHhk..'],
   face:['..khssssssssHk..','..khsskssksshk..','..kHsssssssSHk..','...kkHsssssHkk..'],
   torso:['...kwbbbbbbwk...','...kbBbBbBbBssk.','...kBBBBBBBBk...']},
- {id:'ghoul',name:'Goule',price:38,rod:'#5fe3b0',glow:'#d6ffe8',fx:'wisp',back:'tendrils',
+ {id:'ghoul',name:'Goule',price:38,rod:'#5fe3b0',glow:'#d6ffe8',fx:'wisp',back:'tendrils',grab:true,
   pal:{s:'#a9bfa4',S:'#7f987c',h:'#4a4254',H:'#2c2634',b:'#5a5266',B:'#2c2634',p:'#2c2634',n:'#14101a',y:'#ffe14d',w:'#f4f1e6'},
   hat:['.....kkkkkk.....','....khhhhhhk....','...khhhHHhhhk...','..khhHHHHHHhhk..','..kHHHHHHHHHHk..'],
   face:['..kHssssssssHk..','..kHskkssskkHk..','..kHsykssykkHk..','...kkswwswwskk..'],
   torso:['...kbbbbbbbbk...','...kbBbbbbBbssk.','...kBBkBBkBBk...']},
  {id:'human',name:'Humain',price:42,rod:'#c4202e',glow:'#ff9a9a',fx:'',back:'tendrils',tc:['#7a1020','#c4202e','#ff6a6a'],tn:5,grab:true,
-  pal:{h:'#4a3626',H:'#2e2218',s:'#f0c7a0',S:'#d19a72',b:'#59607a',B:'#3a4058',p:'#3a4a7a',n:'#2a2a34',w:'#ffffff'},
-  hat:['................','.....kkkkkk.....','....khhhhhhk....','...khhhhhhhhk...','..kHhhhhhhhhHk..'],
-  face:['...kssssssssk...','...kssssskssk...','...ksssssssSk...','....kkssssskk...'],
-  torso:['...kbbbbbbbbk...','...kbbbbbbbbssk.','...kBBBBBBBBk...']}
+  pal:{h:'#2b2230',H:'#17121c',s:'#f0c7a0',S:'#d19a72',y:'#e63946',Y:'#a3232e',b:'#f08a3c',B:'#b85a1c',p:'#2b2f3a',n:'#2a2a34',w:'#ffffff'},
+  hat:['................','....kkkkkkkk....','...kyyyyyywyk...','..kyyyyyyyyyyk..','.kwwwwwwwwwwwwk.'],
+  face:['..khssssssssHk..','..khsssssskssHk.','...ksssssssSHk..','....kkssssskk...'],
+  torso:['...kbwbbbbwbk...','...kbbbwwbbbssk.','...kBBBbbBBBk...']}
 ];
 /* =====================================================================================================
    KIT DE LA COLLAB  RNG∞ × Canne & Dauphins  (pour Firetail, de la part de Sacha, rng-infinite.com)
@@ -2136,7 +2136,7 @@ function hitEnemy(e,dmg){
     e.state='dead';e.t=0;e.vy=-170;e.vx=-e.dir*30;
     kills++; shake=Math.max(shake,0.08); sfx.kill();
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
-    if(curSkin().grab&&Math.random()<1/30)startGrab(e);   // skin Humain : 1 chance sur 30 qu'une tentacule sorte du sol et emporte le cadavre
+    if(curSkin().grab&&Math.random()<1/5)startGrab(e);   // skins Humain et Goule : 1 chance sur 5 qu'une tentacule sorte du sol et emporte le cadavre
     const gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
     shop.gold+=gold;
     if(e.kind==='worm'){   // les vers débloquent les tridents multiples
@@ -2521,7 +2521,7 @@ function stepGrabs(dt){
 }
 function drawGrabs(){
   if(!grabs.length)return;
-  const cols=curSkin().tc||['#7a1020','#c4202e','#ff6a6a'];
+  const cols=curSkin().tc||['#2a7a64','#3fb58f','#7ee8c0'];
   for(const g of grabs){
     const e=g.e,tx=e.x+e.w/2,ty=g.tipY,len=Math.abs(g.gy-ty),n=Math.max(8,Math.round(len/2.5));
     for(let i=0;i<=n;i++){
