@@ -173,7 +173,28 @@ body{
 .acc-row small{display:block;font-size:7px;opacity:.75}
 #g-btn{display:flex;justify-content:center;min-height:44px}
 #acc .shop-note{font-size:8px;line-height:1.9;opacity:.85}
+#spd{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(8,12,28,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:35;animation:mfade .2s ease-out}
+#spd[hidden]{display:none}
+#spd-panel{max-height:94vh;overflow:auto;text-align:center}
+#spd .shop-note{font-size:8px;line-height:1.9;opacity:.85}
+#spd-w{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0}
+#spd-w .sbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;font-size:9px}
+#spd-w small{font-size:7px;opacity:.8}
+#spd-t{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:25;font:400 18px/1 var(--pf);color:#fff;padding:7px 14px;border-radius:12px;background:rgba(14,20,44,.72);border:2px solid #ffd23f;text-shadow:0 2px 0 rgba(0,0,0,.6);letter-spacing:1px;pointer-events:none;text-align:center}
+#spd-t[hidden]{display:none}
+#spd-t small{display:block;font-size:7px;letter-spacing:0;opacity:.85;margin-top:5px}
+#spd-t.flash{border-color:#ff6a6a;color:#ffd0d0}
+.spd-time{font:400 30px/1.2 var(--pf);color:#ffd23f;text-shadow:0 3px 0 rgba(0,0,0,.55);margin:6px 0}
+.spd-rec{font:400 10px var(--pf);color:#7dff9a;animation:ovbob 1s ease-in-out infinite}
+.spd-who{display:flex;align-items:center;justify-content:center;gap:16px;margin:10px 0;padding:10px;border:2px solid var(--btn-line);background:var(--btn);border-radius:12px}
+.spd-who canvas{image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px}
+.spd-who div{font:400 9px/1.7 var(--pf)}
+.spd-who b{display:block;font-weight:400;font-size:12px}
+.spd-who small{display:block;font-size:7px;opacity:.75}
+.spd-stats{font:400 8px/1.9 var(--pf);opacity:.9;margin-bottom:8px}
+#spd .go{margin:4px}
 .mode-card{text-align:center;font-size:11px}
+.mode-card.lock{opacity:.5;filter:grayscale(.7)}
 .mode-card.on{border-color:var(--on);box-shadow:0 0 0 2px var(--on) inset}
 #mode .shop-note{font-size:8px;line-height:1.9;opacity:.85}
 #set .shop-note{opacity:.85;line-height:1.9;font-size:8px}
@@ -559,10 +580,14 @@ body{
     <div class="shop-head"><h2 id="mode-title">CHOIX DU MODE</h2></div>
     <button class="sbtn mode-card" id="mode-classic" type="button">CLASSIQUE</button>
     <button class="sbtn mode-card" id="mode-ana" type="button">ANARCHIE</button>
+    <button class="sbtn mode-card" id="mode-speed" type="button">SPEEDRUN</button>
     <p class="shop-note" id="mode-note"></p>
     <button class="go" id="mode-close" type="button">RETOUR</button>
   </div>
 </div>
+
+<div id="spd" hidden role="dialog" aria-modal="true"><div class="shop-panel dev-panel" id="spd-panel"></div></div>
+<div id="spd-t" hidden></div>
 
 <div id="acc" hidden role="dialog" aria-modal="true" aria-labelledby="acc-title">
   <div class="shop-panel dev-panel">
@@ -672,7 +697,7 @@ const EN={
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
 'INVINCIBLE':'INVINCIBLE','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','DAUPHIN DES NUAGES':'CLOUD DOLPHIN','LE MONDE NUAGE':'THE CLOUD WORLD','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','BRÛLURE !':'BURN!','GEL !':'FROZEN!','Sorcellerie':'Sorcery','Silver Chariot':'Silver Chariot','TAROT REQUIS':'TAROT REQUIRED','Autoguidage':'Homing','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
-'RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
+'SPEEDRUN : choisis une arme déjà améliorée au maximum et bats le Roi Cacamille 2 le plus vite possible. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence.':'SPEEDRUN: pick a fully upgraded weapon and beat King Cacamille 2 as fast as you can. No checkpoints, no shop: if you die, everything restarts.','Bats le Roi Cacamille 2 le plus vite possible. Ton arme est déjà améliorée au maximum. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence. Choisis ton arme :':'Beat King Cacamille 2 as fast as you can. Your weapon is already fully upgraded. No checkpoints, no shop: if you die, everything restarts. Pick your weapon:','SPEEDRUN : APPUIE POUR CHOISIR TON ARME':'SPEEDRUN: TAP TO PICK YOUR WEAPON','SPEEDRUN : se débloque après ta première renaissance.':'SPEEDRUN: unlocks after your first rebirth.','MORT : ON RECOMMENCE':'DEAD: RESTARTING','ROI CACAMILLE VAINCU !':'KING CACAMILLE DEFEATED!','NOUVEAU RECORD !':'NEW RECORD!','PREMIER TEMPS !':'FIRST TIME!','SKIN':'SKIN','ARME':'WEAPON','JOUEUR':'PLAYER','REJOUER':'PLAY AGAIN','MENU':'MENU','RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
 'terminée':'completed','SAUVEGARDER LE SCORE':'SAVE SCORE','ENVOI…':'SENDING…','Ton pseudo pour le classement :':'Your leaderboard nickname:','Choisis ton pseudo pour le classement :':'Choose your leaderboard nickname:','Pseudo':'Nickname','VALIDER':'SAVE','TOP 10 ANARCHIE':'ANARCHY TOP 10','Les 10 meilleurs scores de tous les temps en mode Anarchie. Connecte-toi avec Google pour y figurer.':'The 10 best all-time scores in Anarchy mode. Sign in with Google to be on it.','Aucun score pour le moment : sois le premier !':'No scores yet: be the first!','Classement indisponible pour le moment.':'Leaderboard unavailable right now.','Chargement…':'Loading…','Score envoyé au classement.':'Score sent to the leaderboard.','Envoi du score au classement…':'Sending score to the leaderboard…','Connecte-toi avec Google pour entrer au TOP 10.':'Sign in with Google to enter the TOP 10.','MARCHAND':'MERCHANT','ÂMES':'SOULS','Longueur du dash':'Dash length','Hauteur de saut':'Jump height','Chance de parade':'Parry chance','Aucune':'None','PARADE !':'PARRY!','DAGUES REQUISES':'DAGGERS REQUIRED','Les dagues attaquent en dash : chaque amélioration coûte de l\'or. La hauteur de saut va jusqu\'à x2. La parade annule parfois un coup au corps à corps juste après un dash.':'Daggers attack with a dash: each upgrade costs gold. Jump height goes up to x2. Parry sometimes cancels a melee hit right after a dash.','Le trident traverse plusieurs ennemis d\'un seul lancer. Toutes ses améliorations coûtent de l\'or.':'The trident pierces several enemies in a single throw. All its upgrades cost gold.','LES MARÉCAGES':'THE SWAMPS','★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT: THE SWAMPS ★','ARMES':'WEAPONS','Dagues':'Daggers','VERROUILLÉE':'LOCKED','Arme verrouillée':'Locked weapon','Améliorations des dagues : bientôt.':'Dagger upgrades: coming soon.',
@@ -688,6 +713,9 @@ const EN={
 'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
+ [/^SPEEDRUN · TENTATIVE (\d+)$/,m=>'SPEEDRUN · ATTEMPT '+m[1]],
+ [/^TENTATIVES : (\d+)(.*)$/,m=>'ATTEMPTS: '+m[1]+m[2].replace('MEILLEUR','BEST')],
+ [/^MEILLEUR (\d+:\d\d\.\d\d)$/,m=>'BEST '+m[1]],
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
  [/^Récompense : (\d+) or$/,m=>'Reward: '+m[1]+' gold'],
  [/^Récompense : (\d+) âmes? rouges?$/,m=>'Reward: '+m[1]+(m[1]==='1'?' red soul':' red souls')],
@@ -1446,6 +1474,7 @@ const DOLB_W=tint(DOLB,'#ffffff'), DOLP_W=tint(DOLP,'#ffffff'), DOLR_W=tint(DOLR
 
 const HEART_ROWS=[".rr.rr.","rprrrrr","rrrrrrr",".rrrrr.","..rrr..","...r..."];
 const HEART=spr(HEART_ROWS,{r:'#ff4466',p:'#ffc0cc'},true);
+const HEART_GOLD=spr(HEART_ROWS,{r:'#ffc21f',p:'#fff3b0'},true);
 const HEART_OFF=spr(HEART_ROWS,{r:'#3c4a63',p:'#52617d'},true);
 const LURE=spr(["o...oo..","oo.oooo.","ooooooeo","oo.oooo.","o...oo.."],{o:'#ff9a3c',e:'#14182c'},true);
 
@@ -1884,6 +1913,7 @@ let enemies=[],pickups=[],parts=[],texts=[],worldPearls=[],boss=null,bossShots=[
    anarchyWant = choix du menu (sauvegardé) ; anarchyOn = actif pour la run en cours (pris en compte au lancement de la partie, car il change la génération des arènes). */
 const ANA_KEY='canne-dauphins-anarchie';
 let anarchyWant=false,anarchyOn=false,anaEnc=0,jellyDone=new Set();
+let speedWant=false,speedOn=false,speedEnd=false,spdOpen=false;   // mode SPEEDRUN : voir plus bas
 try{anarchyWant=localStorage.getItem(ANA_KEY)==='1';}catch(e){}
 anarchyOn=anarchyWant;
 const rodLocked=()=>false;   // plus aucune arme bloquée selon la zone
@@ -1930,7 +1960,7 @@ let hooks=[],lead=null,castCd=0,tridents=[],throwAnim=0;
 const cam={x:0,y:0};
 
 try{best=parseInt(localStorage.getItem(BEST_KEY)||'0',10)||0;}catch(e){best=0;}
-function saveBest(){try{localStorage.setItem(BEST_KEY,String(best));}catch(e){}cloudQueue();}
+function saveBest(){if(speedOn)return;try{localStorage.setItem(BEST_KEY,String(best));}catch(e){}cloudQueue();}
 
 const UP_KEYS=['range','count','rate','dmg'];
 const fr1=v=>String(Math.round(v*10)/10).replace('.',',');
@@ -1991,10 +2021,10 @@ const DUP={   // améliorations des dagues (or)
 };
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
-function loadShop(){
+function loadShop(fresh){
   const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
-    const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
+    const j=fresh?null:JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
       d.gold=Math.max(0,Math.floor(Number(j.gold))||0);
       if(Number(j.pearls)>0)d.gold+=Math.floor(Number(j.pearls))*50;   // les perles n'existent plus : 1 perle = 50 or
@@ -2070,8 +2100,8 @@ function soulReward(key,n){
   if(shop.bossSouls[key])return false;
   shop.bossSouls[key]=true;shop.souls+=n;return true;
 }
-function saveShop(){try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}cloudQueue();try{misDot();}catch(e){}}
-const maxLives=()=>SOUL_UP.hp.vals[shop.hp];
+function saveShop(){if(speedOn)return;try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}cloudQueue();try{misDot();}catch(e){}}
+const maxLives=()=>speedOn?10:SOUL_UP.hp.vals[shop.hp];   // speedrun : 10 cœurs, les 5 derniers (à droite) sont dorés et partent en premier
 const curSkin=()=>SKINS.find(x=>x.id===shop.equipped)||SKINS[0];
 
 /* ================= Audio ================= */
@@ -2205,7 +2235,7 @@ function hurtPlayer(srcX){
 function die(){
   lives=0; state='dying'; dyingT=0;
   player.vy=-280; player.vx=0; hooks=[]; tridents=[];
-  if(score>best){best=score;newRecord=true;saveBest();}
+  if(!speedOn&&score>best){best=score;newRecord=true;saveBest();}
   sfx.over();
 }
 function drown(){
@@ -3041,7 +3071,7 @@ function healDrop(){   // le cœur de soin apparaît directement sur le joueur e
   const p=player;
   sfx.heal();
   burst(p.x+5,p.y+4,'#ff8aa3',10);
-  if(lives<maxLives()){lives++;floatText(p.x+5,p.y-8,'+1 VIE','#7ff0e8');}
+  if(lives<(speedOn?5:maxLives())){lives++;floatText(p.x+5,p.y-8,'+1 VIE','#7ff0e8');}
   else{score+=500;floatText(p.x+5,p.y-8,'+500','#ffe14d');}
 }
 function stepPickups(dt){
@@ -3798,6 +3828,7 @@ function killKing(){
   for(const e of enemies)if(e.state==='alive'&&(e.kind==='knight'||e.kind==='archer')&&e.y<(F+1)*T){e.state='dead';e.t=0;e.vy=-120;e.vx=0;burst(e.x+e.w/2,e.y+e.h/2,'#e8eefc',8,90);}   // les chevaliers du roi s'effondrent avec lui
   tw.kingDead=true;tw.bars=false;
   kills++;shake=0.8;sfx.bossDie();
+  if(speedOn&&!speedEnd){speedEnd=true;speedResultIn=2.6;player.invuln=99;}   // speedrun : le chrono s'arrête sur le coup fatal
   const again=!!shop.bossSouls.king&&!anarchyOn,gs=soulReward('king',2),gold=again?30:300;shop.gold+=gold;saveShop();
   const cx=k.x,cy=k.y-60;
   if(gs){floatText(cx,cy-12,'+2 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy+30,t:0});soulFx.push({x:cx+10,y:cy+30,t:0.15});}
@@ -4875,12 +4906,13 @@ function merchantAt(m){
   merchants.set(m,res);return res;
 }
 function merchantsNear(px){
+  if(speedOn)return [];   // speedrun : pas de marchands
   const out=[],sg=px<0?-1:1,mf=(Math.abs(px)/VW+MERCH_OFF)/MERCH_EVERY;
   for(let m=Math.max(1,Math.floor(mf)-1);m<=Math.ceil(mf)+1;m++){const a=merchantAt(sg*m);if(a)out.push(a);}
   return out;
 }
 function stepMerchant(){
-  nearMerch=null;
+  nearMerch=null;if(speedOn)return;
   const p=player;
   for(const a of merchantsNear(p.x)){
     if(Math.abs(p.x+5-(a.x+34))<46&&Math.abs(p.y+p.h-a.y)<26){nearMerch=a;break;}
@@ -4974,17 +5006,18 @@ function stepCamera(dt){
 }
 
 function update(dt){
-  if(devOpen||paused||shopOpen||weapOpen)return;
+  if(devOpen||paused||shopOpen||weapOpen||spdOpen)return;
   time+=dt;
   nightA+=(((night&&(!anarchyOn||anaSky%5===1))?1:0)-nightA)*(1-Math.exp(-1.4*dt));
   {const tg=anarchyOn?SKY_PH[anaSky%5]:SKY_PH[0],k=1-Math.exp(-1.4*dt);for(let i=0;i<4;i++)skyCur[i]+=(tg[i]-skyCur[i])*k;}   // la nuit tombe (et se lève) progressivement
   if(state==='title'){return;}
   if(state==='dying'){
     dyingT+=dt;const p=player;p.vy+=GRAV*dt;p.y+=p.vy*dt;stepFx(dt);
-    if(dyingT>1.2)showOver();
+    if(dyingT>1.2){if(speedOn&&speedEnd)showSpeedResult();else if(speedOn){speedMsg('MORT : ON RECOMMENCE');beginSpeedrun(speedWeapon);}else showOver();}
     return;
   }
   if(state==='over'){stepFx(dt);return;}
+  if(speedOn)speedTick(dt);
   if(!tw&&!twTr&&!rz&&!rzTr&&state==='play')twDoorCheck(dt);
   if(twTr){stepTwTr(dt);stepFx(dt);return;}
   if(tw){stepTw(dt);return;}
@@ -5783,7 +5816,9 @@ const pad6=n=>String(n).padStart(6,'0');
 function drawHUD(){
   ctx.font="8px 'Press Start 2P', monospace";
   if(godMode)txt('INVINCIBLE',VW/2,5,'#7ff0e8','center');
-  for(let i=0;i<maxLives();i++)ctx.drawImage(i<lives?HEART:HEART_OFF,5+i*11,5);
+  if(speedOn){   // speedrun : 5 cœurs rouges, et par-dessus, 5 cœurs dorés (les 5 derniers PV) qui partent en premier
+    for(let i=0;i<5;i++){ctx.drawImage(i<lives?HEART:HEART_OFF,5+i*11,6);if(lives>i+5)ctx.drawImage(HEART_GOLD,4+i*11,3);}
+  } else for(let i=0;i<maxLives();i++)ctx.drawImage(i<lives?HEART:HEART_OFF,5+i*11,5);
   if(combo.n>0){
     txt('COMBO x'+Math.min(combo.n,10),6,18,'#ffe14d');
     ctx.fillStyle='#14182c';ctx.fillRect(5,28,52,5);
@@ -5929,12 +5964,13 @@ function drawOvChar(){ovCtx.clearRect(0,0,16,16);ovCtx.imageSmoothingEnabled=fal
 const OV_TEXT0=ovText.textContent,OV_TITLE0=ovTitle.textContent,ovCp=$('ov-cp');
 function refreshCp(){ovCp.hidden=!shop.beach;ovCp.textContent=shop.cloud?'★ CHECKPOINT : LE MONDE NUAGE ★':shop.ice?'★ CHECKPOINT : LA GLACIÈRE ★':shop.swamp?'★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT : LA PLAGE ★';}
 function showTitle(){
+  if(speedOn)endSpeedrun();
   try{misDot();}catch(e){}   // retour à l'écran titre (après un reset de la save par exemple)
   paused=false;initTitle();
   overlayVisible=true;ov.classList.add('show');
   ov.dataset.mode='title';drawOvChar();setShopBtn('title');
   ovTitle.textContent=OV_TITLE0;ovText.textContent=OV_TEXT0;ovText.hidden=false;ovStats.hidden=true;
-  ovLabel.textContent='APPUIE POUR JOUER';ovRestart.hidden=true;refreshCp();
+  ovLabel.textContent=speedWant?'SPEEDRUN : APPUIE POUR CHOISIR TON ARME':'APPUIE POUR JOUER';ovRestart.hidden=true;refreshCp();
   try{ovBtn.focus({preventScroll:true});}catch(e){}
 }
 function resetWorld(){
@@ -5959,6 +5995,12 @@ function initTitle(){
   state='title';
 }
 function startGame(){
+  if(speedOn){beginSpeedrun(speedWeapon);return;}   // speedrun : chaque redémarrage repart du début, sans checkpoint
+  if(speedWant&&!speedOk())speedWant=false;
+  if(speedWant){openSpeedPick();return;}
+  startGameCore();
+}
+function startGameCore(){
   ensureAudio();
   resetWorld();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
@@ -6202,6 +6244,7 @@ addEventListener('keydown',e=>{
   if(misOpen){if(e.code==='Escape'){e.preventDefault();closeMis();}return;}
   if(setOpen){if(e.code==='Escape'){e.preventDefault();closeSet();}return;}
   if(lbOpen)return;
+  if(spdOpen){if(e.code==='Escape'&&!speedShown){e.preventDefault();spdOpen=false;$('spd').hidden=true;}return;}
   if(modeOpen){if(e.code==='Escape'){e.preventDefault();closeMode();}return;}
   if(accOpen){if(e.code==='Escape'){e.preventDefault();closeAcc();}return;}
   if(weapOpen){if(e.code==='Escape'){e.preventDefault();closeWeap();}return;}
@@ -6214,9 +6257,9 @@ addEventListener('keydown',e=>{
   const k=KEYMAP[e.code];
   if(k){e.preventDefault();if(e.repeat)return;ensureAudio();press(k);}
 });
-addEventListener('keyup',e=>{if(shopOpen||devOpen||misOpen||setOpen||modeOpen||accOpen||weapOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
+addEventListener('keyup',e=>{if(spdOpen||shopOpen||devOpen||misOpen||setOpen||modeOpen||accOpen||weapOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
 addEventListener('blur',clearInputs);
-addEventListener('beforeunload',()=>{if(score>best){best=score;saveBest();}});
+addEventListener('beforeunload',()=>{if(!speedOn&&score>best){best=score;saveBest();}});
 ovBtn.addEventListener('click',()=>{if(paused)resumeGame();else startGame();});
 ovRestart.addEventListener('click',startGame);
 $('pausebtn').addEventListener('click',()=>{ensureAudio();if(paused)resumeGame();else pauseGame();$('pausebtn').blur();});
@@ -6330,12 +6373,14 @@ function openMis(){clearInputs();misOpen=true;misEl.hidden=false;renderMis();try
 function closeMis(){misOpen=false;misEl.hidden=true;try{$('mis-btn').focus({preventScroll:true});}catch(e){}}
 const modeEl=$('mode');
 function updateMode(){
-  $('mode-classic').classList.toggle('on',!anarchyWant);$('mode-ana').classList.toggle('on',anarchyWant);
-  $('mode-classic').setAttribute('aria-pressed',String(!anarchyWant));$('mode-ana').setAttribute('aria-pressed',String(anarchyWant));
-  $('mode-note').textContent=anarchyWant!==anarchyOn?'Le mode choisi sera actif à la prochaine partie.':'';
+  $('mode-classic').classList.toggle('on',!anarchyWant&&!speedWant);$('mode-ana').classList.toggle('on',anarchyWant&&!speedWant);$('mode-speed').classList.toggle('on',speedWant);
+  $('mode-classic').setAttribute('aria-pressed',String(!anarchyWant&&!speedWant));$('mode-ana').setAttribute('aria-pressed',String(anarchyWant&&!speedWant));$('mode-speed').setAttribute('aria-pressed',String(speedWant));
+  $('mode-speed').classList.toggle('lock',!speedOk());$('mode-speed').setAttribute('aria-disabled',String(!speedOk()));
+  $('mode-note').textContent=!speedOk()?'SPEEDRUN : se débloque après ta première renaissance.':speedWant?'SPEEDRUN : choisis une arme déjà améliorée au maximum et bats le Roi Cacamille 2 le plus vite possible. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence.':anarchyWant!==anarchyOn?'Le mode choisi sera actif à la prochaine partie.':'';
   $('skins-btn').textContent='MODE';
 }
 function setMode(want){
+  speedWant=false;
   anarchyWant=want;
   try{localStorage.setItem(ANA_KEY,anarchyWant?'1':'0');}catch(e){}
   if(state!=='play'){anarchyOn=anarchyWant;resetWorld();placePlayer();enemies=[];}   // sur le menu : actif tout de suite ; en partie : à la prochaine partie
@@ -6435,6 +6480,104 @@ function buyDUp(key){
 function openMode(){clearInputs();modeOpen=true;modeEl.hidden=false;updateMode();try{$('mode-close').focus({preventScroll:true});}catch(e){}}
 function closeMode(){modeOpen=false;modeEl.hidden=true;try{$('skins-btn').focus({preventScroll:true});}catch(e){}}
 $('mode-classic').addEventListener('click',()=>setMode(false));$('mode-ana').addEventListener('click',()=>setMode(true));
+/* ================= Mode SPEEDRUN =================
+   On choisit une arme déjà améliorée au maximum (2 branches max), on part du tout début en mode classique, sans checkpoint ni boutique ni marchands,
+   et le chrono s'arrête quand le Roi Cacamille 2 tombe. Mourir = tout recommence depuis le début. La vraie save n'est jamais touchée : on joue sur
+   une boutique temporaire (speedBackup garde la vraie, remise en place à la fin). */
+const SPEED_KEY='pechadophin-speedrun';
+const speedOk=()=>(speedOn?speedBackup:shop).rb>=1;   // débloqué après la 1re renaissance
+let speedT=0,speedTry=0,speedWeapon=null,speedBackup=null,speedBests={},speedResultIn=0,speedShown=false,speedMsgT=0,speedLast='';
+try{speedBests=JSON.parse(localStorage.getItem(SPEED_KEY)||'{}')||{};}catch(e){}
+const SPEED_BRANCH={rod:['dmg','rate'],trident:['dmg','rate'],dagger:['dmg','dist'],scepter:['dmg','laser'],tarot:['dmg','chariot'],katana:['dmg','finish'],tentacle:['dmg','reach'],boomerang:['dmg','multi'],harpoon:['dmg','reel'],six:[]};
+const fmtT=t=>{const c=Math.floor(t*100),m=Math.floor(c/6000),sc=Math.floor(c/100)%60;return m+':'+String(sc).padStart(2,'0')+'.'+String(c%100).padStart(2,'0');};
+function speedShop(wid,back){
+  const d=loadShop(true);
+  d.owned=back.owned.slice();d.equipped=back.equipped;d.sx=Object.assign({},back.sx);d.sxOn=Object.assign({},back.sxOn);   // les skins restent ceux du joueur
+  d.tridentOwned=d.daggerOwned=d.sixOwned=d.scepterOwned=d.tarotOwned=d.harpoonOwned=d.katanaOwned=d.boomOwned=d.tenOwned=true;
+  d.sx.spray=true;d.tmulti=3;d.tx={chariot:true,star:true};d.weapon=wid;
+  return d;
+}
+function speedMax(wid){   // l'arme choisie est déjà au maximum : ses 2 branches principales au dernier niveau
+  const T=TREES[wid];if(!T)return;
+  for(const k of SPEED_BRANCH[wid]||[])T.lv()[k]=bmax(T,k);
+}
+function beginSpeedrun(wid){
+  if(!speedOn){speedBackup=shop;speedOn=true;speedTry=0;}
+  speedWeapon=wid;speedTry++;speedT=0;speedEnd=false;speedShown=false;speedResultIn=0;speedLast='';
+  shop=speedShop(wid,speedBackup);speedMax(wid);
+  anarchyWant=false;anarchyOn=false;
+  closeSpeed();
+  startGameCore();
+  speedHud(true);
+}
+function endSpeedrun(){   // retour à la vraie boutique
+  if(!speedOn)return;
+  shop=speedBackup;speedBackup=null;speedOn=false;speedEnd=false;spdOpen=false;
+  $('spd').hidden=true;$('spd-t').hidden=true;
+  try{misDot();}catch(e){}
+}
+function speedMsg(t){speedMsgT=1.6;const el=$('spd-t');el.classList.add('flash');el.dataset.msg=t;speedLast='';}
+function speedTick(dt){
+  if(state==='play'&&!speedEnd&&!paused)speedT+=dt;
+  if(speedMsgT>0){speedMsgT-=dt;if(speedMsgT<=0){$('spd-t').classList.remove('flash');delete $('spd-t').dataset.msg;speedLast='';}}
+  if(speedEnd&&!speedShown&&state==='play'){speedResultIn-=dt;if(speedResultIn<=0)showSpeedResult();}
+  speedHud(false);
+}
+function speedHud(force){
+  const el=$('spd-t');el.hidden=!speedOn||spdOpen&&speedShown;
+  const msg=el.dataset.msg||'',k=fmtT(speedT)+'|'+speedTry+'|'+msg;
+  if(!force&&k===speedLast)return;speedLast=k;
+  el.textContent='';el.appendChild(document.createTextNode(msg||fmtT(speedT)));
+  const sm=document.createElement('small');sm.textContent='SPEEDRUN · TENTATIVE '+speedTry;el.appendChild(sm);
+}
+function closeSpeed(){spdOpen=false;$('spd').hidden=true;speedHud(true);}
+function spdPanel(){const p=$('spd-panel');p.textContent='';return p;}
+function spdBtn(txt,fn,cls){const b=document.createElement('button');b.type='button';b.className=cls||'go';b.textContent=txt;b.addEventListener('click',fn);return b;}
+function openSpeedPick(){
+  clearInputs();spdOpen=true;speedShown=false;const p=spdPanel();
+  const h=document.createElement('div');h.className='shop-head';const t=document.createElement('h2');t.textContent='SPEEDRUN';h.appendChild(t);p.appendChild(h);
+  const n=document.createElement('p');n.className='shop-note';n.textContent='Bats le Roi Cacamille 2 le plus vite possible. Ton arme est déjà améliorée au maximum. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence. Choisis ton arme :';p.appendChild(n);
+  const g=document.createElement('div');g.id='spd-w';
+  for(const id of ['trident','tarot','dagger','tentacle']){   // les 4 armes proposées en speedrun
+    const w=WEAPONS.find(x=>x.id===id);if(!w)continue;
+    const b=document.createElement('button');b.type='button';b.className='sbtn';
+    b.appendChild(weapImg(w,28));
+    const nm=document.createElement('span');nm.textContent=w.name;b.appendChild(nm);
+    if(speedBests[w.id]){const sm=document.createElement('small');sm.textContent='MEILLEUR '+fmtT(speedBests[w.id]);b.appendChild(sm);}
+    b.addEventListener('click',()=>beginSpeedrun(w.id));g.appendChild(b);
+  }
+  p.appendChild(g);p.appendChild(spdBtn('RETOUR',()=>{spdOpen=false;$('spd').hidden=true;}));
+  $('spd').hidden=false;
+}
+function showSpeedResult(){
+  if(speedShown)return;speedShown=true;clearInputs();spdOpen=true;
+  const wid=speedWeapon,t=speedT,old=speedBests[wid],rec=!old||t<old;
+  if(rec){speedBests[wid]=t;try{localStorage.setItem(SPEED_KEY,JSON.stringify(speedBests));}catch(e){}}
+  const w=WEAPONS.find(x=>x.id===wid),sk=curSkin(),name=(gUser&&(gUser.pseudo||gUser.name))||'JOUEUR';
+  const p=spdPanel();
+  const h=document.createElement('div');h.className='shop-head';const ti=document.createElement('h2');ti.textContent='ROI CACAMILLE VAINCU !';h.appendChild(ti);p.appendChild(h);
+  const tm=document.createElement('div');tm.className='spd-time';tm.textContent=fmtT(t);p.appendChild(tm);
+  if(rec){const r=document.createElement('div');r.className='spd-rec';r.textContent=old?'NOUVEAU RECORD !':'PREMIER TEMPS !';p.appendChild(r);}
+  const who=document.createElement('div');who.className='spd-who';
+  const cs=document.createElement('canvas');cs.width=16;cs.height=16;{const g=cs.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(sk.spr.idle,0,0);}who.appendChild(cs);
+  const info=document.createElement('div');const b1=document.createElement('b');b1.textContent=name;info.appendChild(b1);
+  const s1=document.createElement('small');s1.textContent='SKIN';info.appendChild(s1);info.appendChild(document.createTextNode(sk.name));
+  const s2=document.createElement('small');s2.textContent='ARME';info.appendChild(s2);info.appendChild(document.createTextNode(w?w.name:wid));who.appendChild(info);
+  if(w){const wc=weapImg(w,32);wc.style.width='64px';wc.style.height='64px';wc.style.imageRendering='pixelated';who.appendChild(wc);}
+  p.appendChild(who);
+  const st=document.createElement('div');st.className='spd-stats';st.textContent='TENTATIVES : '+speedTry+(old&&!rec?'   ·   MEILLEUR : '+fmtT(old):'');p.appendChild(st);
+  p.appendChild(spdBtn('REJOUER',()=>{endSpeedrun();showTitle();openSpeedPick();}));
+  p.appendChild(spdBtn('MENU',()=>{endSpeedrun();showTitle();}));
+  $('spd').hidden=false;$('spd-t').hidden=true;
+  try{sfx.bossDie();}catch(e){}
+}
+$('mode-speed').addEventListener('click',()=>{
+  if(!speedOk()){updateMode();return;}
+  speedWant=true;anarchyWant=false;anarchyOn=false;
+  if(state!=='play'){resetWorld();placePlayer();enemies=[];}
+  updateMode();closeMode();
+});
+
 $('mode-close').addEventListener('click',closeMode);modeEl.addEventListener('pointerdown',e=>{if(e.target===modeEl)closeMode();});
 function openSet(){clearInputs();setOpen=true;setEl.hidden=false;try{$('set-close').focus({preventScroll:true});}catch(e){}}
 function closeSet(){setOpen=false;setEl.hidden=true;try{$('set-btn').focus({preventScroll:true});}catch(e){}}
@@ -6692,7 +6835,7 @@ $('tab-rod').addEventListener('click',()=>{shopTab='rod';renderShop();});
 $('tab-souls').addEventListener('click',()=>{shopTab='souls';renderShop();});
 $('tab-trident').addEventListener('click',()=>{shopTab='trident';renderShop();});
 $('shop-btn').addEventListener('click',()=>{
-  if(ov.dataset.mode==='pause'){if(score>best){best=score;saveBest();}showTitle();return;}   // retour au menu principal (la partie en cours est abandonnée)
+  if(ov.dataset.mode==='pause'){if(!speedOn&&score>best){best=score;saveBest();}showTitle();return;}   // retour au menu principal (la partie en cours est abandonnée)
   openShop(shopTab==='skins'?(shop.beach?'trident':'rod'):shopTab);
 });   // BOUTIQUE : les rayons canne / âmes / trident
 $('merch-btn').addEventListener('click',()=>{if(nearMerch&&state==='play'&&!paused&&!overlayVisible)openWeap(true);$('merch-btn').blur();});
