@@ -2178,7 +2178,7 @@ function hitEnemy(e,dmg){
     e.state='dead';e.t=0;e.vy=-170;e.vx=-e.dir*30;
     kills++; shake=Math.max(shake,0.08); sfx.kill();
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
-    if(shop.equipped==='clown'&&Math.random()<1/20)startClownFx(e);   // skin Clown : 1 chance sur 20 d'un gag de clown (+100 or)
+    if(shop.equipped==='clown'&&kills%18===0)startClownFx(e);   // skin Clown : un gag de clown (+100 or) garanti tous les 18 kills
     if(curSkin().grab&&Math.random()<1/5)startGrab(e);   // skins Humain et Goule : 1 chance sur 5 qu'une tentacule sorte du sol et emporte le cadavre
     let gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
     if(shop.equipped==='clown'){gold+=Math.max(1,Math.round(gold*0.5));clownKill(e);}   // skin Clown : +50 % d'or par élimination, et une mini animation
