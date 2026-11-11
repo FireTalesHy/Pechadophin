@@ -6475,7 +6475,7 @@ const SPEED_KEY='pechadophin-speedrun';
 const speedOk=()=>(speedOn?speedBackup:shop).rb>=1;   // débloqué après la 1re renaissance
 let speedT=0,speedTry=0,speedWeapon=null,speedBackup=null,speedBests={},speedResultIn=0,speedShown=false,speedMsgT=0,speedLast='';
 try{speedBests=JSON.parse(localStorage.getItem(SPEED_KEY)||'{}')||{};}catch(e){}
-const SPEED_BRANCH={rod:['dmg','rate'],trident:['dmg','pierce'],dagger:['dmg','dist'],scepter:['dmg','laser'],tarot:['dmg','star'],katana:['dmg','finish'],tentacle:['dmg','multi'],boomerang:['dmg','multi'],harpoon:['dmg','reel'],six:[]};
+const SPEED_BRANCH={rod:['dmg','rate'],trident:['dmg','rate'],dagger:['dmg','dist'],scepter:['dmg','laser'],tarot:['dmg','chariot'],katana:['dmg','finish'],tentacle:['dmg','reach'],boomerang:['dmg','multi'],harpoon:['dmg','reel'],six:[]};
 const fmtT=t=>{const c=Math.floor(t*100),m=Math.floor(c/6000),sc=Math.floor(c/100)%60;return m+':'+String(sc).padStart(2,'0')+'.'+String(c%100).padStart(2,'0');};
 function speedShop(wid,back){
   const d=loadShop(true);
