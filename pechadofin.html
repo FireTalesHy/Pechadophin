@@ -1285,7 +1285,7 @@ const SKINS=[
   hat:['.....kkkkkk.....','....khhhhhhk....','...khhhHHhhhk...','..khhHHHHHHhhk..','..kHHHHHHHHHHk..'],
   face:['..kHssssssssHk..','..kHskkssskkHk..','..kHsykssykkHk..','...kkswwswwskk..'],
   torso:['...kbbbbbbbbk...','...kbBbbbbBbssk.','...kBBkBBkBBk...']},
- {id:'human',name:'Humain',price:42,rod:'#c4202e',glow:'#ff9a9a',fx:'',back:'tendrils',tc:['#7a1020','#c4202e','#ff6a6a'],tn:5,
+ {id:'human',name:'Humain',price:42,rod:'#c4202e',glow:'#ff9a9a',fx:'',back:'tendrils',tc:['#7a1020','#c4202e','#ff6a6a'],tn:5,grab:true,
   pal:{h:'#4a3626',H:'#2e2218',s:'#f0c7a0',S:'#d19a72',b:'#59607a',B:'#3a4058',p:'#3a4a7a',n:'#2a2a34',w:'#ffffff'},
   hat:['................','.....kkkkkk.....','....khhhhhhk....','...khhhhhhhhk...','..kHhhhhhhhhHk..'],
   face:['...kssssssssk...','...kssssskssk...','...ksssssssSk...','....kkssssskk...'],
@@ -2136,6 +2136,7 @@ function hitEnemy(e,dmg){
     e.state='dead';e.t=0;e.vy=-170;e.vx=-e.dir*30;
     kills++; shake=Math.max(shake,0.08); sfx.kill();
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
+    if(curSkin().grab&&Math.random()<1/30)startGrab(e);   // skin Humain : 1 chance sur 30 qu'une tentacule sorte du sol et emporte le cadavre
     const gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
     shop.gold+=gold;
     if(e.kind==='worm'){   // les vers débloquent les tridents multiples
@@ -2496,6 +2497,47 @@ const SKIN_FX=(()=>{
     bubbles:(p,mv,em)=>{if(em(mv?20:12))parts.push({x:p.x+5+(R()-.5)*14,y:p.y+4+R()*8,vx:(R()-.5)*10,vy:-22-R()*24,g:-10,life:0.95,col:pick(['#d6fbff','#ffffff','#8fe8ff']),sz:2});}
   };
 })();
+/* ---------- Skin Humain : une tentacule sort du sol, attrape le cadavre d'un ennemi et l'emporte sous terre ---------- */
+let grabs=[];
+function startGrab(e){
+  const cx=e.x+e.w/2;let gy=-1;
+  for(let y=e.y+e.h;y<e.y+e.h+160;y+=4)if(solidAt(cx,y)){gy=Math.floor(y/T)*T;break;}   // le sol sous le cadavre (rien au-dessus du vide ou de l'eau)
+  if(gy<0)return;
+  e.grab=true;e.gy=gy;e.vx=0;e.vy=0;
+  grabs.push({e,x:cx,gy,y0:e.y,t:0,seed:Math.random()*6,tipY:gy,wrap:0});
+  burst(cx,gy,'#8a5a2b',10,90);burst(cx,gy,'#5a3a1e',6,70);try{sfx.hit();}catch(err){}
+}
+function stepGrabs(dt){
+  if(!grabs.length)return;
+  for(const g of grabs){
+    g.t+=dt;const e=g.e,h=e.h,bot0=g.y0+h,LIFT=22;
+    if(g.t<0.5){const k=g.t/0.5;g.tipY=g.gy+(bot0-g.gy)*(1-(1-k)*(1-k));e.y=g.y0;g.wrap=0;}   // elle jaillit du sol jusqu'au cadavre
+    else if(g.t<0.9){const k=(g.t-0.5)/0.4,up=LIFT*(1-(1-k)*(1-k));g.tipY=bot0-up;e.y=g.y0-up;g.wrap=Math.min(1,k*2.5);}   // elle s'enroule autour et le soulève
+    else{const k=Math.min(1,(g.t-0.9)/0.7),ease=k*k,B1=bot0-LIFT;e.y=(B1-h)+(g.gy+h-B1)*ease;g.tipY=Math.min(g.gy,e.y+h*0.85);g.wrap=1;   // elle l'entraîne sous terre
+      if(k>=1){g.done=true;e.t=99;burst(g.x,g.gy,'#8a5a2b',10,90);burst(g.x,g.gy-2,'#c4202e',6,70);}}
+    if(g.t>0.5&&g.t<0.55)burst(g.x,g.tipY,'#c4202e',5,60);
+  }
+  grabs=grabs.filter(g=>!g.done);
+}
+function drawGrabs(){
+  if(!grabs.length)return;
+  const cols=curSkin().tc||['#7a1020','#c4202e','#ff6a6a'];
+  for(const g of grabs){
+    const e=g.e,tx=e.x+e.w/2,ty=g.tipY,len=Math.abs(g.gy-ty),n=Math.max(8,Math.round(len/2.5));
+    for(let i=0;i<=n;i++){
+      const k=i/n,y=g.gy+(ty-g.gy)*k;
+      const wob=Math.sin(time*9+k*6+g.seed)*3*(1-g.wrap*0.7)*Math.min(1,k*2),x=g.x+(tx-g.x)*k+wob;
+      const w=k<0.35?5:k<0.75?4:3,sh=Math.ceil(len/n)+1;
+      ctx.fillStyle=cols[k<0.35?0:k<0.8?1:2];
+      ctx.fillRect(Math.round(x-w/2),Math.round(y),w,sh);
+      if(k>0.15&&k<0.9){ctx.fillStyle=cols[2];ctx.fillRect(Math.round(x-w/2),Math.round(y),1,sh);}   // reflet sur le côté
+    }
+    if(g.wrap>0){   // enroulée autour du cadavre
+      const bw=Math.round(e.w*0.5)+4;
+      for(let b=0;b<3;b++){const by=Math.round(ty)-3-b*4;ctx.fillStyle=cols[b%2];ctx.fillRect(Math.round(tx-bw/2),by,bw,2);ctx.fillStyle=cols[2];ctx.fillRect(Math.round(tx-bw/2),by,2,1);}
+    }
+  }
+}
 function stepSkinFx(dt){
   const sk=curSkin(),f=sk.fx&&SKIN_FX[sk.fx];
   if(!f||state!=='play'||paused||parts.length>400)return;
@@ -2503,7 +2545,7 @@ function stepSkinFx(dt){
 }
 function stepHook(dt){
   reloadBar=-1;
-  stepSkinFx(dt);
+  stepSkinFx(dt);stepGrabs(dt);
   stepCloudBalls(dt);
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
@@ -2712,7 +2754,7 @@ function aiFly(e,dt){
 function stepEnemies(dt){
   const p=player;
   for(const e of enemies){
-    if(e.state==='dead'){e.t+=dt;e.vy+=GRAV*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;continue;}
+    if(e.state==='dead'){if(e.grab)continue;e.t+=dt;e.vy+=GRAV*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;continue;}   // cadavre tenu par une tentacule : c'est elle qui le bouge
     if(Math.abs(e.x-p.x)>380||Math.abs(e.y-p.y)>320)continue;
     e.t+=dt; if(e.flash>0)e.flash-=dt;
     if(e.frost>0){   // gelé par le sceptre : dégâts sur la durée (toutes les 0,5 s) et ralentissement
@@ -4950,6 +4992,10 @@ function drawGull(e){
   }
 }
 function drawEnemy(e){
+  if(e.grab&&e.gy!==undefined){ctx.save();ctx.beginPath();ctx.rect(Math.round(e.x)-60,Math.round(e.y)-160,e.w+120,e.gy-Math.round(e.y)+160);ctx.clip();drawEnemy0(e);ctx.restore();return;}
+  drawEnemy0(e);
+}
+function drawEnemy0(e){
   if(e.kind==='worm'){drawWorm(e);return;}
   if(e.kind==='gull'){drawGull(e);return;}
   if(e.kind==='zombie'){drawZombie(e);return;}
@@ -5564,6 +5610,7 @@ function render(){
     if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(e.x+e.w/2+Math.sin(time*9+e.x)*4),Math.round(e.y-2),1,2);}   // givre
     statusTint(e);
   }
+  drawGrabs();
   drawBoss();
   drawJelly();
   drawCow();
@@ -5618,7 +5665,7 @@ function showTitle(){
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
