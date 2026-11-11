@@ -400,6 +400,13 @@ body{
 .card{background:linear-gradient(180deg,var(--hi),var(--btn));border-width:2px;border-radius:12px;box-shadow:0 3px 0 var(--btn-shadow)}
 .card.eq{background:linear-gradient(180deg,var(--eq1),var(--eq2))}
 .card canvas{border-radius:10px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.card.rgb{animation:rgbcard 2.4s linear infinite}   /* skin Clown : petit halo RGB qui tourne autour de la case */
+@keyframes rgbcard{
+ 0%{border-color:#ff3b3b;box-shadow:0 0 0 2px #ff3b3b,0 0 12px 2px #ff3b3b}
+ 33%{border-color:#3bff6a;box-shadow:0 0 0 2px #3bff6a,0 0 12px 2px #3bff6a}
+ 66%{border-color:#3b8bff;box-shadow:0 0 0 2px #3b8bff,0 0 12px 2px #3b8bff}
+ 100%{border-color:#ff3b3b;box-shadow:0 0 0 2px #ff3b3b,0 0 12px 2px #ff3b3b}}
+@media (prefers-reduced-motion:reduce){.card.rgb{animation:none;border-color:#b44bff}}
 .sbtn{border-radius:10px;border:2px solid #14182c;background:linear-gradient(#ffa968,#ff8a3d 55%,#e8702a);color:#1a0d02;box-shadow:0 3px 0 #14182c,inset 0 1px 0 rgba(255,255,255,.45);padding:8px 8px}
 .sbtn.equip{background:linear-gradient(#2fd0d3,#12a5a8 55%,#0d8588);color:#fff;border-color:#0b3b3d;box-shadow:0 3px 0 #0b3b3d,inset 0 1px 0 rgba(255,255,255,.4)}
 .sbtn.alt{background:linear-gradient(var(--hi),var(--btn));color:var(--panel-ink)}
@@ -6473,9 +6480,10 @@ function buyUp(key){
 }
 function renderSkins(){
   shopList.textContent='';
-  for(const sk of SKINS){
+  const order=SKINS.filter(x=>x.id!=='clown');const cl=SKINS.find(x=>x.id==='clown');if(cl)order.splice(2,0,cl);   // le Clown est en 3e position dans la boutique
+  for(const sk of order){
     const owned=shop.owned.includes(sk.id),eq=shop.equipped===sk.id;
-    const card=document.createElement('div');card.className='card'+(eq?' eq':'');
+    const card=document.createElement('div');card.className='card'+(eq?' eq':'')+(sk.id==='clown'?' rgb':'');
     const pv=document.createElement('canvas');pv.width=16;pv.height=16;
     pv.getContext('2d').drawImage(sk.spr.idle,0,0);
     pv.setAttribute('aria-hidden','true');
