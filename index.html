@@ -654,7 +654,7 @@ const EN={
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).',
-'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
+'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -667,6 +667,7 @@ const EN_RULES=[
  [/^AKIMBO GLOCK 18 : (OUI|NON)$/,m=>'AKIMBO GLOCK 18: '+(m[1]==='OUI'?'ON':'OFF')],
  [/^Niveau (\d+) sur (\d+)$/,m=>'Level '+m[1]+' of '+m[2]],
  [/^([\d,]+) (coups|lancers)\/s$/,m=>m[1].replace(',','.')+(m[2]==='coups'?' hits/s':' throws/s')],
+ [/^(\d+) (tentacules?|boomerangs?)$/,m=>m[1]+' '+(m[2].startsWith('t')?'tentacle':'boomerang')+(m[1]==='1'?'':'s')],
  [/^TOUT RÉCUPÉRER \((\d+)\)$/,m=>'CLAIM ALL ('+m[1]+')'],
  [/^MAX : (.+)$/,m=>'MAX: '+trStr(m[1])],
  [/^IL MANQUE (\d+)$/,m=>'NEED '+m[1]+' MORE'],
@@ -1936,6 +1937,13 @@ const KTUP={   // améliorations du katana (or)
  speed:{name:'Vitesse de coup',vals:[0.40,0.34,0.29,0.25,0.21,0.17],cost:[45,100,170,260,390],fmt:v=>fr1(1/v)+' coups/s'},
  finish:{name:'Grande taille',desc:'Multiplicateur de dégâts du 3e coup du combo.',vals:[2,2.5,3,3.5,4,5],cost:[70,150,250,380,560],fmt:v=>'x'+String(v).replace('.',',')}
 };
+const TN_KEYS=['dmg','reach','rate','multi'];
+const TNUP={   // améliorations des tentacules (or)
+ dmg:{name:'Dégâts',vals:[7,9,11,14,18,23],cost:[60,130,220,340,500],fmt:v=>v+' dégâts'},
+ reach:{name:'Allonge',vals:[44,50,56,62,69,78],cost:[50,110,190,290,420],fmt:v=>fr1(v/16)+' cases'},
+ rate:{name:'Vitesse de coup',vals:[0.46,0.39,0.33,0.28,0.23,0.19],cost:[45,100,170,260,390],fmt:v=>fr1(1/v)+' coups/s'},
+ multi:{name:'Tentacules',desc:'Plus de tentacules frappent d\'un coup, en éventail.',vals:[1,2,3],cost:[200,450],fmt:v=>v+(v>1?' tentacules':' tentacule')}
+};
 const BT_KEYS=['dmg','range','rate','multi'];
 const BTUP={   // améliorations du boomerang (or)
  dmg:{name:'Dégâts',vals:[6,8,10,13,17,22],cost:[60,130,220,340,500],fmt:v=>v+' dégâts'},
@@ -1953,7 +1961,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -1994,6 +2002,9 @@ function loadShop(){
       if(j.bt&&typeof j.bt==='object')for(const k of ['dmg','range','rate','multi'])d.bt[k]=clamp(Math.floor(Number(j.bt[k]))||0,0,k==='multi'?2:5);
       if(j.weapon==='katana'&&d.katanaOwned)d.weapon='katana';
       if(j.weapon==='boomerang'&&d.boomOwned)d.weapon='boomerang';
+      d.tenOwned=j.tenOwned===true;
+      if(j.te&&typeof j.te==='object')for(const k of ['dmg','reach','rate','multi'])d.te[k]=clamp(Math.floor(Number(j.te[k]))||0,0,k==='multi'?2:5);
+      if(j.weapon==='tentacle'&&d.tenOwned)d.weapon='tentacle';
       if(j.tx&&typeof j.tx==='object')for(const k of ['chariot','star'])d.tx[k]=j.tx[k]===true;
       if(j.weapon==='tarot'&&d.tarotOwned)d.weapon='tarot';
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
@@ -2415,6 +2426,62 @@ function drawKatanaHeld(hx,hy){
   ctx.drawImage(KATANA_ICON,0,-KATANA_ICON.height);
   ctx.restore();
 }
+/* ---------- Tentacules (10 âmes) : elles sortent du dos, comme celles du skin, et fouettent vers la visée ---------- */
+const TENT_COST=10,TENT_N=4;
+const teV=k=>TNUP[k].vals[shop.te[k]||0];
+const TENT_ICON=spr(["....rrr..","...rRRRr.","..rRp.rR.",".rRp...r.",".rR......","..rR.....","...rRr...",".....rr.."],{r:'#7a1020',R:'#c4202e',p:'#ff6a6a'},true);
+let teCd=0,teFx=[];
+const tentCols=sk=>(sk&&sk.tc)||['#7a1020','#c4202e','#ff6a6a'];
+const tentAnchor=p=>({x:Math.round(p.x+p.w/2)-p.face*4,y:Math.round(p.y)+6});
+function stepTentacle(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  if(teCd>0)teCd-=dt;
+  for(const f of teFx)f.t+=dt;
+  teFx=teFx.filter(f=>f.t<f.life);
+  throwAnim=Math.max(0,throwAnim-dt);
+  if(!((fireBuf>0||inp.fire||aim.auto)&&teCd<=0&&p.stun<=0&&state==='play'))return;
+  fireBuf=0;teCd=teV('rate');throwAnim=0.12;
+  const len=Math.hypot(aim.x,aim.y)||1,a0=Math.atan2(aim.y/len,aim.x/len);
+  if(Math.abs(aim.x/len)>0.2)p.face=aim.x>0?1:-1;
+  const m=teV('multi'),R=teV('reach'),dmg=teV('dmg'),an=tentAnchor(p),hit=new Set();
+  for(let i=0;i<m;i++){
+    const a=a0+(i-(m-1)/2)*0.42,ux=Math.cos(a),uy=Math.sin(a);
+    teFx.push({a,R,t:0,life:0.24,i});
+    for(const t of allTargets()){
+      if(hit.has(t))continue;
+      for(let d=6;d<=R+4;d+=6){
+        if(rectDist(an.x+ux*d,an.y+uy*d,t.r[0],t.r[1],t.r[2],t.r[3])<=3){hit.add(t);t.hit(dmg);burst(t.r[0]+t.r[2]/2,t.r[1]+t.r[3]/2,tentCols(curSkin())[2],7,90);break;}
+      }
+    }
+  }
+  sfx.trident();
+}
+function drawTentChain(an,ex,ey,seed,cols,th){   // une tentacule ondulante de l'ancre (an) vers (ex,ey)
+  const N=14,dx=ex-an.x,dy=ey-an.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+  for(let s=0;s<=N;s++){
+    const u=s/N,w=Math.sin(time*9+seed+u*5)*2.2*u*(1-u*0.4);
+    const x=an.x+dx*u+nx*w,y=an.y+dy*u+ny*w,sz=Math.max(1,Math.round(th*(1-u*0.7)));
+    ctx.fillStyle=cols[u<0.35?0:u<0.7?1:2];ctx.fillRect(Math.round(x)-(sz>>1),Math.round(y)-(sz>>1),sz,sz);
+  }
+}
+function drawTentWeapon(sk,p){   // tentacules de l'arme, dessinées derrière le personnage à la manière du skin
+  if(state==='dying')return;
+  const f=p.face,an=tentAnchor(p),mv=clamp(p.vx/120,-1,1)*f,cols=tentCols(sk),used=teFx.length?teV('multi'):0;
+  for(let i=used;i<TENT_N;i++){   // au repos : elles ondulent dans le dos
+    const base=-0.95+i*(1.7/(TENT_N-1));let x=an.x,y=an.y;
+    for(let s=0;s<11;s++){
+      const k=s/10,ang=base+Math.sin(time*3.2+i*1.7+s*0.55)*0.38*(0.4+k)+mv*0.35;
+      x+=-f*Math.cos(ang)*2.3;y+=Math.sin(ang)*2.3-0.25;
+      const sz=s<4?3:s<8?2:1;
+      ctx.fillStyle=cols[s<4?0:s<8?1:2];ctx.fillRect(Math.round(x)-1,Math.round(y)-1,sz,sz);
+    }
+  }
+  for(const e of teFx){   // coup de fouet : la tentacule s'allonge vers la visée puis se rétracte
+    const k=e.t/e.life,ext=k<0.4?k/0.4:1-(k-0.4)/0.6;
+    drawTentChain(an,an.x+Math.cos(e.a)*e.R*ext,an.y+Math.sin(e.a)*e.R*ext,e.i*1.9,cols,3);
+  }
+}
 /* ---------- Boomerang (500 or) : aller-retour, blesse à l'aller et au retour ---------- */
 const BOOM_COST=500,BOOM={spd:300};
 const btV=k=>BTUP[k].vals[shop.bt[k]||0];
@@ -2550,6 +2617,7 @@ function stepHook(dt){
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
   if(shop.weapon==='katana'&&!glockOn){stepKatana(dt);return;}
+  if(shop.weapon==='tentacle'&&!glockOn){stepTentacle(dt);return;}
   if(shop.weapon==='boomerang'&&!glockOn){stepBoomerang(dt);return;}
   if(shop.weapon==='tarot'&&!glockOn){stepTarot(dt);return;}
   if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
@@ -5032,6 +5100,7 @@ function drawEnemy0(e){
   }
 }
 function drawSkinBack(sk,p,cx){   // appendices dessinés derrière le personnage (skin « Goule » : tentacules spectraux qui ondulent)
+  if(shop.weapon==='tentacle'&&!glockOn){drawTentWeapon(sk,p);return;}   // l'arme Tentacules remplace ceux du skin
   if(sk.back!=='tendrils'||state==='dying')return;
   const f=p.face,ax=cx-f*4,ay=Math.round(p.y)+6,mv=clamp(p.vx/120,-1,1)*f;   // en avançant, les tentacules se couchent vers l'arrière
   const cols=sk.tc||['#2a7a64','#3fb58f','#7ee8c0'],n=sk.tn||4;
@@ -5073,6 +5142,7 @@ function drawPlayer(){
   else if(shop.weapon==='scepter')drawScepterHeld(hx,hy);
   else if(shop.weapon==='tarot')drawTarotHeld(hx,hy);
   else if(shop.weapon==='katana')drawKatanaHeld(hx,hy);
+  else if(shop.weapon==='tentacle'){}   // rien en main : les tentacules sortent du dos
   else if(shop.weapon==='boomerang'){if(!booms.length)ctx.drawImage(BOOM_ICON,Math.round(hx)-4,Math.round(hy)-8);}
   else if(shop.weapon==='harpoon')drawHarpoonGun(hx,hy,Math.atan2(aim.y,aim.x),aim.x<0,!harp);
   else if(isTri)drawTridentHeld(hx,hy,tip.x,tip.y);
@@ -5665,7 +5735,7 @@ function showTitle(){
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];teFx=[];teCd=0;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -6074,11 +6144,12 @@ const WEAPONS=[
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
   {id:'harpoon',name:'Harpon',desc:'Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi pour un second coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.',icon:()=>HARPOON_ICON,owned:()=>shop.harpoonOwned,buy:{souls:HARPOON_COST,give:()=>{shop.harpoonOwned=true;}},render:()=>renderHarpoon()},
   {id:'katana',name:'Katana',desc:'Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.',icon:()=>KATANA_ICON,owned:()=>shop.katanaOwned,buy:{souls:KATANA_COST,give:()=>{shop.katanaOwned=true;}},render:()=>renderTree('katana')},
+  {id:'tentacle',name:'Tentacules',desc:'Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.',icon:()=>TENT_ICON,owned:()=>shop.tenOwned,buy:{souls:TENT_COST,give:()=>{shop.tenOwned=true;}},render:()=>renderTree('tentacle')},
   {id:'boomerang',name:'Boomerang',desc:'Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.',icon:()=>BOOM_ICON,owned:()=>shop.boomOwned,buy:{gold:BOOM_COST,give:()=>{shop.boomOwned=true;}},render:()=>renderTree('boomerang')},
   {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
-const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon','katana','boomerang'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
+const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon','katana','boomerang','tentacle'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
 WEAPONS.sort((a,b)=>WEAP_ORDER.indexOf(a.id)-WEAP_ORDER.indexOf(b.id));
 let weapOpen=false,weapSel=null;
 const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
@@ -6223,6 +6294,7 @@ const TREES={
  scepter:{tab:()=>SCUP,lv:()=>shop.sc,max:5,cur:'gold',keys:SC_KEYS,block:()=>shop.scepterOwned?'':'SCEPTRE REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg})},
  tarot:{tab:()=>TARU,lv:()=>shop.tl,max:5,bm:{chariot:3,star:3},cur:'gold',keys:['dmg','chariot','star','sorc'],block:()=>shop.tarotOwned?'':'TAROT REQUIS',icons:()=>({dmg:ICONS.dmg,chariot:TAROT_ICON,star:STAR_ICON,sorc:POTION_IC})},
  katana:{tab:()=>KTUP,lv:()=>shop.kt,max:5,cur:'gold',keys:KT_KEYS,block:()=>shop.katanaOwned?'':'KATANA REQUIS',icons:()=>({dmg:ICONS.dmg,reach:ICONS.range,speed:ICONS.rate,finish:ICONS.dmg})},
+ tentacle:{tab:()=>TNUP,lv:()=>shop.te,max:5,bm:{multi:2},cur:'gold',keys:TN_KEYS,block:()=>shop.tenOwned?'':'TENTACULES REQUISES',icons:()=>({dmg:ICONS.dmg,reach:ICONS.range,rate:ICONS.rate,multi:ICONS.count})},
  boomerang:{tab:()=>BTUP,lv:()=>shop.bt,max:5,bm:{multi:2},cur:'gold',keys:BT_KEYS,block:()=>shop.boomOwned?'':'BOOMERANG REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,rate:ICONS.rate,multi:ICONS.count})},
  harpoon:{tab:()=>HU,lv:()=>shop.hu,max:3,cur:'souls',keys:HU_KEYS,block:()=>shop.harpoonOwned?'':'HARPON REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg})}
 };
