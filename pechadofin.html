@@ -2178,10 +2178,7 @@ function hitEnemy(e,dmg){
     saveShop();
     floatText(e.x+e.w/2,e.y+8,'+'+gold+' OR','#ffd23f');
     burst(e.x+e.w/2,e.y+e.h/2,'#ffd23f',6,70);
-    if(kills%HEAL_EVERY===0){
-      pickups.push({x:e.x+e.w/2-5,y:e.y-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
-      floatText(e.x+e.w/2,e.y-14,'SOIN !','#7ff0e8');
-    }
+    if(kills%HEAL_EVERY===0)healDrop();
   } else sfx.hit();
 }
 function hurtPlayer(srcX){
@@ -2989,6 +2986,13 @@ function stepEnemies(dt){
   }
   enemies=enemies.filter(e=>!(e.state==='dead'&&(e.y>(WATER_ROW+4)*T||e.t>3))&&Math.abs(e.x-p.x)<2400);
 }
+function healDrop(){   // le cœur de soin apparaît directement sur le joueur et est récupéré tout de suite
+  const p=player;
+  sfx.heal();
+  burst(p.x+5,p.y+4,'#ff8aa3',10);
+  if(lives<maxLives()){lives++;floatText(p.x+5,p.y-8,'+1 VIE','#7ff0e8');}
+  else{score+=500;floatText(p.x+5,p.y-8,'+500','#ffe14d');}
+}
 function stepPickups(dt){
   const p=player;
   for(const pk of pickups){
@@ -2996,10 +3000,7 @@ function stepPickups(dt){
     moveY(pk,pk.vy*dt);
     if(pk.y>WATER_ROW*T-12){pk.x=p.x+p.face*30;pk.y=p.y-60;pk.vy=0;}
     if(rectsOverlap(p.x,p.y,p.w,p.h,pk.x,pk.y,pk.w,pk.h)){
-      pk.dead=true; sfx.heal();
-      burst(pk.x+5,pk.y+4,'#ff8aa3',10);
-      if(lives<maxLives()){lives++;floatText(p.x+5,p.y-8,'+1 VIE','#7ff0e8');}
-      else{score+=500;floatText(p.x+5,p.y-8,'+500','#ffe14d');}
+      pk.dead=true;healDrop();
     }
   }
   pickups=pickups.filter(pk=>!pk.dead);
@@ -3024,7 +3025,7 @@ function killBoss(b){
   if(gs){floatText(cx,cy-22,'+1 ÂME ROUGE','#ff6a7a');soulFx.push({x:cx,y:cy,t:0});}
   floatText(cx,cy+2,'+40 OR','#ffd23f');
   burst(cx,cy,'#ff3b2f',30,160);burst(cx,cy,'#ffb347',18,110);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function maybeSpawnBoss(){
   if(boss||octo||castle||witch||eskimo||cloudB||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
@@ -3074,7 +3075,7 @@ function killOcto(){
   floatText(cx,cy+22,"LES PORTES S'OUVRENT !",'#7ff0e8');
   if(gs){soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});}
   burst(cx,cy+20,'#c9a0ff',30,170);burst(cx,cy+20,'#ff6a6a',18,120);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function maybeStartArena(){
   if(octo||castle||witch||eskimo)return;
@@ -3144,7 +3145,7 @@ function killCastle(){
   floatText(cx,cy+22,anarchyOn?'LE CHEMIN DU RETOUR S\'OUVRE !':"LES PORTES S'OUVRENT !",'#7ff0e8');
   if(gs){soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});}
   burst(cx,cy+30,'#e4c882',30,170);burst(cx,cy+30,'#7fd4ff',18,120);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function returnHome(){   // anarchie : seul moyen de revenir dans la première zone
   anaLock=0;chunks.clear();enemies=[];pickups=[];boss=null;bossShots=[];jelly=null;tents=[];
@@ -3296,7 +3297,7 @@ function killWitch(){
   floatText(cx,cy+22,"LES PORTES S'OUVRENT !",'#7ff0e8');
   if(gs){soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});}
   burst(cx,cy+30,'#9fe870',30,170);burst(cx,cy+30,'#c9a0ff',18,120);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function potionEffect(type,x){
   const p=player;
@@ -3436,7 +3437,7 @@ function killEskimo(){
   floatText(cx,cy+22,needPed?'PRENDS LE SCEPTRE !':anarchyOn?'LE CHEMIN DU RETOUR S\'OUVRE !':"LES PORTES S'OUVRENT !",'#7ff0e8');
   if(gs){soulFx.push({x:cx-14,y:cy+20,t:0});soulFx.push({x:cx+14,y:cy+20,t:0.15});}
   burst(cx,cy+30,'#bfe9ff',30,170);burst(cx,cy+30,'#7fd0ff',18,120);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:ar.floor*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function eskTip(e){const fl=e.ar.floor*T;return {x:e.x+e.face*(e.cast>0?24:34),y:fl-(e.cast>0?86:62)};}
 function stepEskimo(dt){
@@ -3753,7 +3754,7 @@ function killKing(){
   floatText(cx,cy+11,'PAR LA FENÊTRE !','#7ff0e8');
   if(!shop.tarotOwned&&!anarchyOn){shop.tarotOwned=true;saveShop();floatText(cx,cy+22,'JEU DE TAROT OBTENU !','#ffd23f');floatText(cx,cy+33,'ÉQUIPE-LE DANS ARMES','#ffffff');}
   burst(cx,cy+30,'#e8c8ff',30,170);burst(cx,cy+30,'#ffd23f',18,120);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:F*T-30,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function kingThrow(n){
   const k=king,p=player,ox=k.x+k.face*6,oy=k.y-32,a0=Math.atan2(p.y+6-oy,p.x+5-ox),spread=Math.min(1.5,0.16*(n-1));
@@ -4097,7 +4098,7 @@ function killCow(){
   if(gs){floatText(cx,cy-22,'+2 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy,t:0});soulFx.push({x:cx+10,y:cy,t:0.15});}
   floatText(cx,cy+2,'+150 OR','#ffd23f');
   burst(cx,cy,'#ffffff',30,160);burst(cx,cy,'#14182c',14,120);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function stepCow(dt){
   maybeSpawnCow();
@@ -4486,7 +4487,7 @@ function killCloudBoss(){
   floatText(cx,cy,'+'+gold+' OR','#ffd23f');
   floatText(cx,cy+11,'LA ROUTE EST LIBRE !','#7ff0e8');
   burst(cx,b.y,'#ffffff',30,170);burst(cx,b.y,'#7fc4ff',18,120);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:(SKY_G-3)*T,w:10,h:9,vx:0,vy:-100,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function cloudShoot(n,spread,sp){
   const b=cloudB,p=player,ox=b.x+b.face*22,oy=b.y+2,a0=Math.atan2(p.y+7-oy,p.x+5-ox);
@@ -4725,7 +4726,7 @@ function killJelly(b){
   if(gs){floatText(cx,cy-22,'+2 ÂMES ROUGES','#ff6a7a');soulFx.push({x:cx-10,y:cy,t:0});soulFx.push({x:cx+10,y:cy,t:0.15});}
   floatText(cx,cy-11,'+80 OR','#ffd23f');
   burst(cx,cy,'#f6f0ff',30,160);burst(cx,cy,'#ff9ad8',18,110);
-  if(kills%HEAL_EVERY===0)pickups.push({x:cx-5,y:cy-6,w:10,h:9,vx:0,vy:-140,t:0,onGround:false});
+  if(kills%HEAL_EVERY===0)healDrop();
 }
 function maybeSpawnJelly(){
   if(jelly||octo||castle||witch||eskimo||cloudB||cow||six)return;
