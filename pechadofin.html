@@ -1473,6 +1473,7 @@ const DOLB_W=tint(DOLB,'#ffffff'), DOLP_W=tint(DOLP,'#ffffff'), DOLR_W=tint(DOLR
 
 const HEART_ROWS=[".rr.rr.","rprrrrr","rrrrrrr",".rrrrr.","..rrr..","...r..."];
 const HEART=spr(HEART_ROWS,{r:'#ff4466',p:'#ffc0cc'},true);
+const HEART_GOLD=spr(HEART_ROWS,{r:'#ffc21f',p:'#fff3b0'},true);
 const HEART_OFF=spr(HEART_ROWS,{r:'#3c4a63',p:'#52617d'},true);
 const LURE=spr(["o...oo..","oo.oooo.","ooooooeo","oo.oooo.","o...oo.."],{o:'#ff9a3c',e:'#14182c'},true);
 
@@ -2099,7 +2100,7 @@ function soulReward(key,n){
   shop.bossSouls[key]=true;shop.souls+=n;return true;
 }
 function saveShop(){if(speedOn)return;try{localStorage.setItem(SHOP_KEY,JSON.stringify(shop));}catch(e){}cloudQueue();try{misDot();}catch(e){}}
-const maxLives=()=>SOUL_UP.hp.vals[shop.hp];
+const maxLives=()=>speedOn?10:SOUL_UP.hp.vals[shop.hp];   // speedrun : 10 cœurs, les 5 derniers (à droite) sont dorés et partent en premier
 const curSkin=()=>SKINS.find(x=>x.id===shop.equipped)||SKINS[0];
 
 /* ================= Audio ================= */
@@ -3056,7 +3057,7 @@ function healDrop(){   // le cœur de soin apparaît directement sur le joueur e
   const p=player;
   sfx.heal();
   burst(p.x+5,p.y+4,'#ff8aa3',10);
-  if(lives<maxLives()){lives++;floatText(p.x+5,p.y-8,'+1 VIE','#7ff0e8');}
+  if(lives<(speedOn?5:maxLives())){lives++;floatText(p.x+5,p.y-8,'+1 VIE','#7ff0e8');}
   else{score+=500;floatText(p.x+5,p.y-8,'+500','#ffe14d');}
 }
 function stepPickups(dt){
@@ -5801,7 +5802,7 @@ const pad6=n=>String(n).padStart(6,'0');
 function drawHUD(){
   ctx.font="8px 'Press Start 2P', monospace";
   if(godMode)txt('INVINCIBLE',VW/2,5,'#7ff0e8','center');
-  for(let i=0;i<maxLives();i++)ctx.drawImage(i<lives?HEART:HEART_OFF,5+i*11,5);
+  for(let i=0;i<maxLives();i++){const gold=speedOn&&i>=5;if(gold&&i>=lives)continue;ctx.drawImage(i<lives?(gold?HEART_GOLD:HEART):HEART_OFF,5+i*11,5);}
   if(combo.n>0){
     txt('COMBO x'+Math.min(combo.n,10),6,18,'#ffe14d');
     ctx.fillStyle='#14182c';ctx.fillRect(5,28,52,5);
