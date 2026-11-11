@@ -654,7 +654,7 @@ const EN={
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
 'Sauvegarde cloud activée.':'Cloud save enabled.','Une sauvegarde existe déjà sur ton compte. Laquelle garder ?':'A save already exists on your account. Which one do you keep?','GARDER LA SAVE DU COMPTE':'KEEP THE ACCOUNT SAVE','GARDER LA SAVE DE CET APPAREIL':'KEEP THIS DEVICE\'S SAVE','SYNCHRONISER MAINTENANT':'SYNC NOW','ACTIVER LA SAUVEGARDE CLOUD':'ENABLE CLOUD SAVE','Connexion au cloud…':'Connecting to the cloud…','Autorisation refusée ou indisponible.':'Permission denied or unavailable.','Erreur de sauvegarde cloud.':'Cloud save error.','Synchronisation…':'Syncing…','Termine ta partie avant de charger la save du compte.':'Finish your game before loading the account save.',
 'Connecte-toi avec ton compte Google.':'Sign in with your Google account.','Connexion Google indisponible (hors ligne ou origine non autorisée).':'Google sign-in unavailable (offline or origin not authorized).',
-'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
+'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
  [/^TOP 10 ANARCHIE : #(\d+) !$/,m=>'ANARCHY TOP 10: #'+m[1]+'!'],
@@ -1940,7 +1940,7 @@ const KTUP={   // améliorations du katana (or)
 const TN_KEYS=['dmg','reach','rate','multi'];
 const TNUP={   // améliorations des tentacules (or)
  dmg:{name:'Dégâts',vals:[7,9,11,14,18,23],cost:[60,130,220,340,500],fmt:v=>v+' dégâts'},
- reach:{name:'Allonge',vals:[44,50,56,62,69,78],cost:[50,110,190,290,420],fmt:v=>fr1(v/16)+' cases'},
+ reach:{name:'Allonge',vals:[64,70,76,82,89,98],cost:[50,110,190,290,420],fmt:v=>fr1(v/16)+' cases'},
  rate:{name:'Vitesse de coup',vals:[0.46,0.39,0.33,0.28,0.23,0.19],cost:[45,100,170,260,390],fmt:v=>fr1(1/v)+' coups/s'},
  multi:{name:'Tentacules',desc:'Plus de tentacules frappent d\'un coup, en éventail.',vals:[1,2,3],cost:[200,450],fmt:v=>v+(v>1?' tentacules':' tentacule')}
 };
@@ -2430,7 +2430,8 @@ function drawKatanaHeld(hx,hy){
 const TENT_COST=10,TENT_N=4;
 const teV=k=>TNUP[k].vals[shop.te[k]||0];
 const TENT_ICON=spr(["....rrr..","...rRRRr.","..rRp.rR.",".rRp...r.",".rR......","..rR.....","...rRr...",".....rr.."],{r:'#7a1020',R:'#c4202e',p:'#ff6a6a'},true);
-let teCd=0,teFx=[],teLast=-1;
+let teCd=0,teFx=[],teLast=-1,teZip=null;   // teZip : accrochée au décor, elle nous tire jusqu'au point d'accroche
+const grapAt=(x,y)=>solidAt(x,y)||oneWay(Math.floor(x/T),Math.floor(y/T));
 const hexMix=(c,t,k)=>{const n=parseInt(c.slice(1),16),m=parseInt(t.slice(1),16),f=(sh)=>Math.round(((n>>sh)&255)*(1-k)+((m>>sh)&255)*k);return '#'+((1<<24)+(f(16)<<16)+(f(8)<<8)+f(0)).toString(16).slice(1);};
 function tentCols(sk){   // couleur des tentacules : la couleur majeure du skin (sauf l'Humain, qui garde le rouge)
   if(!sk)return ['#7a1020','#c4202e','#ff6a6a'];
@@ -2450,6 +2451,24 @@ function stepTentacle(dt){
   for(const f of teFx)f.t+=dt;
   teFx=teFx.filter(f=>f.t<f.life);
   throwAnim=Math.max(0,throwAnim-dt);
+  if(teZip){
+    const z=teZip,pcx=p.x+5,pcy=p.y+7,dx=z.x-pcx,dy=z.y-pcy-(z.plat?14:0),dist=Math.hypot(dx,dy),ux=dx/(dist||1),uy=dy/(dist||1);   // plateforme : on se fait tirer jusqu'au-dessus d'elle
+    z.t+=dt;let release=false,jump=false;
+    if(jumpBuf>0){release=true;jump=true;jumpBuf=0;}
+    if(dist<10||p.stun>0||z.t>1.6||state!=='play')release=true;
+    if(!release){
+      const x0=p.x,y0=p.y,sdt=Math.min(380*dt,dist);
+      moveX(p,ux*sdt);moveY(p,uy*sdt);p.vy=0;p.vx=0;
+      if(Math.abs(p.x-x0)+Math.abs(p.y-y0)<sdt*0.35)release=true;   // bloqué contre le décor
+      if(Math.random()<0.8)parts.push({x:p.x+5,y:p.y+7,vx:-ux*25,vy:-uy*25,g:0,life:0.2,col:tentCols(curSkin())[2],sz:1});
+    }
+    if(release){
+      if(jump){p.vy=-JUMPV*0.95;p.vx=ux*150;p.onGround=false;p.coyote=0;sfx.jump();}
+      else{p.vx=ux*150;p.vy=uy*140;}
+      teZip=null;teCd=0.12;
+    }
+    return;
+  }
   if(!((fireBuf>0||inp.fire||aim.auto)&&teCd<=0&&p.stun<=0&&state==='play'))return;
   fireBuf=0;teCd=teV('rate');throwAnim=0.12;
   const len=Math.hypot(aim.x,aim.y)||1,a0=Math.atan2(aim.y/len,aim.x/len);
@@ -2468,6 +2487,13 @@ function stepTentacle(dt){
     }
   }
   teLast=taken[taken.length-1];
+  if(!hit.size){   // aucun ennemi touché : si la tentacule du milieu atteint le sol ou une plateforme, elle s'y accroche et nous tire
+    const fx=teFx.slice(-m),c=fx[Math.floor((m-1)/2)],ux=Math.cos(c.a),uy=Math.sin(c.a);
+    for(let d=8;d<=R;d+=3){
+      const x=an.x+ux*d,y=an.y+uy*d;
+      if(grapAt(x,y)){if(d>=14){teZip={x,y,t:0,slot:c.slot,plat:!solidAt(x,y)};burst(x,y,'#dfe8f0',6,70);sfx.hit();}break;}
+    }
+  }
   sfx.trident();
 }
 function drawTentChain(an,ex,ey,seed,cols,th){   // une tentacule ondulante de l'ancre (an) vers (ex,ey)
@@ -2480,7 +2506,7 @@ function drawTentChain(an,ex,ey,seed,cols,th){   // une tentacule ondulante de l
 }
 function drawTentWeapon(sk,p){   // tentacules de l'arme, dessinées derrière le personnage à la manière du skin
   if(state==='dying')return;
-  const f=p.face,an=tentAnchor(p),mv=clamp(p.vx/120,-1,1)*f,cols=tentCols(sk),busy=new Set(teFx.map(e=>e.slot));
+  const f=p.face,an=tentAnchor(p),mv=clamp(p.vx/120,-1,1)*f,cols=tentCols(sk),busy=new Set(teFx.map(e=>e.slot));if(teZip)busy.add(teZip.slot);
   for(let i=0;i<TENT_N;i++){   // au repos
     if(busy.has(i))continue;   // celle qui frappe est dessinée plus bas : elles ondulent dans le dos
     const base=-0.95+i*(1.7/(TENT_N-1));let x=an.x,y=an.y;
@@ -2491,6 +2517,7 @@ function drawTentWeapon(sk,p){   // tentacules de l'arme, dessinées derrière l
       ctx.fillStyle=cols[s<4?0:s<8?1:2];ctx.fillRect(Math.round(x)-1,Math.round(y)-1,sz,sz);
     }
   }
+  if(teZip)drawTentChain(an,teZip.x,teZip.y,teZip.slot*1.9,cols,3);   // accrochée au décor
   for(const e of teFx){   // coup de fouet : la tentacule s'allonge vers la visée puis se rétracte
     const k=e.t/e.life,ext=k<0.4?k/0.4:1-(k-0.4)/0.6;
     drawTentChain(an,an.x+Math.cos(e.a)*e.R*ext,an.y+Math.sin(e.a)*e.R*ext,e.slot*1.9,cols,3);
@@ -4227,7 +4254,8 @@ function stepHarpoon(dt){
   const dx=h.x-pcx,dy=h.y-pcy,dist=Math.hypot(dx,dy);
   if(h.st==='fly'){
     const step=430*dt;h.x+=h.ux*step;h.y+=h.uy*step;h.d+=step;
-    if(solidAt(h.x,h.y)){h.st='zip';h.zt=0;burst(h.x,h.y,'#dfe8f0',6,70);sfx.hit();}   // planté dans le décor : on se fait tirer
+    if(solidAt(h.x,h.y)||oneWay(Math.floor(h.x/T),Math.floor(h.y/T))){h.st='zip';h.zt=0;h.plat=!solidAt(h.x,h.y);   // plateforme : on se fait tirer jusqu'au-dessus d'elle
+     burst(h.x,h.y,'#dfe8f0',6,70);sfx.hit();}   // planté dans le décor : on se fait tirer
     else{
       for(const t of allTargets()){
         if(!rectsOverlap(h.x-3,h.y-3,6,6,t.r[0],t.r[1],t.r[2],t.r[3]))continue;
@@ -4258,10 +4286,11 @@ function stepHarpoon(dt){
     h.zt+=dt;
     let release=false,jump=false;
     if(jumpBuf>0){release=true;jump=true;jumpBuf=0;}
-    if(dist<10||p.stun>0||h.zt>1.6)release=true;
-    const ux=dx/(dist||1),uy=dy/(dist||1);
+    const zdy=dy-(h.plat?14:0),zd=Math.hypot(dx,zdy);   // point visé : au-dessus de la plateforme
+    if(zd<10||p.stun>0||h.zt>1.6)release=true;
+    const ux=dx/(zd||1),uy=zdy/(zd||1);
     if(!release){
-      const x0=p.x,y0=p.y,sdt=Math.min(spd*1.35*dt,dist);
+      const x0=p.x,y0=p.y,sdt=Math.min(spd*1.35*dt,zd);
       moveX(p,ux*sdt);moveY(p,uy*sdt);p.vy=0;p.vx=0;
       if(Math.abs(p.x-x0)+Math.abs(p.y-y0)<sdt*0.35)release=true;   // bloqué contre le décor
       if(Math.random()<0.8)parts.push({x:p.x+5,y:p.y+7,vx:-ux*25,vy:-uy*25,g:0,life:0.2,col:'#dfe8f0',sz:1});
@@ -5749,7 +5778,7 @@ function showTitle(){
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];teFx=[];teCd=0;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];teFx=[];teCd=0;teZip=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -6158,7 +6187,7 @@ const WEAPONS=[
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
   {id:'harpoon',name:'Harpon',desc:'Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi pour un second coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.',icon:()=>HARPOON_ICON,owned:()=>shop.harpoonOwned,buy:{souls:HARPOON_COST,give:()=>{shop.harpoonOwned=true;}},render:()=>renderHarpoon()},
   {id:'katana',name:'Katana',desc:'Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.',icon:()=>KATANA_ICON,owned:()=>shop.katanaOwned,buy:{souls:KATANA_COST,give:()=>{shop.katanaOwned=true;}},render:()=>renderTree('katana')},
-  {id:'tentacle',name:'Tentacules',desc:'Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.',icon:()=>TENT_ICON,owned:()=>shop.tenOwned,buy:{souls:TENT_COST,give:()=>{shop.tenOwned=true;}},render:()=>renderTree('tentacle')},
+  {id:'tentacle',name:'Tentacules',desc:'Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.',icon:()=>TENT_ICON,owned:()=>shop.tenOwned,buy:{souls:TENT_COST,give:()=>{shop.tenOwned=true;}},render:()=>renderTree('tentacle')},
   {id:'boomerang',name:'Boomerang',desc:'Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.',icon:()=>BOOM_ICON,owned:()=>shop.boomOwned,buy:{gold:BOOM_COST,give:()=>{shop.boomOwned=true;}},render:()=>renderTree('boomerang')},
   {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
@@ -6205,7 +6234,7 @@ function closeWeap(){
 }
 $('weap-btn').addEventListener('click',()=>openWeap(false));$('weap-close').addEventListener('click',closeWeap);
 weapEl.addEventListener('pointerdown',e=>{if(e.target===weapEl)closeWeap();});
-$('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;harp=null;hooks=[];tridents=[];booms=[];katFx=null;saveShop();sfx.heal();renderWeap();});
+$('weap-eq').addEventListener('click',()=>{const w=WEAPONS.find(x=>x.id===weapSel);if(!w||!w.owned()||(w.locked&&w.locked()))return;shop.weapon=w.id;harp=null;teZip=null;hooks=[];tridents=[];booms=[];katFx=null;saveShop();sfx.heal();renderWeap();});
 function renderDagger(){renderTree('dagger');}
 function renderSix(){
   shopList.textContent='';
