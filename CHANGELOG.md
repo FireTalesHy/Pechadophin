@@ -2,6 +2,23 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.5] - 2026-11-11
+
+### Ajouté
+- **10 skins fantaisie** : licorne, citrouille, champignon, boule disco, dragon, alien, cornet de glace, sirène, **Goule** (capuche en lambeaux, tentacules spectraux) et **Humain** (cheveux bruns, chemise blanche, style streetwear), chacun avec ses effets. Le jeu compte maintenant **29 skins**.
+- **Tentacule fatale** (Humain et Goule) : à chaque kill, 1 chance sur 5 qu'une tentacule sorte du sol et emporte le cadavre sous terre.
+- **Tentacules** (10 âmes rouges, armes diverses) : des tentacules sortent de ton dos, façon skin, et fouettent les ennemis, une tentacule différente à chaque coup. Leur couleur est la couleur majeure du skin (rouge pour l'Humain). Elles servent aussi de grappin, au sol comme sur les plateformes.
+  - Arbre de compétences : **Dégâts**, **Allonge**, **Vitesse de coup** et **Multi-tentacules** (jusqu'à 3 tentacules par coup).
+- **Skin Clown** (1 000 000 or) : +50 % d'or à chaque élimination, une mini animation (confettis et ballon) à chaque kill, et 1 chance sur 20 d'un gag (ballons, clown kamikaze, boîte à surprise) qui emporte le cadavre et rapporte 100 or.
+- **Catégorie « Skins prémium »** dans la boutique, séparée des skins normaux par un trait : Clown (case rouge clair, halo et boutons RGB animés) et RNG∞.
+- **Bannière** des skins fantaisie sous le titre, sur l'écran d'accueil.
+
+### Modifié
+- **Harpon** : les plateformes sont maintenant accrochables.
+- **Soin** : le cœur apparaît sur le joueur et se récupère instantanément.
+- **Monde des nuages** : les ressorts roses sont posés sur un sol plat, à la hauteur réelle du sol.
+- **Missions** : nouveau bouton TOUT RÉCUPÉRER pour encaisser toutes les récompenses d'un coup.
+
 ## [V0.4.9] - 2026-11-08
 
 ### Ajouté

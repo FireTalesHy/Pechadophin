@@ -1,6 +1,6 @@
 # 🎣 Pechadophin 
 
-**Version V0.4.9**
+**Version V0.5**
 
 Un jeu de plateforme en pixel art, [jouable directement dans le navigateur](https://firetaleshy.github.io/Pechadophin/) : tu es un pêcheur qui affronte des dauphins, un démon requin, un poulpe géant, une méduse et un château de sable, dans un monde généré aléatoirement à chaque partie.
 
@@ -23,7 +23,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 
 ## ✨ Contenu
 
-- Cinq armes, présentées dans le menu ARMES : une canne améliorable, un trident infernal (débloqué à la plage), des dagues qui attaquent en dash (dans le coffre rouge des marécages, améliorables) et l'arme Numéro 6, laissée par un boss secret caché dans les marécages, et le sceptre de glace, laissé par l'esquimau
+- Dix armes, présentées dans le menu ARMES, presque toutes avec leur arbre de compétences : une canne améliorable, un trident infernal (débloqué à la plage), des dagues qui attaquent en dash (dans le coffre rouge des marécages), l'arme Numéro 6 (boss secret des marécages), le sceptre de glace (laissé par l'esquimau), le jeu de tarot, le harpon, le katana, le boomerang et les tentacules qui sortent de ton dos
 - Classement TOP 10 du mode Anarchie
 - Des dauphins bleus, roses (volants) et rouges (tireurs de boules de feu), des vers de sable et des mouettes en piqué sur la plage
 - Un démon requin à laser, accompagné d'une nuit rouge sang
@@ -36,7 +36,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 - Connexion avec un compte Google et sauvegarde cloud dans ton Google Drive (voir [privacy.html](privacy.html))
 - Collab avec le jeu RNG∞ : skin RNG∞ à débloquer avec le même compte Google
 - Des marchands en pleine partie pour améliorer l'arme équipée
-- Une boutique : 19 skins, améliorations (or) et âmes rouges
+- Une boutique : 29 skins (dont une catégorie premium avec le Clown), améliorations (or) et âmes rouges
 - Nouveau menu principal, menu pause, sauvegarde locale du meilleur score et de la boutique, bouton de réinitialisation de la save (double confirmation)
 
 ## 📝 Historique
