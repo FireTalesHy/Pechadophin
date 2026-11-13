@@ -7418,6 +7418,7 @@ function gOnCredential(resp){
   gCred=resp.credential;gCredT=Date.now();
   if(lbPending)lbSubmit();
   anaBestFetch();
+  cloudAuto=true;setTimeout(()=>cloudAutoLink(false),400);   // la progression se lie automatiquement au compte Google
   if(!gUser.pseudo&&!accOpen)openAcc();   // première connexion : on demande le pseudo
 }
 /* ---- Classement Anarchie (top 10 all time, joueurs connectés) ---- */
@@ -7548,6 +7549,7 @@ async function cloudLink(){   // activée depuis le menu Compte (le clic permet 
     cloudSetRec({sub:gUser.sub,on:true,t:0});
     await cloudFind();
     const d=await cloudRead(),loc=cloudLocal();
+    if(d&&d.shop&&!loc.shop&&state!=='play'){cloudApply(d);cloudS.busy=false;cloudSetStatus('Progression du compte chargée ('+cloudTime()+').');return;}   // appareil vierge : on charge directement la save du compte
     if(d&&d.shop&&JSON.stringify(d.shop)!==JSON.stringify(loc.shop)){cloudS.choice=d;cloudS.busy=false;cloudSetStatus('');return;}
     if(d&&d.shop){const r=cloudRec();r.t=d.t;cloudSetRec(r);}else await cloudWrite(loc);
     cloudS.busy=false;cloudSetStatus('Sauvegarde cloud activée ('+cloudTime()+').');
@@ -7584,6 +7586,16 @@ function cloudQueue(){   // appelé à chaque sauvegarde locale : envoi groupé 
     cloudS.busy=false;
   },2500);
 }
+var cloudAuto=false;
+async function cloudAutoLink(gesture){   // liaison automatique à la connexion Google (une seule autorisation à accepter) ; si le navigateur bloque la fenêtre, on réessaie au prochain clic
+  if(!gUser||!cloudAuto||cloudLinked()||cloudS.busy||state==='play')return;
+  const r0=cloudRec();if(r0.declined&&r0.sub===gUser.sub)return;
+  cloudAuto=false;
+  await cloudLink();
+  if(cloudS.choice&&!accOpen)openAcc();
+  if(!cloudLinked()&&!cloudS.choice){if(gesture){const r=cloudRec();r.sub=gUser.sub;r.declined=true;cloudSetRec(r);}else cloudAuto=true;}
+}
+addEventListener('pointerdown',()=>{cloudAutoLink(true);},true);
 addEventListener('pointerdown',()=>{   // jeton absent ou expiré : renouvelé sur un geste du joueur, hors partie
   if(cloudLinked()&&state!=='play'&&!cloudS.busy&&!(cloudS.tok&&Date.now()<cloudS.exp))cloudSync(false);
 },true);
@@ -7656,7 +7668,7 @@ function openAcc(){clearInputs();accOpen=true;accEl.hidden=false;gRenderAcc();tr
 function closeAcc(){accHint='';accOpen=false;accEl.hidden=true;try{accBtn.focus({preventScroll:true});}catch(e){}}
 accBtn.addEventListener('click',openAcc);$('acc-close').addEventListener('click',closeAcc);
 accEl.addEventListener('pointerdown',e=>{if(e.target===accEl)closeAcc();});
-gUpdateBtn();gCheckDev();if(gUser)anaBestFetch();
+gUpdateBtn();gCheckDev();if(gUser){anaBestFetch();cloudAuto=true;}
 if(gUser&&GOOGLE_CLIENT_ID&&!shop.owned.includes(RNG_SKIN.id))setTimeout(rngRecheck,1500);   // comptes déjà connectés : reconnexion silencieuse pour la collab RNG∞
 
 /* ---- Langue : traduction du DOM + drapeau du pays vers lequel on bascule ---- */
