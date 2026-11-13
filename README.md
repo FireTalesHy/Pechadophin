@@ -48,5 +48,5 @@ Voir [CHANGELOG.md](CHANGELOG.md).
 
 ## 👥 Crédits
 
-- dev : L'taleshy et cocobat
+- dev : [L'taleshy](https://github.com/FireTalesHy) et [cocobat](https://github.com/cocobatard)
 - testeurs : moustik, ofodile, wyzan, nad l'arnaque et bergoute
