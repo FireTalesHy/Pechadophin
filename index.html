@@ -2048,6 +2048,14 @@ anarchyOn=anarchyWant;
 const rodLocked=()=>false;   // plus aucune arme bloquée selon la zone
 let anaMul=1,anaWins={},anaSlotDone=new Set();
 const anaWin=t=>{if(anarchyOn)anaWins[t]=(anaWins[t]||0)+1;};   // anarchie : chaque boss vaincu revient plus résistant (x1,05 de PV par victoire sur ce même boss)
+/* Équilibrage canne : le joueur qui reste à la canne (arme de départ, sans en acheter d'autre) affronte des boss moins résistants,
+   en proportion de ses dégâts par seconde (canne non améliorée ≈ 2, deux branches au max ≈ 36). Classique seulement (pas d'anarchie ni de speedrun). */
+const ROD_DPS_REF=20,ROD_MIN_F=0.25;
+function rodAdapt(hp){
+  if(anarchyOn||speedOn||shop.weapon!=='rod')return hp;
+  const d=UP.dmg.vals[shop.up.dmg]/UP.rate.vals[shop.up.rate],f=Math.min(1,Math.max(ROD_MIN_F,d/ROD_DPS_REF));
+  return Math.max(10,Math.round(hp*f));
+}
 function bossHp(base,t){
   if(!anarchyOn)return base;
   const w=anaWins[t]||0,m=Math.pow(1.05,w),h=Math.round(encHp(base)*m);
@@ -3486,7 +3494,7 @@ function maybeSpawnBoss(){
   const w=38,h=18,bx=sx-w/2;
   let by=p.y-64;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
-  const bhp=anarchyOn?bossHp(BOSS_HP,'shark'):Math.round(BOSS_HP*Math.pow(1.5,bossWins));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
+  const bhp=anarchyOn?bossHp(BOSS_HP,'shark'):rodAdapt(Math.round(BOSS_HP*Math.pow(1.5,bossWins)));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
   boss={kind:'boss',k,x:bx,y:by,w,h,vx:0,vy:0,dir:p.x>sx?1:-1,hp:bhp,maxHp:bhp,state:'alive',spawnT:1.4,t:0,flash:0,fireCd:3,charge:0,laser:0,la:0,upT:0,onGround:false};
   bossSpawned=true;
   if(anarchyOn){anaSlotDone.add(slk);anaSky++;night=SKY_NIGHT[anaSky%5];}   // anarchie : nouveau ciel à chaque requin
@@ -3538,7 +3546,7 @@ function maybeStartArena(){
   ar.state='active';ar.gateL=true;ar.gateR=true;      // les portes se referment : plus de sortie possible
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
-  const oh=anarchyOn?bossHp(OCTO_HP,'octo'):OCTO_HP;
+  const oh=anarchyOn?bossHp(OCTO_HP,'octo'):rodAdapt(OCTO_HP);
   octo={ar,hp:oh,maxHp:oh,state:'intro',t:0,intro:2.2,rage:false,flash:0,nextT:1,sway:0,dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
@@ -3703,7 +3711,7 @@ function startWitch(ar,il,ir){
   ar.state='active';ar.gateL=true;ar.gateR=true;
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
-  const wh=anarchyOn?bossHp(WITCH_HP,'witch'):WITCH_HP;
+  const wh=anarchyOn?bossHp(WITCH_HP,'witch'):rodAdapt(WITCH_HP);
   witch={ar,hp:wh,maxHp:wh,state:'intro',t:0,intro:2.4,phase:1,flash:0,side:1,nextP:1.8,pot:null,last:'',burst:0,throwT:0,tt:0,cat:null,potions:[],zones:[],dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
@@ -3860,7 +3868,7 @@ function startEskimo(ar,il,ir){
   ar.state='active';ar.gateL=true;ar.gateR=true;
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
-  const hp=anarchyOn?bossHp(ESK_HP,'eskimo'):ESK_HP,cx=ar.cx*T+8;
+  const hp=anarchyOn?bossHp(ESK_HP,'eskimo'):rodAdapt(ESK_HP),cx=ar.cx*T+8;
   eskimo={ar,hp,maxHp:hp,state:'intro',t:0,intro:2.4,rage:false,flash:0,x:cx+(player.x<cx?100:-100),face:player.x<cx?-1:1,tgt:cx,tgtT:1.5,nextB:2.4,nextL:3.5,cast:0,beams:[],lures:[],dieT:0};
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
@@ -4179,7 +4187,7 @@ const KING_HP=750;
 function kingRect(){const k=king;if(!k||k.state!=='fight')return null;return [k.x-7,k.y-49,14,49];}
 function startKing(){
   const F=TWB-TWR*TWN,p=player;
-  king={x:(TWC+17)*T+8,y:F*T,hp:KING_HP,maxHp:KING_HP,state:'intro',t:0,intro:1.6,rage:false,flash:0,face:-1,mode:'idle',mt:1.2,tgt:(TWC+17)*T+8,addT:4.5,n:3,dieT:0};
+  king={x:(TWC+17)*T+8,y:F*T,hp:rodAdapt(KING_HP),maxHp:rodAdapt(KING_HP),state:'intro',t:0,intro:1.6,rage:false,flash:0,face:-1,mode:'idle',mt:1.2,tgt:(TWC+17)*T+8,addT:4.5,n:3,dieT:0};
   shake=0.5;sfx.bossSpawn();sfx.gate();
   floatText(p.x+5,p.y-34,'ROI CACAMILLE 2','#ffd23f');
 }
@@ -4527,7 +4535,7 @@ function maybeSpawnCow(){
   let key;
   if(anarchyOn){key=f.sg*(f.j+1);if(cowDone.has(key))return;}
   else if(cowSpawned)return;
-  const w=44,h=30,ctx0=f.sg*f.fc,side=(tx-ctx0)>=0?-1:1,bx=(ctx0+side*8)*T+8-w/2,ch=anarchyOn?bossHp(COW_HP,'cow'):COW_HP;
+  const w=44,h=30,ctx0=f.sg*f.fc,side=(tx-ctx0)>=0?-1:1,bx=(ctx0+side*8)*T+8-w/2,ch=anarchyOn?bossHp(COW_HP,'cow'):rodAdapt(COW_HP);
   cow={x:bx,y:f.floor*T-h-80,w,h,vy:0,dir:-side,hp:ch,maxHp:ch,state:'alive',spawnT:1.2,mode:'walk',mt:0,rot:0,flash:0,t:0,rage:false,sx:0,spit:0};
   cowSpawned=true;if(key!==undefined)cowDone.add(key);shake=0.6;sfx.bossSpawn();
   floatText(p.x+5,p.y-34,'LA VACHE GÉANTE !','#ffffff');
@@ -4621,7 +4629,7 @@ function rzEnter(){
   hooks=[];tridents=[];milk=[];sixShots=[];sixJet=[];bossShots=[];
   Object.assign(player,{x:(RZC-8)*T,y:RZG*T-14,vx:0,vy:0,onGround:true,invuln:1,stun:0,dash:null});
   player.safe={x:player.x,y:player.y};
-  six={x:(RZC+4)*T-14,y:(RZG-8)*T,w:28,h:36,hp:SIX_HP,maxHp:SIX_HP,state:'alive',spawnT:1.4,t:0,cd:1.6,flash:0,rage:false,n:0,bx:(RZC+4)*T,by:(RZG-8)*T};
+  six={x:(RZC+4)*T-14,y:(RZG-8)*T,w:28,h:36,hp:rodAdapt(SIX_HP),maxHp:rodAdapt(SIX_HP),state:'alive',spawnT:1.4,t:0,cd:1.6,flash:0,rage:false,n:0,bx:(RZC+4)*T,by:(RZG-8)*T};
   cam.x=(RZC-RZW)*T;cam.y=RZG*T-173;camLX=0;camLY=0;
 }
 function rzLeave(){
@@ -4936,7 +4944,7 @@ const CLOUDB_HP=900;
 let cloudB=null,cloudBalls=[],cloudDone=false;
 function cloudRect(){const b=cloudB;if(!b||b.state!=='fight')return null;return [b.x-24,b.y-15,48,30];}
 function startCloudBoss(sg){
-  const cx=sg*SKY_CX*T+8,hp=CLOUDB_HP;
+  const cx=sg*SKY_CX*T+8,hp=rodAdapt(CLOUDB_HP);
   enemies=enemies.filter(e=>Math.abs(e.x-cx)>46*T);
   cloudB={sg,cx,hp,maxHp:hp,state:'intro',t:0,intro:2.2,rage:false,flash:0,x:clamp(player.x+9*T,cx-20*T,cx+20*T),y:clamp(player.y-5*T,(SKY_G-10)*T,(SKY_G-4)*T),face:-1,tx:cx,ty:(SKY_G-8)*T,mt:2,nextB:2.5,nextS:4,nextR:7,dieT:0};
   cloudBalls=[];shake=0.6;sfx.gate();sfx.bossSpawn();
@@ -5220,7 +5228,7 @@ function maybeSpawnJelly(){
     if(Math.abs(tx)<BEACH_TX+JELLY_SCREENS_C*(VW/T))return;   // classique : 26 écrans après le début du sable (ou du checkpoint)
     if(!inBeach(tx))return;
   }
-  const w=30,h=20,bx=p.x+5+p.face*150-w/2,jh=anarchyOn?bossHp(JELLY_HP,'jelly'):JELLY_HP;
+  const w=30,h=20,bx=p.x+5+p.face*150-w/2,jh=anarchyOn?bossHp(JELLY_HP,'jelly'):rodAdapt(JELLY_HP);
   let by=p.y-72;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
   jelly={kind:'jelly',x:bx,y:by,w,h,vx:0,vy:0,hp:jh,maxHp:jh,state:'alive',spawnT:1.6,t:0,flash:0,rot:0,fireCd:3,charge:0,fire:0,baseA:0,sweep:0,upT:0,onGround:false};
