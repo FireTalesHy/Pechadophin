@@ -496,10 +496,11 @@ body{
 .crc .pv canvas{width:24px;height:24px}
 .crd{width:100%;font:400 8px/1.3 var(--pf);text-align:left}
 .crd summary{cursor:pointer;text-align:center;padding:2px 0}
-.crl{max-height:170px;overflow-y:auto;scrollbar-width:thin}
+.crl{max-height:170px;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;box-sizing:border-box;width:100%}
 .crr{display:flex;align-items:center;gap:5px;padding:2px 0}
 .crr canvas{width:20px;height:20px;image-rendering:pixelated;flex:none}
-.crr span{flex:1}
+.crr span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crr em{flex:none}
 .crr em{font-style:normal;opacity:.7}
 #crate-roll{margin:6px 0 10px;text-align:center}
 #crate-view{position:relative;overflow:hidden;height:92px;border:2px solid var(--btn-line);border-radius:12px;background:rgba(0,0,0,.35)}
