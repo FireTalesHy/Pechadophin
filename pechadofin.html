@@ -2599,16 +2599,16 @@ function drawKatanaHeld(hx,hy){
 const FA_KEYS=['dmg','reach','speed','poison'];
 const FAUP={   // améliorations de la faux (or)
  dmg:{name:'Dégâts',vals:[9,11,14,17,21,26],cost:[60,130,220,340,500],fmt:v=>v+' dégâts'},
- reach:{name:'Portée',vals:[34,38,42,46,51,57],cost:[50,110,190,290,420],fmt:v=>fr1(v/16)+' cases'},
+ reach:{name:'Portée',vals:[46,50,54,59,64,70],cost:[50,110,190,290,420],fmt:v=>fr1(v/16)+' cases'},
  speed:{name:'Vitesse de coup',vals:[0.46,0.40,0.35,0.30,0.26,0.22],cost:[45,100,170,260,390],fmt:v=>fr1(1/v)+' coups/s'},
  poison:{name:'Poison',desc:'Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).',vals:[0,1,2,3,4,6],cost:[60,130,220,340,500],fmt:v=>v?v+' / s':'Aucun'}
 };
 const SCYTHE_COST=12,SCY={arc:1.25,combo:4};
 const faV=k=>FAUP[k].vals[shop.fa[k]||0];
 const SCYTHE_ICON=(()=>{   // grande faux : manche marron, lame verte en dégradé (sombre à la base, claire à la pointe)
-  const c=mk(28,20),g=c.getContext('2d');
-  for(let i=0;i<=16;i++){const x=1+Math.round(i*0.9),y=19-i;g.fillStyle='#3a220e';g.fillRect(x-1,y,3,1);g.fillStyle=i%5===2?'#b07a3a':'#8a5a2b';g.fillRect(x,y,1,1);if(i%3===0){g.fillStyle='#6a4220';g.fillRect(x+1,y,1,1);}}
-  const cx=15,cy=14,col=(u,e)=>{const A=[15,90,45],B=[31,154,72],C=[74,222,128],D=[200,255,215],t=u<0.5?u*2:(u-0.5)*2,f=u<0.5?[A,B]:[B,C],r=[0,1,2].map(k=>Math.round(f[0][k]+(f[1][k]-f[0][k])*t));if(e)return '#'+D.map((_,k)=>Math.min(255,r[k]+70).toString(16).padStart(2,'0')).join('');return '#'+r.map(v=>v.toString(16).padStart(2,'0')).join('');};
+  const c=mk(28,30),g=c.getContext('2d');
+  for(let i=0;i<=26;i++){const x=1+Math.round(i*0.45),y=29-i;g.fillStyle='#3a220e';g.fillRect(x-1,y,3,1);g.fillStyle=i%5===2?'#b07a3a':'#8a5a2b';g.fillRect(x,y,1,1);if(i%3===0){g.fillStyle='#6a4220';g.fillRect(x+1,y,1,1);}}
+  const cx=13,cy=14,col=(u,e)=>{const A=[15,90,45],B=[31,154,72],C=[74,222,128],D=[200,255,215],t=u<0.5?u*2:(u-0.5)*2,f=u<0.5?[A,B]:[B,C],r=[0,1,2].map(k=>Math.round(f[0][k]+(f[1][k]-f[0][k])*t));if(e)return '#'+D.map((_,k)=>Math.min(255,r[k]+70).toString(16).padStart(2,'0')).join('');return '#'+r.map(v=>v.toString(16).padStart(2,'0')).join('');};
   for(let k=0;k<=60;k++){
     const u=k/60,ang=(-118+u*125)*Math.PI/180,R=11,th=Math.max(0.7,5*(1-u*0.85));
     for(let r=R;r>R-th;r-=0.5){const x=Math.round(cx+Math.cos(ang)*r*1.05),y=Math.round(cy+Math.sin(ang)*r);g.fillStyle=col(u,r>=R-0.5);g.fillRect(x,y,1,1);}
@@ -2681,7 +2681,7 @@ function drawScytheHeld(hx,hy){
   let a;
   if(scyFx){const k=scyFx.t/scyFx.life;a=scyFx.a+scyFx.dir*(k-0.5)*2*SCY.arc;}
   else a=player.face>0?-0.9:-Math.PI+0.9;
-  ctx.save();ctx.translate(Math.round(hx),Math.round(hy));ctx.rotate(a+Math.PI/4);
+  ctx.save();ctx.translate(Math.round(hx),Math.round(hy));ctx.rotate(a+1.148);   // manche quasi vertical
   ctx.drawImage(SCYTHE_ICON,0,-SCYTHE_ICON.height);
   ctx.restore();
 }
