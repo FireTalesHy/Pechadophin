@@ -2599,7 +2599,7 @@ const FAUP={   // améliorations de la faux (or)
 };
 const SCYTHE_COST=12,SCY={arc:1.25,combo:4};
 const faV=k=>FAUP[k].vals[shop.fa[k]||0];
-const SCYTHE_ICON=spr(["...wwwww..","..wwwwwwW.",".ww...wwW.","ww.....wW.","w....bb.W.",".....b....","....b.....","...b......","..b.......",".b........"],{w:'#e8f0f4',W:'#9fb0c4',b:'#8a5a2b'},true);
+const SCYTHE_ICON=spr(["...wwwww..","..wwwwwwW.",".ww...wwW.","ww.....wW.","w....bb.W.",".....b....","....b.....","...b......","..b.......",".b........"],{w:'#1c1c2a',W:'#e0262e',b:'#2a1a22'},true);
 const POISON_IC=spr([".g.","ggg","gGg","gGg",".g."],{g:'#7cff6a',G:'#3ea82c'},true);
 let scyCd=0,scyN=0,scyReset=0,scyFx=null,scyMoves=[];
 function scyShove(e,tx,ty,life){scyMoves.push({e,vx:(tx-e.x)/life,vy:(ty-e.y)/life,t:0,life});}
@@ -2633,7 +2633,7 @@ function stepScythe(dt){
     let da=Math.atan2(t.r[1]+t.r[3]/2-cy,t.r[0]+t.r[2]/2-cx)-a0;da=Math.atan2(Math.sin(da),Math.cos(da));
     if(Math.abs(da)>SCY.arc&&dist>6)continue;
     const e=t.e;
-    t.hit(dmg);burst(t.r[0]+t.r[2]/2,t.r[1]+t.r[3]/2,kind==='hit'?'#e8f0f4':kind==='pull'?'#c9a0ff':'#ffd23f',kind==='hit'?6:10,90);
+    t.hit(dmg);burst(t.r[0]+t.r[2]/2,t.r[1]+t.r[3]/2,kind==='hit'?'#e0262e':kind==='pull'?'#c9a0ff':'#ffd23f',kind==='hit'?6:10,90);
     if(e&&e.state==='alive'){
       if(ps>0){e.psn=4;e.dot=ps;e.psnT=Math.min(e.psnT||1,0.5);}
       const ex=e.x+e.w/2,ey=e.y+e.h/2,dx=ex-cx,dy=ey-cy,dl=Math.hypot(dx,dy)||1;
@@ -2652,7 +2652,7 @@ function drawScytheFx(){
   const f=scyFx;if(!f)return;
   const k=f.t/f.life,sw=Math.min(1,k*1.5+0.2);
   ctx.save();ctx.globalAlpha=Math.max(0.15,1-k*0.7);
-  const c1=f.kind==='pull'?'#c9a0ff':f.kind==='knock'?'#ffd23f':'#e8f4ff';
+  const c1=f.kind==='pull'?'#c9a0ff':f.kind==='knock'?'#ffd23f':'#e0262e';
   for(let i=0;i<=18;i++){
     const u=i/18;if(u>sw)break;
     const ang=f.a+f.dir*(u-0.5)*2*SCY.arc;
