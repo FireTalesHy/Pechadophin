@@ -2048,13 +2048,16 @@ anarchyOn=anarchyWant;
 const rodLocked=()=>false;   // plus aucune arme bloquée selon la zone
 let anaMul=1,anaWins={},anaSlotDone=new Set();
 const anaWin=t=>{if(anarchyOn)anaWins[t]=(anaWins[t]||0)+1;};   // anarchie : chaque boss vaincu revient plus résistant (x1,05 de PV par victoire sur ce même boss)
-/* Équilibrage canne : le joueur qui reste à la canne (arme de départ, sans en acheter d'autre) affronte des boss moins résistants,
-   en proportion de ses dégâts par seconde (canne non améliorée ≈ 2, deux branches au max ≈ 36). Classique seulement (pas d'anarchie ni de speedrun). */
-const ROD_DPS_REF=20,ROD_MIN_F=0.25;
+/* Équilibrage des boss (classique) pour le joueur qui n'a que les armes gratuites (canne, puis trident) : les PV du boss suivent ses dégâts par seconde.
+   Référence = 40 dégâts/s (canne non améliorée ≈ 2, trident non amélioré ≈ 9, trident au max ≈ 78) ; facteur borné entre 0,3 et 2. */
+const DPS_REF=40,DPS_MIN_F=0.3,DPS_MAX_F=2;
 function rodAdapt(hp){
-  if(anarchyOn||speedOn||shop.weapon!=='rod')return hp;
-  const d=UP.dmg.vals[shop.up.dmg]/UP.rate.vals[shop.up.rate],f=Math.min(1,Math.max(ROD_MIN_F,d/ROD_DPS_REF));
-  return Math.max(10,Math.round(hp*f));
+  if(anarchyOn||speedOn)return hp;
+  let d;
+  if(shop.weapon==='rod')d=UP.dmg.vals[shop.up.dmg]/UP.rate.vals[shop.up.rate];
+  else if(shop.weapon==='trident')d=TUP.dmg.vals[shop.tup.dmg||0]/TUP.rate.vals[shop.tup.rate||0];
+  else return hp;
+  return Math.max(10,Math.round(hp*Math.min(DPS_MAX_F,Math.max(DPS_MIN_F,d/DPS_REF))));
 }
 function bossHp(base,t){
   if(!anarchyOn)return base;
