@@ -1535,8 +1535,8 @@ SKINS.push(
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
 for(const sk of SKINS)sk.price*=50;   // les skins s'achètent en or (le moins cher : 100 or)
 const CRATES=[   // caisses : seule façon d'obtenir les skins à plus de 1600 or. Chaque caisse donne des fragments (6 = le skin) ; l'Épouvofodille peut sortir de toutes les caisses
- {id:'hero',name:'Caisse Héros',cost:600,col:['#4aa8e8','#27479a'],skins:['king','pharaoh','mermaid','icecream','human','angel','paladin','fairy'],w:[2,3,3,4,3,3,2,2]},
- {id:'vil',name:'Caisse Vilain',cost:700,col:['#c4202e','#4a0f18'],skins:['dragon','ghoul','dino','disco','demon','necro','vampire'],w:[2,4,4,4,2,3,2]}
+ {id:'hero',show:'human',name:'Caisse Héros',cost:600,col:['#4aa8e8','#27479a'],skins:['king','pharaoh','mermaid','icecream','human','angel','paladin','fairy'],w:[2,3,3,4,3,3,2,2]},
+ {id:'vil',show:'ghoul',name:'Caisse Vilain',cost:700,col:['#c4202e','#4a0f18'],skins:['dragon','ghoul','dino','disco','demon','necro','vampire'],w:[2,4,4,4,2,3,2]}
 ];
 const CRATE_BONUS={id:'scarecrow',chance:0.15},FRAG_NEED=6;
 for(const c of CRATES)for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk){sk.crate=c.id;sk.frag=FRAG_NEED;}}
@@ -7085,7 +7085,7 @@ function renderCrates(){
     const ic=document.createElement('canvas');ic.className='cic';const im=crSpr(c);ic.width=im.width;ic.height=im.height;ic.getContext('2d').drawImage(im,0,0);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
     const nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;card.appendChild(nm);
     const pv=document.createElement('div');pv.className='pv';
-    for(const id of c.skins.concat([CRATE_BONUS.id]))pv.appendChild(mini(id));
+    {const cv=mini(c.show);cv.style.width='48px';cv.style.height='48px';cv.style.opacity='1';pv.appendChild(cv);}   // un seul skin mis en avant sous la caisse
     card.appendChild(pv);
     const dt=document.createElement('details');dt.className='crd';
     const sm=document.createElement('summary');sm.textContent='DÉTAIL';dt.appendChild(sm);
