@@ -1,5 +1,5 @@
 // Statistiques des joueurs actifs : réservées aux comptes développeurs.
-// POST /api/stats  { id, g, c, m, w, n, cred } : « battement » envoyé par chaque page ouverte (id aléatoire, g = connecté Google, c = sauvegarde cloud, m = mode, w = arme).
+// POST /api/stats  { id, g, c, m, w, b, n, cred } : « battement » envoyé par chaque page ouverte (id aléatoire, g = connecté Google, c = sauvegarde cloud, m = mode, w = arme, b = biome 1 à 5).
 //   Si le jeton Google (cred) est valide, le compte (pseudo, mode, arme) est listé 10 minutes dans « act:acc » pour le détail réservé aux comptes développeurs.
 // GET  /api/stats[?detail=1]  (Authorization: Bearer <jeton Google>) : joueurs actifs à l'instant, par heure (24 h) et par jour (14 j) ; detail=1 ajoute la liste des comptes actifs. Le jeton est vérifié côté serveur
 // et l'empreinte SHA-256 de l'e-mail doit figurer dans la liste des comptes développeurs.
@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
         const t = await verify(String(body.cred)).catch(() => null);
         if (t) {
           const cl = x => String(x || '').replace(/[<>]/g, '').trim();
-          cmds.push(['HSET', 'act:acc', t.sub, JSON.stringify({ n: cl(body.n).slice(0, 16) || 'Joueur', m: cl(body.m).slice(0, 8), w: cl(body.w).slice(0, 12), c, t: now })]);
+          cmds.push(['HSET', 'act:acc', t.sub, JSON.stringify({ n: cl(body.n).slice(0, 16) || 'Joueur', m: cl(body.m).slice(0, 8), w: cl(body.w).slice(0, 12), b: Math.max(1, Math.min(5, Math.floor(Number(body.b)) || 1)), c, t: now })]);
         }
       }
       await pipeline(cmds);
@@ -92,7 +92,7 @@ module.exports = async (req, res) => {
           let o = null; try { o = JSON.parse(flat[i + 1]); } catch (e) {}
           if (!o) { stale.push(flat[i]); continue; }
           if (now - o.t > KEEP_MS) { stale.push(flat[i]); continue; }
-          if (now - o.t <= ACTIVE_MS) accs.push({ n: o.n, m: o.m, w: o.w, c: o.c ? 1 : 0, ago: Math.round((now - o.t) / 1000) });
+          if (now - o.t <= ACTIVE_MS) accs.push({ n: o.n, m: o.m, w: o.w, b: o.b || 1, c: o.c ? 1 : 0, ago: Math.round((now - o.t) / 1000) });
         }
         if (stale.length) pipeline([['HDEL', 'act:acc', ...stale]]).catch(() => {});
         accs.sort((a, b) => a.ago - b.ago);
