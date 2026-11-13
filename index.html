@@ -227,13 +227,13 @@ body{
 .go.alt{background:var(--on);color:var(--on-ink)}
 
 .go.sm{font-size:max(7px,calc(var(--u)*5px));padding:calc(var(--u)*4px) calc(var(--u)*8px);opacity:.85}
-#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap{
+#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap,#crate{
   position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;
   background:rgba(4,12,20,.74);font-family:var(--pf);
   padding:max(10px,env(safe-area-inset-top,0px)) 10px max(10px,env(safe-area-inset-bottom,0px));
 }
-#shop[hidden],#dev[hidden],#rst[hidden],#mis[hidden],#set[hidden],#mode[hidden],#acc[hidden],#weap[hidden]{display:none}
-#rst,#mis,#set,#mode,#acc,#weap{z-index:30}
+#shop[hidden],#dev[hidden],#rst[hidden],#mis[hidden],#set[hidden],#mode[hidden],#acc[hidden],#weap[hidden],#crate[hidden]{display:none}
+#rst,#mis,#set,#mode,#acc,#weap,#crate{z-index:30}
 #rst{z-index:31}
 #rst .row{justify-content:center;gap:12px}
 .shop-panel{
@@ -381,7 +381,7 @@ body{
 }
 /* ---- menus plus doux ---- */
 .shop-panel{border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);animation:mpop .2s ease-out}
-#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap{animation:mfade .2s ease-out;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap,#crate{animation:mfade .2s ease-out;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .card,.wsq,.dev-row,.mis-row,.acc-row{border-radius:10px;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
 .card:hover,.wsq:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.18)}
 .card canvas,.wsq canvas,#weap-big canvas{border-radius:8px}
@@ -392,7 +392,7 @@ body{
 .mis-bar{border-radius:4px;overflow:hidden}.mis-bar i{transition:width .3s ease}
 @keyframes mpop{from{transform:translateY(6px) scale(.97);opacity:0}to{transform:none;opacity:1}}
 @keyframes mfade{from{opacity:0}to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.shop-panel,#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap{animation:none}.card,.wsq,.sbtn,.go,.tab{transition:none}}
+@media (prefers-reduced-motion:reduce){.shop-panel,#shop,#dev,#rst,#mis,#set,#mode,#acc,#weap,#crate{animation:none}.card,.wsq,.sbtn,.go,.tab{transition:none}}
 
 /* Couleurs des menus : clair par défaut, variantes sombres pour garder les textes lisibles */
 :root{--hi:#ffffff;--eq1:#e6fbfb;--eq2:#ccf1f1;--dn1:#fffdf0;--dn2:#fff4cf;--pill:rgba(18,34,47,.07);--pill-line:rgba(18,34,47,.18);--tone:#12222f}
@@ -460,7 +460,7 @@ body{
 .go{border-radius:12px;border:3px solid #14182c;background:linear-gradient(#ffa968,#ff8a3d 55%,#e8702a);box-shadow:0 4px 0 #14182c,inset 0 1px 0 rgba(255,255,255,.45)}
 .go.alt{background:linear-gradient(#2fd0d3,#12a5a8 55%,#0d8588);color:#fff;border-color:#0b3b3d;box-shadow:0 4px 0 #0b3b3d}
 .go:active{transform:translateY(3px);box-shadow:0 1px 0 #14182c}
-#shop-close,#dev-close,#mis-close,#set-close,#weap-close,#mode-close{min-width:150px}
+#shop-close,#dev-close,#mis-close,#set-close,#weap-close,#mode-close,#crate-close{min-width:150px}
 #shop-list,#mis-list,#weap-list,#weap-grid,#dev-list{scrollbar-width:thin;scrollbar-color:#12a5a8 transparent}
 #shop-list::-webkit-scrollbar,#mis-list::-webkit-scrollbar,#weap-list::-webkit-scrollbar{width:8px}
 #shop-list::-webkit-scrollbar-thumb,#mis-list::-webkit-scrollbar-thumb,#weap-list::-webkit-scrollbar-thumb{background:#12a5a8;border-radius:8px}
@@ -483,6 +483,30 @@ body{
 .mis-toast{border-radius:14px;background:linear-gradient(#1c2745,#10182e);box-shadow:0 6px 0 rgba(0,0,0,.35),0 0 24px rgba(255,210,63,.35)}
 .ov-big{border-radius:calc(var(--p)*7);background-image:linear-gradient(rgba(255,255,255,.28),rgba(255,255,255,0) 55%);background-blend-mode:overlay}
 .ov-chip,.ov-gear{background-image:linear-gradient(rgba(255,255,255,.28),rgba(255,255,255,0) 55%),linear-gradient(#4a97ff,#1f62c8)}
+#crate-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;overflow-y:auto;min-height:0;padding:3px;touch-action:pan-y}
+.crc{border:2px solid var(--btn-line);background:linear-gradient(180deg,var(--hi),var(--btn));border-radius:12px;box-shadow:0 3px 0 var(--btn-shadow);padding:8px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.crc canvas{image-rendering:pixelated}
+.crc .cic{width:56px;height:44px}
+.crc .nm{font:400 9px/1.3 var(--pf)}
+.crc .pr{display:flex;align-items:center;gap:5px;font:400 9px/1 var(--pf)}
+.crc .pv{display:flex;gap:3px;flex-wrap:wrap;justify-content:center}
+.crc .pv canvas{width:24px;height:24px}
+.crc .pv.fr{font:400 8px/1.3 var(--pf)}
+#crate-roll{margin:6px 0 10px;text-align:center}
+#crate-view{position:relative;overflow:hidden;height:92px;border:2px solid var(--btn-line);border-radius:12px;background:rgba(0,0,0,.35)}
+#crate-strip{display:flex;height:100%;will-change:transform}
+.ctile{flex:none;width:84px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-right:2px solid rgba(255,255,255,.12);font:400 8px/1.2 var(--pf)}
+.ctile canvas{width:48px;height:48px;image-rendering:pixelated}
+#crate-mark{position:relative;height:0;z-index:2}
+#crate-mark::after{content:'';position:absolute;left:50%;top:0;width:4px;height:96px;margin-left:-2px;background:#ffd23f;box-shadow:0 0 10px #ffd23f;border-radius:2px}
+#crate-res{font:400 11px/1.4 var(--pf);margin:10px 0 0;min-height:16px}
+.ov-sq.crb{background:linear-gradient(#c98a4b,#7a4a1e)}
+.ov-sq.crb canvas{width:calc(var(--p)*14);height:calc(var(--p)*11);image-rendering:pixelated;display:block;margin:auto}
+.card.hay{background:linear-gradient(180deg,#fff0b8,#e8c25a)}
+.card.hay .nm,.card.hay .pr{color:#4a3208}
+.card.hay{animation:haycard 2.6s ease-in-out infinite}
+@keyframes haycard{0%,100%{box-shadow:0 3px 0 var(--btn-shadow),0 0 0 rgba(224,176,74,0)}50%{box-shadow:0 3px 0 var(--btn-shadow),0 0 14px rgba(224,176,74,.9)}}
+@media (prefers-reduced-motion:reduce){.card.hay{animation:none}}
 </style>
 </head>
 <body>
@@ -518,7 +542,7 @@ body{
           <button class="go alt" id="ov-restart" type="button" hidden>RECOMMENCER</button>
           <p class="credits" id="credits">dev : L'taleshy et cocobat<br>testeurs : moustik, ofodile, wyzan, nad l'arnaque et bergoute</p>
         </div>
-        <div class="ov-left"><div class="ov-mini" id="ov-mini"><button class="ov-sq rbb" id="rb-btn" type="button" hidden aria-label="Renaissance" title="Renaissance">↻</button></div><button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button></div>
+        <div class="ov-left"><div class="ov-mini" id="ov-mini"><button class="ov-sq crb" id="crate-btn" type="button" aria-label="Caisses" title="Caisses"><canvas id="crate-ic" width="14" height="11" aria-hidden="true"></canvas></button><button class="ov-sq rbb" id="rb-btn" type="button" hidden aria-label="Renaissance" title="Renaissance">↻</button></div><button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button></div>
       </div>
     </div>
   </div>
@@ -551,6 +575,15 @@ body{
     <button class="sbtn equip" id="mis-all" type="button">TOUT RÉCUPÉRER</button>
     <div id="mis-list"></div>
     <button class="go" id="mis-close" type="button">RETOUR</button>
+  </div>
+</div>
+
+<div id="crate" hidden role="dialog" aria-modal="true" aria-labelledby="crate-title">
+  <div class="shop-panel">
+    <div class="shop-head"><h2 id="crate-title">CAISSES</h2><div class="bals"><div class="bal" title="Or"><canvas id="crate-gold-ic" width="7" height="6" aria-hidden="true"></canvas><span id="crate-gold">0</span></div></div></div>
+    <div id="crate-roll" hidden><div id="crate-mark"></div><div id="crate-view"><div id="crate-strip"></div></div><p id="crate-res"></p></div>
+    <div id="crate-list"></div>
+    <button class="go" id="crate-close" type="button">RETOUR</button>
   </div>
 </div>
 
@@ -669,7 +702,7 @@ const EN={
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
-'BOUTIQUE':'SHOP','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Costumée':'Costume Crate','Caisse Féerique':'Fairy Crate','Caisse Obscure':'Dark Crate','Caisse à skin':'Skin Crate','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
 'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
@@ -704,7 +737,7 @@ const EN={
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
-"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.":'Skins are bought with gold. Open the chests you find along the way to earn some.',
+"Les skins s'achètent avec de l'or. Ceux à plus de 1600 or s'obtiennent dans les caisses (bouton coffre du menu).":'Skins are bought with gold. Skins above 1600 gold come from crates (chest button in the menu).',
 'DAGUES OBTENUES !':'DAGGERS OBTAINED!','ARME N°6 OBTENUE !':'WEAPON N°6 OBTAINED!','LE NUMÉRO 6 !':'NUMBER 6!','Spray':'Spray','Cadence de tir des chiffres x2 (une seule fois).':'Digit fire rate x2 (one time only).','Rouge':'Red','Skin : chaque chiffre a une couleur différente.':'Skin: each digit has a different color.','Skin : tous les chiffres sont rouges.':'Skin: all digits are red.','Rotation':'Spin','Skin : les chiffres tournent sur eux-mêmes.':'Skin: digits spin around.','ACTIF':'ACTIVE','ACHETÉ':'BOUGHT','ACHETER':'BUY','ACTIVER':'ENABLE','DÉSACTIVER':'DISABLE','ÉQUIPE-LA DANS ARMES':'EQUIP IT IN WEAPONS','+3 ÂMES ROUGES':'+3 RED SOULS','+300 OR':'+300 GOLD','+30 OR':'+30 GOLD','ENRAGÉ !':'ENRAGED!','Numéro 6':'Number 6','Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.':'A continuous stream of digits falling in an arc, like the cow\'s milk. Dropped by boss n°6.','Un secret se cache dans les marécages…':'A secret hides in the swamps…','ÉQUIPE-LES DANS ARMES':'EQUIP THEM IN WEAPONS','LA VACHE GÉANTE !':'THE GIANT COW!','ENRAGÉE !':'ENRAGED!','VACHE GÉANTE':'GIANT COW','Vaincre la vache géante':'Defeat the giant cow','Vaincre la sorcière':'Defeat the witch','Vaincre l\'esquimau':'Defeat the eskimo','Vaincre le Roi Cacamille 2':'Defeat King Cacamille 2','Vaincre le dauphin des nuages':'Defeat the cloud dolphin','Mettre une branche au niveau max sur une arme':'Max out one branch on any weapon','Mettre 3 branches au niveau max (toutes armes)':'Max out 3 branches (all weapons)','Obtenir les dagues':'Get the daggers','Obtenir le Numéro 6':'Get Number 6','Obtenir le sceptre de glace':'Get the ice scepter','Obtenir le jeu de tarot':'Get the tarot deck','Acheter le harpon':'Buy the harpoon','Débloquer Silver Chariot':'Unlock Silver Chariot','Débloquer Star Platinum':'Unlock Star Platinum','Débloquer la Sorcellerie':'Unlock Sorcery','Monter les points de vie au maximum':'Max out your hit points','Posséder 15 skins':'Own 15 skins','Renaître une fois':'Be reborn once','RÉCUPÉRER':'CLAIM','MISSION RÉUSSIE !':'MISSION COMPLETE!','RÉCUPÉRÉE':'CLAIMED','Récompense : 100 or':'Reward: 100 gold','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
@@ -713,6 +746,13 @@ const EN={
 'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
+  [/^FRAGMENTS (\d+)\/(\d+)$/,m=>'FRAGMENTS '+m[1]+'/'+m[2]],
+  [/^\+(\d) FRAGMENTS? · (.+) (\d+)\/(\d+)$/,m=>'+'+m[1]+(m[1]==='1'?' FRAGMENT':' FRAGMENTS')+' · '+m[2]+' '+m[3]+'/'+m[4]],
+  [/^SKIN DÉBLOQUÉ : (.+) !$/,m=>'SKIN UNLOCKED: '+m[1]+'!'],
+  [/^NOUVEAU SKIN : (.+) !$/,m=>'NEW SKIN: '+m[1]+'!'],
+  [/^DOUBLON · (.+) · \+(\d+) OR$/,m=>'DUPLICATE · '+m[1]+' · +'+m[2]+' GOLD'],
+  [/^\+(\d+) OR$/,m=>'+'+m[1]+' GOLD'],
+  [/^\+1 VIE$/,()=>'+1 LIFE'],
   [/^SPEEDRUN · TENTATIVE (\d+)$/,m=>'SPEEDRUN · ATTEMPT '+m[1]],
  [/^TENTATIVES : (\d+)(.*)$/,m=>'ATTEMPTS: '+m[1]+m[2].replace('MEILLEUR','BEST')],
  [/^MEILLEUR (\d+:\d\d\.\d\d)$/,m=>'BEST '+m[1]],
@@ -1450,8 +1490,20 @@ function rngCollab(credential) {
     .catch(() => rngMsg('Serveur RNG∞ injoignable, réessaie plus tard.'));
 }
 SKINS.push(RNG_SKIN);
+SKINS.push({id:'scarecrow',name:'Épouvofodille',price:0,frag:6,rod:'#5a3a6a',glow:'#ffb020',
+  pal:{h:'#c9a24a',H:'#7a5a1e',s:'#b8955a',S:'#8a6a3a',b:'#3a2a4a',B:'#241830',g:'#7a5a2a',w:'#f0d070',n:'#2a1a10',y:'#ffb020'},
+  hat:["...w..w..w.w....",".....kkkkkk.....","....khhhhhhk....","...khhHHHhhhk...","..kHHHHHHHHHHk.."],
+  face:["...kssssssssk...","...ksyssssysk...","...kssSSSSssk...","....kksnsnskk..."],
+  torso:["...kbbbbbbbbk...","..wkbbgbbbbswk..","..wkBBBBBBBBkw.."]});   // skin premium : s'obtient par 6 fragments (Caisse à skin)
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
 for(const sk of SKINS)sk.price*=50;   // les skins s'achètent en or (le moins cher : 100 or)
+const CRATES=[   // caisses : seule façon d'obtenir les skins à plus de 1600 or
+ {id:'cos',name:'Caisse Costumée',cost:2500,col:['#c98a4b','#7a4a1e'],skins:['pharaoh','dino','king'],w:[4,4,2]},
+ {id:'fee',name:'Caisse Féerique',cost:3000,col:['#ff8ad8','#a03a98'],skins:['disco','icecream','mermaid'],w:[4,4,2]},
+ {id:'obs',name:'Caisse Obscure',cost:3500,col:['#8a6ad0','#352a4d'],skins:['dragon','ghoul','human'],w:[4,3,3]},
+ {id:'skin',name:'Caisse à skin',cost:1500,col:['#b6e04a','#5a8a1e'],frag:'scarecrow',w:[6,3,1]}   // fragments : x1 / x2 / x3
+];
+for(const c of CRATES)if(c.skins)for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk)sk.crate=c.id;}
 for(const sk of SKINS){
   sk.spr={};
   const pal=Object.assign({},PAL_P,sk.pal);
@@ -2022,7 +2074,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(fresh){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,faOwned:false,fa:{dmg:0,reach:0,speed:0,poison:0},te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,fr:{scarecrow:0},treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=fresh?null:JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -2063,6 +2115,9 @@ function loadShop(fresh){
       if(j.bt&&typeof j.bt==='object')for(const k of ['dmg','range','rate','multi'])d.bt[k]=clamp(Math.floor(Number(j.bt[k]))||0,0,k==='multi'?2:5);
       if(j.weapon==='katana'&&d.katanaOwned)d.weapon='katana';
       if(j.weapon==='boomerang'&&d.boomOwned)d.weapon='boomerang';
+      d.faOwned=j.faOwned===true;
+      if(j.fa&&typeof j.fa==='object')for(const k of ['dmg','reach','speed','poison'])d.fa[k]=clamp(Math.floor(Number(j.fa[k]))||0,0,5);
+      if(j.weapon==='scythe'&&d.faOwned)d.weapon='scythe';
       d.tenOwned=j.tenOwned===true;
       if(j.te&&typeof j.te==='object')for(const k of ['dmg','reach','rate','multi'])d.te[k]=clamp(Math.floor(Number(j.te[k]))||0,0,k==='multi'?2:5);
       if(j.weapon==='tentacle'&&d.tenOwned)d.weapon='tentacle';
@@ -2071,6 +2126,8 @@ function loadShop(fresh){
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
+      if(j.fr&&typeof j.fr==='object')d.fr.scarecrow=clamp(Math.floor(Number(j.fr.scarecrow))||0,0,6);
+      if(d.fr.scarecrow>=6&&!d.owned.includes('scarecrow'))d.owned.push('scarecrow');
       if(Array.isArray(j.owned))for(const id of j.owned)if(SKINS.some(x=>x.id===id)&&!d.owned.includes(id))d.owned.push(id);
       if(d.owned.includes(j.equipped))d.equipped=j.equipped;
       let mig=false;
@@ -2210,6 +2267,7 @@ function hitEnemy(e,dmg){
     kills++; shake=Math.max(shake,0.08); sfx.kill();
     if(shop.equipped===RNG_SKIN.id)rngRoll();   // skin RNG∞ : un tirage au-dessus du pêcheur à chaque dauphin
     if(shop.equipped==='clown'&&kills%18===0)startClownFx(e);   // skin Clown : un gag de clown (+100 or) garanti tous les 18 kills
+    if(shop.equipped==='scarecrow')startCrow(e);   // skin Épouvofodille : un corbeau vient se poser sur le cadavre (1 chance sur 50 : corbeau doré = vie bonus)
     if(curSkin().grab&&Math.random()<1/5)startGrab(e);   // skins Humain et Goule : 1 chance sur 5 qu'une tentacule sorte du sol et emporte le cadavre
     let gold=(e.kind==='knight'?8:e.kind==='archer'?6:e.kind==='fly'?5:e.kind==='gull'?5:e.kind==='mcow'?4:e.kind==='bear'?4:e.kind==='zombie'?3:e.kind==='shoot'?4:e.kind==='worm'?3:2)+(e.tier||0);
     if(shop.equipped==='clown'){gold+=Math.max(1,Math.round(gold*0.5));clownKill(e);}   // skin Clown : +50 % d'or par élimination, et une mini animation
@@ -2231,6 +2289,7 @@ function hurtPlayer(srcX){
   p.invuln=1.6;p.stun=0.28;
   p.vx=(p.x+p.w/2<srcX?-1:1)*150;p.vy=-200;p.onGround=false;
   burst(p.x+5,p.y+7,'#ff5a5a',8);
+  if(shop.equipped==='scarecrow')hayBurst(p);   // skin Épouvofodille : du foin sort du personnage
   if(lives<=0) die();
 }
 function die(){
@@ -2491,6 +2550,87 @@ function drawKatanaHeld(hx,hy){
   ctx.drawImage(KATANA_ICON,0,-KATANA_ICON.height);
   ctx.restore();
 }
+/* ---------- Faux (12 âmes) : 2 coups normaux, le 3e ramène l'ennemi vers toi, le 4e le repousse. Poison en amélioration ---------- */
+const FA_KEYS=['dmg','reach','speed','poison'];
+const FAUP={   // améliorations de la faux (or)
+ dmg:{name:'Dégâts',vals:[9,11,14,17,21,26],cost:[60,130,220,340,500],fmt:v=>v+' dégâts'},
+ reach:{name:'Portée',vals:[34,38,42,46,51,57],cost:[50,110,190,290,420],fmt:v=>fr1(v/16)+' cases'},
+ speed:{name:'Vitesse de coup',vals:[0.46,0.40,0.35,0.30,0.26,0.22],cost:[45,100,170,260,390],fmt:v=>fr1(1/v)+' coups/s'},
+ poison:{name:'Poison',desc:'Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).',vals:[0,1,2,3,4,6],cost:[60,130,220,340,500],fmt:v=>v?v+' / s':'Aucun'}
+};
+const SCYTHE_COST=12,SCY={arc:1.25,combo:4};
+const faV=k=>FAUP[k].vals[shop.fa[k]||0];
+const SCYTHE_ICON=spr(["...wwwww..","..wwwwwwW.",".ww...wwW.","ww.....wW.","w....bb.W.",".....b....","....b.....","...b......","..b.......",".b........"],{w:'#e8f0f4',W:'#9fb0c4',b:'#8a5a2b'},true);
+const POISON_IC=spr([".g.","ggg","gGg","gGg",".g."],{g:'#7cff6a',G:'#3ea82c'},true);
+let scyCd=0,scyN=0,scyReset=0,scyFx=null,scyMoves=[];
+function scyShove(e,tx,ty,life){scyMoves.push({e,vx:(tx-e.x)/life,vy:(ty-e.y)/life,t:0,life});}
+function stepScythe(dt){
+  const p=player;
+  if(fireBuf>0)fireBuf-=dt;
+  if(scyCd>0)scyCd-=dt;
+  if(scyReset>0){scyReset-=dt;if(scyReset<=0)scyN=0;}
+  if(scyFx){scyFx.t+=dt;if(scyFx.t>=scyFx.life)scyFx=null;}
+  throwAnim=Math.max(0,throwAnim-dt);
+  for(const m of scyMoves){   // ennemis ramenés ou repoussés
+    const e=m.e;m.t+=dt;if(e.state!=='alive'){m.t=99;continue;}
+    const nx=e.x+m.vx*dt,ny=e.y+m.vy*dt;
+    if(solidAt(nx+e.w/2,e.y+e.h/2))m.t=99;else e.x=nx;
+    if(!solidAt(e.x+e.w/2,ny+e.h/2))e.y=ny;
+    e.vx=0;if(m.vy<0)e.vy=Math.min(e.vy,0);
+    if(Math.random()<0.7)parts.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:-m.vx*0.1,vy:-m.vy*0.1,g:0,life:0.2,col:m.kind==='pull'?'#c9a0ff':'#ffffff',sz:1});
+  }
+  scyMoves=scyMoves.filter(m=>m.t<m.life);
+  if(!((fireBuf>0||inp.fire||aim.auto)&&scyCd<=0&&p.stun<=0&&state==='play'))return;
+  fireBuf=0;scyN=(scyN%SCY.combo)+1;
+  const kind=scyN===3?'pull':scyN===4?'knock':'hit';
+  scyCd=faV('speed')*(kind==='hit'?1:1.3);scyReset=1.2;throwAnim=0.18;
+  const len=Math.hypot(aim.x,aim.y)||1,ux=aim.x/len,uy=aim.y/len,a0=Math.atan2(uy,ux);
+  if(Math.abs(ux)>0.2)p.face=ux>0?1:-1;
+  const cx=p.x+5,cy=p.y+6,R=Math.round(faV('reach')*(kind==='hit'?1:1.15)),dmg=Math.round(faV('dmg')*(kind==='pull'?1.2:kind==='knock'?1.6:1)),ps=faV('poison');
+  scyFx={a:a0,R,kind,t:0,life:0.18,dir:scyN%2?1:-1,x:cx,y:cy};
+  for(const t of allTargets()){
+    const dist=rectDist(cx,cy,t.r[0],t.r[1],t.r[2],t.r[3]);
+    if(dist>R)continue;
+    let da=Math.atan2(t.r[1]+t.r[3]/2-cy,t.r[0]+t.r[2]/2-cx)-a0;da=Math.atan2(Math.sin(da),Math.cos(da));
+    if(Math.abs(da)>SCY.arc&&dist>6)continue;
+    const e=t.e;
+    t.hit(dmg);burst(t.r[0]+t.r[2]/2,t.r[1]+t.r[3]/2,kind==='hit'?'#e8f0f4':kind==='pull'?'#c9a0ff':'#ffd23f',kind==='hit'?6:10,90);
+    if(e&&e.state==='alive'){
+      if(ps>0){e.psn=4;e.dot=ps;e.psnT=Math.min(e.psnT||1,0.5);}
+      const ex=e.x+e.w/2,ey=e.y+e.h/2,dx=ex-cx,dy=ey-cy,dl=Math.hypot(dx,dy)||1;
+      if(kind==='pull'){   // 3e coup : l'ennemi est ramené contre toi
+        const want=Math.max(0,dl-(e.w/2+8));
+        if(want>1){scyShove(e,e.x-dx/dl*want,e.y-dy/dl*want*0.6,0.14);scyMoves[scyMoves.length-1].kind='pull';}
+      }else if(kind==='knock'){   // 4e coup : l'ennemi est repoussé
+        scyShove(e,e.x+dx/dl*52,e.y+(dy/dl)*20-10,0.2);scyMoves[scyMoves.length-1].kind='knock';
+        e.stunT2=Math.max(e.stunT2||0,0.3);
+      }
+    }
+  }
+  sfx.trident();
+}
+function drawScytheFx(){
+  const f=scyFx;if(!f)return;
+  const k=f.t/f.life,sw=Math.min(1,k*1.5+0.2);
+  ctx.save();ctx.globalAlpha=Math.max(0.15,1-k*0.7);
+  const c1=f.kind==='pull'?'#c9a0ff':f.kind==='knock'?'#ffd23f':'#e8f4ff';
+  for(let i=0;i<=18;i++){
+    const u=i/18;if(u>sw)break;
+    const ang=f.a+f.dir*(u-0.5)*2*SCY.arc;
+    ctx.fillStyle=c1;ctx.fillRect(Math.round(f.x+Math.cos(ang)*f.R*0.88),Math.round(f.y+Math.sin(ang)*f.R*0.88),2,2);
+    ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(f.x+Math.cos(ang)*f.R*0.66),Math.round(f.y+Math.sin(ang)*f.R*0.66),1,1);
+  }
+  if(f.kind==='pull'){ctx.strokeStyle='#c9a0ff';ctx.lineWidth=1;for(let i=-1;i<=1;i++){const a=f.a+i*0.5;ctx.beginPath();ctx.moveTo(Math.round(f.x+Math.cos(a)*f.R)+0.5,Math.round(f.y+Math.sin(a)*f.R)+0.5);ctx.lineTo(Math.round(f.x+Math.cos(a)*f.R*0.45)+0.5,Math.round(f.y+Math.sin(a)*f.R*0.45)+0.5);ctx.stroke();}}
+  ctx.restore();
+}
+function drawScytheHeld(hx,hy){
+  let a;
+  if(scyFx){const k=scyFx.t/scyFx.life;a=scyFx.a+scyFx.dir*(k-0.5)*2*SCY.arc;}
+  else a=player.face>0?-0.9:-Math.PI+0.9;
+  ctx.save();ctx.translate(Math.round(hx),Math.round(hy));ctx.rotate(a+Math.PI/4);
+  ctx.drawImage(SCYTHE_ICON,0,-SCYTHE_ICON.height);
+  ctx.restore();
+}
 /* ---------- Tentacules (10 âmes) : elles sortent du dos, comme celles du skin, et fouettent vers la visée ---------- */
 const TENT_COST=10,TENT_N=4;
 const teV=k=>TNUP[k].vals[shop.te[k]||0];
@@ -2740,6 +2880,52 @@ function clownPayout(c,x,y){
   confetti(x,y,34);burst(x,y,'#ffd23f',10,110);
   shake=Math.max(shake,0.12);try{sfx.bossDie();}catch(err){}
 }
+let crows=[];
+function hayBurst(p){
+  const cols=['#f0d070','#e0b04a','#c89a30','#fff0a0'];
+  for(let i=0;i<16;i++){const a=-Math.PI/2+(Math.random()-0.5)*2.4,sp=40+Math.random()*90;
+    parts.push({x:p.x+3+Math.random()*7,y:p.y+3+Math.random()*9,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-20,g:140,life:0.7+Math.random()*0.5,col:cols[i%4],sz:i%3===0?2:1});}
+}
+function startCrow(e){
+  const gx=e.x+e.w/2,gy=e.y+e.h/2,side=Math.random()<0.5?-1:1;
+  crows.push({x:gx+side*90,y:gy-70,gx,gy,side,t:0,gold:Math.random()<1/50,got:false});
+}
+function stepCrows(dt){
+  if(!crows.length)return;
+  for(const c of crows){
+    c.t+=dt;
+    if(c.t<0.7){const k=c.t/0.7;c.x=c.gx+c.side*90*(1-k);c.y=c.gy-70*(1-k)-Math.sin(k*Math.PI)*6;}
+    else if(c.t<1.4){
+      c.x=c.gx;c.y=c.gy-2;
+      if(!c.got&&c.t>=0.8){
+        c.got=true;
+        if(c.gold&&state==='play'){   // corbeau doré : 1 chance sur 50 d'apporter une vie bonus
+          if(lives<maxLives()){lives++;floatText(c.gx,c.gy-18,'+1 VIE','#ff6a8a');}
+          else if(!speedOn){shop.gold+=100;saveShop();floatText(c.gx,c.gy-18,'+100 OR','#ffd23f');}
+          burst(c.gx,c.gy-6,'#ffd23f',12,90);try{sfx.heal();}catch(e){}
+        }
+      }
+    }
+    else{const k=c.t-1.4;c.x=c.gx-c.side*k*80;c.y=c.gy-2-k*70;}
+  }
+  crows=crows.filter(c=>c.t<2.6);
+}
+function drawCrows(){
+  for(const c of crows){
+    const sit=c.t>=0.7&&c.t<1.4,face=c.t<1.4?-c.side:c.side,flap=sit?0:(Math.floor(c.t*14)%2),peck=sit&&Math.floor(c.t*10)%2;
+    const x=Math.round(c.x),y=Math.round(c.y),main=c.gold?'#ffd23f':'#1c1c2a',wing=c.gold?'#c98a10':'#2e2e44';
+    ctx.save();ctx.translate(x,y);ctx.scale(face,1);
+    ctx.fillStyle=main;ctx.fillRect(-3,-4,7,4);ctx.fillRect(3,peck?-3:-6,3,3);   // corps et tête
+    ctx.fillStyle='#ff9a3c';ctx.fillRect(6,peck?-2:-5,2,1);   // bec
+    ctx.fillStyle=wing;
+    if(sit){ctx.fillRect(-4,-4,4,3);}
+    else if(flap){ctx.fillRect(-4,-8,3,4);ctx.fillRect(-2,-9,3,3);}else{ctx.fillRect(-4,-1,3,3);ctx.fillRect(-2,0,3,2);}
+    ctx.fillStyle=main;ctx.fillRect(-6,-3,3,2);   // queue
+    ctx.fillStyle='#fff';ctx.fillRect(4,peck?-3:-6,1,1);
+    ctx.restore();
+    if(c.gold&&c.t<1.4){ctx.drawImage(HEART,x-3,y-14+Math.round(Math.sin(c.t*10)));}   // le cœur qu'il apporte
+  }
+}
 function clownKill(e){   // skin Clown : à chaque élimination, confettis + petit ballon qui monte puis éclate
   const x=e.x+e.w/2,y=e.y+e.h/2;
   confetti(x,y,10);
@@ -2842,11 +3028,12 @@ function stepSkinFx(dt){
 }
 function stepHook(dt){
   reloadBar=-1;
-  stepSkinFx(dt);stepGrabs(dt);stepClownFx(dt);
+  stepSkinFx(dt);stepGrabs(dt);stepClownFx(dt);stepCrows(dt);
   stepCloudBalls(dt);
   stepCards(dt);
   if(shop.weapon==='harpoon'&&!glockOn){stepHarpoon(dt);return;}
   if(shop.weapon==='katana'&&!glockOn){stepKatana(dt);return;}
+  if(shop.weapon==='scythe'&&!glockOn){stepScythe(dt);return;}
   if(shop.weapon==='tentacle'&&!glockOn){stepTentacle(dt);return;}
   if(shop.weapon==='boomerang'&&!glockOn){stepBoomerang(dt);return;}
   if(shop.weapon==='tarot'&&!glockOn){stepTarot(dt);return;}
@@ -4404,8 +4591,17 @@ const HU={
   chain:{name:'Chaîne',desc:'Les ennemis proches de la cible harponnée subissent la moitié des dégâts.',vals:[0,40,56,72],cost:[1,2,2],fmt:v=>v?fr1(v/16)+' cases':'aucune'}
 };
 const HU_KEYS=['dmg','range','reel','chain'],HARPOON_COST=13;
+const clownGun=()=>shop.equipped==='clown';
 function drawHarpoonShape(x,y,a,flip){
   ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a);if(flip)ctx.scale(1,-1);
+  if(clownGun()){   // skin Clown : un gros poing de clown sur ressort
+    ctx.fillStyle='#14182c';ctx.fillRect(-2,-2,13,4);
+    for(let i=0;i<5;i++){ctx.fillStyle=i%2?'#ffe14d':'#e0262e';ctx.fillRect(-1+i*2,i%2?-2:0,2,2);}
+    ctx.fillStyle='#14182c';ctx.fillRect(10,-5,9,10);ctx.fillRect(18,-3,2,5);
+    ctx.fillStyle='#ffffff';ctx.fillRect(11,-4,7,8);ctx.fillRect(18,-2,1,3);ctx.fillStyle='#d8d8e8';ctx.fillRect(11,2,7,2);
+    ctx.fillStyle='#14182c';ctx.fillRect(14,-4,1,4);ctx.fillRect(16,-4,1,4);ctx.fillStyle='#e0262e';ctx.fillRect(9,-3,2,6);
+    ctx.restore();return;
+  }
   ctx.fillStyle='#14182c';ctx.fillRect(-3,-2,16,4);ctx.fillRect(13,-3,5,6);
   ctx.fillStyle='#8a5a2a';ctx.fillRect(-2,-1,14,2);
   ctx.fillStyle='#dfe8f0';ctx.fillRect(13,-1,4,2);ctx.fillRect(12,-2,2,4);ctx.fillStyle='#ffffff';ctx.fillRect(14,-1,3,1);
@@ -4421,7 +4617,16 @@ function paintGun(g,loaded){   // pistolet à harpon : corps d'acier, crosse en 
   g.fillStyle='#14182c';g.fillRect(12,-3,2,6);
   if(loaded){g.fillStyle='#14182c';g.fillRect(13,-2,10,4);g.fillStyle='#8a5a2a';g.fillRect(13,-1,7,2);g.fillStyle='#dfe8f0';g.fillRect(19,-2,3,4);g.fillRect(22,-1,2,2);g.fillStyle='#ffffff';g.fillRect(20,-1,3,1);}
 }
+function paintClownGun(g,loaded,sm){   // pistolet de clown : canon rayé rouge et jaune, crosse violette, drapeau BANG
+  g.fillStyle='#14182c';g.fillRect(-2,-3,14,6);g.fillRect(0,3,6,7);
+  for(let i=0;i<6;i++){g.fillStyle=i%2?'#ffe14d':'#e0262e';g.fillRect(-1+i*2,-2,2,4);}
+  g.fillStyle='#7a4ad8';g.fillRect(1,3,4,6);g.fillStyle='#b48aff';g.fillRect(1,3,1,6);
+  g.fillStyle='#14182c';g.fillRect(6,3,1,3);g.fillRect(11,-4,3,8);g.fillStyle='#ff8a2a';g.fillRect(12,-3,1,6);
+  if(loaded){g.fillStyle='#14182c';g.fillRect(14,-2,3,4);g.fillStyle='#ffffff';g.fillRect(14,-1,2,2);   // bout du poing qui dépasse du canon
+    g.fillStyle='#14182c';g.fillRect(11,-9,9,5);g.fillStyle='#ff4466';g.fillRect(12,-8,7,3);g.fillStyle='#fff';g.fillRect(13,-7,1,1);g.fillRect(15,-7,1,1);g.fillRect(17,-7,1,1);}   // drapeau BANG
+}
 function paintGunSm(g,loaded){   // version tenue en main : plus petite
+  if(clownGun()){g.save();g.scale(0.8,0.8);paintClownGun(g,loaded,true);g.restore();return;}
   g.fillStyle='#14182c';g.fillRect(-1,-2,10,4);g.fillRect(0,2,4,4);
   g.fillStyle='#6a7488';g.fillRect(0,-1,8,2);g.fillStyle='#9fb0c4';g.fillRect(0,-1,8,1);
   g.fillStyle='#8a5a2a';g.fillRect(1,2,2,3);g.fillStyle='#ffd23f';g.fillRect(2,0,2,1);
@@ -4431,6 +4636,7 @@ function drawHarpoonGun(x,y,a,flip,loaded){
   ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a);if(flip)ctx.scale(1,-1);paintGunSm(ctx,loaded);ctx.restore();
 }
 const HARPOON_ICON=(()=>{const c=mk(26,13),g=c.getContext('2d');g.translate(3,4);paintGun(g,true);return c;})();
+const HARPOON_ICON_CLOWN=(()=>{const c=mk(26,15),g=c.getContext('2d');g.translate(3,8);paintClownGun(g,true);return c;})();
 function stepHarpoon(dt){
   const p=player,L=shop.hu;
   if(fireBuf>0)fireBuf-=dt;
@@ -4471,6 +4677,8 @@ function stepHarpoon(dt){
       const ex=e.x+e.w/2,ey=e.y+e.h/2,tx=pcx-ex,ty=pcy-ey,td=Math.hypot(tx,ty)||1;
       if(td<16||h.t>1.3){hitEnemy(e,dmg);h.st='back';}   // arrivé au pêcheur : second coup
       else{
+        h.dt=(h.dt||0)-dt;   // l'ennemi saigne pendant tout le trajet : dégâts sur la durée
+        if(h.dt<=0){h.dt=0.17;hitEnemy(e,Math.max(1,Math.round(dmg*0.4)));parts.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:(Math.random()-0.5)*50,vy:-30,g:120,life:0.4,col:clownGun()?'#ffe14d':'#ff4466',sz:2});if(e.state!=='alive'){h.st='back';return;}}
         const sdt=spd*dt,nx=e.x+tx/td*sdt,ny=e.y+ty/td*sdt;
         if(solidAt(nx+e.w/2,ny+e.h/2))h.st='back';
         else{e.x=nx;e.y=ny;e.vx=0;if(e.vy>0)e.vy=0;h.x=e.x+e.w/2;h.y=e.y+e.h/2;}
@@ -4507,7 +4715,9 @@ function stepHarpoon(dt){
 function drawHarpoon(){
   const h=harp;if(!h)return;
   const p=player,aa=Math.atan2(aim.y,aim.x),px=p.x+5+p.face*5+Math.cos(aa)*9,py=p.y+8+Math.sin(aa)*9;   // le câble part du canon
-  ctx.strokeStyle='#d8c8a0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(Math.round(px)+0.5,Math.round(py)+0.5);ctx.lineTo(Math.round(h.x)+0.5,Math.round(h.y)+0.5);ctx.stroke();
+  ctx.strokeStyle=clownGun()?'#e0262e':'#d8c8a0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(Math.round(px)+0.5,Math.round(py)+0.5);
+  if(clownGun()){const L=Math.hypot(h.x-px,h.y-py)||1,nx=-(h.y-py)/L,ny=(h.x-px)/L,n=Math.max(2,Math.floor(L/4));for(let i=1;i<n;i++){const k=i/n,o=(i%2?3:-3);ctx.lineTo(Math.round(px+(h.x-px)*k+nx*o)+0.5,Math.round(py+(h.y-py)*k+ny*o)+0.5);}}   // ressort
+  ctx.lineTo(Math.round(h.x)+0.5,Math.round(h.y)+0.5);ctx.stroke();
   const a=h.st==='back'||h.st==='reel'?Math.atan2(py-h.y,px-h.x)+Math.PI:Math.atan2(h.uy,h.ux);
   drawHarpoonShape(h.x-Math.cos(a)*8,h.y-Math.sin(a)*8,a,false);
 }
@@ -4655,7 +4865,7 @@ function stepCards(dt){
 }
 function drawCards(){
   drawHarpoon();
-  drawKatanaFx();drawBoomerang();
+  drawKatanaFx();drawScytheFx();drawBoomerang();
   for(const c of tcards){
     ctx.save();ctx.translate(Math.round(c.x),Math.round(c.y));ctx.rotate(c.sp+c.t*16);
     if(c.star)ctx.drawImage(STAR_ICON,-5,-5);
@@ -5007,7 +5217,7 @@ function stepCamera(dt){
 }
 
 function update(dt){
-  if(devOpen||paused||shopOpen||weapOpen||spdOpen)return;
+  if(devOpen||paused||shopOpen||weapOpen||spdOpen||crOpen)return;
   time+=dt;
   nightA+=(((night&&(!anarchyOn||anaSky%5===1))?1:0)-nightA)*(1-Math.exp(-1.4*dt));
   {const tg=anarchyOn?SKY_PH[anaSky%5]:SKY_PH[0],k=1-Math.exp(-1.4*dt);for(let i=0;i<4;i++)skyCur[i]+=(tg[i]-skyCur[i])*k;}   // la nuit tombe (et se lève) progressivement
@@ -5381,6 +5591,7 @@ function drawPlayer(){
   else if(shop.weapon==='scepter')drawScepterHeld(hx,hy);
   else if(shop.weapon==='tarot')drawTarotHeld(hx,hy);
   else if(shop.weapon==='katana')drawKatanaHeld(hx,hy);
+  else if(shop.weapon==='scythe')drawScytheHeld(hx,hy);
   else if(shop.weapon==='tentacle'){}   // rien en main : les tentacules sortent du dos
   else if(shop.weapon==='boomerang'){if(!booms.length)ctx.drawImage(BOOM_ICON,Math.round(hx)-4,Math.round(hy)-8);}
   else if(shop.weapon==='harpoon')drawHarpoonGun(hx,hy,Math.atan2(aim.y,aim.x),aim.x<0,!harp);
@@ -5921,7 +6132,7 @@ function render(){
     if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(e.x+e.w/2+Math.sin(time*9+e.x)*4),Math.round(e.y-2),1,2);}   // givre
     statusTint(e);
   }
-  drawGrabs();drawClownFx();
+  drawGrabs();drawClownFx();drawCrows();
   drawBoss();
   drawJelly();
   drawCow();
@@ -5977,7 +6188,7 @@ function showTitle(){
 function resetWorld(){
   SEED=(Math.random()*4294967296)|0;
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];crows=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -6248,6 +6459,7 @@ addEventListener('keydown',e=>{
   if(spdOpen){if(e.code==='Escape'&&!speedShown){e.preventDefault();spdOpen=false;$('spd').hidden=true;}return;}
   if(modeOpen){if(e.code==='Escape'){e.preventDefault();closeMode();}return;}
   if(accOpen){if(e.code==='Escape'){e.preventDefault();closeAcc();}return;}
+  if(crOpen){if(e.code==='Escape'){e.preventDefault();closeCrates();}return;}
   if(weapOpen){if(e.code==='Escape'){e.preventDefault();closeWeap();}return;}
   if(devOpen){if(e.code==='Escape'){e.preventDefault();closeDev();}return;}
   if(shopOpen){if(e.code==='Escape'){e.preventDefault();closeShop();}return;}
@@ -6258,7 +6470,7 @@ addEventListener('keydown',e=>{
   const k=KEYMAP[e.code];
   if(k){e.preventDefault();if(e.repeat)return;ensureAudio();press(k);}
 });
-addEventListener('keyup',e=>{if(spdOpen||shopOpen||devOpen||misOpen||setOpen||modeOpen||accOpen||weapOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
+addEventListener('keyup',e=>{if(spdOpen||shopOpen||devOpen||misOpen||setOpen||modeOpen||accOpen||weapOpen||crOpen)return;const k=KEYMAP[e.code];if(k){e.preventDefault();release(k);}});
 addEventListener('blur',clearInputs);
 addEventListener('beforeunload',()=>{if(!speedOn&&score>best){best=score;saveBest();}});
 ovBtn.addEventListener('click',()=>{if(paused)resumeGame();else startGame();});
@@ -6277,8 +6489,8 @@ $('set-sound').addEventListener('click',toggleMute);
 const misEl=$('mis'),setEl=$('set');
 let misOpen=false,setOpen=false,modeOpen=false,accOpen=false;
 const BOSS_MIS=[['shark','shark','Vaincre le démon requin',{gold:100}],['octo','octo','Vaincre le poulpe géant',{gold:150}],['jelly','jelly','Vaincre la méduse',{gold:200}],['castle','castle','Vaincre le château de sable',{gold:250}],['cow','cow','Vaincre la vache géante',{souls:1}],['witch','witch','Vaincre la sorcière',{gold:300}],['esk','eskimo','Vaincre l\'esquimau',{gold:400}],['king','king','Vaincre le Roi Cacamille 2',{souls:2}],['cloud','cloud','Vaincre le dauphin des nuages',{souls:3}]];
-const WEAPON_MAX=[['m_rod','rod','Canne : une branche au niveau max',{gold:100}],['m_trident','trident','Trident : une branche au niveau max',{gold:150}],['m_dagger','dagger','Dagues : une branche au niveau max',{gold:200}],['m_scep','scepter','Sceptre de glace : une branche au niveau max',{gold:250}],['m_tarot','tarot','Tarot : une branche au niveau max',{gold:300}],['m_harp','harpoon','Harpon : une branche au niveau max',{souls:1}],['m_kat','katana','Katana : une branche au niveau max',{gold:350}],['m_boom','boomerang','Boomerang : une branche au niveau max',{gold:350}],['m_ten','tentacle','Tentacules : une branche au niveau max',{gold:400}]];
-const MIS_CHAINS=[['shark','octo','jelly','castle','cow','witch','esk','king','cloud'],['beach','worm'],['skins','skins15'],['o_trident','dagger','scep','six','tarot','harp','o_kat','o_boom','o_ten'],['m_rod','m_trident','m_dagger','m_scep','m_tarot','m_harp','m_kat','m_boom','m_ten']];   // chaînes de missions
+const WEAPON_MAX=[['m_rod','rod','Canne : une branche au niveau max',{gold:100}],['m_trident','trident','Trident : une branche au niveau max',{gold:150}],['m_dagger','dagger','Dagues : une branche au niveau max',{gold:200}],['m_scep','scepter','Sceptre de glace : une branche au niveau max',{gold:250}],['m_tarot','tarot','Tarot : une branche au niveau max',{gold:300}],['m_harp','harpoon','Harpon : une branche au niveau max',{souls:1}],['m_kat','katana','Katana : une branche au niveau max',{gold:350}],['m_boom','boomerang','Boomerang : une branche au niveau max',{gold:350}],['m_ten','tentacle','Tentacules : une branche au niveau max',{gold:400}],['m_fa','scythe','Faux : une branche au niveau max',{gold:450}]];
+const MIS_CHAINS=[['shark','octo','jelly','castle','cow','witch','esk','king','cloud'],['beach','worm'],['skins','skins15'],['o_trident','dagger','scep','six','tarot','harp','o_kat','o_boom','o_ten','o_fa'],['m_rod','m_trident','m_dagger','m_scep','m_tarot','m_harp','m_kat','m_boom','m_ten','m_fa']];   // chaînes de missions
 function missionList(){   // [id, nom, progression, objectif, récompense {gold|souls}]
   const bs=shop.bossSouls||{};
   const L=[
@@ -6293,7 +6505,7 @@ function missionList(){   // [id, nom, progression, objectif, récompense {gold|
     ['skins15','Posséder 15 skins',Math.min(shop.owned.length,15),15,{gold:1000}],
     ['rebirth','Renaître une fois',Math.min(shop.rb||0,1),1,{souls:2}]
   ];
-  L.push(['o_trident','Obtenir le trident infernal',shop.tridentOwned?1:0,1,{gold:50}],['o_kat','Obtenir le katana',shop.katanaOwned?1:0,1,{gold:250}],['o_boom','Obtenir le boomerang',shop.boomOwned?1:0,1,{gold:250}],['o_ten','Obtenir les tentacules',shop.tenOwned?1:0,1,{gold:300}]);
+  L.push(['o_trident','Obtenir le trident infernal',shop.tridentOwned?1:0,1,{gold:50}],['o_kat','Obtenir le katana',shop.katanaOwned?1:0,1,{gold:250}],['o_boom','Obtenir le boomerang',shop.boomOwned?1:0,1,{gold:250}],['o_ten','Obtenir les tentacules',shop.tenOwned?1:0,1,{gold:300}],['o_fa','Obtenir la faux',shop.faOwned?1:0,1,{gold:350}]);
   for(const [id,wid,name,rw] of WEAPON_MAX){const T=TREES[wid],Lv=T.lv();L.push([id,name,T.keys.some(k=>Lv[k]>=bmax(T,k))?1:0,1,rw]);}   // une branche au niveau max pour chaque arme
   for(const [id,key,name,rw] of BOSS_MIS)L.push([id,name,bs[key]?1:0,1,rw]);
   for(const m of L)if(shop.mc[m[0]])m[2]=m[3];   // une mission déjà récupérée reste réussie, même après une renaissance
@@ -6388,14 +6600,15 @@ const WEAPONS=[
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
-  {id:'harpoon',name:'Harpon',desc:'Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi pour un second coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.',icon:()=>HARPOON_ICON,owned:()=>shop.harpoonOwned,buy:{souls:HARPOON_COST,give:()=>{shop.harpoonOwned=true;}},render:()=>renderHarpoon()},
+  {id:'harpoon',name:'Harpon',desc:'Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.',icon:()=>clownGun()?HARPOON_ICON_CLOWN:HARPOON_ICON,owned:()=>shop.harpoonOwned,buy:{souls:HARPOON_COST,give:()=>{shop.harpoonOwned=true;}},render:()=>renderHarpoon()},
   {id:'katana',name:'Katana',desc:'Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.',icon:()=>KATANA_ICON,owned:()=>shop.katanaOwned,buy:{souls:KATANA_COST,give:()=>{shop.katanaOwned=true;}},render:()=>renderTree('katana')},
+  {id:'scythe',name:'Faux',desc:'Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.',icon:()=>SCYTHE_ICON,owned:()=>shop.faOwned,buy:{souls:SCYTHE_COST,give:()=>{shop.faOwned=true;}},render:()=>renderTree('scythe')},
   {id:'tentacle',name:'Tentacules',desc:'Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.',icon:()=>TENT_ICON,owned:()=>shop.tenOwned,buy:{souls:TENT_COST,give:()=>{shop.tenOwned=true;}},render:()=>renderTree('tentacle')},
   {id:'boomerang',name:'Boomerang',desc:'Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.',icon:()=>BOOM_ICON,owned:()=>shop.boomOwned,buy:{gold:BOOM_COST,give:()=>{shop.boomOwned=true;}},render:()=>renderTree('boomerang')},
   {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
-const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon','katana','boomerang','tentacle'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
+const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon','katana','boomerang','tentacle','scythe'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
 WEAPONS.sort((a,b)=>WEAP_ORDER.indexOf(a.id)-WEAP_ORDER.indexOf(b.id));
 let weapOpen=false,weapSel=null;
 const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
@@ -6484,12 +6697,12 @@ const SPEED_KEY='pechadophin-speedrun';
 const speedOk=()=>(speedOn?speedBackup:shop).rb>=1;   // débloqué après la 1re renaissance
 let speedT=0,speedTry=0,speedWeapon=null,speedBackup=null,speedBests={},speedResultIn=0,speedShown=false,speedMsgT=0,speedLast='';
 try{speedBests=JSON.parse(localStorage.getItem(SPEED_KEY)||'{}')||{};}catch(e){}
-const SPEED_BRANCH={rod:['dmg','rate'],trident:['dmg','rate'],dagger:['dmg','dist'],scepter:['dmg','laser'],tarot:['dmg','chariot'],katana:['dmg','finish'],tentacle:['dmg','reach'],boomerang:['dmg','multi'],harpoon:['dmg','reel'],six:[]};
+const SPEED_BRANCH={rod:['dmg','rate'],trident:['dmg','rate'],dagger:['dmg','dist'],scepter:['dmg','laser'],tarot:['dmg','chariot'],katana:['dmg','finish'],scythe:['dmg','poison'],tentacle:['dmg','reach'],boomerang:['dmg','multi'],harpoon:['dmg','reel'],six:[]};
 const fmtT=t=>{const c=Math.floor(t*100),m=Math.floor(c/6000),sc=Math.floor(c/100)%60;return m+':'+String(sc).padStart(2,'0')+'.'+String(c%100).padStart(2,'0');};
 function speedShop(wid,back){
   const d=loadShop(true);
   d.owned=back.owned.slice();d.equipped=back.equipped;d.sx=Object.assign({},back.sx);d.sxOn=Object.assign({},back.sxOn);   // les skins restent ceux du joueur
-  d.tridentOwned=d.daggerOwned=d.sixOwned=d.scepterOwned=d.tarotOwned=d.harpoonOwned=d.katanaOwned=d.boomOwned=d.tenOwned=true;
+  d.tridentOwned=d.daggerOwned=d.sixOwned=d.scepterOwned=d.tarotOwned=d.harpoonOwned=d.katanaOwned=d.boomOwned=d.tenOwned=d.faOwned=true;
   d.sx.spray=true;d.tmulti=3;d.tx={chariot:true,star:true};d.weapon=wid;
   return d;
 }
@@ -6595,7 +6808,7 @@ function renderShop(){
   $('shop-gold').textContent=shop.gold;
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
-  const notes={skins:"Les skins s'achètent avec de l'or. Ouvre les coffres trouvés en chemin pour en gagner.",dagger:"Les dagues attaquent en dash : chaque amélioration coûte de l'or. La hauteur de saut va jusqu'à x2. La parade annule parfois un coup au corps à corps juste après un dash.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Améliore tes points de vie avec les âmes rouges. Les armes et leurs améliorations sont dans le menu ARMES. Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur.",
+  const notes={skins:"Les skins s'achètent avec de l'or. Ceux à plus de 1600 or s'obtiennent dans les caisses (bouton coffre du menu).",dagger:"Les dagues attaquent en dash : chaque amélioration coûte de l'or. La hauteur de saut va jusqu'à x2. La parade annule parfois un coup au corps à corps juste après un dash.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Améliore tes points de vie avec les âmes rouges. Les armes et leurs améliorations sont dans le menu ARMES. Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur.",
     trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or.":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=shopMerchant?"Le marchand améliore ton arme équipée contre de l'or. Ton score n'est pas touché et le jeu est en pause.":notes[shopTab];
   if(shopTab==='dagger')renderDagger();else if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
@@ -6638,6 +6851,7 @@ const TREES={
  scepter:{tab:()=>SCUP,lv:()=>shop.sc,max:5,cur:'gold',keys:SC_KEYS,block:()=>shop.scepterOwned?'':'SCEPTRE REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,slow:ICONS.rate,laser:ICONS.dmg})},
  tarot:{tab:()=>TARU,lv:()=>shop.tl,max:5,bm:{chariot:3,star:3},cur:'gold',keys:['dmg','chariot','star','sorc'],block:()=>shop.tarotOwned?'':'TAROT REQUIS',icons:()=>({dmg:ICONS.dmg,chariot:TAROT_ICON,star:STAR_ICON,sorc:POTION_IC})},
  katana:{tab:()=>KTUP,lv:()=>shop.kt,max:5,cur:'gold',keys:KT_KEYS,block:()=>shop.katanaOwned?'':'KATANA REQUIS',icons:()=>({dmg:ICONS.dmg,reach:ICONS.range,speed:ICONS.rate,finish:ICONS.dmg})},
+ scythe:{tab:()=>FAUP,lv:()=>shop.fa,max:5,cur:'gold',keys:FA_KEYS,block:()=>shop.faOwned?'':'FAUX REQUISE',icons:()=>({dmg:ICONS.dmg,reach:ICONS.range,speed:ICONS.rate,poison:POISON_IC})},
  tentacle:{tab:()=>TNUP,lv:()=>shop.te,max:5,bm:{multi:2},cur:'gold',keys:TN_KEYS,block:()=>shop.tenOwned?'':'TENTACULES REQUISES',icons:()=>({dmg:ICONS.dmg,reach:ICONS.range,rate:ICONS.rate,multi:ICONS.count})},
  boomerang:{tab:()=>BTUP,lv:()=>shop.bt,max:5,bm:{multi:2},cur:'gold',keys:BT_KEYS,block:()=>shop.boomOwned?'':'BOOMERANG REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,rate:ICONS.rate,multi:ICONS.count})},
  harpoon:{tab:()=>HU,lv:()=>shop.hu,max:3,cur:'souls',keys:HU_KEYS,block:()=>shop.harpoonOwned?'':'HARPON REQUIS',icons:()=>({dmg:ICONS.dmg,range:ICONS.range,reel:ICONS.rate,chain:ICONS.dmg})}
@@ -6774,12 +6988,12 @@ function buyUp(key){
 }
 function renderSkins(){
   shopList.textContent='';
-  const PREM=['clown',RNG_SKIN.id],prem=PREM.map(id=>SKINS.find(x=>x.id===id)).filter(Boolean),order=prem.concat(SKINS.filter(x=>!PREM.includes(x.id)));   // skins prémium en haut, puis les skins normaux
+  const PREM=['clown','scarecrow',RNG_SKIN.id],prem=PREM.map(id=>SKINS.find(x=>x.id===id)).filter(Boolean),order=prem.concat(SKINS.filter(x=>!PREM.includes(x.id)));   // skins prémium en haut, puis les skins normaux
   for(const sk of order){
     if(sk===prem[0]){const h=document.createElement('div');h.className='prem-h';h.textContent='PREMIUM SKINS';shopList.appendChild(h);}
     else if(sk===order[prem.length]){const h=document.createElement('div');h.className='prem-sep';shopList.appendChild(h);}
     const owned=shop.owned.includes(sk.id),eq=shop.equipped===sk.id;
-    const card=document.createElement('div');card.className='card'+(eq?' eq':'')+(sk.id==='clown'?' rgb':'')+(sk.id===RNG_SKIN.id?' vio':'');
+    const card=document.createElement('div');card.className='card'+(eq?' eq':'')+(sk.id==='clown'?' rgb':'')+(sk.id===RNG_SKIN.id?' vio':'')+(sk.id==='scarecrow'?' hay':'');
     const pv=document.createElement('canvas');pv.width=16;pv.height=16;
     pv.getContext('2d').drawImage(sk.spr.idle,0,0);
     pv.setAttribute('aria-hidden','true');
@@ -6788,11 +7002,14 @@ function renderSkins(){
     const pr=document.createElement('div');pr.className='pr';
     if(owned){pr.textContent=sk.collab?'COLLAB':sk.price===0?'OFFERT':'POSSÉDÉ';}
     else if(sk.collab){pr.textContent='COLLAB RNG∞';}
+    else if(sk.frag){pr.textContent='FRAGMENTS '+(shop.fr[sk.id]||0)+'/'+sk.frag;}
+    else if(sk.crate){pr.textContent='EN CAISSE';}
     else{const ic=document.createElement('canvas');ic.width=7;ic.height=6;drawIcon(ic,GOLD);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.price;pr.appendChild(sp);}
     card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
     if(eq){b.textContent='ÉQUIPÉ';b.disabled=true;}
     else if(owned){b.textContent='ÉQUIPER';b.classList.add('equip');b.addEventListener('click',()=>{shop.equipped=sk.id;saveShop();renderShop();});}
+    else if(sk.frag||sk.crate){b.textContent='CAISSES';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();openCrates();});}
     else if(sk.collab){b.textContent='DÉBLOQUER';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();accHint='rng';openAcc();});}   // skin collab : renvoie à la connexion Google
     else if(shop.gold>=sk.price){b.textContent='ACHETER';b.addEventListener('click',()=>buySkin(sk));}
     else{b.textContent='IL MANQUE '+(sk.price-shop.gold);b.disabled=true;}
@@ -6802,11 +7019,95 @@ function renderSkins(){
   }
 }
 function buySkin(sk){
-  if(shop.owned.includes(sk.id)||shop.gold<sk.price)return;
+  if(shop.owned.includes(sk.id)||shop.gold<sk.price||sk.crate||sk.frag)return;
   shop.gold-=sk.price;shop.owned.push(sk.id);shop.equipped=sk.id;
   saveShop();sfx.heal();renderShop();
   const nb=shopList.querySelector('.card.eq .sbtn');if(nb)nb.focus({preventScroll:true});
 }
+/* ================= Caisses ================= */
+const crateEl=$('crate'),crateList=$('crate-list');
+let crOpen=false,crBusy=false;
+const crSpr=(c)=>spr(CHEST_ROWS,{k:'#14182c',b:c.col[0],B:c.col[1],y:'#ffd23f'},false);
+function crPick(c){   // tirage pondéré : renvoie l'indice
+  const w=c.w,t=w.reduce((a,b)=>a+b,0);let r=Math.random()*t;
+  for(let i=0;i<w.length;i++){r-=w[i];if(r<0)return i;}
+  return w.length-1;
+}
+function crItem(c,i){   // un lot de la caisse
+  if(c.frag)return {sk:SKINS.find(x=>x.id===c.frag),n:i+1};
+  return {sk:SKINS.find(x=>x.id===c.skins[i]),n:0};
+}
+function renderCrates(){
+  $('crate-gold').textContent=shop.gold;drawIcon($('crate-gold-ic'),GOLD);
+  crateList.textContent='';
+  for(const c of CRATES){
+    const card=document.createElement('div');card.className='crc';
+    const ic=document.createElement('canvas');ic.className='cic';const im=crSpr(c);ic.width=im.width;ic.height=im.height;ic.getContext('2d').drawImage(im,0,0);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;card.appendChild(nm);
+    const pv=document.createElement('div');pv.className='pv'+(c.frag?' fr':'');
+    if(c.frag){const sk=SKINS.find(x=>x.id===c.frag);const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);pv.appendChild(cv);const t=document.createElement('span');t.textContent=sk.name+' : '+(shop.fr[sk.id]||0)+'/'+sk.frag;pv.appendChild(t);}
+    else for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);cv.title=sk.name+(shop.owned.includes(id)?' (possédé)':'');if(shop.owned.includes(id))cv.style.opacity='.45';pv.appendChild(cv);}
+    card.appendChild(pv);
+    const pr=document.createElement('div');pr.className='pr';const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=c.cost;pr.appendChild(sp);card.appendChild(pr);
+    const b=document.createElement('button');b.className='sbtn';b.type='button';
+    const done=c.frag&&shop.owned.includes(c.frag);
+    if(done){b.textContent='COMPLET';b.disabled=true;}
+    else if(crBusy){b.textContent='OUVERTURE…';b.disabled=true;}
+    else if(shop.gold>=c.cost){b.textContent='OUVRIR';b.classList.add('equip');b.addEventListener('click',()=>openCrate(c));}
+    else{b.textContent='IL MANQUE '+(c.cost-shop.gold);b.disabled=true;}
+    b.setAttribute('aria-label',c.name+' : '+b.textContent);
+    card.appendChild(b);crateList.appendChild(card);
+  }
+}
+function openCrate(c){
+  if(crBusy||shop.gold<c.cost||(c.frag&&shop.owned.includes(c.frag)))return;
+  shop.gold-=c.cost;
+  const win=crItem(c,crPick(c));let msg;
+  if(c.frag){   // fragments de skin
+    const id=c.frag,need=win.sk.frag;shop.fr[id]=Math.min(need,(shop.fr[id]||0)+win.n);
+    msg='+'+win.n+(win.n>1?' FRAGMENTS':' FRAGMENT')+' · '+win.sk.name+' '+shop.fr[id]+'/'+need;
+    if(shop.fr[id]>=need&&!shop.owned.includes(id)){shop.owned.push(id);msg='SKIN DÉBLOQUÉ : '+win.sk.name+' !';}
+  }else if(shop.owned.includes(win.sk.id)){const back=Math.floor(win.sk.price/2);shop.gold+=back;msg='DOUBLON · '+win.sk.name+' · +'+back+' OR';}
+  else{shop.owned.push(win.sk.id);msg='NOUVEAU SKIN : '+win.sk.name+' !';}
+  saveShop();
+  // bande de défilement
+  const N=36,WIN=30,TW=84,strip=$('crate-strip'),roll=$('crate-roll'),view=$('crate-view');
+  strip.textContent='';strip.style.transition='none';strip.style.transform='translateX(0)';
+  for(let i=0;i<N;i++){
+    const it=i===WIN?win:crItem(c,crPick(c));
+    const t=document.createElement('div');t.className='ctile';
+    const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(it.sk.spr.idle,0,0);t.appendChild(cv);
+    const l=document.createElement('span');l.textContent=c.frag?'x'+it.n:it.sk.name;t.appendChild(l);
+    strip.appendChild(t);
+  }
+  roll.hidden=false;$('crate-res').textContent='';crBusy=true;renderCrates();
+  void strip.offsetWidth;
+  const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const target=WIN*TW+TW/2-view.clientWidth/2+(Math.random()-0.5)*TW*0.6,dur=reduce?0.3:4.2;
+  strip.style.transition='transform '+dur+'s cubic-bezier(.12,.7,.1,1)';
+  strip.style.transform='translateX('+(-Math.round(target))+'px)';
+  if(typeof sfx!=='undefined'){try{sfx.hit();}catch(e){}}
+  const done=()=>{
+    if(!crBusy)return;crBusy=false;
+    $('crate-res').textContent=msg;try{sfx.heal();}catch(e){}
+    if(crOpen)renderCrates();
+  };
+  strip.addEventListener('transitionend',ev=>{if(ev.target===strip&&ev.propertyName==='transform')done();});
+  setTimeout(done,dur*1000+400);
+}
+function openCrates(){
+  clearInputs();crOpen=true;crateEl.hidden=false;$('crate-roll').hidden=true;renderCrates();
+  try{(crateList.querySelector('.sbtn:not(:disabled)')||$('crate-close')).focus({preventScroll:true});}catch(e){}
+}
+function closeCrates(){
+  crOpen=false;crateEl.hidden=true;crBusy=false;
+  try{drawOvChar();}catch(e){}
+  last=performance.now();acc=0;
+  try{$('crate-btn').focus({preventScroll:true});}catch(e){}
+}
+$('crate-btn').addEventListener('click',()=>{ensureAudio();openCrates();});
+$('crate-close').addEventListener('click',closeCrates);
+{const im=crSpr(CRATES[0]),cv=$('crate-ic');cv.width=im.width;cv.height=im.height;cv.getContext('2d').drawImage(im,0,0);}
 function openShop(tab){
   shopMerchant=tab==='merchant';
   if(shopMerchant)shopTab=shop.weapon==='trident'?'trident':shop.weapon==='dagger'?'dagger':'rod';   // le marchand ne vend que les améliorations de l'arme équipée
