@@ -45,7 +45,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 
 ## 📝 Historique
 
-Voir [CHANGELOG.md](CHANGELOG.md).
+Voir [CHANGELOG.fr.md](CHANGELOG.fr.md).
 
 ## 👥 Crédits
 

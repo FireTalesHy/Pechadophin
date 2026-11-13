@@ -1,289 +1,291 @@
 # Changelog
 
-Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
+🇫🇷 [Lire en français](CHANGELOG.fr.md)
+
+All notable changes to **Pechadophin** (formerly Canne & Dauphins) (`pechadofin.html`).
 
 ## [V0.6] - 2026-11-13 · CASE UPDATE
 
-### Ajouté
-- **Système de caisses (case opening)** : nouveau **bouton coffre** sur l'écran d'accueil. C'est maintenant la **seule façon d'obtenir les skins** (sauf Clown et RNG∞).
-  - **2 caisses** : la **Caisse Héros** (600 or) et la **Caisse Vilain** (700 or), avec une roulette animée qui défile et s'arrête sur ton lot.
-  - Chaque ouverture donne des **fragments** d'un skin (x1 70 %, x2 25 %, x3 5 %) : il en faut **6** pour débloquer un skin. Plus un skin est cher à l'origine, plus il est rare.
-  - Un skin que tu possèdes déjà est converti en **or** (**doublon**).
-  - Chaque caisse a un menu **DÉTAIL** déroulant qui liste ses skins et ta progression en fragments.
-  - Les skins que tu possédais déjà **restent à toi**.
-- **6 nouveaux skins qui opposent le bien et le mal** : **Ange**, **Paladin** et **Fée** (Caisse Héros) face à **Démon**, **Nécromancien** et **Vampire** (Caisse Vilain). Le jeu compte maintenant **36 skins**.
-- **Skin premium Épouvofodille** (épouvantail aux yeux lumineux, **12 fragments**, présent dans les deux caisses avec 15 % de chance par ouverture) :
-  - à chaque kill, un **corbeau** se pose sur le cadavre ; **1 chance sur 50** qu'il soit **doré** et apporte une **vie bonus** (ou 100 or si tes vies sont déjà pleines) ;
-  - quand il prend un coup, du **foin** sort du personnage.
-- **La Faux** (12 âmes rouges) : une grande faux (manche marron, lame verte en dégradé) tenue à la verticale, avec un **combo en 4 coups** : 2 coups normaux, le **3e ramène l'ennemi vers toi** (tourbillon violet, chaînes spectrales), le **4e le repousse** (onde de choc en croissant rouge et noir, étoile d'impact).
-  - Arbre de compétences : **Dégâts**, **Portée**, **Vitesse de coup** et **Poison** (4 s, un tick par seconde).
-  - Deux nouvelles missions : obtenir la faux, et monter une de ses branches au maximum.
-- **Skin RNG∞** : un **laser doré** part vers le ciel à ta mort, et chaque kill a **1 chance sur 67** de déclencher un laser doré qui traverse tout sur son passage (40 dégâts).
-- **Sauvegarde liée au compte Google** : la sauvegarde cloud s'active maintenant **automatiquement à la connexion** (une seule autorisation à accepter). Sur un appareil vierge, la progression du compte se charge directement.
+### Added
+- **Crate system (case opening)**: new **chest button** on the home screen. It is now the **only way to get skins** (except Clown and RNG∞).
+  - **2 crates**: the **Hero Crate** (600 gold) and the **Villain Crate** (700 gold), with an animated roulette that scrolls and stops on your prize.
+  - Each opening gives **fragments** of a skin (x1 70%, x2 25%, x3 5%): you need **6** to unlock a skin. The more expensive a skin was originally, the rarer it is.
+  - A skin you already own is converted into **gold** (**duplicate**).
+  - Each crate has a collapsible **DETAILS** menu listing its skins and your fragment progress.
+  - Skins you already owned **stay yours**.
+- **6 new skins pitting good against evil**: **Angel**, **Paladin** and **Fairy** (Hero Crate) versus **Demon**, **Necromancer** and **Vampire** (Villain Crate). The game now has **36 skins**.
+- **Premium skin Épouvofodille** (scarecrow with glowing eyes, **12 fragments**, found in both crates with a 15% chance per opening):
+  - on every kill, a **crow** lands on the corpse; **1 in 50** is **golden** and brings a **bonus life** (or 100 gold if your lives are already full);
+  - when it takes a hit, **hay** bursts out of the character.
+- **The Scythe** (12 red souls): a large scythe (brown handle, green gradient blade) held vertically, with a **4-hit combo**: 2 normal hits, the **3rd pulls the enemy toward you** (purple vortex, spectral chains), the **4th knocks it back** (red and black crescent shockwave, impact star).
+  - Skill tree: **Damage**, **Reach**, **Attack speed** and **Poison** (4 s, one tick per second).
+  - Two new missions: obtain the scythe, and max out one of its branches.
+- **RNG∞ skin**: a **golden laser** shoots into the sky when you die, and every kill has a **1 in 67 chance** of triggering a golden laser that pierces everything in its path (40 damage).
+- **Save linked to your Google account**: the cloud save now turns on **automatically at sign-in** (a single permission to accept). On a fresh device, your account's progress loads right away.
 
-### Modifié
-- **Harpon : dégâts sur la durée.** L'ennemi harponné saigne pendant tout le trajet qui le ramène à toi, puis prend un dernier coup.
-- **Harpon + skin Clown** : le harpon devient un **pistolet de clown** (canon rayé rouge et jaune, drapeau BANG) qui tire un **gros poing blanc sur ressort rouge**.
-- **Skin Clown** : il s'achète maintenant avec **60 âmes rouges** (au lieu de 1 000 000 or).
-- **Boutique** : les skins sont rangés en **SKINS DÉBLOQUÉS** et **SKINS BLOQUÉS** (menu pliable). Les cartes des skins en caisse affichent leur progression en fragments.
-- Bannière de l'écran d'accueil : **CASE UPDATE**.
+### Changed
+- **Harpoon: damage over time.** A harpooned enemy bleeds along the whole trip back to you, then takes a final hit.
+- **Harpoon + Clown skin**: the harpoon becomes a **clown pistol** (red and yellow striped barrel, BANG flag) that fires a **big white fist on a red spring**.
+- **Clown skin**: it now costs **60 red souls** (instead of 1,000,000 gold).
+- **Shop**: skins are sorted into **UNLOCKED SKINS** and **LOCKED SKINS** (collapsible). Crate skin cards show their fragment progress.
+- Home screen banner: **CASE UPDATE**.
 
 ## [V0.5.5] - 2026-11-11 · SPEEDRUN UPDATE
 
-### Ajouté
-- **Mode SPEEDRUN** (débloqué après ta première renaissance, dans le menu MODE) : bats le **Roi Cacamille 2** le plus vite possible.
-  - Au lancement, tu choisis une arme parmi **4** : trident infernal, jeu de tarot, dagues ou tentacules. Elle est **déjà améliorée au maximum** (2 branches : dégâts + vitesse de tir pour le trident, dégâts + Silver Chariot pour le tarot, dégâts + longueur du dash pour les dagues, dégâts + allonge pour les tentacules).
-  - **Chrono** en haut de l'écran, avec le numéro de tentative. On part du tout début, **sans checkpoint, sans boutique ni marchands** : si tu meurs, **tout recommence depuis le début**.
-  - **10 cœurs** : 5 cœurs dorés posés par-dessus les 5 cœurs rouges. Les dorés partent en premier, les rouges sont la dernière chance. Les cœurs de soin ne restaurent que les rouges.
-  - **Menu de fin** après la victoire : temps, pseudo, skin et arme du joueur, avec ton meilleur temps par arme (enregistré en local). La vraie sauvegarde n'est jamais touchée.
-- **Tentacules : saut boosté.** Quand tu sautes avec les tentacules, trois tentacules prennent appui sur le sol et te propulsent (hauteur de saut x1,25), avec leur animation.
-- **Skin Clown : nouveau gag du tigre.** Un tigre accourt, attrape le cadavre dans sa gueule et bondit dans l'arrière-plan avec lui.
-- Boutique : **halo violet animé**, bouton violet et fond violet pour la case du skin RNG∞.
+### Added
+- **SPEEDRUN mode** (unlocked after your first rebirth, in the MODE menu): beat **King Cacamille 2** as fast as you can.
+  - At launch you pick one of **4** weapons: infernal trident, tarot deck, daggers or tentacles. It is **already fully upgraded** (2 branches: damage + fire rate for the trident, damage + Silver Chariot for the tarot, damage + dash length for the daggers, damage + reach for the tentacles).
+  - **Timer** at the top of the screen, with the attempt number. You start from the very beginning, **with no checkpoints, shop or merchants**: if you die, **everything restarts from the beginning**.
+  - **10 hearts**: 5 golden hearts on top of the 5 red ones. Golden ones go first, red ones are the last chance. Healing hearts only restore the red ones.
+  - **End menu** after victory: time, player name, skin and weapon, with your best time per weapon (stored locally). Your real save is never touched.
+- **Tentacles: boosted jump.** When you jump with the tentacles, three tentacles brace on the ground and propel you (jump height x1.25), with their animation.
+- **Clown skin: new tiger gag.** A tiger rushes in, grabs the corpse in its jaws and leaps into the background with it.
+- Shop: **animated purple halo**, purple button and purple background for the RNG∞ skin card.
 
-### Modifié
-- **Skin Clown** : l'animation spéciale sort maintenant à coup sûr **tous les 18 kills** (au lieu d'1 chance sur 20).
-- **Tentacules : grappin continu.** La vitesse monte progressivement, tu traverses le point d'accroche sans t'arrêter, et la vitesse est **conservée** à l'arrivée et en l'air.
-- Boutique : la catégorie s'appelle **PREMIUM SKINS** (en français comme en anglais).
-- Bannière de l'écran d'accueil : **SPEEDRUN UPDATE**.
+### Changed
+- **Clown skin**: the special animation now triggers **every 18 kills** for sure (instead of a 1 in 20 chance).
+- **Tentacles: continuous grapple.** Speed builds up progressively, you pass through the anchor point without stopping, and speed is **kept** on arrival and in the air.
+- Shop: the category is now called **PREMIUM SKINS** (in French and English).
+- Home screen banner: **SPEEDRUN UPDATE**.
 
 ## [V0.5] - 2026-11-11
 
-### Ajouté
-- **10 skins fantaisie** : licorne, citrouille, champignon, boule disco, dragon, alien, cornet de glace, sirène, **Goule** (capuche en lambeaux, tentacules spectraux) et **Humain** (cheveux bruns, chemise blanche, style streetwear), chacun avec ses effets. Le jeu compte maintenant **29 skins**.
-- **Tentacule fatale** (Humain et Goule) : à chaque kill, 1 chance sur 5 qu'une tentacule sorte du sol et emporte le cadavre sous terre.
-- **Tentacules** (10 âmes rouges, armes diverses) : des tentacules sortent de ton dos, façon skin, et fouettent les ennemis, une tentacule différente à chaque coup. Leur couleur est la couleur majeure du skin (rouge pour l'Humain). Elles servent aussi de grappin, au sol comme sur les plateformes.
-  - Arbre de compétences : **Dégâts**, **Allonge**, **Vitesse de coup** et **Multi-tentacules** (jusqu'à 3 tentacules par coup).
-- **Skin Clown** (1 000 000 or) : +50 % d'or à chaque élimination, une mini animation (confettis et ballon) à chaque kill, et 1 chance sur 20 d'un gag (ballons, clown kamikaze, boîte à surprise) qui emporte le cadavre et rapporte 100 or.
-- **Catégorie « Skins prémium »** dans la boutique, séparée des skins normaux par un trait : Clown (case rouge clair, halo et boutons RGB animés) et RNG∞.
-- **Bannière** des skins fantaisie sous le titre, sur l'écran d'accueil.
+### Added
+- **10 fantasy skins**: unicorn, pumpkin, mushroom, disco ball, dragon, alien, ice cream cone, mermaid, **Ghoul** (ragged hood, spectral tentacles) and **Human** (brown hair, white shirt, streetwear style), each with its own effects. The game now has **29 skins**.
+- **Fatal tentacle** (Human and Ghoul): on every kill, a 1 in 5 chance that a tentacle bursts from the ground and drags the corpse underground.
+- **Tentacles** (10 red souls, misc. weapons): tentacles sprout from your back, skin-style, and whip enemies, a different tentacle on each hit. Their color is the skin's main color (red for the Human). They also work as a grapple, on the ground and on platforms.
+  - Skill tree: **Damage**, **Reach**, **Attack speed** and **Multi-tentacle** (up to 3 tentacles per hit).
+- **Clown skin** (1,000,000 gold): +50% gold on every kill, a mini animation (confetti and balloon) on each kill, and a 1 in 20 chance of a gag (balloons, kamikaze clown, jack-in-the-box) that carries off the corpse and earns 100 gold.
+- **"Premium skins" category** in the shop, separated from normal skins by a line: Clown (light red card, animated RGB halo and buttons) and RNG∞.
+- **Banner** for the fantasy skins under the title on the home screen.
 
-### Modifié
-- **Harpon** : les plateformes sont maintenant accrochables.
-- **Soin** : le cœur apparaît sur le joueur et se récupère instantanément.
-- **Monde des nuages** : les ressorts roses sont posés sur un sol plat, à la hauteur réelle du sol.
-- **Missions** : nouveau bouton TOUT RÉCUPÉRER pour encaisser toutes les récompenses d'un coup.
+### Changed
+- **Harpoon**: platforms can now be hooked.
+- **Healing**: the heart appears on the player and is picked up instantly.
+- **Cloud world**: the pink springs are placed on flat ground, at the real ground height.
+- **Missions**: new CLAIM ALL button to collect every reward at once.
 
 ## [V0.4.9] - 2026-11-08
 
-### Ajouté
-- **Katana** (8 âmes rouges, armes diverses) : un sabre qui tranche en arc devant toi. Les coups s'enchaînent en combo de 3 : le 3e est une grande taille, plus large et bien plus puissante.
-  - Arbre de compétences : **Dégâts**, **Allonge**, **Vitesse de coup** et **Grande taille** (multiplicateur de dégâts du 3e coup, jusqu'à x5).
-- **Boomerang** (500 or, armes diverses) : lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois.
-  - Arbre de compétences : **Dégâts**, **Portée**, **Relance** et **Multi-boomerang** (jusqu'à 3 boomerangs lancés en éventail).
-- **Barre de recharge** au-dessus de la tête du joueur pour les armes qui mettent plus d'une seconde à être de nouveau prêtes (dagues, boomerang).
+### Added
+- **Katana** (8 red souls, misc. weapons): a sword that slashes in an arc in front of you. Hits chain into a 3-hit combo: the 3rd is a big slash, wider and far more powerful.
+  - Skill tree: **Damage**, **Reach**, **Attack speed** and **Big slash** (3rd-hit damage multiplier, up to x5).
+- **Boomerang** (500 gold, misc. weapons): thrown straight ahead, it hurts everything in its path, then returns to you, hitting enemies a second time.
+  - Skill tree: **Damage**, **Range**, **Rethrow** and **Multi-boomerang** (up to 3 boomerangs thrown in a fan).
+- **Cooldown bar** above the player's head for weapons that take more than a second to be ready again (daggers, boomerang).
 
 ## [V0.4.8] - 2026-11-08
 
-### Ajouté
-- **Arbre de compétences du jeu de tarot** : le tarot passe lui aussi à l'arbre, avec 4 branches (2 actives maximum, remboursables).
-  - **Dégâts** : plus de dégâts par carte.
-  - **Silver Chariot** : plus de cartes lancées en éventail (3 niveaux).
-  - **Star Platinum** : étoiles perforantes autoguidées (3 niveaux).
-  - **Sorcellerie** (nouvelle) : chaque carte a une chance d'appliquer une potion au hasard sur l'ennemi touché, brûlure, gel, poison ou étourdissement. Chaque niveau augmente la chance (12 %, 20 %, 28 %, 36 %, puis 50 %).
-- **Nouvelle mission** : débloquer la Sorcellerie.
-- **Refonte de l'interface** : boutons, panneaux et menus redessinés, avec un **thème clair et un thème sombre** qui suivent le réglage de ton appareil.
-- **Bannière « SKILL TREE UPDATE »** sous le titre, sur l'écran d'accueil.
+### Added
+- **Tarot deck skill tree**: the tarot now uses the tree too, with 4 branches (2 active at most, refundable).
+  - **Damage**: more damage per card.
+  - **Silver Chariot**: more cards thrown in a fan (3 levels).
+  - **Star Platinum**: piercing, self-guided stars (3 levels).
+  - **Sorcery** (new): each card has a chance to apply a random potion to the enemy hit: burn, freeze, poison or stun. Each level raises the chance (12%, 20%, 28%, 36%, then 50%).
+- **New mission**: unlock Sorcery.
+- **Interface overhaul**: redesigned buttons, panels and menus, with a **light and a dark theme** that follow your device setting.
+- **"SKILL TREE UPDATE" banner** under the title on the home screen.
 
-### Modifié
-- **Château de sable** : le seau d'eau inflige maintenant des dégâts fixes, qui ne dépendent plus de l'arme utilisée.
-- Le compteur de kills (0/15) pour regagner de la vie passe en bas à gauche de l'écran, avec un cœur grisé à la place du dauphin.
+### Changed
+- **Sand castle**: the water bucket now deals fixed damage, no longer depending on the weapon used.
+- The kill counter (0/15) for regaining life moves to the bottom left of the screen, with a greyed-out heart in place of the dolphin.
 
 ## [V0.4.7] - 2026-11-08
 
-### Ajouté
-- **Anarchie : un boss aléatoire tous les 20 écrans.** Les boss à structure (poulpe géant, château de sable, sorcière, esquimau) sont dans leur arène, les autres (requin, méduse, vache géante, Numéro 6) surgissent en plein terrain. N'importe quel boss peut tomber dans n'importe quel biome.
-  - Chaque victoire sur un même boss le rend un peu plus résistant (x1,05 de PV).
-- **Récompenses de missions** : chaque mission donne de l'or ou des âmes rouges, à récupérer depuis le menu MISSIONS. Un point rouge s'affiche sur l'onglet quand une récompense est disponible, et une notification apparaît à chaque mission réussie.
-- **11 nouvelles missions** : sorcière, esquimau, Roi Cacamille 2, dauphin des nuages, obtenir chaque arme (dagues, Numéro 6, sceptre de glace, tarot, harpon), débloquer Silver Chariot et Star Platinum, points de vie au maximum, 15 skins, renaître une fois, et mettre 3 branches au niveau max.
+### Added
+- **Anarchy: a random boss every 20 screens.** Structured bosses (giant octopus, sand castle, witch, Eskimo) appear in their arena, the others (shark, jellyfish, giant cow, Number 6) burst out in open terrain. Any boss can show up in any biome.
+  - Each victory against the same boss makes it a bit tougher (x1.05 HP).
+- **Mission rewards**: each mission gives gold or red souls, to claim from the MISSIONS menu. A red dot shows on the tab when a reward is available, and a notification pops up on every completed mission.
+- **11 new missions**: witch, Eskimo, King Cacamille 2, cloud dolphin, obtain each weapon (daggers, Number 6, ice scepter, tarot, harpoon), unlock Silver Chariot and Star Platinum, full health, 15 skins, be reborn once, and max out 3 branches.
 
-### Modifié
-- La mission « Trident : toutes les améliorations au maximum » devient « Mettre une branche au niveau max sur une arme » (n'importe quelle arme).
-- **Renaissance** : les boss redonnent leurs récompenses (âmes et or) comme la première fois, et le bouton se débloque en sortant par la fenêtre du château, à chaque renaissance.
-- L'or de tous les joueurs est divisé par 2 et les missions réussies sont remises à zéro (leurs récompenses sont de nouveau à récupérer).
+### Changed
+- The mission "Trident: all upgrades maxed" becomes "Max out one branch on a weapon" (any weapon).
+- **Rebirth**: bosses give their rewards (souls and gold) again like the first time, and the button unlocks when leaving through the castle window, on every rebirth.
+- Every player's gold is halved and completed missions are reset (their rewards can be claimed again).
 
 ## [V0.4.5] - 2026-11-08
 
-### Ajouté
-- **Boss du monde nuage : le dauphin des nuages**. Un énorme dauphin qui vole au-dessus de l'arène, tire des boules de nuages (salves de 3, puis de 5 et un anneau de 10 une fois enragé à 50 % de vie) et fait apparaître des dauphins volants normaux. 900 PV.
-  - Son arène est faite de 18 plateformes de nuages sur 4 niveaux qui ne changent jamais, au-dessus d'un grand vide.
-  - Récompense : 3 âmes rouges (première victoire) et de l'or.
-- **Arbre de compétences des armes** : les améliorations de la canne, du trident, des dagues, du sceptre de glace et du harpon se choisissent maintenant dans un arbre qui part de l'arme.
-  - 4 branches en sortent (une par amélioration) et on ne peut en activer que 2.
-  - Chaque niveau supplémentaire d'une branche est un nœud plus bas.
-  - Les améliorations sont remboursables intégralement, niveau par niveau.
-- **Renaissance** (mode Classique) : une fois le Roi Cacamille 2 vaincu, un petit bouton au-dessus de la boutique permet de recommencer le jeu depuis le début. Les checkpoints sont effacés, mais tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.
-- **Harpon** : nouvelle arme en forme de pistolet, achetable avec des âmes (13). Elle empale les ennemis pour les ramener à toi, ou te tire jusqu'au point d'accroche sur le décor. Coup lourd sur les boss.
-  - Quatre améliorations en âmes : barbes (dégâts), longueur du câble, treuil et chaîne.
-- Nouveau menu ARMES réorganisé : une ligne d'armes d'histoire (canne, trident, dagues, sceptre de glace, avec deux places libres) et une ligne d'armes diverses.
-- Nad l'arnaque rejoint les testeurs dans les crédits.
+### Added
+- **Cloud world boss: the cloud dolphin**. A huge dolphin flying above the arena, firing cloud balls (volleys of 3, then 5 and a ring of 10 once enraged at 50% health) and summoning regular flying dolphins. 900 HP.
+  - Its arena is made of 18 cloud platforms on 4 levels that never change, above a big void.
+  - Reward: 3 red souls (first victory) and gold.
+- **Weapon skill tree**: upgrades for the rod, trident, daggers, ice scepter and harpoon are now picked in a tree starting from the weapon.
+  - 4 branches come out of it (one per upgrade) and only 2 can be active.
+  - Each extra level of a branch is a node further down.
+  - Upgrades are fully refundable, level by level.
+- **Rebirth** (Classic mode): once King Cacamille 2 is beaten, a small button above the shop lets you restart the game from the beginning. Checkpoints are erased, but you keep your weapons, their upgrades, your skins, gold and souls.
+- **Harpoon**: new pistol-shaped weapon, buyable with souls (13). It impales enemies to pull them to you, or pulls you to the anchor point on the scenery. Heavy hit on bosses.
+  - Four upgrades paid in souls: barbs (damage), cable length, winch and chain.
+- New reorganized WEAPONS menu: a row of story weapons (rod, trident, daggers, ice scepter, with two free slots) and a row of misc. weapons.
+- Nad l'arnaque joins the testers in the credits.
 
-### Modifié
-- **Monde nuage** : un vrai ciel sans mer ni montagnes en arrière-plan, et encore moins de sol, avec des trous de 7 à 12 cases.
-- Toutes les améliorations d'armes sont remises à zéro à cause du nouvel arbre : tout ce que tu avais dépensé (or et âmes) t'est rendu automatiquement à ta prochaine connexion.
+### Changed
+- **Cloud world**: a real sky with no sea or mountains in the background, and even less ground, with 7 to 12-tile gaps.
+- All weapon upgrades are reset because of the new tree: everything you had spent (gold and souls) is refunded automatically on your next sign-in.
 
-### Corrigé
-- Certaines armes (comme le Numéro 6) ne pouvaient pas tirer dans le château.
+### Fixed
+- Some weapons (like Number 6) could not fire inside the castle.
 
 ## [V0.4.0] - 2026-11-06
 
-### Ajouté
-- **Le château de glace** au bout de la glacière : on y entre par la porte et on grimpe une tour de 6 étages, avec plateformes, pics de glace, stalactites qui tombent, plateformes friables, chevaliers dauphins et archers.
-- **Boss : le Roi Cacamille 2**, dans sa chambre au sommet. Un grand roi tout fin qui lance des boules marrons par 3, 5, puis jusqu'à 9 une fois enragé, et fait venir ses chevaliers. On y accède par une porte qui téléporte dans sa chambre, avec deux plateformes accessibles d'un saut normal.
-- **Jeu de tarot** : nouvelle arme laissée par le roi, qui tire une carte.
-  - **Silver Chariot** (500 or) : lance 3 cartes en éventail au lieu d'une.
-  - **Star Platinum** (1000 or) : cartes étoilées perforantes, autoguidées vers les autres ennemis dès qu'une étoile a touché.
-- **Le monde nuage** : nouvelle zone, accessible par la fenêtre de la chambre du roi, avec son checkpoint (mode Classique). Ciel lumineux, sol et plateformes en nuages, dauphins volants deux fois plus nombreux, grands trous de 5 à 9 cases avec des ponts de nuages, beaucoup plus de plateformes, et de nouveaux éléments de plateforme :
-  - nuages mobiles (horizontaux ou verticaux) ;
-  - nuages friables qui cèdent après quelques instants ;
-  - ressorts roses qui propulsent très haut ;
-  - courants ascendants.
+### Added
+- **The ice castle** at the end of the icebox: you enter through the door and climb a 6-floor tower, with platforms, ice spikes, falling stalactites, crumbling platforms, dolphin knights and archers.
+- **Boss: King Cacamille 2**, in his chamber at the top. A tall, thin king who throws brown balls in 3s, 5s, then up to 9 once enraged, and summons his knights. You reach him through a door that teleports into his chamber, with two platforms reachable with a normal jump.
+- **Tarot deck**: new weapon dropped by the king, firing a card.
+  - **Silver Chariot** (500 gold): throws 3 cards in a fan instead of one.
+  - **Star Platinum** (1000 gold): piercing star cards, self-guided toward other enemies once a star has hit.
+- **The cloud world**: new zone, reached through the king's chamber window, with its checkpoint (Classic mode). Bright sky, cloud ground and platforms, twice as many flying dolphins, big 5 to 9-tile gaps with cloud bridges, many more platforms, and new platform elements:
+  - moving clouds (horizontal or vertical);
+  - crumbling clouds that give way after a moment;
+  - pink springs that launch very high;
+  - updrafts.
 
 ## [V0.3.9] - 2026-11-02
 
-### Ajouté
-- **Boss de fin des marécages : la sorcière**, dans sa cabane. Elle lance 3 types de potions (poison, dégâts, étourdissement). En seconde phase, elle envoie son chat géant sur le terrain.
-- **La glacière** : nouvelle zone après les marécages, entièrement en glace, avec plateformes de glace, igloo pour le marchand, dauphins de glace (le tireur a des projectiles bleus) et mini ours.
-- **Boss de la glacière : l'esquimau**, qui tire des lasers depuis le sol et pêche lentement avec sa canne.
-- **Sceptre de glace** : nouvelle arme, laissée sur un piédestal par l'esquimau (les portes restent fermées tant qu'elle n'est pas ramassée). Son souffle de glace ralentit les ennemis et les blesse sur la durée, et des lasers de glace jaillissent parfois du sol.
-  - Quatre améliorations (dégâts, portée, ralentissement, fréquence des lasers) jusqu'au niveau 5, dans le menu ARMES ou chez le marchand.
-- **Checkpoint de la glacière** (mode Classique).
-- Un secret supplémentaire à découvrir dans les marécages.
+### Added
+- **Swamp final boss: the witch**, in her hut. She throws 3 types of potions (poison, damage, stun). In the second phase, she sends her giant cat onto the field.
+- **The icebox**: new zone after the swamps, entirely made of ice, with ice platforms, an igloo for the merchant, ice dolphins (the shooter has blue projectiles) and mini bears.
+- **Icebox boss: the Eskimo**, who fires lasers from the ground and slowly fishes with his rod.
+- **Ice scepter**: new weapon, left on a pedestal by the Eskimo (doors stay closed until it is picked up). Its ice breath slows enemies and hurts them over time, and ice lasers sometimes burst from the ground.
+  - Four upgrades (damage, range, slow, laser frequency) up to level 5, in the WEAPONS menu or at the merchant.
+- **Icebox checkpoint** (Classic mode).
+- One more secret to find in the swamps.
 
-### Modifié
-- Le skin Clown coûte désormais 10 000 or.
+### Changed
+- The Clown skin now costs 10,000 gold.
 
 ## [V0.3.5] - 2026-10-16
 
-### Ajouté
-- **Boss secret n°6** : dans les marécages, toucher 6 fois une plateforme posée sur un pilier plonge l'écran dans le noir et téléporte dans une zone secrète d'un écran (fond noir, sol en liseré blanc, chiffres aléatoires qui défilent en dessous, impossible d'en sortir).
-  - Le boss est un grand 6 blanc ailé qui flotte et lance des tridents lents et des salves de chiffres. 800 PV, enragé à 50 %.
-  - Récompense : la nouvelle arme **Numéro 6**, 300 or et 3 âmes rouges (première victoire), puis retour à l'endroit d'où on est parti.
-- **Arme Numéro 6** : un jet continu de chiffres qui retombent en arc, comme le lait de la vache.
-- **Checkpoint des marécages** (mode Classique).
-- **Améliorations des dagues** : dégâts, longueur du dash, hauteur de saut (jusqu'à x2) et parade (25 à 60 % de chance).
-- **Classement TOP 10** du mode Anarchie, avec un pseudo choisi à la connexion Google, et bouton pour enregistrer son score quand on bat son record.
-- **Taille des joysticks** réglable dans les réglages.
+### Added
+- **Secret boss no. 6**: in the swamps, hitting a platform on top of a pillar 6 times plunges the screen into darkness and teleports you to a one-screen secret zone (black background, white outline ground, random digits scrolling below, no way out).
+  - The boss is a big winged white 6 that floats and throws slow tridents and volleys of digits. 800 HP, enraged at 50%.
+  - Reward: the new weapon **Number 6**, 300 gold and 3 red souls (first victory), then you return to where you left from.
+- **Number 6 weapon**: a continuous stream of digits that fall in an arc, like the cow's milk.
+- **Swamp checkpoint** (Classic mode).
+- **Dagger upgrades**: damage, dash length, jump height (up to x2) and parry (25 to 60% chance).
+- **TOP 10 leaderboard** for Anarchy mode, with a nickname chosen at Google sign-in, and a button to submit your score when you beat your record.
+- **Joystick size** adjustable in the settings.
 
-### Modifié
-- Les armes se changent uniquement dans le menu ARMES, ou chez le marchand pendant une partie (nouveau bouton marchand).
-- Menus plus fluides.
-- Tridents multiples supprimés et plus de blocage d'arme par zone.
-- Dash des dagues : 1 s de recharge après l'atterrissage, portée maximale réduite.
-- Piliers des marécages plus larges, uniquement sous les plateformes au-dessus d'un sol plat.
-- Remise à zéro de tous les meilleurs scores.
+### Changed
+- Weapons can only be switched in the WEAPONS menu, or at the merchant during a run (new merchant button).
+- Smoother menus.
+- Multiple tridents removed and no more weapon lock per zone.
+- Dagger dash: 1 s cooldown after landing, reduced maximum range.
+- Wider swamp pillars, only under platforms above flat ground.
+- All best scores reset.
 
 ## [V0.3.1] - 2026-10-15
 
-### Ajouté
-- **Les marécages** : nouvelle zone juste après l'arène du château de sable (mode Classique), aussi tirée au hasard en mode Anarchie.
-  - Herbe et terre sombres, ciel et eau verdâtres, petites flaques et mini tours de château en ruine.
-  - Les plateformes sont des sommets de tours en pierre.
-  - Nouveaux ennemis : mini zombies qui sautillent et mini vaches qui roulent sur le joueur (les dauphins bleus et volants restent).
-- **Vache géante** : boss des marécages, 600 PV, qui attend sur un grand pré plat avec deux plateformes volantes.
-  - Elle se met en boule et roule sur le joueur, ou crache un jet de lait en arc qui s'arrête en touchant le sol.
-  - Enragée à 50 % de PV. Récompense : 150 or et 2 âmes rouges (première victoire seulement). Nouvelle mission associée.
-- **Coffres** : des coffres marron apparaissent au hasard et donnent de l'or.
-- **Coffre rouge** : uniquement dans les marécages, il contient une nouvelle arme, les **dagues**.
-- **Dagues** : chaque attaque est un dash qui blesse tout sur sa trajectoire. Avec les dagues, on se déplace plus vite et on saute un peu plus haut.
-- **Menu ARMES** (menu principal) : une case par arme ; cliquer sur une arme ouvre sa fiche en grand avec ses améliorations et le bouton pour l'équiper.
-- **Sauvegarde cloud** : avec la connexion Google, la progression est sauvegardée dans un fichier caché du Google Drive du joueur et récupérée sur un autre appareil.
-- **Tir automatique** : en maintenant le joystick de visée 1 seconde, le jeu tire tout seul.
-- **Collab RNG∞** : skin RNG∞ à débloquer en ayant un compte RNG∞ avec le même compte Google (bouton DÉBLOQUER dans la boutique), tirage de chiffres au-dessus du pêcheur à chaque dauphin, et les suites 13, 67 et 69 rapportent autant d'or. Lien vers RNG∞ dans les réglages.
+### Added
+- **The swamps**: new zone right after the sand castle arena (Classic mode), also drawn at random in Anarchy mode.
+  - Dark grass and soil, greenish sky and water, small puddles and mini ruined castle towers.
+  - Platforms are the tops of stone towers.
+  - New enemies: hopping mini zombies and mini cows that roll at the player (blue and flying dolphins stay).
+- **Giant cow**: swamp boss, 600 HP, waiting on a big flat meadow with two flying platforms.
+  - It curls into a ball and rolls at the player, or spits an arcing jet of milk that stops when it hits the ground.
+  - Enraged at 50% HP. Reward: 150 gold and 2 red souls (first victory only). New related mission.
+- **Chests**: brown chests appear at random and give gold.
+- **Red chest**: swamps only, it holds a new weapon, the **daggers**.
+- **Daggers**: each attack is a dash that hurts everything along its path. With the daggers, you move faster and jump a bit higher.
+- **WEAPONS menu** (main menu): one slot per weapon; clicking a weapon opens its full sheet with its upgrades and the button to equip it.
+- **Cloud save**: with Google sign-in, progress is saved in a hidden file in the player's Google Drive and restored on another device.
+- **Auto-fire**: holding the aim joystick for 1 second makes the game fire by itself.
+- **RNG∞ collab**: RNG∞ skin to unlock by having an RNG∞ account with the same Google account (UNLOCK button in the shop), digit draw above the fisherman on every dolphin, and the sequences 13, 67 and 69 give bonus gold. Link to RNG∞ in the settings.
 
-### Modifié
-- **Perles supprimées** : les perles déjà gagnées sont converties en or (1 perle = 50 or).
-- **Skins** : ils s'achètent maintenant en or (le moins cher coûte 100 or).
-- **Page de confidentialité** mise à jour (sauvegarde cloud et collab RNG∞).
+### Changed
+- **Pearls removed**: pearls already earned are converted into gold (1 pearl = 50 gold).
+- **Skins**: they are now bought with gold (the cheapest costs 100 gold).
+- **Privacy page** updated (cloud save and RNG∞ collab).
 
 ## [V0.2.12] - 2026-10-15
 
-### Ajouté
-- **Nouveau nom** : le jeu s'appelle désormais **Pechadophin**.
-- **Français / Anglais** : bouton drapeau en haut du menu (il affiche le drapeau de la langue vers laquelle on bascule). Tout le jeu est traduit et le choix est mémorisé.
-- **Connexion Google** : bouton compte dans le menu pour se connecter avec son compte Google (nom et photo affichés). Rien n'est envoyé à un serveur : la session reste dans le navigateur.
-- **Page de confidentialité** (`privacy.html`).
+### Added
+- **New name**: the game is now called **Pechadophin**.
+- **French / English**: flag button at the top of the menu (it shows the flag of the language you will switch to). The whole game is translated and your choice is remembered.
+- **Google sign-in**: account button in the menu to sign in with your Google account (name and photo shown). Nothing is sent to a server: the session stays in the browser.
+- **Privacy page** (`privacy.html`).
 
-### Modifié
-- **Château de sable** : le seau doit être touché 2 fois (peu importe les dégâts) pour s'activer et blesser le château.
-- **Mode Classique** : la méduse apparaît 26 écrans après le début du sable (ou du checkpoint), le château de sable 22 écrans après la méduse.
-- **Mode Anarchie** : la partie commence toujours dans les plaines ; après chaque boss d'arène, la zone suivante est tirée au hasard parmi toutes les zones (plaines, plage), et le boss d'arène dépend de la zone (poulpe dans les plaines, château de sable sur la plage).
+### Changed
+- **Sand castle**: the bucket must be hit 2 times (regardless of damage) to activate and hurt the castle.
+- **Classic mode**: the jellyfish appears 26 screens after the start of the sand (or the checkpoint), the sand castle 22 screens after the jellyfish.
+- **Anarchy mode**: the run always starts in the plains; after each arena boss, the next zone is drawn at random among all zones (plains, beach), and the arena boss depends on the zone (octopus in the plains, sand castle on the beach).
 
 ## [V0.2.11] - 2026-10-13
 
-### Ajouté
-- **Nouveau menu principal** : disposition inspirée des jeux de course sans fin, reprise pour le menu principal, le menu pause et l'écran de mort.
-  - Gros bouton de lancement au centre avec le pêcheur, MISSIONS et réglages (⚙) en haut, bouton MODE à gauche et BOUTIQUE à droite.
-  - Les commandes sont maintenant dans les réglages.
-- **Choix du mode** (bouton MODE) : deux boutons, **Classique** (l'aventure habituelle) et **Anarchie**. Le choix est sauvegardé.
-- **Mode Anarchie** :
-  - Les boss reviennent sans fin selon leur distance et leur zone, avec des PV qui montent à chaque rencontre dans la même partie.
-  - Les ennemis deviennent de plus en plus nombreux, rapides et résistants, sans plafond, et la canne à pêche reste utilisable partout.
-  - La zone change à chaque rencontre avec le poulpe : plage et herbe en alternance, avec décor, cocotiers, tunnels et ennemis adaptés.
-  - Le ciel change à chaque rencontre avec le requin : jour, nuit rouge, crépuscule, nuit bleue, aube, puis le cycle recommence.
-  - Impossible de revenir en arrière dans la zone précédente : seul le château de sable permet de retourner dans la première zone.
-- **Château de sable** : nouveau boss de la plage, 500 PV.
-  - Arène en sable au milieu de la plage, avec le château dessiné en arrière-plan (ses yeux suivent le joueur).
-  - Il ne prend pas de dégâts directement : il faut viser le seau d'eau, qui change de place à chaque coup.
-  - Il attaque avec des vagues de sable annoncées par un avertissement, et fait apparaître quelques mouettes.
-  - Enragé à 50 % de PV : vagues plus rapides et plus nombreuses.
-  - Récompense : 2 âmes rouges (première victoire seulement) et 120 or. Nouvelle mission associée.
-- **Mouette** : ennemi de la plage, elle plane en altitude, se cabre puis fond en piqué sur le joueur avant de remonter. 2 PV de base, rapporte 5 or.
-- **Cocotiers-plateformes** : la couronne de feuilles des cocotiers de la plage sert de plateforme traversable par le dessous.
-- **Second joystick** (tablette) : il contrôle la caméra et la visée, avec une aide à la visée vers la cible la plus proche.
-- **Marchands en cours de partie** : un marchand à côté de son tuk-tuk tous les 18 écrans, pour améliorer l'arme équipée sans toucher au score.
+### Added
+- **New main menu**: layout inspired by endless runners, reused for the main menu, pause menu and death screen.
+  - Big launch button in the center with the fisherman, MISSIONS and settings (⚙) at the top, MODE button on the left and SHOP on the right.
+  - Controls are now in the settings.
+- **Mode selection** (MODE button): two buttons, **Classic** (the usual adventure) and **Anarchy**. Your choice is saved.
+- **Anarchy mode**:
+  - Bosses come back endlessly depending on distance and zone, with HP that rises with each encounter in the same run.
+  - Enemies get more and more numerous, fast and tough, with no cap, and the fishing rod stays usable everywhere.
+  - The zone changes with each octopus encounter: beach and grass alternate, with matching scenery, palm trees, tunnels and enemies.
+  - The sky changes with each shark encounter: day, blood-red night, dusk, blue night, dawn, then the cycle restarts.
+  - You cannot go back to the previous zone: only the sand castle lets you return to the first zone.
+- **Sand castle**: new beach boss, 500 HP.
+  - Sand arena in the middle of the beach, with the castle drawn in the background (its eyes follow the player).
+  - It takes no direct damage: you have to aim at the water bucket, which changes place on every hit.
+  - It attacks with sand waves announced by a warning, and summons a few seagulls.
+  - Enraged at 50% HP: faster, more numerous waves.
+  - Reward: 2 red souls (first victory only) and 120 gold. New related mission.
+- **Seagull**: beach enemy, it hovers high up, rears back then dives at the player before climbing again. 2 base HP, gives 5 gold.
+- **Palm tree platforms**: the leaf crown of the beach palm trees acts as a platform you can pass through from below.
+- **Second joystick** (tablet): it controls the camera and aiming, with aim assist toward the nearest target.
+- **In-run merchants**: a merchant next to his tuk-tuk every 18 screens, to upgrade the equipped weapon without touching the score.
 
-### Modifié
-- **Méduse** : 420 PV (au lieu de 300) et déplacement 1,15 fois plus rapide.
-- **Vers de sable** : sprite simplifié.
-- **Boutique** : l'onglet « ÂMES » devient « ARMES ».
-- **Menu pause** : le bouton « Boutique » devient « Retour au menu principal » et le bouton « Recommencer » disparaît.
-- **Mode Classique** : le poulpe et le château de sable ne se déclenchent qu'une seule fois par partie (quel que soit le côté), et le requin reste dans la zone d'herbe.
+### Changed
+- **Jellyfish**: 420 HP (instead of 300) and moves 1.15 times faster.
+- **Sand worms**: simplified sprite.
+- **Shop**: the "SOULS" tab becomes "WEAPONS".
+- **Pause menu**: the "Shop" button becomes "Back to main menu" and the "Restart" button disappears.
+- **Classic mode**: the octopus and the sand castle trigger only once per run (whichever side), and the shark stays in the grass zone.
 
-## Versions précédentes (jusqu'au 2026-10-12)
+## Earlier versions (up to 2026-10-12)
 
-### Modifié
-- **Canne à pêche (nerf)** : l'amélioration « Grappins tirés » devient « Zone de dégâts ».
-  - Les grappins gardent leur apparence (éventail), mais ne font plus de dégâts individuellement.
-  - Un point central invisible détecte le contact et déclenche une zone de dégâts invisible autour de l'impact.
-  - Dégâts pleins au centre, réduits progressivement jusqu'à -50 % au bord de la zone (minimum 1 dégât).
-  - Rayon de la zone : de 0,3 case (niveau 1, comportement identique à avant) à environ 2 cases (niveau 6).
-  - Tous les grappins reviennent ensemble dès que la zone se déclenche.
-  - Textes de la boutique mis à jour (nom, valeurs affichées, notes).
-- **Démon requin** : les boules de feu sont remplacées par un laser.
-  - Durée de 2 s, le requin reste immobile pendant le tir (il peut toujours être touché).
-  - Épaisseur du faisceau égale à la largeur du requin, longueur égale à celle de l'écran, il traverse le décor.
-  - Télégraphe : une ligne suit le joueur pendant la charge (0,8 s), puis la visée se verrouille 0,3 s avant le tir avec la zone affichée en rouge clignotant.
-  - Nouveau son de laser et léger tremblement d'écran au tir.
-- **Démon requin** : il n'apparaît plus qu'une seule fois par partie, et tire un peu plus vite qu'avant.
-- **Poulpe géant** : il n'y a plus qu'une seule arène par côté (celle avant la plage) ; plus d'arène ni de poulpe dans la plage.
-- **Canne à pêche** : ses améliorations sont bloquées dès que la plage est atteinte. Les niveaux sont conservés, mais la canne devient indisponible (le trident la remplace).
-- **Trident** : il ne s'achète plus, il est débloqué automatiquement à l'arrivée sur la plage. Toutes ses améliorations coûtent de l'or.
-- **Âmes rouges** : chaque boss (requin, poulpe, méduse) n'en donne que la première fois qu'il est vaincu ; ensuite il ne donne plus que de l'or.
+### Changed
+- **Fishing rod (nerf)**: the "Grapples fired" upgrade becomes "Damage zone".
+  - The grapples keep their look (fan), but no longer deal damage individually.
+  - An invisible central point detects contact and triggers an invisible damage zone around the impact.
+  - Full damage at the center, gradually reduced down to -50% at the zone edge (minimum 1 damage).
+  - Zone radius: from 0.3 tile (level 1, same behavior as before) to about 2 tiles (level 6).
+  - All grapples return together as soon as the zone triggers.
+  - Shop texts updated (name, displayed values, notes).
+- **Shark demon**: fireballs are replaced by a laser.
+  - Lasts 2 s, the shark stays still while firing (it can still be hit).
+  - Beam thickness equals the shark's width, length equals the screen's, and it goes through the scenery.
+  - Telegraph: a line follows the player during the charge (0.8 s), then the aim locks 0.3 s before firing with the zone shown flashing red.
+  - New laser sound and a slight screen shake on firing.
+- **Shark demon**: it now appears only once per run, and fires a bit faster than before.
+- **Giant octopus**: there is now only one arena per side (the one before the beach); no more arena or octopus on the beach.
+- **Fishing rod**: its upgrades are locked as soon as the beach is reached. Levels are kept, but the rod becomes unavailable (the trident replaces it).
+- **Trident**: it can no longer be bought, it is unlocked automatically on arriving at the beach. All its upgrades cost gold.
+- **Red souls**: each boss (shark, octopus, jellyfish) gives them only the first time it is beaten; afterwards it only gives gold.
 
-### Ajouté
-- **Dauphin tireur** (rouge-orange) : lent, il charge puis crache les boules de feu que le requin lançait auparavant (vitesse réduite).
-  - Apparaît à la place d'environ 30 % des dauphins bleus au sol, 2 PV de base (plus avec la distance), rapporte 4 or.
-- **Nuit rouge sang** : à l'apparition du requin, le ciel devient rouge sang (transition progressive) avec une teinte rouge sur le monde.
-  - Tous les dauphins sont 1,15 fois plus rapides jusqu'à l'arène du poulpe, qui met fin à la nuit.
-- **Menu pause** : copie du menu principal avec les boutons Reprendre, Boutique et Recommencer.
-  - Touche Échap ou P, ou nouveau bouton ⏸ à côté du bouton son.
-  - Pause automatique quand l'onglet n'est plus visible.
-  - Le jeu est figé pendant la pause et les entrées mémorisées sont réinitialisées à la reprise.
-- **Crédits** affichés en petit sur le menu principal, le menu pause et l'écran de mort :
-  - dev : L'taleshy et cocobat
-  - testeurs : moustik, ofodile et wyzan
-- **Zone Plage** : nouvelle zone à la sortie de l'arène du poulpe, des deux côtés du départ.
-  - Direction artistique sable : ciel, sol, palmiers, transition progressive depuis l'herbe, et sable en niveaux progressifs comme l'herbe du début.
-  - Plus de plateformes : la verticalité passe par des tunnels de sable (descente en pente, galerie, remontée, cheminées avec rebords).
-  - Plus de dauphins volants (roses) ni bleus : seuls les dauphins tireurs rouges restent en surface.
-  - Aide de montée sur les marches d'une case pour parcourir les tunnels plus facilement.
-- **Vers de sable** : ennemis qui vivent dans les tunnels de la plage.
-- **Checkpoint de la plage** : atteindre la plage enregistre la progression ; les parties suivantes démarrent sur la plage (arène du poulpe considérée comme vaincue).
-  - Bouton « RÉINITIALISER LA SAVE » avec double confirmation pour tout effacer (boutique, meilleur score, checkpoint).
-- **Tridents multiples** : amélioration du trident (jusqu'à 4 tridents lancés autour du joueur), débloquée en tuant 10 vers de la plage (compteur affiché). Chaque niveau coûte de l'or (60, 140, 260).
-- **Méduse** : boss volant de la plage, 300 PV, une seule fois par partie, à environ 37 écrans de l'entrée de la plage.
-  - Se balade au-dessus du joueur et le rattrape s'il s'éloigne.
-  - Lasers blancs : charge de 0,85 s avec visée qui se verrouille 0,3 s avant le tir, puis 3 faisceaux en éventail pendant 1,1 s qui balaient lentement.
-  - 4 tentacules qui tournent en permanence autour d'elle et blessent au contact.
-  - Récompense : 2 âmes rouges et 80 or.
-- **10 nouveaux skins** : zombie, plombier, cuisinier, viking, robot, clown, fantôme, pharaon, costume de dino et roi (de 3 à 60 perles).
+### Added
+- **Shooter dolphin** (red-orange): slow, it charges then spits the fireballs the shark used to throw (reduced speed).
+  - Replaces about 30% of the blue dolphins on the ground, 2 base HP (more with distance), gives 4 gold.
+- **Blood-red night**: when the shark appears, the sky turns blood red (gradual transition) with a red tint on the world.
+  - All dolphins are 1.15 times faster until the octopus arena, which ends the night.
+- **Pause menu**: copy of the main menu with Resume, Shop and Restart buttons.
+  - Esc or P key, or a new ⏸ button next to the sound button.
+  - Automatic pause when the tab is no longer visible.
+  - The game is frozen during the pause and buffered inputs are reset on resume.
+- **Credits** shown small on the main menu, pause menu and death screen:
+  - dev: L'taleshy and cocobat
+  - testers: moustik, ofodile and wyzan
+- **Beach zone**: new zone at the exit of the octopus arena, on both sides of the start.
+  - Sand art direction: sky, ground, palm trees, gradual transition from the grass, and sand in progressive levels like the starting grass.
+  - More platforms: verticality comes through sand tunnels (sloping descent, gallery, climb back up, chimneys with ledges).
+  - No more flying (pink) or blue dolphins: only the red shooter dolphins remain on the surface.
+  - Climb assist on one-tile steps to move through the tunnels more easily.
+- **Sand worms**: enemies living in the beach tunnels.
+- **Beach checkpoint**: reaching the beach saves progress; later runs start on the beach (octopus arena counted as beaten).
+  - "RESET SAVE" button with double confirmation to erase everything (shop, best score, checkpoint).
+- **Multiple tridents**: trident upgrade (up to 4 tridents thrown around the player), unlocked by killing 10 beach worms (counter shown). Each level costs gold (60, 140, 260).
+- **Jellyfish**: flying beach boss, 300 HP, once per run, about 37 screens from the beach entrance.
+  - Wanders above the player and catches up if they move away.
+  - White lasers: 0.85 s charge with aim locking 0.3 s before firing, then 3 beams in a fan for 1.1 s that sweep slowly.
+  - 4 tentacles that spin constantly around it and hurt on contact.
+  - Reward: 2 red souls and 80 gold.
+- **10 new skins**: zombie, plumber, cook, viking, robot, clown, ghost, pharaoh, dino costume and king (from 3 to 60 pearls).
