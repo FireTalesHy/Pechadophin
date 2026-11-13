@@ -702,7 +702,7 @@ const EN={
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
-'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Costumée':'Costume Crate','Caisse Féerique':'Fairy Crate','Caisse Obscure':'Dark Crate','Caisse à skin':'Skin Crate','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Costumée':'Costume Crate','Caisse Féerique':'Fairy Crate','Caisse Obscure':'Dark Crate','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
 'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
@@ -1497,13 +1497,13 @@ SKINS.push({id:'scarecrow',name:'Épouvofodille',price:0,frag:6,rod:'#5a3a6a',gl
   torso:["...kbbbbbbbbk...","..wkbbgbbbbswk..","..wkBBBBBBBBkw.."]});   // skin premium : s'obtient par 6 fragments (Caisse à skin)
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
 for(const sk of SKINS)sk.price*=50;   // les skins s'achètent en or (le moins cher : 100 or)
-const CRATES=[   // caisses : seule façon d'obtenir les skins à plus de 1600 or
- {id:'cos',name:'Caisse Costumée',cost:2500,col:['#c98a4b','#7a4a1e'],skins:['pharaoh','dino','king'],w:[4,4,2]},
- {id:'fee',name:'Caisse Féerique',cost:3000,col:['#ff8ad8','#a03a98'],skins:['disco','icecream','mermaid'],w:[4,4,2]},
- {id:'obs',name:'Caisse Obscure',cost:3500,col:['#8a6ad0','#352a4d'],skins:['dragon','ghoul','human'],w:[4,3,3]},
- {id:'skin',name:'Caisse à skin',cost:1500,col:['#b6e04a','#5a8a1e'],frag:'scarecrow',w:[6,3,1]}   // fragments : x1 / x2 / x3
+const CRATES=[   // caisses : seule façon d'obtenir les skins à plus de 1600 or. Chaque caisse donne des fragments (6 = le skin) ; l'Épouvofodille peut sortir de toutes les caisses
+ {id:'cos',name:'Caisse Costumée',cost:500,col:['#c98a4b','#7a4a1e'],skins:['pharaoh','dino','king'],w:[4,4,2]},
+ {id:'fee',name:'Caisse Féerique',cost:600,col:['#ff8ad8','#a03a98'],skins:['disco','icecream','mermaid'],w:[4,4,2]},
+ {id:'obs',name:'Caisse Obscure',cost:700,col:['#8a6ad0','#352a4d'],skins:['dragon','ghoul','human'],w:[4,3,3]}
 ];
-for(const c of CRATES)if(c.skins)for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk)sk.crate=c.id;}
+const CRATE_BONUS={id:'scarecrow',chance:0.15},FRAG_NEED=6;
+for(const c of CRATES)for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk){sk.crate=c.id;sk.frag=FRAG_NEED;}}
 for(const sk of SKINS){
   sk.spr={};
   const pal=Object.assign({},PAL_P,sk.pal);
@@ -2074,7 +2074,7 @@ const DUP={   // améliorations des dagues (or)
 const SOUL_UP={hp:{name:'Points de vie',vals:[3,4,5,6,7,8],cost:[1,2,3,5,8],fmt:v=>v+' PV'}};
 const SHOP_KEY='canne-dauphins-boutique';
 function loadShop(fresh){
-  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,faOwned:false,fa:{dmg:0,reach:0,speed:0,poison:0},te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,fr:{scarecrow:0},treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
+  const d={swamp:0,ice:0,pearls:0,daggerOwned:false,sixOwned:false,cloud:0,scepterOwned:false,tarotOwned:false,harpoonOwned:false,katanaOwned:false,boomOwned:false,tenOwned:false,faOwned:false,fa:{dmg:0,reach:0,speed:0,poison:0},te:{dmg:0,reach:0,rate:0,multi:0},kt:{dmg:0,reach:0,speed:0,finish:0},bt:{dmg:0,range:0,rate:0,multi:0},rb:0,fr:{},treeV:2,gv:1,tl:{dmg:0,chariot:0,star:0,sorc:0},mc:{},hu:{dmg:0,range:0,reel:0,chain:0},tx:{chariot:false,star:false},sc:{dmg:0,range:0,slow:0,laser:0},sx:{spray:false,rgb:false,red:false,spin:false},sxOn:{rgb:false,red:false,spin:false},gold:0,souls:0,hp:0,beach:0,wormKills:0,weapon:'rod',tridentOwned:false,bossSouls:{},tmulti:0,tup:{dmg:0,pierce:0,rate:0,range:0},dup:{dmg:0,dist:0,jump:0,parry:0},up:{range:0,count:0,rate:0,dmg:0},owned:['classic'],equipped:'classic'};
   try{
     const j=fresh?null:JSON.parse(localStorage.getItem(SHOP_KEY)||'null');
     if(j&&typeof j==='object'){
@@ -2126,8 +2126,11 @@ function loadShop(fresh){
       if(j.dup&&typeof j.dup==='object')for(const k of D_KEYS)d.dup[k]=clamp(Math.floor(Number(j.dup[k]))||0,0,5);
       if(j.tup&&typeof j.tup==='object')for(const k of T_KEYS)d.tup[k]=clamp(Math.floor(Number(j.tup[k]))||0,0,5);
       if(j.up&&typeof j.up==='object')for(const k of UP_KEYS)d.up[k]=clamp(Math.floor(Number(j.up[k]))||0,0,5);
-      if(j.fr&&typeof j.fr==='object')d.fr.scarecrow=clamp(Math.floor(Number(j.fr.scarecrow))||0,0,6);
-      if(d.fr.scarecrow>=6&&!d.owned.includes('scarecrow'))d.owned.push('scarecrow');
+      for(const sk of SKINS)if(sk.frag){
+        const n=j.fr&&typeof j.fr==='object'?clamp(Math.floor(Number(j.fr[sk.id]))||0,0,sk.frag):0;
+        if(n>0)d.fr[sk.id]=n;
+        if(n>=sk.frag&&!d.owned.includes(sk.id))d.owned.push(sk.id);
+      }
       if(Array.isArray(j.owned))for(const id of j.owned)if(SKINS.some(x=>x.id===id)&&!d.owned.includes(id))d.owned.push(id);
       if(d.owned.includes(j.equipped))d.equipped=j.equipped;
       let mig=false;
@@ -7033,26 +7036,24 @@ function crPick(c){   // tirage pondéré : renvoie l'indice
   for(let i=0;i<w.length;i++){r-=w[i];if(r<0)return i;}
   return w.length-1;
 }
-function crItem(c,i){   // un lot de la caisse
-  if(c.frag)return {sk:SKINS.find(x=>x.id===c.frag),n:i+1};
-  return {sk:SKINS.find(x=>x.id===c.skins[i]),n:0};
+function crRoll(c){   // un lot : un skin et un nombre de fragments (x1 70 %, x2 25 %, x3 5 %)
+  const id=Math.random()<CRATE_BONUS.chance?CRATE_BONUS.id:c.skins[crPick(c)],r=Math.random();
+  return {sk:SKINS.find(x=>x.id===id),n:r<0.7?1:r<0.95?2:3};
 }
 function renderCrates(){
   $('crate-gold').textContent=shop.gold;drawIcon($('crate-gold-ic'),GOLD);
   crateList.textContent='';
+  const mini=(id)=>{const sk=SKINS.find(x=>x.id===id),cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);cv.title=sk.name+' '+(shop.owned.includes(id)?'(possédé)':(shop.fr[id]||0)+'/'+FRAG_NEED);if(shop.owned.includes(id))cv.style.opacity='.45';return cv;};
   for(const c of CRATES){
     const card=document.createElement('div');card.className='crc';
     const ic=document.createElement('canvas');ic.className='cic';const im=crSpr(c);ic.width=im.width;ic.height=im.height;ic.getContext('2d').drawImage(im,0,0);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
     const nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;card.appendChild(nm);
-    const pv=document.createElement('div');pv.className='pv'+(c.frag?' fr':'');
-    if(c.frag){const sk=SKINS.find(x=>x.id===c.frag);const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);pv.appendChild(cv);const t=document.createElement('span');t.textContent=sk.name+' : '+(shop.fr[sk.id]||0)+'/'+sk.frag;pv.appendChild(t);}
-    else for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);cv.title=sk.name+(shop.owned.includes(id)?' (possédé)':'');if(shop.owned.includes(id))cv.style.opacity='.45';pv.appendChild(cv);}
+    const pv=document.createElement('div');pv.className='pv';
+    for(const id of c.skins.concat([CRATE_BONUS.id]))pv.appendChild(mini(id));
     card.appendChild(pv);
     const pr=document.createElement('div');pr.className='pr';const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=c.cost;pr.appendChild(sp);card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
-    const done=c.frag&&shop.owned.includes(c.frag);
-    if(done){b.textContent='COMPLET';b.disabled=true;}
-    else if(crBusy){b.textContent='OUVERTURE…';b.disabled=true;}
+    if(crBusy){b.textContent='OUVERTURE…';b.disabled=true;}
     else if(shop.gold>=c.cost){b.textContent='OUVRIR';b.classList.add('equip');b.addEventListener('click',()=>openCrate(c));}
     else{b.textContent='IL MANQUE '+(c.cost-shop.gold);b.disabled=true;}
     b.setAttribute('aria-label',c.name+' : '+b.textContent);
@@ -7060,24 +7061,24 @@ function renderCrates(){
   }
 }
 function openCrate(c){
-  if(crBusy||shop.gold<c.cost||(c.frag&&shop.owned.includes(c.frag)))return;
+  if(crBusy||shop.gold<c.cost)return;
   shop.gold-=c.cost;
-  const win=crItem(c,crPick(c));let msg;
-  if(c.frag){   // fragments de skin
-    const id=c.frag,need=win.sk.frag;shop.fr[id]=Math.min(need,(shop.fr[id]||0)+win.n);
-    msg='+'+win.n+(win.n>1?' FRAGMENTS':' FRAGMENT')+' · '+win.sk.name+' '+shop.fr[id]+'/'+need;
-    if(shop.fr[id]>=need&&!shop.owned.includes(id)){shop.owned.push(id);msg='SKIN DÉBLOQUÉ : '+win.sk.name+' !';}
-  }else if(shop.owned.includes(win.sk.id)){const back=Math.floor(win.sk.price/2);shop.gold+=back;msg='DOUBLON · '+win.sk.name+' · +'+back+' OR';}
-  else{shop.owned.push(win.sk.id);msg='NOUVEAU SKIN : '+win.sk.name+' !';}
+  const win=crRoll(c),sk=win.sk,id=sk.id;let msg;
+  if(shop.owned.includes(id)){   // skin déjà possédé : les fragments sont convertis en or
+    const back=Math.max(25,Math.floor(sk.price/12))*win.n;shop.gold+=back;msg='DOUBLON · '+sk.name+' · +'+back+' OR';
+  }else{
+    shop.fr[id]=Math.min(FRAG_NEED,(shop.fr[id]||0)+win.n);
+    msg='+'+win.n+(win.n>1?' FRAGMENTS':' FRAGMENT')+' · '+sk.name+' '+shop.fr[id]+'/'+FRAG_NEED;
+    if(shop.fr[id]>=FRAG_NEED){shop.owned.push(id);msg='SKIN DÉBLOQUÉ : '+sk.name+' !';}
+  }
   saveShop();
-  // bande de défilement
   const N=36,WIN=30,TW=84,strip=$('crate-strip'),roll=$('crate-roll'),view=$('crate-view');
   strip.textContent='';strip.style.transition='none';strip.style.transform='translateX(0)';
   for(let i=0;i<N;i++){
-    const it=i===WIN?win:crItem(c,crPick(c));
+    const it=i===WIN?win:crRoll(c);
     const t=document.createElement('div');t.className='ctile';
     const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(it.sk.spr.idle,0,0);t.appendChild(cv);
-    const l=document.createElement('span');l.textContent=c.frag?'x'+it.n:it.sk.name;t.appendChild(l);
+    const l=document.createElement('span');l.textContent=it.sk.name+' x'+it.n;t.appendChild(l);
     strip.appendChild(t);
   }
   roll.hidden=false;$('crate-res').textContent='';crBusy=true;renderCrates();
@@ -7086,7 +7087,7 @@ function openCrate(c){
   const target=WIN*TW+TW/2-view.clientWidth/2+(Math.random()-0.5)*TW*0.6,dur=reduce?0.3:4.2;
   strip.style.transition='transform '+dur+'s cubic-bezier(.12,.7,.1,1)';
   strip.style.transform='translateX('+(-Math.round(target))+'px)';
-  if(typeof sfx!=='undefined'){try{sfx.hit();}catch(e){}}
+  try{sfx.hit();}catch(e){}
   const done=()=>{
     if(!crBusy)return;crBusy=false;
     $('crate-res').textContent=msg;try{sfx.heal();}catch(e){}
