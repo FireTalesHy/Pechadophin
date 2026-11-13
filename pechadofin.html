@@ -409,6 +409,15 @@ body.kb #controls{display:none}
   .pad{height:48px}
   #controls{padding:4px 12px 8px}
 }
+@media (orientation:landscape) and (max-height:520px){   /* téléphone en paysage : les commandes passent par-dessus le jeu, qui occupe tout l'écran */
+  body:not(.kb) #controls{position:fixed;left:0;right:0;bottom:0;z-index:2;padding:0 10px max(8px,env(safe-area-inset-bottom));pointer-events:none;background:none}
+  body:not(.kb) #controls .grp{pointer-events:auto}
+  body:not(.kb) #controls .grp.mid{position:fixed;top:max(6px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));bottom:auto;gap:6px}
+  body:not(.kb) #controls #joy,body:not(.kb) #controls #joy2,body:not(.kb) #controls .pad{opacity:.62}
+  body:not(.kb) #controls #joy.on,body:not(.kb) #controls #joy2.on,body:not(.kb) #controls .pad:active{opacity:.95}
+  body:has(#overlay.show) #controls{visibility:hidden}
+  #stage{padding:2px}
+}
 /* ---- menus plus doux ---- */
 .shop-panel{border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);animation:mpop .2s ease-out}
 #shop,#dev,#rst,#mis,#set,#mode,#acc,#weap,#crate{animation:mfade .2s ease-out;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
@@ -558,6 +567,26 @@ body.kb #controls{display:none}
 .mview.best{border-color:#ffd23f;box-shadow:0 0 12px #ffd23f}
 .mstrip{display:flex;height:100%;will-change:transform}
 .mview .ctile{font-size:6px;gap:2px}.mview .ctile canvas{width:32px;height:32px}
+@media (max-height:560px),(max-width:520px){   /* petites fenêtres : menu caisses compact, tout le panneau défile, RETOUR reste visible */
+  #crate .shop-panel{overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:10px;gap:6px}
+  #crate-list{flex:none;overflow:visible;gap:6px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .crc{padding:5px;gap:4px;border-radius:10px}
+  .crc .cic{width:40px;height:31px}
+  .crc .pv,.crc .crd{display:none}
+  .crc .sbtn{padding-top:5px;padding-bottom:5px}
+  #crate-close{position:sticky;bottom:-10px;z-index:3;flex:none}
+  #crate-roll{margin:2px 0 4px}
+  #crate-view{height:64px}.ctile canvas{width:36px;height:36px}.ctile{width:72px}
+  #crate-mark::after{height:68px}
+  #crate-multi{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;max-height:none;overflow:visible}
+  .mview{height:44px;border-radius:8px}.mview .ctile canvas{width:24px;height:24px}.mview .ctile span{display:none}
+  #crate-rev{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 10px;margin-top:4px;padding:4px 0}
+  #crate-rev canvas{width:56px;height:56px}#crate-rev .rv-halo{display:none}
+  #crate-rev .rv-nm,#crate-rev .rv-tag{flex:0 1 auto}
+  #crate #crate-res{font-size:9px;max-height:none;overflow:visible;margin-top:4px}
+  #crate-roll{display:flex;flex-direction:column}#crate-roll[hidden]{display:none}
+  #crate-skip{order:-1;align-self:center;width:auto;min-width:120px;margin:0 auto 4px;padding:4px 14px}
+}
 #crate-res{font:400 11px/1.4 var(--pf);margin:10px 0 0;min-height:16px;max-height:34vh;overflow-y:auto}
 .crm{display:flex;gap:6px}
 #crate-skip{margin:8px auto 0}#crate-skip[hidden]{display:none}.crm .sbtn{flex:1;min-width:0;padding-left:2px;padding-right:2px}
@@ -7391,8 +7420,9 @@ function openCrate(c,nb){
   const done=()=>{
     if(fin)return;fin=true;
     crBusy=false;$('crate-skip').hidden=true;crSkip=null;
-    if(multi){const bi=wins.indexOf(win);if(box.children[bi])box.children[bi].classList.add('best');}
+    if(multi){const bi=wins.indexOf(win);if(box.children[bi])box.children[bi].classList.add('best');if(matchMedia('(max-height:560px),(max-width:520px)').matches)box.hidden=true;}   // petite fenêtre : on replie les roulettes pour montrer le résultat
     showReveal(c,win,!!(agg[win.sk.id]&&agg[win.sk.id].unlocked),!!(agg.back&&!agg[win.sk.id].fr&&!agg[win.sk.id].unlocked));const rs=$('crate-res');rs.textContent='';for(const t of msg){const d=document.createElement('div');d.textContent=t;rs.appendChild(d);}try{sfx.heal();}catch(e){}
+    try{$('crate-rev').scrollIntoView({block:'nearest'});}catch(e){}
     if(crOpen)renderCrates();
   };
   crSkip=()=>{if(fin)return;for(const r of rolls){r.strip.style.transition='none';r.strip.style.transform='translateX('+(-Math.round(r.target))+'px)';}done();};   // PASSER : saute l'animation
