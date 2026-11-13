@@ -441,6 +441,9 @@ body{
 .card.vio,.card.vio.eq{background:linear-gradient(180deg,#e6ccff,#b98af0)}
 .card.vio .nm,.card.vio .pr{color:#2a0f4a}
 .prem-h{grid-column:1/-1;font:400 9px/1.4 var(--pf);letter-spacing:1px;padding:2px 2px 0}
+.lkd{grid-column:1/-1}
+.lkd summary{cursor:pointer;font:400 9px/1.4 var(--pf);letter-spacing:1px;padding:6px 2px;list-style-position:inside}
+.lkg{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px;padding-top:6px}
 .prem-sep{grid-column:1/-1;height:0;border-top:2px solid var(--btn-line);margin:4px 0 2px}
 /* le fond de la case est rouge clair, et les boutons ACHETER / ÉQUIPER passent aussi par toutes les couleurs */
 .card.rgb,.card.rgb.eq{background:linear-gradient(180deg,#ffdede,#ffb3b3)}
@@ -493,6 +496,7 @@ body{
 .crc .pv canvas{width:24px;height:24px}
 .crd{width:100%;font:400 8px/1.3 var(--pf);text-align:left}
 .crd summary{cursor:pointer;text-align:center;padding:2px 0}
+.crl{max-height:170px;overflow-y:auto;scrollbar-width:thin}
 .crr{display:flex;align-items:center;gap:5px;padding:2px 0}
 .crr canvas{width:20px;height:20px;image-rendering:pixelated;flex:none}
 .crr span{flex:1}
@@ -707,7 +711,7 @@ const EN={
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
-'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Ange':'Angel','Fée':'Fairy','Démon':'Demon','Nécromancien':'Necromancer','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Ange':'Angel','Fée':'Fairy','Démon':'Demon','Nécromancien':'Necromancer','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','SKINS BLOQUÉS':'LOCKED SKINS','SKINS DÉBLOQUÉS':'UNLOCKED SKINS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
 'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
@@ -742,7 +746,7 @@ const EN={
 'Grappin qui déclenche une zone de dégâts.':'Hook that triggers a damage area.','Transperce plusieurs ennemis. Débloqué à la plage.':'Pierces several enemies. Unlocked at the beach.',
 'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.':'Every attack is a dash that hurts everything in its path. Faster and jumps higher. Found in the red chest of the swamps.',
 'Trouve le coffre rouge dans les marécages pour la débloquer.':'Find the red chest in the swamps to unlock it.','Débloquée en atteignant la plage.':'Unlocked by reaching the beach.',
-"Les skins s'achètent avec de l'or. Ceux à plus de 1600 or s'obtiennent dans les caisses (bouton coffre du menu).":'Skins are bought with gold. Skins above 1600 gold come from crates (chest button in the menu).',
+"Les skins s'obtiennent dans les caisses (bouton coffre du menu), par fragments.":'Skins come from crates (chest button in the menu), by fragments.',
 'DAGUES OBTENUES !':'DAGGERS OBTAINED!','ARME N°6 OBTENUE !':'WEAPON N°6 OBTAINED!','LE NUMÉRO 6 !':'NUMBER 6!','Spray':'Spray','Cadence de tir des chiffres x2 (une seule fois).':'Digit fire rate x2 (one time only).','Rouge':'Red','Skin : chaque chiffre a une couleur différente.':'Skin: each digit has a different color.','Skin : tous les chiffres sont rouges.':'Skin: all digits are red.','Rotation':'Spin','Skin : les chiffres tournent sur eux-mêmes.':'Skin: digits spin around.','ACTIF':'ACTIVE','ACHETÉ':'BOUGHT','ACHETER':'BUY','ACTIVER':'ENABLE','DÉSACTIVER':'DISABLE','ÉQUIPE-LA DANS ARMES':'EQUIP IT IN WEAPONS','+3 ÂMES ROUGES':'+3 RED SOULS','+300 OR':'+300 GOLD','+30 OR':'+30 GOLD','ENRAGÉ !':'ENRAGED!','Numéro 6':'Number 6','Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.':'A continuous stream of digits falling in an arc, like the cow\'s milk. Dropped by boss n°6.','Un secret se cache dans les marécages…':'A secret hides in the swamps…','ÉQUIPE-LES DANS ARMES':'EQUIP THEM IN WEAPONS','LA VACHE GÉANTE !':'THE GIANT COW!','ENRAGÉE !':'ENRAGED!','VACHE GÉANTE':'GIANT COW','Vaincre la vache géante':'Defeat the giant cow','Vaincre la sorcière':'Defeat the witch','Vaincre l\'esquimau':'Defeat the eskimo','Vaincre le Roi Cacamille 2':'Defeat King Cacamille 2','Vaincre le dauphin des nuages':'Defeat the cloud dolphin','Mettre une branche au niveau max sur une arme':'Max out one branch on any weapon','Mettre 3 branches au niveau max (toutes armes)':'Max out 3 branches (all weapons)','Obtenir les dagues':'Get the daggers','Obtenir le Numéro 6':'Get Number 6','Obtenir le sceptre de glace':'Get the ice scepter','Obtenir le jeu de tarot':'Get the tarot deck','Acheter le harpon':'Buy the harpoon','Débloquer Silver Chariot':'Unlock Silver Chariot','Débloquer Star Platinum':'Unlock Star Platinum','Débloquer la Sorcellerie':'Unlock Sorcery','Monter les points de vie au maximum':'Max out your hit points','Posséder 15 skins':'Own 15 skins','Renaître une fois':'Be reborn once','RÉCUPÉRER':'CLAIM','MISSION RÉUSSIE !':'MISSION COMPLETE!','RÉCUPÉRÉE':'CLAIMED','Récompense : 100 or':'Reward: 100 gold','Vérification auprès de RNG∞…':'Checking with RNG∞…','Skin RNG∞ débloqué ! Équipe-le dans la boutique.':'RNG∞ skin unlocked! Equip it in the shop.','RNG∞ a refusé la vérification, reconnecte-toi.':'RNG∞ rejected the check, sign in again.','Aucun compte RNG∞ trouvé avec ce compte Google pour le moment.':'No RNG∞ account found with this Google account yet.','Serveur RNG∞ injoignable, réessaie plus tard.':'RNG∞ server unreachable, try again later.','Demande de connexion à Google…':'Asking Google…','Google indisponible, réessaie plus tard.':'Google unavailable, try again later.','Google n\'a pas pu te reconnecter automatiquement : déconnecte-toi puis reconnecte-toi avec Google.':'Google could not sign you in again automatically: sign out, then sign in again with Google.','COLLAB RNG∞':'RNG∞ COLLAB','COLLAB':'COLLAB','DÉBLOQUER':'UNLOCK','OUVRIR RNG∞':'OPEN RNG∞','VÉRIFIER MAINTENANT':'CHECK NOW','Skin RNG∞ : crée un compte sur le jeu RNG∞ avec ton compte Google, puis connecte-toi ici avec le même compte Google. Le skin se débloque automatiquement.':'RNG∞ skin: create an account on the RNG∞ game with your Google account, then sign in here with the same Google account. The skin unlocks automatically.','JOUE AUSSI À RNG∞':'ALSO PLAY RNG∞',
 'COMPTE GOOGLE':'GOOGLE ACCOUNT','Compte Google':'Google account','SE DÉCONNECTER':'SIGN OUT','Connecté avec Google.':'Signed in with Google.',
 'Connexion Google non configurée : renseigne l\'identifiant client Google du jeu (balise google-client-id).':'Google sign-in is not set up: add the game\'s Google client ID (google-client-id tag).',
@@ -752,6 +756,7 @@ const EN={
 };
 const EN_RULES=[
   [/^FRAGMENTS (\d+)\/(\d+)$/,m=>'FRAGMENTS '+m[1]+'/'+m[2]],
+  [/^SKINS (BLOQUÉS|DÉBLOQUÉS) \((\d+)\)$/,m=>(m[1]==='BLOQUÉS'?'LOCKED':'UNLOCKED')+' SKINS ('+m[2]+')'],
   [/^\+(\d) FRAGMENTS? · (.+) (\d+)\/(\d+)$/,m=>'+'+m[1]+(m[1]==='1'?' FRAGMENT':' FRAGMENTS')+' · '+m[2]+' '+m[3]+'/'+m[4]],
   [/^SKIN DÉBLOQUÉ : (.+) !$/,m=>'SKIN UNLOCKED: '+m[1]+'!'],
   [/^NOUVEAU SKIN : (.+) !$/,m=>'NEW SKIN: '+m[1]+'!'],
@@ -1535,11 +1540,11 @@ SKINS.push(
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
 for(const sk of SKINS)sk.price*=50;   // les skins s'achètent en or (le moins cher : 100 or)
 const CRATES=[   // caisses : seule façon d'obtenir les skins à plus de 1600 or. Chaque caisse donne des fragments (6 = le skin) ; l'Épouvofodille peut sortir de toutes les caisses
- {id:'hero',show:'human',name:'Caisse Héros',cost:600,col:['#4aa8e8','#27479a'],skins:['king','pharaoh','mermaid','icecream','human','angel','paladin','fairy'],w:[2,3,3,4,3,3,2,2]},
- {id:'vil',show:'ghoul',name:'Caisse Vilain',cost:700,col:['#c4202e','#4a0f18'],skins:['dragon','ghoul','dino','disco','demon','necro','vampire'],w:[2,4,4,4,2,3,2]}
+ {id:'hero',show:'human',name:'Caisse Héros',cost:600,col:['#4aa8e8','#27479a'],skins:['knight','wizard','hero','astronaut','cowboy','plumber','chef','viking','robot','unicorn','king','pharaoh','mermaid','icecream','human','angel','paladin','fairy']},
+ {id:'vil',show:'ghoul',name:'Caisse Vilain',cost:700,col:['#c4202e','#4a0f18'],skins:['pirate','ninja','zombie','ghost','pumpkin','shroom','alien','dino','disco','dragon','ghoul','demon','necro','vampire']}
 ];
 const CRATE_BONUS={id:'scarecrow',chance:0.15},FRAG_NEED=6;
-for(const c of CRATES)for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk){sk.crate=c.id;sk.frag=FRAG_NEED;}}
+for(const c of CRATES){c.w=[];for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk){sk.crate=c.id;sk.frag=FRAG_NEED;c.w.push(clamp(Math.round(100/(sk.price/50)),1,25));}else c.w.push(0);}}   // plus un skin vaut cher, plus il est rare
 for(const sk of SKINS){
   sk.spr={};
   const pal=Object.assign({},PAL_P,sk.pal);
@@ -6847,7 +6852,7 @@ function renderShop(){
   $('shop-gold').textContent=shop.gold;
   $('shop-souls').textContent=shop.souls;
   for(const t of ['skins','rod','souls','trident'])$('tab-'+t).setAttribute('aria-selected',String(shopTab===t));
-  const notes={skins:"Les skins s'achètent avec de l'or. Ceux à plus de 1600 or s'obtiennent dans les caisses (bouton coffre du menu).",dagger:"Les dagues attaquent en dash : chaque amélioration coûte de l'or. La hauteur de saut va jusqu'à x2. La parade annule parfois un coup au corps à corps juste après un dash.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Améliore tes points de vie avec les âmes rouges. Les armes et leurs améliorations sont dans le menu ARMES. Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur.",
+  const notes={skins:"Les skins s'obtiennent dans les caisses (bouton coffre du menu), par fragments.",dagger:"Les dagues attaquent en dash : chaque amélioration coûte de l'or. La hauteur de saut va jusqu'à x2. La parade annule parfois un coup au corps à corps juste après un dash.",rod:rodLocked()?"La canne est indisponible depuis que tu as atteint la plage : ses niveaux sont conservés, mais le trident prend le relais.":"Chaque dauphin battu rapporte de l'or (2 pour un bleu, 4 pour un rouge tireur, 5 pour un rose, plus s'il est costaud). 5 niveaux par amélioration. La zone de dégâts est invisible : plein dégât au centre, -50 % au bord.",souls:"Améliore tes points de vie avec les âmes rouges. Les armes et leurs améliorations sont dans le menu ARMES. Chaque boss (démon requin, poulpe géant, méduse) donne des âmes rouges uniquement la première fois qu'il est vaincu. Elles renforcent ton pêcheur.",
     trident:shop.tridentOwned?"Le trident traverse plusieurs ennemis d'un seul lancer. Toutes ses améliorations coûtent de l'or.":"Le trident infernal se débloque en atteignant la plage. Ses améliorations coûtent de l'or."};
   $('shop-note').textContent=shopMerchant?"Le marchand améliore ton arme équipée contre de l'or. Ton score n'est pas touché et le jeu est en pause.":notes[shopTab];
   if(shopTab==='dagger')renderDagger();else if(shopTab==='rod')renderRod();else if(shopTab==='souls')renderSouls();else if(shopTab==='trident')renderTrident();else renderSkins();
@@ -7028,9 +7033,7 @@ function buyUp(key){
 function renderSkins(){
   shopList.textContent='';
   const PREM=['clown','scarecrow',RNG_SKIN.id],prem=PREM.map(id=>SKINS.find(x=>x.id===id)).filter(Boolean),order=prem.concat(SKINS.filter(x=>!PREM.includes(x.id)));   // skins prémium en haut, puis les skins normaux
-  for(const sk of order){
-    if(sk===prem[0]){const h=document.createElement('div');h.className='prem-h';h.textContent='PREMIUM SKINS';shopList.appendChild(h);}
-    else if(sk===order[prem.length]){const h=document.createElement('div');h.className='prem-sep';shopList.appendChild(h);}
+  const mkCard=(sk)=>{
     const owned=shop.owned.includes(sk.id),eq=shop.equipped===sk.id;
     const card=document.createElement('div');card.className='card'+(eq?' eq':'')+(sk.id==='clown'?' rgb':'')+(sk.id===RNG_SKIN.id?' vio':'')+(sk.id==='scarecrow'?' hay':'');
     const pv=document.createElement('canvas');pv.width=16;pv.height=16;
@@ -7054,9 +7057,25 @@ function renderSkins(){
     else{b.textContent='IL MANQUE '+(sk.price-shop.gold);b.disabled=true;}
     b.setAttribute('aria-label',sk.name+' : '+b.textContent);
     card.appendChild(b);
-    shopList.appendChild(card);
+    return card;
+  };
+  const hd=(t,c)=>{const h=document.createElement('div');h.className=c||'prem-h';h.textContent=t;shopList.appendChild(h);};
+  hd('PREMIUM SKINS');
+  for(const sk of prem)shopList.appendChild(mkCard(sk));
+  const rest=order.slice(prem.length),un=rest.filter(x=>shop.owned.includes(x.id)),lk=rest.filter(x=>!shop.owned.includes(x.id));
+  hd('','prem-sep');
+  hd('SKINS DÉBLOQUÉS ('+un.length+')');
+  for(const sk of un)shopList.appendChild(mkCard(sk));
+  if(lk.length){   // skins bloqués : menu pliable
+    const dt=document.createElement('details');dt.className='lkd';dt.open=skLockedOpen;
+    const sm=document.createElement('summary');sm.textContent='SKINS BLOQUÉS ('+lk.length+')';dt.appendChild(sm);
+    const g=document.createElement('div');g.className='lkg';
+    for(const sk of lk)g.appendChild(mkCard(sk));
+    dt.appendChild(g);dt.addEventListener('toggle',()=>{skLockedOpen=dt.open;});
+    shopList.appendChild(dt);
   }
 }
+let skLockedOpen=false;
 function buySkin(sk){
   if(shop.owned.includes(sk.id)||shop.gold<sk.price||sk.crate||sk.frag)return;
   shop.gold-=sk.price;shop.owned.push(sk.id);shop.equipped=sk.id;
@@ -7089,12 +7108,13 @@ function renderCrates(){
     card.appendChild(pv);
     const dt=document.createElement('details');dt.className='crd';
     const sm=document.createElement('summary');sm.textContent='DÉTAIL';dt.appendChild(sm);
+    const lst=document.createElement('div');lst.className='crl';dt.appendChild(lst);
     for(const id of c.skins.concat([CRATE_BONUS.id])){
       const sk=SKINS.find(x=>x.id===id),row=document.createElement('div');row.className='crr';
       const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);row.appendChild(cv);
       const t=document.createElement('span');t.textContent=sk.name;row.appendChild(t);
       const q=document.createElement('em');q.textContent=shop.owned.includes(id)?'POSSÉDÉ':(shop.fr[id]||0)+'/'+sk.frag;row.appendChild(q);
-      dt.appendChild(row);
+      lst.appendChild(row);
     }
     card.appendChild(dt);
     const pr=document.createElement('div');pr.className='pr';const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=c.cost;pr.appendChild(sp);card.appendChild(pr);
