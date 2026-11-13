@@ -707,7 +707,7 @@ const EN={
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
-'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Ange':'Angel','Fée':'Fairy','Démon':'Demon','Nécromancien':'Necromancer','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
 'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
@@ -1500,11 +1500,43 @@ SKINS.push({id:'scarecrow',name:'Épouvofodille',price:0,frag:6,rod:'#5a3a6a',gl
   hat:["...w..w..w.w....",".....kkkkkk.....","....khhhhhhk....","...khhHHHhhhk...","..kHHHHHHHHHHk.."],
   face:["...kssssssssk...","...ksyssssysk...","...kssSSSSssk...","....kksnsnskk..."],
   torso:["...kbbbbbbbbk...","..wkbbgbbbbswk..","..wkBBBBBBBBkw.."]});   // skin premium : s'obtient par 6 fragments (Caisse à skin)
+SKINS.push(
+ {id:'angel',name:'Ange',price:34,rod:'#ffd23f',glow:'#ffffff',fx:'',
+  pal:{h:'#fff0a0',H:'#e0c060',b:'#f4f4ff',B:'#c0c8e8',g:'#ffd23f'},
+  hat:["....gggggggg....",".....kkkkkk.....","....khhhhhhk....","...khhhhhhhhk...","..kHHHHHHHHHHk.."],
+  face:["...kssssssssk...","...kskssskssk...","...ksssssssSk...","....kkssssskk..."],
+  torso:["...kbbbbbbbbk...","...kbbgbbbbssk..","...kBBBBBBBBk..."]},
+ {id:'paladin',name:'Paladin',price:46,rod:'#dfe8f0',glow:'#fff2a8',
+  pal:{h:'#c8d4e8',H:'#8a98b0',r:'#e0262e',b:'#c8d4e8',B:'#8a98b0',g:'#ffd23f'},
+  hat:["....rrr.........",".....hhhhhh.....","....khhhhhhk....","...khhhhhhhhk...","..kHHHHHHHHHHk.."],
+  face:["...kssssssssk...","...kskssskssk...","...ksssssssSk...","....kkssssskk..."],
+  torso:["...kbbbbbbbbk...","...kbbgbbbbssk..","...kBBBBBBBBk..."]},
+ {id:'fairy',name:'Fée',price:52,rod:'#ff9ad8',glow:'#fffbb0',fx:'sugar',
+  pal:{h:'#ff9ad8',H:'#c4569e',b:'#ffd0f0',B:'#e08ac0',y:'#fffbb0'},
+  hat:["...y......y.....",".....kkkkkk.....","....khhhhhhk....","...khhhhhhhhk...","..kHHHHHHHHHHk.."],
+  face:["...kssssssssk...","...kskssskssk...","...ksssssssSk...","....kkssssskk..."],
+  torso:["...kbbbbbbbbk...","...kbbybbbbssk..","...kBBBBBBBBk..."]},
+ {id:'demon',name:'Démon',price:50,rod:'#e0262e',glow:'#ff6a1e',fx:'ember',
+  pal:{h:'#4a0f18',H:'#2a0810',r:'#e0262e',s:'#e8606a',S:'#b03a48',b:'#2a1018',B:'#14080c',y:'#ffe14d'},
+  hat:["..r..........r..","..rr.kkkkkk.rr..","...rkhhhhhhkr...","...khhhhhhhhk...","..kHHHHHHHHHHk.."],
+  face:["...kssssssssk...","...ksyssssysk...","...kssSSSSssk...","....kksnsnskk..."],
+  torso:["...kbbbbbbbbk...","...kbbrbbbbssk..","...kBBBBBBBBk..."]},
+ {id:'necro',name:'Nécromancien',price:44,rod:'#7cff6a',glow:'#b6ffa8',fx:'wisp',
+  pal:{h:'#3a2a5a',H:'#241838',s:'#d8e8d0',S:'#a8b8a0',b:'#2a1c48',B:'#180e2c',y:'#7cff6a'},
+  hat:["................",".....kkkkkk.....","....khhhhhhk....","...khhhhhhhhk...","..khhhhhhhhhhk.."],
+  face:["...kssssssssk...","...ksyssssysk...","...kssSSSSssk...","....kksnsnskk..."],
+  torso:["...kbbbbbbbbk...","...kbbybbbbssk..","...kBBBBBBBBk..."]},
+ {id:'vampire',name:'Vampire',price:58,rod:'#8a1424',glow:'#ff4466',
+  pal:{h:'#1c1c28',H:'#0c0c14',s:'#f0e4e4',S:'#c8b8b8',b:'#8a1424',B:'#4a0a14',y:'#ff4466'},
+  hat:["................",".....kkkkkk.....","....khhhhhhk....","...khhhHhhhhk...","..kHHHHHHHHHHk.."],
+  face:["...kssssssssk...","...ksyssssysk...","...kssSSSSssk...","....kkswsswkk..."],
+  torso:["...kbbbbbbbbk...","...kbbwbbbbssk..","...kBBBBBBBBk..."]}
+);
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
 for(const sk of SKINS)sk.price*=50;   // les skins s'achètent en or (le moins cher : 100 or)
 const CRATES=[   // caisses : seule façon d'obtenir les skins à plus de 1600 or. Chaque caisse donne des fragments (6 = le skin) ; l'Épouvofodille peut sortir de toutes les caisses
- {id:'hero',name:'Caisse Héros',cost:600,col:['#4aa8e8','#27479a'],skins:['king','pharaoh','mermaid','icecream','disco'],w:[2,3,3,4,4]},
- {id:'vil',name:'Caisse Vilain',cost:700,col:['#c4202e','#4a0f18'],skins:['dragon','human','ghoul','dino'],w:[2,3,4,4]}
+ {id:'hero',name:'Caisse Héros',cost:600,col:['#4aa8e8','#27479a'],skins:['king','pharaoh','mermaid','icecream','human','angel','paladin','fairy'],w:[2,3,3,4,3,3,2,2]},
+ {id:'vil',name:'Caisse Vilain',cost:700,col:['#c4202e','#4a0f18'],skins:['dragon','ghoul','dino','disco','demon','necro','vampire'],w:[2,4,4,4,2,3,2]}
 ];
 const CRATE_BONUS={id:'scarecrow',chance:0.15},FRAG_NEED=6;
 for(const c of CRATES)for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk){sk.crate=c.id;sk.frag=FRAG_NEED;}}
