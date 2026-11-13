@@ -588,7 +588,7 @@ body.kb #controls{display:none}
   #crate-skip{order:-1;align-self:center;width:auto;min-width:120px;margin:0 auto 4px;padding:4px 14px}
 }
 #crate-res{font:400 11px/1.4 var(--pf);margin:10px 0 0;min-height:16px;max-height:34vh;overflow-y:auto}
-.crm{display:flex;gap:6px}
+.crm{display:flex;gap:4px}
 #crate-skip{margin:8px auto 0}#crate-skip[hidden]{display:none}.crm .sbtn{flex:1;min-width:0;padding-left:2px;padding-right:2px}
 .ov-sq.crb{background:linear-gradient(#c98a4b,#7a4a1e)}
 .ov-sq.crb canvas{width:calc(var(--p)*14);height:calc(var(--p)*11);image-rendering:pixelated;display:block;margin:auto}
@@ -7334,7 +7334,7 @@ function renderCrates(){
     card.appendChild(b);
     if(!crBusy&&shop.gold>=c.cost){   // multi-ouvertures : x5 et x10
       const row=document.createElement('div');row.className='crm';
-      for(const n of [5,10]){
+      for(const n of [2,4]){
         const m=document.createElement('button');m.className='sbtn';m.type='button';m.textContent='x'+n;m.title=(c.cost*n)+' OR';
         m.setAttribute('aria-label',c.name+' : x'+n+' ('+(c.cost*n)+' or)');
         if(shop.gold>=c.cost*n){m.classList.add('equip');m.addEventListener('click',()=>openCrate(c,n));}else m.disabled=true;
