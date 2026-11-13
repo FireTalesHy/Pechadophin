@@ -551,6 +551,13 @@ body.kb #controls{display:none}
 @keyframes rvhalo{0%{opacity:0;transform:scale(.3)}30%{opacity:.85}100%{opacity:.35;transform:scale(1.15)}}
 @keyframes rvsp{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}}
 @media (prefers-reduced-motion:reduce){#crate-rev canvas,#crate-rev .rv-nm,#crate-rev .rv-tag,#crate-rev .rv-halo,#crate-rev .rv-sp{animation:none;opacity:1}#crate-rev .rv-sp{display:none}}
+#crate-multi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:38vh;overflow-y:auto;padding:2px}
+#crate-multi[hidden]{display:none}
+.mview{position:relative;overflow:hidden;height:64px;border:2px solid var(--btn-line);border-radius:10px;background:rgba(0,0,0,.35)}
+.mview::after{content:'';position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1px;background:#ffd23f;box-shadow:0 0 8px #ffd23f;z-index:2}
+.mview.best{border-color:#ffd23f;box-shadow:0 0 12px #ffd23f}
+.mstrip{display:flex;height:100%;will-change:transform}
+.mview .ctile{font-size:6px;gap:2px}.mview .ctile canvas{width:32px;height:32px}
 #crate-res{font:400 11px/1.4 var(--pf);margin:10px 0 0;min-height:16px;max-height:34vh;overflow-y:auto}
 .crm{display:flex;gap:6px}
 #crate-skip{margin:8px auto 0}#crate-skip[hidden]{display:none}.crm .sbtn{flex:1;min-width:0;padding-left:2px;padding-right:2px}
@@ -635,7 +642,7 @@ body.kb #controls{display:none}
 <div id="crate" hidden role="dialog" aria-modal="true" aria-labelledby="crate-title">
   <div class="shop-panel">
     <div class="shop-head"><h2 id="crate-title">CAISSES</h2><div class="bals"><div class="bal" title="Or"><canvas id="crate-gold-ic" width="7" height="6" aria-hidden="true"></canvas><span id="crate-gold">0</span></div></div></div>
-    <div id="crate-roll" hidden><div id="crate-mark"></div><div id="crate-view"><div id="crate-strip"></div></div><div id="crate-rev" hidden></div><div id="crate-res"></div><button class="sbtn" id="crate-skip" type="button">PASSER</button></div>
+    <div id="crate-roll" hidden><div id="crate-mark"></div><div id="crate-view"><div id="crate-strip"></div></div><div id="crate-multi" hidden></div><div id="crate-rev" hidden></div><div id="crate-res"></div><button class="sbtn" id="crate-skip" type="button">PASSER</button></div>
     <div id="crate-list"></div>
     <button class="go" id="crate-close" type="button">RETOUR</button>
   </div>
@@ -809,10 +816,10 @@ const EN_RULES=[
   [/^(\d+ > \d+ dégâts?|[\d,.]+ cases? > [\d,.]+ cases?|.+ > .+)\. (Dégâts du harpon.*|Portée du harpon.*|Vitesse du câble.*|Les ennemis proches.*)$/,m=>trStr(m[1])+'. '+trStr(m[2])],
   [/^FRAGMENTS (\d+)\/(\d+)$/,m=>'FRAGMENTS '+m[1]+'/'+m[2]],
   [/^SKINS (BLOQUÉS|DÉBLOQUÉS) \((\d+)\)$/,m=>(m[1]==='BLOQUÉS'?'LOCKED':'UNLOCKED')+' SKINS ('+m[2]+')'],
-  [/^\+(\d) FRAGMENTS? · (.+) (\d+)\/(\d+)$/,m=>'+'+m[1]+(m[1]==='1'?' FRAGMENT':' FRAGMENTS')+' · '+m[2]+' '+m[3]+'/'+m[4]],
-  [/^SKIN DÉBLOQUÉ : (.+) !$/,m=>'SKIN UNLOCKED: '+m[1]+'!'],
+  [/^\+(\d) FRAGMENTS? · (.+) (\d+)\/(\d+)$/,m=>'+'+m[1]+(m[1]==='1'?' FRAGMENT':' FRAGMENTS')+' · '+trStr(m[2])+' '+m[3]+'/'+m[4]],
+  [/^SKIN DÉBLOQUÉ : (.+) !$/,m=>'SKIN UNLOCKED: '+trStr(m[1])+'!'],
   [/^NOUVEAU SKIN : (.+) !$/,m=>'NEW SKIN: '+m[1]+'!'],
-  [/^DOUBLON · (.+) · \+(\d+) OR$/,m=>'DUPLICATE · '+m[1]+' · +'+m[2]+' GOLD'],
+  [/^DOUBLON · (.+) · \+(\d+) OR$/,m=>'DUPLICATE · '+trStr(m[1])+' · +'+m[2]+' GOLD'],
   [/^\+(\d+) OR$/,m=>'+'+m[1]+' GOLD'],
   [/^\+1 VIE$/,()=>'+1 LIFE'],
   [/^SPEEDRUN · TENTATIVE (\d+)$/,m=>'SPEEDRUN · ATTEMPT '+m[1]],
@@ -7354,33 +7361,42 @@ function openCrate(c,nb){
   if(agg.back)lines.push(nb>1?'DOUBLONS · +'+agg.back+' OR':'DOUBLON · '+win.sk.name+' · +'+agg.back+' OR');
   saveShop();
   const msg=lines;
-  const N=36,WIN=30,TW=84,strip=$('crate-strip'),roll=$('crate-roll'),view=$('crate-view');
-  strip.textContent='';strip.style.transition='none';strip.style.transform='translateX(0)';
-  for(let i=0;i<N;i++){
-    const it=i===WIN?win:crRoll(c);
-    const t=document.createElement('div');t.className='ctile';
-    const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(it.sk.spr.idle,0,0);t.appendChild(cv);
-    const l=document.createElement('span');l.textContent=it.sk.name+' x'+it.n;t.appendChild(l);
-    strip.appendChild(t);
-  }
-  roll.hidden=false;$('crate-rev').hidden=true;$('crate-res').textContent='';crBusy=true;$('crate-skip').hidden=false;renderCrates();
-  void strip.offsetWidth;
+  const roll=$('crate-roll'),multi=nb>1,box=$('crate-multi');
+  $('crate-mark').hidden=multi;$('crate-view').hidden=multi;box.hidden=!multi;box.textContent='';
   const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const target=WIN*TW+TW/2-view.clientWidth/2+(Math.random()-0.5)*TW*0.6,dur=reduce?0.3:4.2;
-  strip.style.transition='transform '+dur+'s cubic-bezier(.12,.7,.1,1)';
-  strip.style.transform='translateX('+(-Math.round(target))+'px)';
+  const rolls=(multi?wins:[win]).map((w,i)=>{   // une roulette par lot ; en multi, toutes tournent en même temps
+    const r=multi?{TW:60,N:30,WIN:24,win:w,dur:reduce?0.3:3.4+Math.random()*1.6}:{TW:84,N:36,WIN:30,win:w,dur:reduce?0.3:4.2};
+    if(multi){r.view=document.createElement('div');r.view.className='mview';r.strip=document.createElement('div');r.strip.className='mstrip';r.view.appendChild(r.strip);box.appendChild(r.view);}
+    else{r.view=$('crate-view');r.strip=$('crate-strip');}
+    r.strip.textContent='';r.strip.style.transition='none';r.strip.style.transform='translateX(0)';
+    for(let k=0;k<r.N;k++){
+      const it=k===r.WIN?w:crRoll(c);
+      const t=document.createElement('div');t.className='ctile';if(multi)t.style.width=r.TW+'px';
+      const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(it.sk.spr.idle,0,0);t.appendChild(cv);
+      const l=document.createElement('span');l.textContent=trStr(it.sk.name)+' x'+it.n;t.appendChild(l);
+      r.strip.appendChild(t);
+    }
+    return r;
+  });
+  roll.hidden=false;$('crate-rev').hidden=true;$('crate-res').textContent='';crBusy=true;$('crate-skip').hidden=false;renderCrates();
+  for(const r of rolls){
+    void r.strip.offsetWidth;
+    r.target=r.WIN*r.TW+r.TW/2-r.view.clientWidth/2+(Math.random()-0.5)*r.TW*0.6;
+    r.strip.style.transition='transform '+r.dur+'s cubic-bezier(.12,.7,.1,1)';
+    r.strip.style.transform='translateX('+(-Math.round(r.target))+'px)';
+  }
   try{sfx.hit();}catch(e){}
   let fin=false;
+  const maxDur=Math.max(...rolls.map(r=>r.dur));
   const done=()=>{
-    if(fin)return;fin=true;strip.removeEventListener('transitionend',onEnd);
+    if(fin)return;fin=true;
     crBusy=false;$('crate-skip').hidden=true;crSkip=null;
+    if(multi){const bi=wins.indexOf(win);if(box.children[bi])box.children[bi].classList.add('best');}
     showReveal(c,win,!!(agg[win.sk.id]&&agg[win.sk.id].unlocked),!!(agg.back&&!agg[win.sk.id].fr&&!agg[win.sk.id].unlocked));const rs=$('crate-res');rs.textContent='';for(const t of msg){const d=document.createElement('div');d.textContent=t;rs.appendChild(d);}try{sfx.heal();}catch(e){}
     if(crOpen)renderCrates();
   };
-  const onEnd=ev=>{if(ev.target===strip&&ev.propertyName==='transform')done();};
-  crSkip=()=>{if(fin)return;strip.style.transition='none';strip.style.transform='translateX('+(-Math.round(target))+'px)';done();};   // PASSER : saute l'animation
-  strip.addEventListener('transitionend',onEnd);
-  setTimeout(done,dur*1000+400);
+  crSkip=()=>{if(fin)return;for(const r of rolls){r.strip.style.transition='none';r.strip.style.transform='translateX('+(-Math.round(r.target))+'px)';}done();};   // PASSER : saute l'animation
+  setTimeout(done,maxDur*1000+400);
 }
 $('crate-skip').addEventListener('click',()=>{if(crSkip)crSkip();});
 function openCrates(){
