@@ -2,6 +2,32 @@
 
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.6] - 2026-11-13 · CASE UPDATE
+
+### Ajouté
+- **Système de caisses (case opening)** : nouveau **bouton coffre** sur l'écran d'accueil. C'est maintenant la **seule façon d'obtenir les skins** (sauf Clown et RNG∞).
+  - **2 caisses** : la **Caisse Héros** (600 or) et la **Caisse Vilain** (700 or), avec une roulette animée qui défile et s'arrête sur ton lot.
+  - Chaque ouverture donne des **fragments** d'un skin (x1 70 %, x2 25 %, x3 5 %) : il en faut **6** pour débloquer un skin. Plus un skin est cher à l'origine, plus il est rare.
+  - Un skin que tu possèdes déjà est converti en **or** (**doublon**).
+  - Chaque caisse a un menu **DÉTAIL** déroulant qui liste ses skins et ta progression en fragments.
+  - Les skins que tu possédais déjà **restent à toi**.
+- **6 nouveaux skins qui opposent le bien et le mal** : **Ange**, **Paladin** et **Fée** (Caisse Héros) face à **Démon**, **Nécromancien** et **Vampire** (Caisse Vilain). Le jeu compte maintenant **36 skins**.
+- **Skin premium Épouvofodille** (épouvantail aux yeux lumineux, **12 fragments**, présent dans les deux caisses avec 15 % de chance par ouverture) :
+  - à chaque kill, un **corbeau** se pose sur le cadavre ; **1 chance sur 50** qu'il soit **doré** et apporte une **vie bonus** (ou 100 or si tes vies sont déjà pleines) ;
+  - quand il prend un coup, du **foin** sort du personnage.
+- **La Faux** (12 âmes rouges) : une grande faux (manche marron, lame verte en dégradé) tenue à la verticale, avec un **combo en 4 coups** : 2 coups normaux, le **3e ramène l'ennemi vers toi** (tourbillon violet, chaînes spectrales), le **4e le repousse** (onde de choc en croissant rouge et noir, étoile d'impact).
+  - Arbre de compétences : **Dégâts**, **Portée**, **Vitesse de coup** et **Poison** (4 s, un tick par seconde).
+  - Deux nouvelles missions : obtenir la faux, et monter une de ses branches au maximum.
+- **Skin RNG∞** : un **laser doré** part vers le ciel à ta mort, et chaque kill a **1 chance sur 67** de déclencher un laser doré qui traverse tout sur son passage (40 dégâts).
+- **Sauvegarde liée au compte Google** : la sauvegarde cloud s'active maintenant **automatiquement à la connexion** (une seule autorisation à accepter). Sur un appareil vierge, la progression du compte se charge directement.
+
+### Modifié
+- **Harpon : dégâts sur la durée.** L'ennemi harponné saigne pendant tout le trajet qui le ramène à toi, puis prend un dernier coup.
+- **Harpon + skin Clown** : le harpon devient un **pistolet de clown** (canon rayé rouge et jaune, drapeau BANG) qui tire un **gros poing blanc sur ressort rouge**.
+- **Skin Clown** : il s'achète maintenant avec **60 âmes rouges** (au lieu de 1 000 000 or).
+- **Boutique** : les skins sont rangés en **SKINS DÉBLOQUÉS** et **SKINS BLOQUÉS** (menu pliable). Les cartes des skins en caisse affichent leur progression en fragments.
+- Bannière de l'écran d'accueil : **CASE UPDATE**.
+
 ## [V0.5.5] - 2026-11-11 · SPEEDRUN UPDATE
 
 ### Ajouté

@@ -1,6 +1,6 @@
 # 🎣 Pechadophin 
 
-**Version V0.5.5**
+**Version V0.6 · CASE UPDATE**
 
 <h2 align="center">▶️ <a href="https://pechadophin.vercel.app/">JOUER MAINTENANT : pechadophin.vercel.app</a></h2>
 
@@ -25,7 +25,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 
 ## ✨ Contenu
 
-- Dix armes, présentées dans le menu ARMES, presque toutes avec leur arbre de compétences : une canne améliorable, un trident infernal (débloqué à la plage), des dagues qui attaquent en dash (dans le coffre rouge des marécages), l'arme Numéro 6 (boss secret des marécages), le sceptre de glace (laissé par l'esquimau), le jeu de tarot, le harpon, le katana, le boomerang et les tentacules qui sortent de ton dos
+- Onze armes, présentées dans le menu ARMES, presque toutes avec leur arbre de compétences : une canne améliorable, un trident infernal (débloqué à la plage), des dagues qui attaquent en dash (dans le coffre rouge des marécages), l'arme Numéro 6 (boss secret des marécages), le sceptre de glace (laissé par l'esquimau), le jeu de tarot, le harpon, le katana, le boomerang, les tentacules qui sortent de ton dos et la faux (combo en 4 coups, poison)
 - Classement TOP 10 du mode Anarchie
 - Des dauphins bleus, roses (volants) et rouges (tireurs de boules de feu), des vers de sable et des mouettes en piqué sur la plage
 - Un démon requin à laser, accompagné d'une nuit rouge sang
@@ -35,10 +35,11 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 - Des coffres à ouvrir en chemin pour gagner de l'or
 - Trois modes de jeu : Classique, Anarchie (boss sans fin, zone tirée au hasard après chaque boss d'arène, ciel qui change à chaque requin) et Speedrun (débloqué après la première renaissance : bats le Roi Cacamille 2 au chrono, arme au choix déjà au maximum, sans checkpoint)
 - Jeu en français ou en anglais (bouton drapeau)
-- Connexion avec un compte Google et sauvegarde cloud dans ton Google Drive (voir [privacy.html](privacy.html))
+- Connexion avec un compte Google et sauvegarde cloud automatique dans ton Google Drive (voir [privacy.html](privacy.html))
 - Collab avec le jeu RNG∞ : skin RNG∞ à débloquer avec le même compte Google
 - Des marchands en pleine partie pour améliorer l'arme équipée
-- Une boutique : 29 skins (dont une catégorie premium avec le Clown), améliorations (or) et âmes rouges
+- Un système de caisses : 36 skins à débloquer par fragments dans la Caisse Héros et la Caisse Vilain (roulette animée), dont l'épouvantail Épouvofodille
+- Une boutique : skins débloqués / bloqués, catégorie premium (Clown, Épouvofodille, RNG∞), améliorations (or) et âmes rouges
 - Nouveau menu principal, menu pause, sauvegarde locale du meilleur score et de la boutique, bouton de réinitialisation de la save (double confirmation)
 
 ## 📝 Historique
