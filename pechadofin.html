@@ -539,7 +539,9 @@ body.kb #controls{display:none}
 .ctile canvas{width:48px;height:48px;image-rendering:pixelated}
 #crate-mark{position:relative;height:0;z-index:2}
 #crate-mark::after{content:'';position:absolute;left:50%;top:0;width:4px;height:96px;margin-left:-2px;background:#ffd23f;box-shadow:0 0 10px #ffd23f;border-radius:2px}
-#crate-res{font:400 11px/1.4 var(--pf);margin:10px 0 0;min-height:16px}
+#crate-res{font:400 11px/1.4 var(--pf);margin:10px 0 0;min-height:16px;max-height:34vh;overflow-y:auto}
+.crm{display:flex;gap:6px}
+#crate-skip{margin:8px auto 0}#crate-skip[hidden]{display:none}.crm .sbtn{flex:1;min-width:0;padding-left:2px;padding-right:2px}
 .ov-sq.crb{background:linear-gradient(#c98a4b,#7a4a1e)}
 .ov-sq.crb canvas{width:calc(var(--p)*14);height:calc(var(--p)*11);image-rendering:pixelated;display:block;margin:auto}
 .card.hay{background:linear-gradient(180deg,#fff0b8,#e8c25a)}
@@ -621,7 +623,7 @@ body.kb #controls{display:none}
 <div id="crate" hidden role="dialog" aria-modal="true" aria-labelledby="crate-title">
   <div class="shop-panel">
     <div class="shop-head"><h2 id="crate-title">CAISSES</h2><div class="bals"><div class="bal" title="Or"><canvas id="crate-gold-ic" width="7" height="6" aria-hidden="true"></canvas><span id="crate-gold">0</span></div></div></div>
-    <div id="crate-roll" hidden><div id="crate-mark"></div><div id="crate-view"><div id="crate-strip"></div></div><p id="crate-res"></p></div>
+    <div id="crate-roll" hidden><div id="crate-mark"></div><div id="crate-view"><div id="crate-strip"></div></div><div id="crate-res"></div><button class="sbtn" id="crate-skip" type="button">PASSER</button></div>
     <div id="crate-list"></div>
     <button class="go" id="crate-close" type="button">RETOUR</button>
   </div>
@@ -769,7 +771,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'Jeu de tarot':'Tarot deck','À ACHETER':'FOR SALE','Barbes':'Barbs','Longueur du câble':'Cable length','Treuil':'Winch','Chaîne':'Chain','aucune':'none','Dégâts du harpon (x3 sur un boss).':'Harpoon damage (x3 on a boss).','Portée du harpon.':'Harpoon range.','Vitesse du câble : ennemis ramenés et pêcheur tiré plus vite.':'Cable speed: enemies are reeled in and the fisher is pulled faster.','Les ennemis proches de la cible harponnée subissent la moitié des dégâts.':'Enemies near the harpooned target take half the damage.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cabled harpoon. On an enemy: it impales it and reels it back to you, hurting it all the way, then a final blow. On scenery: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.':'Throws a card in a straight line. Skill tree: damage, Silver Chariot (more cards), Star Platinum (piercing homing stars) and Sorcery (random potions). Dropped by King Cacamille 2.','INVINCIBLE':'INVINCIBLE','CONFIRMER ?':'CONFIRM?','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','DAUPHIN DES NUAGES':'CLOUD DOLPHIN','LE MONDE NUAGE':'THE CLOUD WORLD','★ CHECKPOINT : LE MONDE NUAGE ★':'★ CHECKPOINT: THE CLOUD WORLD ★','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','BRÛLURE !':'BURN!','GEL !':'FROZEN!','Sorcellerie':'Sorcery','Silver Chariot':'Silver Chariot','TAROT REQUIS':'TAROT REQUIRED','Autoguidage':'Homing','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
+'Jeu de tarot':'Tarot deck','À ACHETER':'FOR SALE','Barbes':'Barbs','Longueur du câble':'Cable length','Treuil':'Winch','Chaîne':'Chain','aucune':'none','Dégâts du harpon (x3 sur un boss).':'Harpoon damage (x3 on a boss).','Portée du harpon.':'Harpoon range.','Vitesse du câble : ennemis ramenés et pêcheur tiré plus vite.':'Cable speed: enemies are reeled in and the fisher is pulled faster.','Les ennemis proches de la cible harponnée subissent la moitié des dégâts.':'Enemies near the harpooned target take half the damage.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cabled harpoon. On an enemy: it impales it and reels it back to you, hurting it all the way, then a final blow. On scenery: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.':'Throws a card in a straight line. Skill tree: damage, Silver Chariot (more cards), Star Platinum (piercing homing stars) and Sorcery (random potions). Dropped by King Cacamille 2.','INVINCIBLE':'INVINCIBLE','CONFIRMER ?':'CONFIRM?','PASSER':'SKIP','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','DAUPHIN DES NUAGES':'CLOUD DOLPHIN','LE MONDE NUAGE':'THE CLOUD WORLD','★ CHECKPOINT : LE MONDE NUAGE ★':'★ CHECKPOINT: THE CLOUD WORLD ★','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','BRÛLURE !':'BURN!','GEL !':'FROZEN!','Sorcellerie':'Sorcery','Silver Chariot':'Silver Chariot','TAROT REQUIS':'TAROT REQUIRED','Autoguidage':'Homing','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'SPEEDRUN : choisis une arme déjà améliorée au maximum et bats le Roi Cacamille 2 le plus vite possible. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence.':'SPEEDRUN: pick a fully upgraded weapon and beat King Cacamille 2 as fast as you can. No checkpoints, no shop: if you die, everything restarts.','Bats le Roi Cacamille 2 le plus vite possible. Ton arme est déjà améliorée au maximum. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence. Choisis ton arme :':'Beat King Cacamille 2 as fast as you can. Your weapon is already fully upgraded. No checkpoints, no shop: if you die, everything restarts. Pick your weapon:','SPEEDRUN : APPUIE POUR CHOISIR TON ARME':'SPEEDRUN: TAP TO PICK YOUR WEAPON','SPEEDRUN : se débloque après ta première renaissance.':'SPEEDRUN: unlocks after your first rebirth.','MORT : ON RECOMMENCE':'DEAD: RESTARTING','ROI CACAMILLE VAINCU !':'KING CACAMILLE DEFEATED!','NOUVEAU RECORD !':'NEW RECORD!','PREMIER TEMPS !':'FIRST TIME!','SKIN':'SKIN','ARME':'WEAPON','JOUEUR':'PLAYER','REJOUER':'PLAY AGAIN','MENU':'MENU','+1 CŒUR DORÉ':'+1 GOLDEN HEART','Toutes les missions sont terminées !':'All missions completed!','Obtenir le trident infernal':'Get the infernal trident','Obtenir le katana':'Get the katana','Obtenir le boomerang':'Get the boomerang','Obtenir les tentacules':'Get the tentacles','Canne : une branche au niveau max':'Rod: max out one branch','Trident : une branche au niveau max':'Trident: max out one branch','Dagues : une branche au niveau max':'Daggers: max out one branch','Sceptre de glace : une branche au niveau max':'Ice scepter: max out one branch','Tarot : une branche au niveau max':'Tarot: max out one branch','Harpon : une branche au niveau max':'Harpoon: max out one branch','Katana : une branche au niveau max':'Katana: max out one branch','Boomerang : une branche au niveau max':'Boomerang: max out one branch','Tentacules : une branche au niveau max':'Tentacles: max out one branch','RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -786,6 +788,8 @@ const EN={
 'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
+  [/^(\d+) CAISSES OUVERTES$/,m=>m[1]+' CRATES OPENED'],
+  [/^DOUBLONS · \+(\d+) OR$/,m=>'DUPLICATES · +'+m[1]+' GOLD'],
   [/^(.+) \((\d+)\/(\d+)\)$/,m=>trStr(m[1])+' ('+m[2]+'/'+m[3]+')'],
   [/^(.+?) ?: niveau (\d+)$/,m=>trStr(m[1])+': level '+m[2]],
   [/^Branches actives : (\d+)\/(\d+)\. Rembourser une amélioration te rend tout son prix\.$/,m=>'Active branches: '+m[1]+'/'+m[2]+'. Refunding an upgrade gives back its full price.'],
@@ -7276,24 +7280,49 @@ function renderCrates(){
     const pr=document.createElement('div');pr.className='pr';const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=c.cost;pr.appendChild(sp);card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
     if(crBusy){b.textContent='OUVERTURE…';b.disabled=true;}
-    else if(shop.gold>=c.cost){b.textContent='OUVRIR';b.classList.add('equip');b.addEventListener('click',()=>openCrate(c));}
+    else if(shop.gold>=c.cost){b.textContent='OUVRIR';b.classList.add('equip');b.addEventListener('click',()=>openCrate(c,1));}
     else{b.textContent='IL MANQUE '+(c.cost-shop.gold);b.disabled=true;}
     b.setAttribute('aria-label',c.name+' : '+b.textContent);
-    card.appendChild(b);crateList.appendChild(card);
+    card.appendChild(b);
+    if(!crBusy&&shop.gold>=c.cost){   // multi-ouvertures : x5 et x10
+      const row=document.createElement('div');row.className='crm';
+      for(const n of [5,10]){
+        const m=document.createElement('button');m.className='sbtn';m.type='button';m.textContent='x'+n;m.title=(c.cost*n)+' OR';
+        m.setAttribute('aria-label',c.name+' : x'+n+' ('+(c.cost*n)+' or)');
+        if(shop.gold>=c.cost*n){m.classList.add('equip');m.addEventListener('click',()=>openCrate(c,n));}else m.disabled=true;
+        row.appendChild(m);
+      }
+      card.appendChild(row);
+    }
+    crateList.appendChild(card);
   }
 }
-function openCrate(c){
-  if(crBusy||shop.gold<c.cost)return;
-  shop.gold-=c.cost;
-  const win=crRoll(c),sk=win.sk,id=sk.id;let msg;
-  if(shop.owned.includes(id)){   // skin déjà possédé : les fragments sont convertis en or
-    const back=Math.max(25,Math.floor(sk.price/12))*win.n;shop.gold+=back;msg='DOUBLON · '+sk.name+' · +'+back+' OR';
-  }else{
-    shop.fr[id]=Math.min(sk.frag,(shop.fr[id]||0)+win.n);
-    msg='+'+win.n+(win.n>1?' FRAGMENTS':' FRAGMENT')+' · '+sk.name+' '+shop.fr[id]+'/'+sk.frag;
-    if(shop.fr[id]>=sk.frag){shop.owned.push(id);msg='SKIN DÉBLOQUÉ : '+sk.name+' !';}
+let crSkip=null;
+function applyRoll(win,agg){   // applique un lot (fragments ou doublon converti en or) et cumule dans agg
+  const sk=win.sk,id=sk.id,a=agg[id]||(agg[id]={sk,fr:0,unlocked:false});
+  if(shop.owned.includes(id)){agg.back=(agg.back||0)+Math.max(25,Math.floor(sk.price/12))*win.n;}   // skin déjà possédé : les fragments sont convertis en or
+  else{
+    shop.fr[id]=Math.min(sk.frag,(shop.fr[id]||0)+win.n);a.fr+=win.n;
+    if(shop.fr[id]>=sk.frag){shop.owned.push(id);a.unlocked=true;}
   }
+}
+function openCrate(c,nb){
+  nb=nb||1;
+  if(crBusy||shop.gold<c.cost*nb)return;
+  shop.gold-=c.cost*nb;
+  const wins=[],agg={};
+  for(let i=0;i<nb;i++){const w=crRoll(c);wins.push(w);applyRoll(w,agg);}
+  if(agg.back)shop.gold+=agg.back;
+  const win=wins.reduce((m,w)=>w.sk.price>m.sk.price||(w.sk.price===m.sk.price&&w.n>m.n)?w:m,wins[0]);   // la roulette s'arrête sur le plus beau lot
+  const lines=[];
+  if(nb>1)lines.push(nb+' CAISSES OUVERTES');
+  for(const k in agg){
+    if(k==='back')continue;const a=agg[k];if(!a.fr&&!a.unlocked)continue;
+    lines.push(a.unlocked?'SKIN DÉBLOQUÉ : '+a.sk.name+' !':'+'+a.fr+(a.fr>1?' FRAGMENTS':' FRAGMENT')+' · '+a.sk.name+' '+shop.fr[a.sk.id]+'/'+a.sk.frag);
+  }
+  if(agg.back)lines.push(nb>1?'DOUBLONS · +'+agg.back+' OR':'DOUBLON · '+win.sk.name+' · +'+agg.back+' OR');
   saveShop();
+  const msg=lines;
   const N=36,WIN=30,TW=84,strip=$('crate-strip'),roll=$('crate-roll'),view=$('crate-view');
   strip.textContent='';strip.style.transition='none';strip.style.transform='translateX(0)';
   for(let i=0;i<N;i++){
@@ -7303,7 +7332,7 @@ function openCrate(c){
     const l=document.createElement('span');l.textContent=it.sk.name+' x'+it.n;t.appendChild(l);
     strip.appendChild(t);
   }
-  roll.hidden=false;$('crate-res').textContent='';crBusy=true;renderCrates();
+  roll.hidden=false;$('crate-res').textContent='';crBusy=true;$('crate-skip').hidden=false;renderCrates();
   void strip.offsetWidth;
   const reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
   const target=WIN*TW+TW/2-view.clientWidth/2+(Math.random()-0.5)*TW*0.6,dur=reduce?0.3:4.2;
@@ -7313,16 +7342,18 @@ function openCrate(c){
   let fin=false;
   const done=()=>{
     if(fin)return;fin=true;strip.removeEventListener('transitionend',onEnd);
-    crBusy=false;
-    $('crate-res').textContent=msg;try{sfx.heal();}catch(e){}
+    crBusy=false;$('crate-skip').hidden=true;crSkip=null;
+    const rs=$('crate-res');rs.textContent='';for(const t of msg){const d=document.createElement('div');d.textContent=t;rs.appendChild(d);}try{sfx.heal();}catch(e){}
     if(crOpen)renderCrates();
   };
   const onEnd=ev=>{if(ev.target===strip&&ev.propertyName==='transform')done();};
+  crSkip=()=>{if(fin)return;strip.style.transition='none';strip.style.transform='translateX('+(-Math.round(target))+'px)';done();};   // PASSER : saute l'animation
   strip.addEventListener('transitionend',onEnd);
   setTimeout(done,dur*1000+400);
 }
+$('crate-skip').addEventListener('click',()=>{if(crSkip)crSkip();});
 function openCrates(){
-  clearInputs();crOpen=true;crateEl.hidden=false;$('crate-roll').hidden=true;renderCrates();
+  clearInputs();crOpen=true;crateEl.hidden=false;$('crate-roll').hidden=true;$('crate-skip').hidden=true;renderCrates();
   try{(crateList.querySelector('.sbtn:not(:disabled)')||$('crate-close')).focus({preventScroll:true});}catch(e){}
 }
 function closeCrates(){
