@@ -1495,7 +1495,7 @@ function rngCollab(credential) {
     .catch(() => rngMsg('Serveur RNG∞ injoignable, réessaie plus tard.'));
 }
 SKINS.push(RNG_SKIN);
-SKINS.push({id:'scarecrow',name:'Épouvofodille',price:0,frag:6,rod:'#5a3a6a',glow:'#ffb020',
+SKINS.push({id:'scarecrow',name:'Épouvofodille',price:0,frag:12,rod:'#5a3a6a',glow:'#ffb020',
   pal:{h:'#c9a24a',H:'#7a5a1e',s:'#b8955a',S:'#8a6a3a',b:'#3a2a4a',B:'#241830',g:'#7a5a2a',w:'#f0d070',n:'#2a1a10',y:'#ffb020'},
   hat:["...w..w..w.w....",".....kkkkkk.....","....khhhhhhk....","...khhHHHhhhk...","..kHHHHHHHHHHk.."],
   face:["...kssssssssk...","...ksyssssysk...","...kssSSSSssk...","....kksnsnskk..."],
@@ -7079,7 +7079,7 @@ function crRoll(c){   // un lot : un skin et un nombre de fragments (x1 70 %, x2
 function renderCrates(){
   $('crate-gold').textContent=shop.gold;drawIcon($('crate-gold-ic'),GOLD);
   crateList.textContent='';
-  const mini=(id)=>{const sk=SKINS.find(x=>x.id===id),cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);cv.title=sk.name+' '+(shop.owned.includes(id)?'(possédé)':(shop.fr[id]||0)+'/'+FRAG_NEED);if(shop.owned.includes(id))cv.style.opacity='.45';return cv;};
+  const mini=(id)=>{const sk=SKINS.find(x=>x.id===id),cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);cv.title=sk.name+' '+(shop.owned.includes(id)?'(possédé)':(shop.fr[id]||0)+'/'+sk.frag);if(shop.owned.includes(id))cv.style.opacity='.45';return cv;};
   for(const c of CRATES){
     const card=document.createElement('div');card.className='crc';
     const ic=document.createElement('canvas');ic.className='cic';const im=crSpr(c);ic.width=im.width;ic.height=im.height;ic.getContext('2d').drawImage(im,0,0);ic.setAttribute('aria-hidden','true');card.appendChild(ic);
@@ -7093,7 +7093,7 @@ function renderCrates(){
       const sk=SKINS.find(x=>x.id===id),row=document.createElement('div');row.className='crr';
       const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);row.appendChild(cv);
       const t=document.createElement('span');t.textContent=sk.name;row.appendChild(t);
-      const q=document.createElement('em');q.textContent=shop.owned.includes(id)?'POSSÉDÉ':(shop.fr[id]||0)+'/'+FRAG_NEED;row.appendChild(q);
+      const q=document.createElement('em');q.textContent=shop.owned.includes(id)?'POSSÉDÉ':(shop.fr[id]||0)+'/'+sk.frag;row.appendChild(q);
       dt.appendChild(row);
     }
     card.appendChild(dt);
@@ -7113,9 +7113,9 @@ function openCrate(c){
   if(shop.owned.includes(id)){   // skin déjà possédé : les fragments sont convertis en or
     const back=Math.max(25,Math.floor(sk.price/12))*win.n;shop.gold+=back;msg='DOUBLON · '+sk.name+' · +'+back+' OR';
   }else{
-    shop.fr[id]=Math.min(FRAG_NEED,(shop.fr[id]||0)+win.n);
-    msg='+'+win.n+(win.n>1?' FRAGMENTS':' FRAGMENT')+' · '+sk.name+' '+shop.fr[id]+'/'+FRAG_NEED;
-    if(shop.fr[id]>=FRAG_NEED){shop.owned.push(id);msg='SKIN DÉBLOQUÉ : '+sk.name+' !';}
+    shop.fr[id]=Math.min(sk.frag,(shop.fr[id]||0)+win.n);
+    msg='+'+win.n+(win.n>1?' FRAGMENTS':' FRAGMENT')+' · '+sk.name+' '+shop.fr[id]+'/'+sk.frag;
+    if(shop.fr[id]>=sk.frag){shop.owned.push(id);msg='SKIN DÉBLOQUÉ : '+sk.name+' !';}
   }
   saveShop();
   const N=36,WIN=30,TW=84,strip=$('crate-strip'),roll=$('crate-roll'),view=$('crate-view');
