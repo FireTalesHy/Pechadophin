@@ -1,6 +1,7 @@
 // Statistiques des joueurs actifs : réservées aux comptes développeurs.
-// POST /api/stats  { id, g, c } : « battement » anonyme envoyé par chaque page ouverte (id aléatoire, g = connecté Google, c = sauvegarde cloud activée).
-// GET  /api/stats  (Authorization: Bearer <jeton Google>) : joueurs actifs à l'instant, par heure (24 h) et par jour (14 j). Le jeton est vérifié côté serveur
+// POST /api/stats  { id, g, c, m, w, n, cred } : « battement » envoyé par chaque page ouverte (id aléatoire, g = connecté Google, c = sauvegarde cloud, m = mode, w = arme).
+//   Si le jeton Google (cred) est valide, le compte (pseudo, mode, arme) est listé 10 minutes dans « act:acc » pour le détail réservé aux comptes développeurs.
+// GET  /api/stats[?detail=1]  (Authorization: Bearer <jeton Google>) : joueurs actifs à l'instant, par heure (24 h) et par jour (14 j) ; detail=1 ajoute la liste des comptes actifs. Le jeton est vérifié côté serveur
 // et l'empreinte SHA-256 de l'e-mail doit figurer dans la liste des comptes développeurs.
 const crypto = require('crypto');
 const CLIENT_ID = '613987510700-0gp3rfu2tmcm32uu0aun7q1lmubl8vav.apps.googleusercontent.com';
@@ -22,11 +23,22 @@ function parts(ts) {
   const o = {}; for (const p of f.formatToParts(new Date(ts))) o[p.type] = p.value;
   return { d: o.year + '-' + o.month + '-' + o.day, h: o.year + '-' + o.month + '-' + o.day + 'T' + o.hour };
 }
-async function isDev(cred) {
+// vérifie un jeton Google (résultat gardé 50 min dans Redis pour ne pas rappeler Google à chaque battement) ; renvoie { sub, email } ou null
+async function verify(cred) {
+  const key = 'tk:' + crypto.createHash('sha256').update(cred).digest('hex').slice(0, 32);
+  const [cached] = await pipeline([['GET', key]]);
+  if (cached) { try { return JSON.parse(cached); } catch (e) {} }
   const v = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(cred));
   const t = await v.json();
-  if (!v.ok || t.aud !== CLIENT_ID || !t.email || String(t.email_verified) !== 'true') return false;
-  const h = crypto.createHash('sha256').update(String(t.email).trim().toLowerCase()).digest('hex');
+  if (!v.ok || t.aud !== CLIENT_ID || !t.sub) return null;
+  const out = { sub: String(t.sub), email: String(t.email || ''), ev: String(t.email_verified) === 'true' };
+  await pipeline([['SET', key, JSON.stringify(out), 'EX', 3000]]);
+  return out;
+}
+async function isDev(cred) {
+  const t = await verify(cred);
+  if (!t || !t.ev || !t.email) return false;
+  const h = crypto.createHash('sha256').update(t.email.trim().toLowerCase()).digest('hex');
   return DEV_HASHES.includes(h);
 }
 module.exports = async (req, res) => {
@@ -43,8 +55,15 @@ module.exports = async (req, res) => {
         ['PFADD', 'act:d:' + p.d, id], ['EXPIRE', 'act:d:' + p.d, 40 * 86400],
         ['PFADD', 'act:h:' + p.h, id], ['EXPIRE', 'act:h:' + p.h, 3 * 86400],
       ];
-      if (g) cmds.push(['ZADD', 'act:nowg', now, id], ['ZREMRANGEBYSCORE', 'act:nowg', '-inf', now - KEEP_MS], ['PFADD', 'act:dg:' + p.d, id], ['EXPIRE', 'act:dg:' + p.d, 40 * 86400]);
+      if (g) cmds.push(['PFADD', 'act:hg:' + p.h, id], ['EXPIRE', 'act:hg:' + p.h, 3 * 86400], ['ZADD', 'act:nowg', now, id], ['ZREMRANGEBYSCORE', 'act:nowg', '-inf', now - KEEP_MS], ['PFADD', 'act:dg:' + p.d, id], ['EXPIRE', 'act:dg:' + p.d, 40 * 86400]);
       if (c) cmds.push(['ZADD', 'act:nowc', now, id], ['ZREMRANGEBYSCORE', 'act:nowc', '-inf', now - KEEP_MS], ['PFADD', 'act:dc:' + p.d, id], ['EXPIRE', 'act:dc:' + p.d, 40 * 86400]);
+      if (g && body.cred) {   // compte vérifié : détail (pseudo, mode, arme) gardé pour l'onglet comptes
+        const t = await verify(String(body.cred)).catch(() => null);
+        if (t) {
+          const cl = x => String(x || '').replace(/[<>]/g, '').trim();
+          cmds.push(['HSET', 'act:acc', t.sub, JSON.stringify({ n: cl(body.n).slice(0, 16) || 'Joueur', m: cl(body.m).slice(0, 8), w: cl(body.w).slice(0, 12), c, t: now })]);
+        }
+      }
       await pipeline(cmds);
       res.status(200).json({ ok: 1 }); return;
     }
@@ -59,12 +78,26 @@ module.exports = async (req, res) => {
       for (let i = 13; i >= 0; i--) days.push(parts(now - i * 86400000).d);
       for (let i = 23; i >= 0; i--) hours.push(parts(now - i * 3600000).h);
       for (const d of days) cmds.push(['PFCOUNT', 'act:d:' + d], ['PFCOUNT', 'act:dg:' + d], ['PFCOUNT', 'act:dc:' + d]);
-      for (const h of hours) cmds.push(['PFCOUNT', 'act:h:' + h]);
+      for (const h of hours) cmds.push(['PFCOUNT', 'act:h:' + h], ['PFCOUNT', 'act:hg:' + h]);
+      const detail = req.query && req.query.detail === '1';
+      if (detail) cmds.push(['HGETALL', 'act:acc']);
       const r = await pipeline(cmds);
       let k = 3;
       const out = { now: { all: r[0], google: r[1], cloud: r[2] }, days: [], hours: [] };
       for (const d of days) { out.days.push({ d, n: r[k], g: r[k + 1], c: r[k + 2] }); k += 3; }
-      for (const h of hours) { out.hours.push({ h: h.slice(11), n: r[k++] }); }
+      for (const h of hours) { out.hours.push({ h: h.slice(11), n: r[k], g: r[k + 1] }); k += 2; }
+      if (detail) {
+        const flat = r[k] || [], accs = [], stale = [];
+        for (let i = 0; i < flat.length; i += 2) {
+          let o = null; try { o = JSON.parse(flat[i + 1]); } catch (e) {}
+          if (!o) { stale.push(flat[i]); continue; }
+          if (now - o.t > KEEP_MS) { stale.push(flat[i]); continue; }
+          if (now - o.t <= ACTIVE_MS) accs.push({ n: o.n, m: o.m, w: o.w, c: o.c ? 1 : 0, ago: Math.round((now - o.t) / 1000) });
+        }
+        if (stale.length) pipeline([['HDEL', 'act:acc', ...stale]]).catch(() => {});
+        accs.sort((a, b) => a.ago - b.ago);
+        out.accounts = accs;
+      }
       res.status(200).json(out); return;
     }
     res.status(405).json({ error: 'method' });

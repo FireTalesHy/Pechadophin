@@ -174,6 +174,12 @@ body{
 #stats[hidden]{display:none}
 #stats .shop-panel{width:min(560px,100%);overflow-y:auto}
 #stats-body{display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto;padding:3px}
+.st-tabs{display:flex;gap:6px}.st-tabs .sbtn{flex:1;min-width:0;padding-left:4px;padding-right:4px}
+.st-split{display:flex;height:16px;border-radius:8px;overflow:hidden;border:2px solid var(--btn-line)}.st-split i{display:block;height:100%}
+.st-lg{display:flex;gap:12px;font:400 8px/1.4 var(--pf);flex-wrap:wrap}.st-lg em{font-style:normal;display:inline-block;width:8px;height:8px;margin-right:4px;border-radius:2px}
+.st-bars i b{display:block;position:absolute;left:0;right:0;bottom:0;background:#ffb020;border-radius:2px 2px 0 0}
+.st-acc{display:grid;grid-template-columns:1.4fr 1fr 1fr .6fr;gap:2px 8px;font:400 8px/1.6 var(--pf);border:2px solid var(--btn-line);background:var(--btn);border-radius:10px;padding:8px 10px}
+.st-acc .r{text-align:right}
 .st-now{display:flex;align-items:baseline;gap:10px;border:2px solid var(--on);background:var(--btn);border-radius:12px;padding:10px 12px}
 .st-now b{font:400 26px/1 var(--pf);color:var(--on)}
 .st-now span{font:400 9px/1.5 var(--pf)}
@@ -706,6 +712,7 @@ body.kb #controls{display:none}
 <div id="stats" hidden role="dialog" aria-modal="true" aria-labelledby="stats-title">
   <div class="shop-panel dev-panel">
     <div class="shop-head"><h2 id="stats-title">STATS JOUEURS</h2></div>
+    <div class="st-tabs" role="tablist"><button class="sbtn equip" id="st-tab-ov" type="button" role="tab">VUE D'ENSEMBLE</button><button class="sbtn" id="st-tab-acc" type="button" role="tab">COMPTES</button></div>
     <div id="stats-body"></div>
     <button class="sbtn equip" id="stats-refresh" type="button">ACTUALISER</button>
     <button class="go" id="stats-close" type="button">RETOUR</button>
@@ -842,7 +849,7 @@ const EN={
 'TRIDENTS MULTIPLES !':'MULTIPLE TRIDENTS!','SOIN !':'HEAL!','+1 VIE':'+1 LIFE','+1 ÂME ROUGE':'+1 RED SOUL','+2 ÂMES ROUGES':'+2 RED SOULS','+1 PERLE':'+1 PEARL',
 'LES PORTES S\'OUVRENT !':'THE GATES OPEN!','LE CHEMIN DU RETOUR S\'OUVRE !':'THE WAY BACK OPENS!','SEAU 1/2':'BUCKET 1/2','RETOUR À LA PREMIÈRE ZONE !':'BACK TO THE FIRST ZONE!','ENRAGÉ !':'ENRAGED!','LA MÉDUSE !':'THE JELLYFISH!',
 'PLUS DE RETOUR EN ARRIÈRE':'NO WAY BACK','BATS LE CHÂTEAU DE SABLE':'BEAT THE SANDCASTLE','CHECKPOINT !':'CHECKPOINT!','LA PLAGE':'THE BEACH','TRIDENT DÉBLOQUÉ !':'TRIDENT UNLOCKED!',
-'Jeu de tarot':'Tarot deck','À ACHETER':'FOR SALE','Barbes':'Barbs','Longueur du câble':'Cable length','Treuil':'Winch','Chaîne':'Chain','aucune':'none','Dégâts du harpon (x3 sur un boss).':'Harpoon damage (x3 on a boss).','Portée du harpon.':'Harpoon range.','Vitesse du câble : ennemis ramenés et pêcheur tiré plus vite.':'Cable speed: enemies are reeled in and the fisher is pulled faster.','Les ennemis proches de la cible harponnée subissent la moitié des dégâts.':'Enemies near the harpooned target take half the damage.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cabled harpoon. On an enemy: it impales it and reels it back to you, hurting it all the way, then a final blow. On scenery: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.':'Throws a card in a straight line. Skill tree: damage, Silver Chariot (more cards), Star Platinum (piercing homing stars) and Sorcery (random potions). Dropped by King Cacamille 2.','INVINCIBLE':'INVINCIBLE','JOUEURS EN LIGNE À L\'INSTANT':'PLAYERS ONLINE RIGHT NOW','DERNIÈRES 24 HEURES (JOUEURS PAR HEURE)':'LAST 24 HOURS (PLAYERS PER HOUR)','14 DERNIERS JOURS (JOUEURS DIFFÉRENTS PAR JOUR)':'LAST 14 DAYS (UNIQUE PLAYERS PER DAY)','JOUR':'DAY','JOUEURS':'PLAYERS','Un joueur = un navigateur (identifiant anonyme). Heures et jours à l\'heure de Paris.':'One player = one browser (anonymous ID). Hours and days are in Paris time.','Accès refusé : compte non autorisé.':'Access denied: account not authorised.','Stats indisponibles pour le moment.':'Stats unavailable right now.','Jeton Google expiré : reconnexion en cours…':'Google token expired: reconnecting…','CONFIRMER ?':'CONFIRM?','STATS JOUEURS':'PLAYER STATS','ACTUALISER':'REFRESH','PASSER':'SKIP','COMMUN':'COMMON','RARE':'RARE','ÉPIQUE':'EPIC','LÉGENDAIRE':'LEGENDARY','BONUS':'BONUS','DOUBLON':'DUPLICATE','SKIN DÉBLOQUÉ !':'SKIN UNLOCKED!','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','DAUPHIN DES NUAGES':'CLOUD DOLPHIN','LE MONDE NUAGE':'THE CLOUD WORLD','★ CHECKPOINT : LE MONDE NUAGE ★':'★ CHECKPOINT: THE CLOUD WORLD ★','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','BRÛLURE !':'BURN!','GEL !':'FROZEN!','Sorcellerie':'Sorcery','Silver Chariot':'Silver Chariot','TAROT REQUIS':'TAROT REQUIRED','Autoguidage':'Homing','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
+'Jeu de tarot':'Tarot deck','À ACHETER':'FOR SALE','Barbes':'Barbs','Longueur du câble':'Cable length','Treuil':'Winch','Chaîne':'Chain','aucune':'none','Dégâts du harpon (x3 sur un boss).':'Harpoon damage (x3 on a boss).','Portée du harpon.':'Harpoon range.','Vitesse du câble : ennemis ramenés et pêcheur tiré plus vite.':'Cable speed: enemies are reeled in and the fisher is pulled faster.','Les ennemis proches de la cible harponnée subissent la moitié des dégâts.':'Enemies near the harpooned target take half the damage.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cabled harpoon. On an enemy: it impales it and reels it back to you, hurting it all the way, then a final blow. On scenery: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.':'Throws a card in a straight line. Skill tree: damage, Silver Chariot (more cards), Star Platinum (piercing homing stars) and Sorcery (random potions). Dropped by King Cacamille 2.','INVINCIBLE':'INVINCIBLE','JOUEURS EN LIGNE À L\'INSTANT':'PLAYERS ONLINE RIGHT NOW','DERNIÈRES 24 HEURES (JOUEURS PAR HEURE)':'LAST 24 HOURS (PLAYERS PER HOUR)','14 DERNIERS JOURS (JOUEURS DIFFÉRENTS PAR JOUR)':'LAST 14 DAYS (UNIQUE PLAYERS PER DAY)','JOUR':'DAY','JOUEURS':'PLAYERS','Un joueur = un navigateur (identifiant anonyme). Heures et jours à l\'heure de Paris.':'One player = one browser (anonymous ID). Hours and days are in Paris time.','Accès refusé : compte non autorisé.':'Access denied: account not authorised.','Stats indisponibles pour le moment.':'Stats unavailable right now.','Jeton Google expiré : reconnexion en cours…':'Google token expired: reconnecting…','VUE D\'ENSEMBLE':'OVERVIEW','COMPTES':'ACCOUNTS','CONNECTÉS':'SIGNED IN','NON CONNECTÉS':'SIGNED OUT','% CONNECTÉS':'% SIGNED IN','DERNIÈRES 24 HEURES (CONNECTÉS EN ORANGE)':'LAST 24 HOURS (SIGNED IN IN ORANGE)','14 DERNIERS JOURS : CONNECTÉS CONTRE NON CONNECTÉS':'LAST 14 DAYS: SIGNED IN VS SIGNED OUT','AFFICHER LES COMPTES ACTIFS':'SHOW ACTIVE ACCOUNTS','MASQUER LES COMPTES ACTIFS':'HIDE ACTIVE ACCOUNTS','PSEUDO':'NICKNAME','MODE':'MODE','ARME':'WEAPON','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY','OUI':'YES','NON':'NO','Pseudos tels que choisis par les joueurs. Liste actualisée à chaque rafraîchissement.':'Nicknames as chosen by the players. List refreshed on each refresh.','Aucun compte actif détaillé pour le moment (les comptes apparaissent après leur prochain battement, avec un jeton Google valide).':'No detailed active account right now (accounts appear after their next heartbeat, with a valid Google token).','CONFIRMER ?':'CONFIRM?','STATS JOUEURS':'PLAYER STATS','ACTUALISER':'REFRESH','PASSER':'SKIP','COMMUN':'COMMON','RARE':'RARE','ÉPIQUE':'EPIC','LÉGENDAIRE':'LEGENDARY','BONUS':'BONUS','DOUBLON':'DUPLICATE','SKIN DÉBLOQUÉ !':'SKIN UNLOCKED!','CHÂTEAU DE SABLE':'SANDCASTLE','POULPE GÉANT':'GIANT OCTOPUS','MÉDUSE':'JELLYFISH','DÉMON REQUIN':'SHARK DEMON','SORCIÈRE':'WITCH','ESQUIMAU':'ESKIMO','ROI CACAMILLE 2':'KING CACAMILLE 2','DAUPHIN DES NUAGES':'CLOUD DOLPHIN','LE MONDE NUAGE':'THE CLOUD WORLD','★ CHECKPOINT : LE MONDE NUAGE ★':'★ CHECKPOINT: THE CLOUD WORLD ★','JEU DE TAROT OBTENU !':'TAROT DECK OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','LE ROI':'THE KING','CHAMBRE DU ROI':'KING\'S CHAMBER','PAR LA FENÊTRE !':'THROUGH THE WINDOW!','CHÂTEAU DE GLACE':'ICE CASTLE','ÉTAGE 1':'FLOOR 1','ÉTAGE 2':'FLOOR 2','ÉTAGE 3':'FLOOR 3','ÉTAGE 4':'FLOOR 4','ÉTAGE 5':'FLOOR 5','SALLE DU BOSS':'BOSS ROOM','LA PORTE EST SCELLÉE':'THE DOOR IS SEALED','Sceptre de glace':'Ice scepter','SCEPTRE DE GLACE OBTENU !':'ICE SCEPTER OBTAINED!','ÉQUIPE-LE DANS ARMES':'EQUIP IT IN WEAPONS','PRENDS LE SCEPTRE !':'TAKE THE SCEPTER!','Vaincs l\'esquimau dans la glacière.':'Defeat the eskimo in the ice fields.','SCEPTRE REQUIS':'SCEPTER REQUIRED','Gel et dégâts':'Frost damage','Portée du souffle':'Breath range','Ralentissement':'Slowdown','Lasers de glace':'Ice lasers','Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.':'A freezing breath that slows enemies and hurts them over time. Ice lasers sometimes burst from the ground (level 3: 2 lasers, level 5: 3). Dropped by the eskimo.','LA GLACIÈRE':'THE ICE FIELDS','★ CHECKPOINT : LA GLACIÈRE ★':'★ CHECKPOINT: THE ICE FIELDS ★','+200 OR':'+200 GOLD','LE CHAT':'THE CAT','ELLE ENVOIE SON CHAT !':'SHE SENDS HER CAT!','POISON':'POISON','ÉTOURDI !':'STUNNED!','BRÛLURE !':'BURN!','GEL !':'FROZEN!','Sorcellerie':'Sorcery','Silver Chariot':'Silver Chariot','TAROT REQUIS':'TAROT REQUIRED','Autoguidage':'Homing','+150 OR':'+150 GOLD','BIOME INTROUVABLE':'BIOME NOT FOUND',
 'SPEEDRUN : choisis une arme déjà améliorée au maximum et bats le Roi Cacamille 2 le plus vite possible. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence.':'SPEEDRUN: pick a fully upgraded weapon and beat King Cacamille 2 as fast as you can. No checkpoints, no shop: if you die, everything restarts.','Bats le Roi Cacamille 2 le plus vite possible. Ton arme est déjà améliorée au maximum. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence. Choisis ton arme :':'Beat King Cacamille 2 as fast as you can. Your weapon is already fully upgraded. No checkpoints, no shop: if you die, everything restarts. Pick your weapon:','SPEEDRUN : APPUIE POUR CHOISIR TON ARME':'SPEEDRUN: TAP TO PICK YOUR WEAPON','SPEEDRUN : se débloque après ta première renaissance.':'SPEEDRUN: unlocks after your first rebirth.','MORT : ON RECOMMENCE':'DEAD: RESTARTING','ROI CACAMILLE VAINCU !':'KING CACAMILLE DEFEATED!','NOUVEAU RECORD !':'NEW RECORD!','PREMIER TEMPS !':'FIRST TIME!','SKIN':'SKIN','ARME':'WEAPON','JOUEUR':'PLAYER','REJOUER':'PLAY AGAIN','MENU':'MENU','+1 CŒUR DORÉ':'+1 GOLDEN HEART','Toutes les missions sont terminées !':'All missions completed!','Obtenir le trident infernal':'Get the infernal trident','Obtenir le katana':'Get the katana','Obtenir le boomerang':'Get the boomerang','Obtenir les tentacules':'Get the tentacles','Canne : une branche au niveau max':'Rod: max out one branch','Trident : une branche au niveau max':'Trident: max out one branch','Dagues : une branche au niveau max':'Daggers: max out one branch','Sceptre de glace : une branche au niveau max':'Ice scepter: max out one branch','Tarot : une branche au niveau max':'Tarot: max out one branch','Harpon : une branche au niveau max':'Harpoon: max out one branch','Katana : une branche au niveau max':'Katana: max out one branch','Boomerang : une branche au niveau max':'Boomerang: max out one branch','Tentacules : une branche au niveau max':'Tentacles: max out one branch','RETOUR MENU':'MAIN MENU','Retour au menu principal':'Back to the main menu','ANARCHIE !':'ANARCHY!','PAUSE':'PAUSE','APPUIE POUR REPRENDRE':'TAP TO RESUME','GAME OVER':'GAME OVER','NOUVEAU RECORD !':'NEW RECORD!','APPUIE POUR REJOUER':'TAP TO PLAY AGAIN',
 'RÉINITIALISER LA SAVE ?':'RESET THE SAVE?','Toute ta progression sera perdue : or, âmes rouges, améliorations, skins, meilleur score et checkpoint de la plage.':'All your progress will be lost: gold, red souls, upgrades, skins, best score and the beach checkpoint.',
 'DERNIÈRE CONFIRMATION':'LAST CONFIRMATION','C\'est définitif. Tout sera effacé et tu recommenceras depuis le tout début. Tu es vraiment sûr ?':'This is final. Everything will be erased and you will start over from the very beginning. Are you really sure?','TOUT EFFACER':'ERASE EVERYTHING',
@@ -859,6 +866,8 @@ const EN={
 'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
+  [/^CONNECTÉS À L'INSTANT contre (\d+) non connectés?\s\((\d+) %\)$/,m=>'SIGNED IN RIGHT NOW vs '+m[1]+' signed out ('+m[2]+'%)'],
+  [/^COMPTES CONNECTÉS ACTIFS \((\d+)\)$/,m=>'ACTIVE SIGNED-IN ACCOUNTS ('+m[1]+')'],
   [/^Dont (\d+) connectés? avec Google et (\d+) avec la sauvegarde cloud\. Actif = page ouverte dans les 90 dernières secondes\.$/,m=>m[1]+' signed in with Google and '+m[2]+' with cloud save. Active = page open within the last 90 seconds.'],
   [/^(\d+) CAISSES OUVERTES$/,m=>m[1]+' CRATES OPENED'],
   [/^DOUBLONS · \+(\d+) OR$/,m=>'DUPLICATES · +'+m[1]+' GOLD'],
@@ -7715,25 +7724,54 @@ addEventListener('keydown',e=>{if(lbOpen&&e.code==='Escape'){e.preventDefault();
 /* ---- Stats joueurs (comptes développeurs) : menu à part, ouvert depuis le menu compte ---- */
 const statsEl=$('stats'),statsBody=$('stats-body');
 let statsOpen=false,statsTimer=null,statsData=null,statsMsg='';
+let statsTab='ov',statsDetail=false;
 function statsRender(){
   statsBody.textContent='';
+  $('st-tab-ov').classList.toggle('equip',statsTab==='ov');$('st-tab-acc').classList.toggle('equip',statsTab==='acc');
   const add=(tag,cls,txt,par)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;(par||statsBody).appendChild(e);return e;};
   if(statsMsg)add('p','shop-note',statsMsg);
   const d=statsData;if(!d)return;
-  const now=add('div','st-now');add('b','',String(d.now.all),now);
-  const t=add('span','',"JOUEURS EN LIGNE À L'INSTANT",now);
-  add('p','st-sub','Dont '+d.now.google+' connecté'+(d.now.google>1?'s':'')+' avec Google et '+d.now.cloud+' avec la sauvegarde cloud. Actif = page ouverte dans les 90 dernières secondes.');
-  add('p','st-h','DERNIÈRES 24 HEURES (JOUEURS PAR HEURE)');
-  const bars=add('div','st-bars'),mx=Math.max(1,...d.hours.map(h=>h.n));
-  for(const h of d.hours){const i=add('i','',undefined,bars);i.style.height=Math.max(1,Math.round(h.n/mx*100))+'%';i.title=h.h+' h : '+h.n;}
-  const ax=add('div','st-ax');add('span','',d.hours[0].h+' h',ax);add('span','','max '+mx,ax);add('span','',d.hours[d.hours.length-1].h+' h',ax);
-  add('p','st-h','14 DERNIERS JOURS (JOUEURS DIFFÉRENTS PAR JOUR)');
-  const tb=add('div','st-tb');
-  for(const [x,c] of [['JOUR',''],['JOUEURS','r'],['GOOGLE','r'],['CLOUD','r']])add('span','hd '+c,x,tb);
-  for(const r of d.days.slice().reverse()){
-    add('span','',r.d.slice(8)+'/'+r.d.slice(5,7),tb);add('span','r',String(r.n),tb);add('span','r',String(r.g),tb);add('span','r',String(r.c),tb);
+  const axis=()=>{const mx=Math.max(1,...d.hours.map(h=>h.n));const ax=add('div','st-ax');add('span','',d.hours[0].h+' h',ax);add('span','','max '+mx,ax);add('span','',d.hours[d.hours.length-1].h+' h',ax);return mx;};
+  if(statsTab==='ov'){
+    const now=add('div','st-now');add('b','',String(d.now.all),now);
+    add('span','',"JOUEURS EN LIGNE À L'INSTANT",now);
+    add('p','st-sub','Dont '+d.now.google+' connecté'+(d.now.google>1?'s':'')+' avec Google et '+d.now.cloud+' avec la sauvegarde cloud. Actif = page ouverte dans les 90 dernières secondes.');
+    add('p','st-h','DERNIÈRES 24 HEURES (JOUEURS PAR HEURE)');
+    const bars=add('div','st-bars'),mx=Math.max(1,...d.hours.map(h=>h.n));
+    for(const h of d.hours){const i=add('i','',undefined,bars);i.style.height=Math.max(1,Math.round(h.n/mx*100))+'%';i.title=h.h+' h : '+h.n;}
+    axis();
+    add('p','st-h','14 DERNIERS JOURS (JOUEURS DIFFÉRENTS PAR JOUR)');
+    const tb=add('div','st-tb');
+    for(const [x,c] of [['JOUR',''],['JOUEURS','r'],['GOOGLE','r'],['CLOUD','r']])add('span','hd '+c,x,tb);
+    for(const r of d.days.slice().reverse()){add('span','',r.d.slice(8)+'/'+r.d.slice(5,7),tb);add('span','r',String(r.n),tb);add('span','r',String(r.g),tb);add('span','r',String(r.c),tb);}
+    add('p','st-sub',"Un joueur = un navigateur (identifiant anonyme). Heures et jours à l'heure de Paris.");
+    return;
   }
-  add('p','st-sub',"Un joueur = un navigateur (identifiant anonyme). Heures et jours à l'heure de Paris.");
+  /* onglet COMPTES : joueurs connectés comparés aux non connectés */
+  const all=d.now.all,co=Math.min(all,d.now.google),an=all-co,pc=all?Math.round(co/all*100):0;
+  const now=add('div','st-now');add('b','',String(co),now);add('span','',"CONNECTÉS À L'INSTANT contre "+an+' non connecté'+(an>1?'s':'')+' ('+pc+' %)',now);
+  const sp=add('div','st-split');const a1=add('i','',undefined,sp),a2=add('i','',undefined,sp);a1.style.width=pc+'%';a1.style.background='#ffb020';a2.style.width=(100-pc)+'%';a2.style.background='var(--on)';
+  const lg=add('div','st-lg');{const x=add('span','',undefined,lg);add('em','',undefined,x).style.background='#ffb020';x.append('CONNECTÉS');const y=add('span','',undefined,lg);add('em','',undefined,y).style.background='var(--on)';y.append('NON CONNECTÉS');}
+  add('p','st-h','DERNIÈRES 24 HEURES (CONNECTÉS EN ORANGE)');
+  const bars=add('div','st-bars'),mx=Math.max(1,...d.hours.map(h=>h.n));
+  for(const h of d.hours){const i=add('i','',undefined,bars);i.style.height=Math.max(1,Math.round(h.n/mx*100))+'%';const g=Math.min(h.g||0,h.n),b=document.createElement('b');b.style.height=(h.n?Math.round(g/h.n*100):0)+'%';i.appendChild(b);i.title=h.h+' h : '+(h.g||0)+' connectés / '+(h.n-(h.g||0))+' non connectés';}
+  axis();
+  add('p','st-h','14 DERNIERS JOURS : CONNECTÉS CONTRE NON CONNECTÉS');
+  const tb=add('div','st-tb');
+  for(const [x,c] of [['JOUR',''],['CONNECTÉS','r'],['NON CONNECTÉS','r'],['% CONNECTÉS','r']])add('span','hd '+c,x,tb);
+  for(const r of d.days.slice().reverse()){const g=Math.min(r.g,r.n);add('span','',r.d.slice(8)+'/'+r.d.slice(5,7),tb);add('span','r',String(g),tb);add('span','r',String(r.n-g),tb);add('span','r',r.n?Math.round(g/r.n*100)+' %':'-',tb);}
+  const bt=add('button','sbtn'+(statsDetail?'':' equip'),statsDetail?'MASQUER LES COMPTES ACTIFS':'AFFICHER LES COMPTES ACTIFS');bt.type='button';
+  bt.addEventListener('click',()=>{statsDetail=!statsDetail;if(statsDetail){statsMsg='Chargement…';statsRender();statsLoad();}else statsRender();});
+  if(statsDetail&&d.accounts){
+    add('p','st-h','COMPTES CONNECTÉS ACTIFS ('+d.accounts.length+')');
+    if(!d.accounts.length)add('p','st-sub','Aucun compte actif détaillé pour le moment (les comptes apparaissent après leur prochain battement, avec un jeton Google valide).');
+    else{
+      const ac=add('div','st-acc');
+      for(const [x,c] of [['PSEUDO',''],['MODE','r'],['ARME','r'],['CLOUD','r']])add('span','hd '+c,x,ac);
+      for(const r of d.accounts){add('span','',r.n,ac);add('span','r',r.m==='ana'?'ANARCHIE':r.m==='speed'?'SPEEDRUN':'CLASSIQUE',ac);add('span','r',((typeof WEAPONS!=='undefined'&&WEAPONS.find(x=>x.id===r.w))||{name:r.w||'-'}).name,ac);add('span','r',r.c?'OUI':'NON',ac);}
+    }
+    add('p','st-sub','Pseudos tels que choisis par les joueurs. Liste actualisée à chaque rafraîchissement.');
+  }
 }
 async function statsLoad(){
   if(!gUser){statsMsg='Connecte-toi avec Google.';statsRender();return;}
@@ -7743,7 +7781,7 @@ async function statsLoad(){
     return;
   }
   try{
-    const r=await fetch('/api/stats',{headers:{Authorization:'Bearer '+gCred}});
+    const r=await fetch('/api/stats'+(statsDetail?'?detail=1':''),{headers:{Authorization:'Bearer '+gCred}});
     if(r.status===403){statsMsg='Accès refusé : compte non autorisé.';statsData=null;}
     else{const j=await r.json();if(j&&j.now){statsData=j;statsMsg='';}else statsMsg='Stats indisponibles pour le moment.';}
   }catch(e){statsMsg='Stats indisponibles pour le moment.';}
@@ -7751,19 +7789,19 @@ async function statsLoad(){
 }
 function openStats(){
   if(!devOk)return;   // réservé aux comptes développeurs
-  clearInputs();statsOpen=true;statsEl.hidden=false;statsMsg='Chargement…';statsData=null;statsRender();statsLoad();
+  clearInputs();statsOpen=true;statsDetail=false;statsEl.hidden=false;statsMsg='Chargement…';statsData=null;statsRender();statsLoad();
   clearInterval(statsTimer);statsTimer=setInterval(()=>{if(statsOpen&&!document.hidden)statsLoad();},30000);
   try{$('stats-close').focus({preventScroll:true});}catch(e){}
 }
 function closeStats(){statsOpen=false;statsEl.hidden=true;clearInterval(statsTimer);}
-$('stats-close').addEventListener('click',closeStats);$('stats-refresh').addEventListener('click',()=>{statsMsg='Chargement…';statsRender();statsLoad();});
+$('stats-close').addEventListener('click',closeStats);$('st-tab-ov').addEventListener('click',()=>{statsTab='ov';statsRender();});$('st-tab-acc').addEventListener('click',()=>{statsTab='acc';statsRender();});$('stats-refresh').addEventListener('click',()=>{statsMsg='Chargement…';statsRender();statsLoad();});
 statsEl.addEventListener('pointerdown',e=>{if(e.target===statsEl)closeStats();});
 addEventListener('keydown',e=>{if(statsOpen&&e.code==='Escape'){e.preventDefault();e.stopPropagation();closeStats();}},true);
 /* battement anonyme : permet de compter les joueurs actifs (identifiant aléatoire propre au navigateur, aucune donnée personnelle) */
 (function(){
   if(!/^https?:$/.test(location.protocol)||/^(localhost|127\.|\[::1\])/.test(location.hostname))return;   // pas de comptage en local / hors ligne
   let pid='';try{pid=localStorage.getItem('canne-dauphins-pid')||'';if(!/^[a-z0-9]{12,32}$/.test(pid)){pid=Array.from(crypto.getRandomValues(new Uint8Array(10)),b=>b.toString(36).padStart(2,'0')).join('');localStorage.setItem('canne-dauphins-pid',pid);}}catch(e){return;}
-  const beat=()=>{if(document.hidden)return;try{fetch('/api/stats',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id:pid,g:gUser?1:0,c:cloudLinked()?1:0})}).catch(()=>{});}catch(e){}};
+  const beat=()=>{if(document.hidden)return;try{fetch('/api/stats',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id:pid,g:gUser?1:0,c:cloudLinked()?1:0,m:speedOn?'speed':anarchyOn?'ana':'classic',w:shop.weapon,n:gUser&&gUser.pseudo||'',cred:gUser&&gCred&&Date.now()-gCredT<55*60*1000?gCred:undefined})}).catch(()=>{});}catch(e){}};
   setTimeout(beat,3000);setInterval(beat,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)beat();});
 })();
 function gSignOut(){
