@@ -1324,7 +1324,7 @@ const SKINS=[
   hat:["................",".......kk.......","......krrk......","...kkkkkkkkkk...","...khhhhhhhhk..."],
   face:["...khHHHHHHhk...","...kHrrHHrrHk...","...kHHkkkkHHk...","....kkHHHHkk...."],
   torso:["...kbbbbbbbbk...","...kbbyybbbbHk..","...kBBBBBBBBk..."]},
- {id:'clown',name:'Clown',price:20000,rod:'#d92b3a',
+ {id:'clown',name:'Clown',price:20000,souls:60,rod:'#d92b3a',
   pal:{h:'#ff8a2a',g:'#ffe14d',r:'#e0262e',s:'#fff6ee',S:'#e6d8cc',b:'#7a4ad8',B:'#4a2a98',p:'#f2b630',n:'#d92b3a'},
   hat:["................","...h.g.r.g.h....","..hhhgrrrghhh...","..hhhhgggrrhh...","...khhhhhhhhk..."],
   face:["...kssssssssk...","...kskssskssk...","...ksssrrsssk...","....kkssssskk..."],
@@ -2604,7 +2604,16 @@ const FAUP={   // améliorations de la faux (or)
 };
 const SCYTHE_COST=12,SCY={arc:1.25,combo:4};
 const faV=k=>FAUP[k].vals[shop.fa[k]||0];
-const SCYTHE_ICON=spr(["...wwwww..","..wwwwwwW.",".ww...wwW.","ww.....wW.","w....bb.W.",".....b....","....b.....","...b......","..b.......",".b........"],{w:'#1c1c2a',W:'#e0262e',b:'#2a1a22'},true);
+const SCYTHE_ICON=(()=>{   // grande faux : manche marron, lame verte en dégradé (sombre à la base, claire à la pointe)
+  const c=mk(28,20),g=c.getContext('2d');
+  for(let i=0;i<=16;i++){const x=1+Math.round(i*0.9),y=19-i;g.fillStyle='#3a220e';g.fillRect(x-1,y,3,1);g.fillStyle=i%5===2?'#b07a3a':'#8a5a2b';g.fillRect(x,y,1,1);if(i%3===0){g.fillStyle='#6a4220';g.fillRect(x+1,y,1,1);}}
+  const cx=15,cy=14,col=(u,e)=>{const A=[15,90,45],B=[31,154,72],C=[74,222,128],D=[200,255,215],t=u<0.5?u*2:(u-0.5)*2,f=u<0.5?[A,B]:[B,C],r=[0,1,2].map(k=>Math.round(f[0][k]+(f[1][k]-f[0][k])*t));if(e)return '#'+D.map((_,k)=>Math.min(255,r[k]+70).toString(16).padStart(2,'0')).join('');return '#'+r.map(v=>v.toString(16).padStart(2,'0')).join('');};
+  for(let k=0;k<=60;k++){
+    const u=k/60,ang=(-118+u*125)*Math.PI/180,R=11,th=Math.max(0.7,5*(1-u*0.85));
+    for(let r=R;r>R-th;r-=0.5){const x=Math.round(cx+Math.cos(ang)*r*1.05),y=Math.round(cy+Math.sin(ang)*r);g.fillStyle=col(u,r>=R-0.5);g.fillRect(x,y,1,1);}
+  }
+  return c;
+})();
 const POISON_IC=spr([".g.","ggg","gGg","gGg",".g."],{g:'#7cff6a',G:'#3ea82c'},true);
 let scyCd=0,scyN=0,scyReset=0,scyFx=null,scyMoves=[];
 function scyShove(e,tx,ty,life){scyMoves.push({e,vx:(tx-e.x)/life,vy:(ty-e.y)/life,t:0,life});}
@@ -7046,6 +7055,7 @@ function renderSkins(){
     else if(sk.collab){pr.textContent='COLLAB RNG∞';}
     else if(sk.frag){pr.textContent='FRAGMENTS '+(shop.fr[sk.id]||0)+'/'+sk.frag;}
     else if(sk.crate){pr.textContent='EN CAISSE';}
+    else if(sk.souls){const ic=document.createElement('canvas');ic.width=7;ic.height=8;drawIcon(ic,SOUL);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.souls;pr.appendChild(sp);}   // skin Clown : s'achète avec des âmes
     else{const ic=document.createElement('canvas');ic.width=7;ic.height=6;drawIcon(ic,GOLD);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.price;pr.appendChild(sp);}
     card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
@@ -7053,6 +7063,7 @@ function renderSkins(){
     else if(owned){b.textContent='ÉQUIPER';b.classList.add('equip');b.addEventListener('click',()=>{shop.equipped=sk.id;saveShop();renderShop();});}
     else if(sk.frag||sk.crate){b.textContent='CAISSES';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();openCrates();});}
     else if(sk.collab){b.textContent='DÉBLOQUER';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();accHint='rng';openAcc();});}   // skin collab : renvoie à la connexion Google
+    else if(sk.souls){if(shop.souls>=sk.souls){b.textContent='ACHETER';b.addEventListener('click',()=>buySkin(sk));}else{const m=sk.souls-shop.souls;b.textContent='IL MANQUE '+m+' ÂME'+(m>1?'S':'');b.disabled=true;}}
     else if(shop.gold>=sk.price){b.textContent='ACHETER';b.addEventListener('click',()=>buySkin(sk));}
     else{b.textContent='IL MANQUE '+(sk.price-shop.gold);b.disabled=true;}
     b.setAttribute('aria-label',sk.name+' : '+b.textContent);
@@ -7077,8 +7088,10 @@ function renderSkins(){
 }
 let skLockedOpen=false;
 function buySkin(sk){
-  if(shop.owned.includes(sk.id)||shop.gold<sk.price||sk.crate||sk.frag)return;
-  shop.gold-=sk.price;shop.owned.push(sk.id);shop.equipped=sk.id;
+  if(shop.owned.includes(sk.id)||sk.crate||sk.frag)return;
+  if(sk.souls){if(shop.souls<sk.souls)return;shop.souls-=sk.souls;}
+  else{if(shop.gold<sk.price)return;shop.gold-=sk.price;}
+  shop.owned.push(sk.id);shop.equipped=sk.id;
   saveShop();sfx.heal();renderShop();
   const nb=shopList.querySelector('.card.eq .sbtn');if(nb)nb.focus({preventScroll:true});
 }
