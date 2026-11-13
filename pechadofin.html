@@ -491,7 +491,12 @@ body{
 .crc .pr{display:flex;align-items:center;gap:5px;font:400 9px/1 var(--pf)}
 .crc .pv{display:flex;gap:3px;flex-wrap:wrap;justify-content:center}
 .crc .pv canvas{width:24px;height:24px}
-.crc .pv.fr{font:400 8px/1.3 var(--pf)}
+.crd{width:100%;font:400 8px/1.3 var(--pf);text-align:left}
+.crd summary{cursor:pointer;text-align:center;padding:2px 0}
+.crr{display:flex;align-items:center;gap:5px;padding:2px 0}
+.crr canvas{width:20px;height:20px;image-rendering:pixelated;flex:none}
+.crr span{flex:1}
+.crr em{font-style:normal;opacity:.7}
 #crate-roll{margin:6px 0 10px;text-align:center}
 #crate-view{position:relative;overflow:hidden;height:92px;border:2px solid var(--btn-line);border-radius:12px;background:rgba(0,0,0,.35)}
 #crate-strip{display:flex;height:100%;will-change:transform}
@@ -702,7 +707,7 @@ const EN={
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
-'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Costumée':'Costume Crate','Caisse Féerique':'Fairy Crate','Caisse Obscure':'Dark Crate','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'BOUTIQUE':'SHOP','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
 'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
@@ -1498,9 +1503,8 @@ SKINS.push({id:'scarecrow',name:'Épouvofodille',price:0,frag:6,rod:'#5a3a6a',gl
 SKINS.sort((a,b)=>a.price-b.price);   // du moins cher au plus cher
 for(const sk of SKINS)sk.price*=50;   // les skins s'achètent en or (le moins cher : 100 or)
 const CRATES=[   // caisses : seule façon d'obtenir les skins à plus de 1600 or. Chaque caisse donne des fragments (6 = le skin) ; l'Épouvofodille peut sortir de toutes les caisses
- {id:'cos',name:'Caisse Costumée',cost:500,col:['#c98a4b','#7a4a1e'],skins:['pharaoh','dino','king'],w:[4,4,2]},
- {id:'fee',name:'Caisse Féerique',cost:600,col:['#ff8ad8','#a03a98'],skins:['disco','icecream','mermaid'],w:[4,4,2]},
- {id:'obs',name:'Caisse Obscure',cost:700,col:['#8a6ad0','#352a4d'],skins:['dragon','ghoul','human'],w:[4,3,3]}
+ {id:'hero',name:'Caisse Héros',cost:600,col:['#4aa8e8','#27479a'],skins:['king','pharaoh','mermaid','icecream','disco'],w:[2,3,3,4,4]},
+ {id:'vil',name:'Caisse Vilain',cost:700,col:['#c4202e','#4a0f18'],skins:['dragon','human','ghoul','dino'],w:[2,3,4,4]}
 ];
 const CRATE_BONUS={id:'scarecrow',chance:0.15},FRAG_NEED=6;
 for(const c of CRATES)for(const id of c.skins){const sk=SKINS.find(x=>x.id===id);if(sk){sk.crate=c.id;sk.frag=FRAG_NEED;}}
@@ -7051,6 +7055,16 @@ function renderCrates(){
     const pv=document.createElement('div');pv.className='pv';
     for(const id of c.skins.concat([CRATE_BONUS.id]))pv.appendChild(mini(id));
     card.appendChild(pv);
+    const dt=document.createElement('details');dt.className='crd';
+    const sm=document.createElement('summary');sm.textContent='DÉTAIL';dt.appendChild(sm);
+    for(const id of c.skins.concat([CRATE_BONUS.id])){
+      const sk=SKINS.find(x=>x.id===id),row=document.createElement('div');row.className='crr';
+      const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.getContext('2d').drawImage(sk.spr.idle,0,0);row.appendChild(cv);
+      const t=document.createElement('span');t.textContent=sk.name;row.appendChild(t);
+      const q=document.createElement('em');q.textContent=shop.owned.includes(id)?'POSSÉDÉ':(shop.fr[id]||0)+'/'+FRAG_NEED;row.appendChild(q);
+      dt.appendChild(row);
+    }
+    card.appendChild(dt);
     const pr=document.createElement('div');pr.className='pr';const gi=document.createElement('canvas');gi.width=7;gi.height=6;drawIcon(gi,GOLD);pr.appendChild(gi);const sp=document.createElement('span');sp.textContent=c.cost;pr.appendChild(sp);card.appendChild(pr);
     const b=document.createElement('button');b.className='sbtn';b.type='button';
     if(crBusy){b.textContent='OUVERTURE…';b.disabled=true;}
