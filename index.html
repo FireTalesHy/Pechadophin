@@ -5885,6 +5885,7 @@ Object.assign(BG_BEACH,{rays:1});
 Object.assign(BG_SWAMP,{sunA:0.35,tree:'dead',treeC:'#2c4232',treeT:'#2c4232',treeD:'#22362a'});
 Object.assign(BG_ICE,{snowCap:1,tree:'pine',treeC:'#5d8fb8',treeT:'#ffffff',treeD:'#3e6a8e'});
 Object.assign(BG_CLOUD,{rays:1});
+BG_GRASS.lm='grass';BG_BEACH.lm='beach';BG_SWAMP.lm='swamp';BG_ICE.lm='ice';BG_CLOUD.lm='cloud';
 /* ===== Décor v3 : ciel tramé, halo du soleil, rayons, montagnes lointaines, arbres, mer profonde ===== */
 const hexRgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
 const mixMemo=new Map();
@@ -5971,7 +5972,7 @@ function drawBackground(cx,cy,P){
     cloud(mod(c.x-cx*c.par+time*(3+c.par*30),VW+220)-110,c.y-(cy-200)*0.04,c.s,K);
   }
   ctx.globalAlpha=A;
-  if(P.noHills)return;   // monde nuage : un ciel pur, sans mer ni montagnes
+  if(P.noHills){drawLandmarks(cx,0,0,P,K,'sky');return;}   // monde nuage : un ciel pur, sans mer ni montagnes (mais des îles flottantes)
   const seaTop=Math.round(VH*0.6-(cy-200)*0.10);
   if(seaTop>0)for(let x=0;x<VW;x++){   // montagnes lointaines, presque fondues dans le ciel
     const wx=x+cx*0.07,h=noise1(wx/70,21)*46+noise1(wx/23,22)*9-12;
@@ -6004,6 +6005,7 @@ function drawBackground(cx,cy,P){
       if(h>0){const top=Math.round(base1-h);ctx.fillStyle=sh?K.h1s:P.h1;ctx.fillRect(x,top,1,base1-top);ctx.fillStyle=sh?P.h1:P.h1t;ctx.fillRect(x,top,1,1);}
     }
   }
+  drawLandmarks(cx,seaTop,base1,P,K,'land');   // moulins, ruines, tours… posés sur les collines du milieu
   const base2=seaTop+46-(cy-200)*0.08,h2=wx=>noise1(wx/40,13)*46+noise1(wx/15,14)*10,off=cx*0.45;
   if(P.tree){   // arbres plantés sur la crête (dessinés avant la colline, qui cache leur pied)
     const k0=Math.floor(off/9)-1,k1=Math.floor((off+VW)/9)+1;
@@ -6017,6 +6019,110 @@ function drawBackground(cx,cy,P){
   for(let x=0;x<VW;x++){
     const h=h2(x+off),top=Math.round(base2-h),sh=h>prev2+0.2;prev2=h;
     if(top<VH){ctx.fillStyle=sh?K.h2s:P.h2;ctx.fillRect(x,top,1,VH-top);ctx.fillStyle=P.h2t;ctx.fillRect(x,top,1,sh?1:2);}
+  }
+}
+
+/* ===== Repères au loin (refonte v5) : un monument à l'horizon environ tous les 10 écrans, propre à chaque biome.
+   Purement décoratif : sur la couche des collines du milieu (parallaxe 0,22), légèrement voilé par la brume. ===== */
+const LANDMARKS={grass:['windmill','ruins','lighthouse','windmill'],beach:['lighthouse','wreck','lighthouse'],swamp:['tower','deadtree','stilts'],ice:['arch','spire','wreck'],cloud:['island']};
+const LM_SEA={lighthouse:1,wreck:1};
+function lmTri(x,y,h,w0,w1,col){ctx.fillStyle=col;for(let r=0;r<h;r++){const w=Math.max(1,Math.round(w0+(w1-w0)*r/Math.max(1,h-1)));ctx.fillRect(Math.round(x-w/2),y+r,w,1);}}
+function drawLandmarks(cx,seaTop,base1,P,K,pass){
+  const list=LANDMARKS[P.lm];if(!list)return;
+  const A=ctx.globalAlpha,par=P.noHills?0.12:0.22,off=cx*par,SP=1050,hh=wx=>noise1(wx/52,11)*34+noise1(wx/19,12)*8-14;
+  const hz=c=>mixHex(c,K.low,0.18),hz2=c=>mixHex(c,K.low,0.28);
+  const i0=Math.floor((off-160)/SP),i1=Math.floor((off+VW+160)/SP);
+  for(let i=i0;i<=i1;i++){
+    const type=list[Math.floor(hash2(i,301)*list.length)];
+    if(pass==='sky'?type!=='island':pass!=='land'||type==='island')continue;
+    let wx=i*SP+180+Math.floor(hash2(i,302)*420);
+    if(LM_SEA[type]){   // phare et épave : on cherche à côté un bout de mer dégagé (pas de colline devant)
+      let best=null;for(let d=0;d<=260&&best===null;d+=6)for(const s of[d,-d])if(best===null&&hh(wx+s)<-3&&hh(wx+s-14)<0&&hh(wx+s+14)<0)best=wx+s;
+      if(best===null)continue;wx=best;
+    }
+    const x=Math.round(wx-off);
+    if(x<-110||x>VW+110)continue;
+    const h=hh(wx),gy=h>2?Math.round(base1-h)+1:seaTop+3;
+    if(type==='windmill'){   // moulin dont les ailes tournent
+      const H=36,top=gy-H;
+      for(let r=0;r<H;r++){const w=Math.round(7+r*0.22);ctx.fillStyle=hz('#e2d2b2');ctx.fillRect(x-(w>>1),top+r,w,1);ctx.fillStyle=hz('#f7efdc');ctx.fillRect(x,top+r,w-(w>>1),1);}
+      ctx.fillStyle=hz('#c9b894');for(let r=top+6;r<gy;r+=7)ctx.fillRect(x-6,r,12,1);
+      lmTri(x,top-6,7,1,13,hz('#9a4a3a'));ctx.fillStyle=hz('#c0624c');ctx.fillRect(x,top-4,4,4);
+      ctx.fillStyle=hz('#5a3a2a');ctx.fillRect(x-2,gy-7,4,7);ctx.fillRect(x+2,top+12,3,3);ctx.fillRect(x-4,top+20,2,3);
+      const hx=x,hy=top+2,a=time*0.9;
+      for(let b=0;b<4;b++){const g=a+b*Math.PI/2,c=Math.cos(g),sn=Math.sin(g),px=-sn,py=c;
+        pixLine(hx,hy,hx+c*22,hy+sn*22,hz('#5a3f2c'));
+        for(let k=6;k<=22;k++){const bx=hx+c*k,by=hy+sn*k;ctx.fillStyle=hz('#f4ecdc');for(const o of[1.5,2.5,3.5])ctx.fillRect(Math.round(bx+px*o),Math.round(by+py*o),1,1);
+          if(k%4===0){ctx.fillStyle=hz('#8a6a4a');ctx.fillRect(Math.round(bx+px*2.5),Math.round(by+py*2.5),1,1);}}}
+      ctx.fillStyle=hz('#3a2a1e');ctx.fillRect(hx-1,hy-1,3,3);
+    } else if(type==='lighthouse'){   // phare rayé sur son rocher, faisceau qui balaie la mer
+      const gy2=seaTop+5,top=gy2-56;
+      ctx.fillStyle=hz('#5b6270');ctx.fillRect(x-13,gy2-4,26,5);ctx.fillRect(x-9,gy2-7,18,3);ctx.fillStyle=hz('#7c8494');ctx.fillRect(x-8,gy2-7,8,1);ctx.fillRect(x-12,gy2-4,6,1);
+      for(let r=0;r<46;r++){const w=Math.round(7+r*0.14),band=Math.floor(r/7)%2;ctx.fillStyle=hz(band?'#c8343c':'#eeeef2');ctx.fillRect(x-(w>>1),top+9+r,w,1);ctx.fillStyle=hz(band?'#9a2430':'#c4c4cc');ctx.fillRect(x-(w>>1),top+9+r,2,1);}
+      ctx.fillStyle=hz('#2c3040');ctx.fillRect(x-7,top+8,14,2);ctx.fillRect(x-5,top+2,10,1);ctx.fillRect(x-5,top+2,1,6);ctx.fillRect(x+4,top+2,1,6);
+      ctx.fillStyle=hz('#5a3a2a');ctx.fillRect(x-1,gy2-14,3,5);
+      const sw=Math.sin(time*0.8),on=Math.abs(sw);
+      ctx.fillStyle=on>0.85?'#fff8d8':'#ffe08a';ctx.fillRect(x-4,top+3,8,5);
+      lmTri(x,top-4,6,1,11,hz('#2c3040'));
+      if(on>0.08){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=A*0.24*on;ctx.fillStyle='#fff3c0';
+        const L=150*on,ly=top+5;ctx.beginPath();ctx.moveTo(x,ly);ctx.lineTo(x+Math.sign(sw)*L,ly-10*on);ctx.lineTo(x+Math.sign(sw)*L,ly+12*on);ctx.closePath();ctx.fill();ctx.restore();ctx.globalAlpha=A;}
+      if(on>0.85){ctx.globalAlpha=A*0.35;ctx.fillStyle='#fff3c0';disc(x,top+5,7);ctx.globalAlpha=A;}
+    } else if(type==='wreck'){   // épave échouée qui se balance doucement
+      const gy2=seaTop+6+Math.round(Math.sin(time*1.1+i)),ice=!!P.snowCap,c1=ice?'#6f88a0':'#5a3a26',c2=ice?'#9fb9cf':'#7a5236',sail=ice?'#e8f4fc':'#d8ccb0';
+      for(let r=0;r<10;r++){const w=38-r*3;ctx.fillStyle=hz(r<2?c2:c1);ctx.fillRect(x-19+r+(r>>1),gy2-12+r,w,1);}
+      ctx.fillStyle=hz(c2);for(let k=0;k<6;k++)ctx.fillRect(x-14+k*6,gy2-12,2,1);ctx.fillStyle=hz(c1);ctx.fillRect(x-20,gy2-15,6,3);ctx.fillRect(x+14,gy2-14,5,2);
+      pixLine(x+3,gy2-12,x-4,gy2-46,hz(c1));pixLine(x+4,gy2-12,x-3,gy2-46,hz(c1));pixLine(x-1,gy2-34,x+12,gy2-31,hz(c1));
+      ctx.fillStyle=hz(sail);ctx.fillRect(x-2,gy2-42,4,9);ctx.fillRect(x+1,gy2-31,6,6);ctx.fillRect(x-1,gy2-29,2,3);ctx.fillStyle=hz(c2);ctx.fillRect(x+2,gy2-38,1,3);
+      if(ice){ctx.fillStyle='#ffffff';ctx.fillRect(x-18,gy2-13,34,1);ctx.fillRect(x-20,gy2-16,6,1);}
+      ctx.fillStyle=P.sea;ctx.fillRect(x-24,gy2-3,48,4);ctx.fillStyle=P.seaTop;ctx.fillRect(x-22+((time*6|0)%5),gy2-3,10,1);ctx.fillRect(x+4-((time*5|0)%5),gy2-3,10,1);
+    } else if(type==='ruins'){   // temple en ruine : colonnes cassées, fronton tombé, lierre
+      const st=hz('#b4ad9f'),sl=hz('#d2ccbe'),sd=hz('#7c776c'),iv=hz('#3f8a48');
+      ctx.fillStyle=sd;ctx.fillRect(x-24,gy-3,48,3);ctx.fillStyle=st;ctx.fillRect(x-23,gy-4,46,1);
+      for(const [dx,ch] of[[-18,30],[-7,22],[5,30],[16,12]]){ctx.fillStyle=sd;ctx.fillRect(x+dx,gy-3-ch,6,ch);ctx.fillStyle=st;ctx.fillRect(x+dx+1,gy-3-ch,4,ch);ctx.fillStyle=sl;ctx.fillRect(x+dx+3,gy-3-ch,1,ch);ctx.fillStyle=sd;ctx.fillRect(x+dx-1,gy-4-ch,8,2);}
+      ctx.fillStyle=sd;ctx.fillRect(x-20,gy-38,33,4);ctx.fillStyle=st;ctx.fillRect(x-20,gy-38,33,1);
+      lmTri(x-4,gy-45,7,3,30,st);
+      ctx.fillStyle=st;ctx.fillRect(x+21,gy-7,7,4);ctx.fillRect(x+12,gy-6,4,3);ctx.fillStyle=sd;ctx.fillRect(x+21,gy-4,7,1);
+      ctx.fillStyle=iv;ctx.fillRect(x-18,gy-30,1,10);ctx.fillRect(x-17,gy-24,1,5);ctx.fillRect(x+10,gy-33,1,8);ctx.fillRect(x+6,gy-30,1,4);ctx.fillRect(x-14,gy-38,4,1);ctx.fillRect(x+16,gy-15,1,6);
+    } else if(type==='tower'){   // donjon en ruine du marais, une fenêtre éclairée
+      const st=hz2('#56645a'),sl=hz2('#728476'),dk=hz2('#2f3a32');
+      ctx.fillStyle=st;ctx.fillRect(x-9,gy-46,18,46);ctx.fillStyle=sl;ctx.fillRect(x+3,gy-46,6,46);
+      for(const [dx,w,hgt] of[[-11,5,5],[-3,4,3],[5,6,7]]){ctx.fillStyle=st;ctx.fillRect(x+dx,gy-46-hgt,w,hgt);}
+      ctx.fillStyle=dk;for(let r=gy-40;r<gy;r+=6){ctx.fillRect(x-9,r,18,1);for(let k=(r/6|0)%2?-9:-6;k<9;k+=6)ctx.fillRect(x+k,r-5,1,5);}
+      ctx.fillRect(x-3,gy-8,6,8);ctx.fillRect(x+9,gy-28,3,14);ctx.fillRect(x-12,gy-6,4,6);
+      const fl=0.75+0.25*Math.sin(time*9+Math.sin(time*3)*2);ctx.globalAlpha=A*fl;ctx.fillStyle='#ffcf5a';ctx.fillRect(x-2,gy-32,4,6);
+      ctx.globalAlpha=A*0.22*fl;disc(x,gy-29,7);ctx.globalAlpha=A;
+      ctx.fillStyle=hz2('#3d5a3e');ctx.fillRect(x-9,gy-20,1,12);ctx.fillRect(x-8,gy-14,1,6);
+    } else if(type==='deadtree'){   // grand arbre mort, mousse qui pend
+      const c=hz2('#2c3a30'),m=hz2('#4d6a4a');
+      ctx.fillStyle=c;ctx.fillRect(x-3,gy-34,6,34);ctx.fillRect(x-6,gy-3,12,3);ctx.fillRect(x-4,gy-12,1,8);
+      for(const [a,b2,cc,d] of[[0,-30,-19,-46],[-1,-31,-18,-45],[1,-24,20,-40],[1,-25,21,-39],[2,-33,8,-52],[-10,-37,-14,-50],[12,-31,22,-28],[-15,-42,-22,-44]])pixLine(x+a,gy+b2,x+cc,gy+d,c);
+      ctx.fillStyle=m;const sw=Math.round(Math.sin(time*0.8));for(const [dx,dy,l] of[[-15,-42,7],[16,-36,8],[6,-46,5],[-9,-37,4],[20,-30,5]])ctx.fillRect(x+dx+sw,gy+dy,1,l);
+    } else if(type==='stilts'){   // cabane de pêcheur sur pilotis
+      const w=hz2('#6b5638'),wd=hz2('#4a3a26'),r=hz2('#8a7448');
+      ctx.fillStyle=wd;for(const k of[-11,-4,4,11])ctx.fillRect(x+k,gy-13,2,13);ctx.fillRect(x-13,gy-13,27,2);pixLine(x-11,gy-2,x-4,gy-11,wd);pixLine(x+11,gy-2,x+4,gy-11,wd);
+      ctx.fillStyle=w;ctx.fillRect(x-11,gy-25,23,12);ctx.fillStyle=wd;for(let k=0;k<23;k+=4)ctx.fillRect(x-11+k,gy-25,1,12);
+      lmTri(x,gy-36,11,3,29,r);ctx.fillStyle=hz2('#a89060');ctx.fillRect(x-1,gy-36,3,2);
+      const fl=0.8+0.2*Math.sin(time*7);ctx.globalAlpha=A*fl;ctx.fillStyle='#ffd36a';ctx.fillRect(x+3,gy-22,5,4);ctx.globalAlpha=A;
+      ctx.fillStyle=wd;ctx.fillRect(x-6,gy-22,4,9);pixLine(x+13,gy-13,x+22,gy-30,wd);pixLine(x+22,gy-30,x+22,gy-16,hz2('#c8c0a8'));
+    } else if(type==='arch'){   // arche de glace
+      for(let k=0;k<=36;k++){const g=Math.PI*k/36,ax=Math.round(x-Math.cos(g)*20),ay=Math.round(gy-Math.sin(g)*30);ctx.fillStyle=hz('#9ccfec');ctx.fillRect(ax-3,ay-1,7,6);ctx.fillStyle=hz('#e6f8ff');ctx.fillRect(ax-2,ay-1,4,1);}
+      ctx.fillStyle=hz('#7fb4d8');ctx.fillRect(x-25,gy-6,9,6);ctx.fillRect(x+17,gy-6,9,6);ctx.fillStyle='#ffffff';ctx.fillRect(x-6,gy-33,12,2);ctx.fillRect(x-14,gy-28,4,1);
+      for(const dx of[-12,-2,9]){ctx.fillStyle=hz('#c8ecff');ctx.fillRect(x+dx,gy-28+Math.abs(dx>>2),1,4);}
+      if(Math.sin(time*2.3+i)>0.8){ctx.fillStyle='#ffffff';ctx.fillRect(x+9,gy-24,1,5);ctx.fillRect(x+7,gy-22,5,1);}
+    } else if(type==='spire'){   // aiguilles de cristal de glace
+      for(const [dx,hgt,ww] of [[-11,28,10],[0,50,13],[11,36,10],[19,18,7],[-19,14,6]]){
+        for(let r=0;r<hgt;r++){const w=Math.max(1,Math.round(ww*r/hgt));ctx.fillStyle=hz('#80c0e6');ctx.fillRect(x+dx-(w>>1),gy-hgt+r,w,1);ctx.fillStyle=hz('#e8f9ff');ctx.fillRect(x+dx,gy-hgt+r,Math.max(1,w>>1),1);}
+      }
+      if(Math.sin(time*1.7+i)>0.75){ctx.fillStyle='#ffffff';ctx.fillRect(x,gy-53,1,5);ctx.fillRect(x-2,gy-51,5,1);}
+    } else if(type==='island'){   // île flottante avec sa cascade (monde nuage)
+      const iy=Math.round(70+(i%3)*12+Math.sin(time*0.9+i)*2);
+      lmTri(x,iy+4,18,40,2,hz('#9a8c7a'));lmTri(x+4,iy+4,13,14,1,hz('#7a6e5e'));
+      ctx.fillStyle=hz('#6cc46a');ctx.fillRect(x-20,iy,40,4);ctx.fillStyle=hz('#9be890');ctx.fillRect(x-19,iy,38,1);
+      ctx.fillStyle=hz('#2e8048');disc(x-9,iy-7,6);ctx.fillStyle=hz('#4fae5e');disc(x-8,iy-8,3);ctx.fillStyle=hz('#5a3a2a');ctx.fillRect(x-9,iy-2,2,2);
+      ctx.fillStyle=hz('#ffffff');ctx.fillRect(x+5,iy-10,8,10);ctx.fillRect(x+4,iy-13,10,3);ctx.fillStyle=hz('#ffd23f');ctx.fillRect(x+8,iy-15,2,2);ctx.fillStyle=hz('#8fb3d9');ctx.fillRect(x+8,iy-6,2,6);
+      for(let k=0;k<18;k++){const fy=iy+4+((k*3+(time*18|0))%40);ctx.globalAlpha=A*Math.max(0,0.85-(fy-iy)/48);ctx.fillStyle='#e8f6ff';ctx.fillRect(x+15,fy,3,2);}
+      ctx.globalAlpha=A;
+    }
   }
 }
 let vigC=null;
