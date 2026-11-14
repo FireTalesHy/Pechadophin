@@ -692,9 +692,10 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .x3in :is(.card,.crc,.wsq,.mis-row,.lb-row,.mode-card):nth-child(n+8){animation-delay:.21s}
 @keyframes x3card{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
 /* cases et caisses : reflet qui passe au survol */
-.card,.crc,.wsq{position:relative;overflow:hidden}
-.card::after,.crc::after,.wsq::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-12deg);pointer-events:none;opacity:0}
-@media (hover:hover){.card:hover::after,.crc:hover::after,.wsq:hover::after{opacity:1;animation:x3sheen .6s ease-out}}
+.card,.crc{position:relative;overflow:hidden}
+#shop-list,.lkg,#crate-list,#weap-grid,#weap-list{grid-auto-rows:max-content}   /* une case qui rogne son contenu ne doit jamais se faire écraser par la grille */
+.card::after,.crc::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-12deg);pointer-events:none;opacity:0}
+@media (hover:hover){.card:hover::after,.crc:hover::after{opacity:1;animation:x3sheen .6s ease-out}}
 @keyframes x3sheen{from{left:-60%}to{left:130%}}
 /* caisses : grille centrée, coffre qui s'agite au survol */
 @media (min-height:561px) and (min-width:521px){#crate-list{grid-template-columns:repeat(auto-fit,minmax(160px,210px));justify-content:center}}
@@ -736,8 +737,136 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
   #overlay.show .ov-top,#overlay.show .ov-logo,#overlay.show .ov-center,#overlay.show .ov-bot,#ov-title,#ov-label,.shop-panel,.x3in .card,.x3in .crc,.x3in .wsq,.x3in .mis-row,.x3in .lb-row,.x3in .mode-card,#crate-mark::after,#crate-roll.x3shake{animation:none}
   #crate-rev canvas,#crate-rev.r-leg .rv-nm,#crate-rev.unl .rv-nm{animation:none;opacity:1}
   #crate-rev .rv-wave,#crate-rev .rv-flash,#crate-rev .rv-rays,#crate-rev .rv-cf{display:none}
-  .card::after,.crc::after,.wsq::after{display:none}
+  .card::after,.crc::after{display:none}
 }
+/* ================= Refonte des fenêtres (v4) : un seul système pour toutes les fenêtres, assorti aux boutons du menu =================
+   panneau crème (bleu nuit en sombre) au contour épais, barre de titre colorée par fenêtre, ✕ dans le coin, RETOUR neutre,
+   onglets segmentés, interrupteur du son, réglages en lignes, podium du top 10, fenêtre de danger pour la remise à zéro */
+:root{--x4-pt:#fffaf0;--x4-pb:#f3e8d0;--x4-rim:rgba(255,255,255,.75);--x4-card:#ffffff;--x4-card2:#fbf4e4;--x4-line:rgba(20,24,44,.14);--x4-shadow:rgba(20,24,44,.16);--x4-well:rgba(20,24,44,.07);--x4-muted:#5b5f73;--x4-ink:#1b1f33}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--x4-pt:#1e3554;--x4-pb:#13243b;--x4-rim:rgba(255,255,255,.06);--x4-card:#24456f;--x4-card2:#1b3657;--x4-line:rgba(255,255,255,.1);--x4-shadow:rgba(0,0,0,.35);--x4-well:rgba(0,0,0,.25);--x4-muted:#a8bdd8;--x4-ink:#eef5ff}}
+:root[data-theme="dark"]{--x4-pt:#1e3554;--x4-pb:#13243b;--x4-rim:rgba(255,255,255,.06);--x4-card:#24456f;--x4-card2:#1b3657;--x4-line:rgba(255,255,255,.1);--x4-shadow:rgba(0,0,0,.35);--x4-well:rgba(0,0,0,.25);--x4-muted:#a8bdd8;--x4-ink:#eef5ff}
+/* couleur de la barre de titre : la même que le bouton qui ouvre la fenêtre */
+#shop,#acc{--hd:linear-gradient(#5aa4ff,#1f62c8)}
+#crate{--hd:linear-gradient(#d9984f,#8a5320)}
+#weap{--hd:linear-gradient(#ffa25a,#c8501f)}
+#mode{--hd:linear-gradient(#bd7cff,#6a2fc8)}
+#mis{--hd:linear-gradient(#56d683,#1c8746)}
+#lb{--hd:linear-gradient(#ffd84f,#d8861f)}
+#set,#dev{--hd:linear-gradient(#8aa3c2,#475f7d)}
+#stats{--hd:linear-gradient(#36d1d4,#0d7f83)}
+#rst{--hd:linear-gradient(#ff7676,#c4283a)}
+#spd{--hd:linear-gradient(#ffd84f,#d8861f)}
+/* panneau */
+:is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#rst,#dev,#spd) .shop-panel{
+  background:linear-gradient(180deg,var(--x4-pt),var(--x4-pb));color:var(--x4-ink);
+  border:3px solid #14182c;border-radius:18px;padding:0 16px 16px;gap:12px;
+  box-shadow:inset 0 0 0 3px var(--x4-rim),0 6px 0 #14182c,0 28px 56px rgba(0,0,0,.5)}
+:is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#rst,#dev,#spd) .shop-panel::before{display:none}
+#spd .shop-panel{padding-top:0}
+#shop .shop-panel,#weap .shop-panel{width:min(680px,100%)}
+#crate .shop-panel{width:min(620px,100%)}
+#mis .shop-panel,#lb .shop-panel,#stats .shop-panel{width:min(560px,100%)}
+#set .shop-panel,#mode .shop-panel,#acc .shop-panel,#rst .shop-panel,#spd .shop-panel{width:min(460px,100%)}
+/* barre de titre : pleine largeur, collée en haut même quand le contenu défile */
+:is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#rst,#dev,#spd) .shop-head{
+  position:sticky;top:0;z-index:6;margin:0 -16px;padding:11px 12px 11px 16px;gap:10px;
+  background:var(--hd,linear-gradient(#5aa4ff,#1f62c8));border:0;border-bottom:3px solid #14182c;border-radius:15px 15px 0 0;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.38),inset 0 -3px 0 rgba(0,0,0,.18)}
+:is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#rst,#dev,#spd) .shop-head h2{
+  flex:1;min-width:0;font:400 16px/1.2 var(--pf);letter-spacing:.06em;color:#fff;
+  background:none;-webkit-background-clip:border-box;background-clip:border-box;filter:none;
+  -webkit-text-stroke:3px #14182c;paint-order:stroke fill;text-shadow:0 3px 0 #14182c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shop-head .bals{gap:6px}
+.shop-head .bal{background:rgba(8,14,32,.42);border:2px solid rgba(8,14,32,.5);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);text-shadow:0 1px 0 #000;padding:5px 10px}
+/* ✕ de fermeture */
+.x4-x{flex:none;width:34px;height:34px;padding:0;cursor:pointer;border-radius:10px;border:3px solid #14182c;background:linear-gradient(#ff8080,#d92b3d);color:#fff;
+  font:400 13px/1 var(--pf);-webkit-text-stroke:1px #14182c;paint-order:stroke fill;box-shadow:0 3px 0 #14182c,inset 0 2px 0 rgba(255,255,255,.45);transition:transform .1s ease,filter .12s ease}
+.x4-x{position:relative}
+.x4-x::before,.x4-x::after{content:"";position:absolute;left:50%;top:50%;width:16px;height:4px;margin:-2px 0 0 -8px;background:#fff;border-radius:1px;box-shadow:0 0 0 1.5px #14182c;transform:rotate(45deg)}
+.x4-x::after{transform:rotate(-45deg);box-shadow:none}
+.x4-x:hover{filter:brightness(1.1)}
+.x4-x:active{transform:translateY(2px);box-shadow:0 1px 0 #14182c}
+.x4-x:focus-visible{outline:3px solid #ffd23f;outline-offset:2px}
+/* RETOUR : bouton secondaire neutre, les vraies actions restent les seules en couleur */
+:is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#dev) .go[id$="-close"]{
+  align-self:center;width:auto;min-width:190px;background:linear-gradient(var(--x4-card),var(--x4-card2));color:var(--x4-ink);
+  border:3px solid #14182c;border-radius:12px;box-shadow:0 4px 0 #14182c,inset 0 2px 0 var(--x4-rim)}
+:is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#dev) .go[id$="-close"]:active{transform:translateY(3px);box-shadow:0 1px 0 #14182c}
+/* textes : plus lisibles */
+.shop-note{color:var(--x4-muted);opacity:1;line-height:1.8}
+.prem-h,.wsq-title,.lkd summary{display:flex;align-items:center;gap:10px;color:var(--x4-muted);opacity:1;font:400 9px/1.4 var(--pf);letter-spacing:.12em}
+.prem-h::after,.wsq-title::after{content:"";flex:1;height:2px;border-radius:2px;background:var(--x4-line)}
+.prem-sep{border-top-color:var(--x4-line)}
+.lkd summary{list-style:none;cursor:pointer}
+.lkd summary::-webkit-details-marker{display:none}
+.lkd summary::before{content:"";flex:none;border:5px solid transparent;border-left:7px solid currentColor;border-right:0;transition:transform .15s ease}
+.lkd[open] summary::before{transform:rotate(90deg)}
+.lkd summary::after{content:"";flex:1;height:2px;border-radius:2px;background:var(--x4-line)}
+.lkd summary:hover{color:var(--x4-ink)}
+/* onglets segmentés */
+#shop .tabs{align-self:flex-start;background:var(--x4-well);border:2px solid var(--x4-line);border-radius:14px;padding:4px;gap:4px}
+#shop .tab{border:0;border-radius:10px;box-shadow:none;background:transparent;color:var(--x4-muted);padding:9px 16px}
+#shop .tab:hover{color:var(--x4-ink);filter:none;background:var(--x4-well)}
+#shop .tab[aria-selected="true"]{background:linear-gradient(#2fd0d3,#0d8588);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.45);box-shadow:0 2px 0 #0b3b3d,inset 0 1px 0 rgba(255,255,255,.4)}
+/* cartes, cases, lignes : même matière partout */
+.card,.crc,.wsq,.mis-row,.acc-row,.dev-row,.lb-row{background:linear-gradient(180deg,var(--x4-card),var(--x4-card2));border:2px solid var(--x4-line);border-radius:14px;box-shadow:0 3px 0 var(--x4-shadow),inset 0 1px 0 var(--x4-rim);color:var(--x4-ink)}
+.card.eq{background:linear-gradient(180deg,var(--eq1),var(--eq2));border-color:#12a5a8;box-shadow:0 0 0 2px #12a5a8,0 3px 0 var(--x4-shadow)}
+.card canvas,.wsq canvas,#weap-big canvas,.tnode canvas{border:2px solid #14182c;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}
+.card .pr canvas{border:0;box-shadow:none}
+.wsq.eq{border-color:#12a5a8;box-shadow:0 0 0 2px #12a5a8,0 3px 0 var(--x4-shadow)}
+.wsq-empty{border-color:var(--x4-line);border-radius:14px}
+/* missions : barre de progression plus épaisse, mission terminée en or */
+.mis-row{padding:10px 12px 10px 16px}
+.mis-row.done{background:linear-gradient(180deg,var(--dn1),var(--dn2));border-color:#e0a300;box-shadow:0 0 0 2px rgba(224,163,0,.35),0 3px 0 var(--x4-shadow)}
+.mis-bar{height:12px;background:var(--x4-well);border:2px solid var(--x4-line)}
+#mis-all:not(:disabled){background:linear-gradient(#ffe36a,#ffb020 55%,#e8901a);color:#2a1600;border-color:#14182c;box-shadow:0 3px 0 #14182c,inset 0 1px 0 rgba(255,255,255,.6)}
+/* top 10 : podium or / argent / bronze */
+.lb-row{padding:10px 12px}
+.lb-row .rk{flex:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--x4-well);border:2px solid var(--x4-line)}
+.lb-row:nth-child(1){background:linear-gradient(180deg,#fff3b0,#ffd23f);border-color:#a67c00;color:#2a1a00}
+.lb-row:nth-child(2){background:linear-gradient(180deg,#f2f5fa,#c9d2e0);border-color:#7d889c;color:#1b2233}
+.lb-row:nth-child(3){background:linear-gradient(180deg,#ffe0c2,#e3a36b);border-color:#9a5a26;color:#2a1405}
+.lb-row:nth-child(-n+3) .rk{background:#14182c;border-color:#14182c;color:#fff}
+.lb-row:nth-child(1) .rk{color:#ffd23f}
+/* choix du mode : grandes tuiles colorées */
+#mode .mode-card{position:relative;text-align:left;font-size:12px;padding:16px 16px 16px 44px;border:3px solid #14182c;border-radius:14px;color:#fff;-webkit-text-stroke:0;text-shadow:0 2px 0 rgba(0,0,0,.45);box-shadow:0 4px 0 #14182c,inset 0 2px 0 rgba(255,255,255,.35)}
+#mode-classic{background:linear-gradient(#5aa4ff,#1f62c8)}
+#mode-ana{background:linear-gradient(#ff6a6a,#8e1428)}
+#mode-speed{background:linear-gradient(#ffd84f,#d8861f);color:#2a1600 !important;text-shadow:0 1px 0 rgba(255,255,255,.4) !important}
+#mode .mode-card::before{content:"";position:absolute;left:14px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;border:3px solid #14182c;background:rgba(255,255,255,.25)}
+#mode .mode-card.on::before{background:#fff;box-shadow:inset 0 0 0 3px #14182c}
+#mode .mode-card.on{box-shadow:0 0 0 3px #ffd23f,0 4px 0 #14182c,inset 0 2px 0 rgba(255,255,255,.35)}
+#mode .mode-card.lock{background:linear-gradient(#a7aebb,#6d7584);color:#eef1f6 !important;filter:none;opacity:.75}
+#mode .mode-card:active:not(.lock){transform:translateY(3px);box-shadow:0 1px 0 #14182c}
+/* réglages : lignes + interrupteur pour le son */
+#set .sbtn,#set #rng-link{text-align:left;padding:13px 14px;font-size:9px;border-radius:12px}
+#set-sound{position:relative;background:linear-gradient(180deg,var(--x4-card),var(--x4-card2));color:var(--x4-ink);border:2px solid var(--x4-line);box-shadow:0 3px 0 var(--x4-shadow)}
+#set-sound::after{content:"";position:absolute;right:12px;top:50%;width:38px;height:20px;margin-top:-10px;border-radius:999px;border:2px solid #14182c;background:#9aa3b5;box-shadow:inset 0 2px 0 rgba(0,0,0,.2);transition:background .15s ease}
+#set-sound::before{content:"";position:absolute;right:30px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;border:2px solid #14182c;z-index:1;transition:right .15s ease}
+#set-sound[aria-pressed="true"]::after{background:#2fd06a}
+#set-sound[aria-pressed="true"]::before{right:16px}
+#set label.shop-note{color:var(--x4-ink);margin-top:2px}
+#set-joy{accent-color:#12a5a8 !important;height:22px}
+#rng-link{background:linear-gradient(#b878ff,#7a2fd8);color:#fff;border:2px solid #14182c;box-shadow:0 3px 0 #14182c,inset 0 1px 0 rgba(255,255,255,.4);text-shadow:0 1px 0 rgba(0,0,0,.45)}
+#rst-btn{align-self:stretch;background:transparent !important;color:#d92b3d !important;border:2px dashed #d92b3d !important;box-shadow:none !important;font-size:8px;padding:10px}
+#set #ov-hint{background:var(--x4-well);border-radius:12px;padding:10px 12px}
+#set .credits{background:none;color:var(--x4-muted);opacity:1;font:400 8px/1.9 var(--pf);text-align:center}
+/* remise à zéro : fenêtre de danger */
+#rst .shop-note{color:var(--x4-ink)}
+#rst #rst-no{background:linear-gradient(var(--x4-card),var(--x4-card2));color:var(--x4-ink);border:3px solid #14182c;box-shadow:0 4px 0 #14182c}
+#rst #rst-yes{background:linear-gradient(#ff7676,#c4283a);color:#fff;border:3px solid #14182c;box-shadow:0 4px 0 #14182c,inset 0 2px 0 rgba(255,255,255,.35);text-shadow:0 1px 0 rgba(0,0,0,.4)}
+/* boutons d'action un peu plus lisibles sur grand écran */
+@media (min-width:521px) and (min-height:561px){.sbtn{font-size:9px}.card .nm{font-size:9px}}
+/* petits écrans : barre de titre et marges plus compactes */
+@media (max-height:560px),(max-width:520px){
+  :is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#rst,#dev,#spd) .shop-panel{padding:0 10px 10px}
+  :is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#rst,#dev,#spd) .shop-head{margin:0 -10px;padding:7px 8px 7px 10px}
+  :is(#shop,#mis,#crate,#weap,#stats,#lb,#mode,#acc,#set,#rst,#dev,#spd) .shop-head h2{font-size:11px;-webkit-text-stroke:2px #14182c;text-shadow:0 2px 0 #14182c}
+  .x4-x{width:28px;height:28px}.x4-x::before,.x4-x::after{width:13px;height:3px;margin:-1.5px 0 0 -6.5px}
+  .shop-head .bal{padding:3px 7px;font-size:9px}
+  #mode .mode-card{padding:12px 12px 12px 40px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){.x4-x,#set-sound::after,#set-sound::before{transition:none}}
 </style>
 </head>
 <body>
@@ -7122,6 +7251,7 @@ function toggleMute(){
   $('mute').textContent=muted?'🔇':'🔊';
   $('mute').setAttribute('aria-label',muted?'Activer le son':'Couper le son');
   $('set-sound').textContent='SON : '+(muted?'NON':'OUI');
+  $('set-sound').setAttribute('aria-pressed',String(!muted));   // interrupteur visuel (refonte v4)
 }
 $('mute').addEventListener('click',toggleMute);
 $('set-sound').addEventListener('click',toggleMute);
@@ -7836,8 +7966,16 @@ function openCrate(c,nb){
 }
 $('crate-skip').addEventListener('click',()=>{if(crSkip)crSkip();});
 {   // refonte v3 : les cartes d'une fenêtre arrivent en cascade quand elle s'ouvre, pas à chaque re-rendu (achat, équipement…)
-  const mo=new MutationObserver(ms=>{for(const m of ms){const el=m.target;if(el.hidden)continue;el.classList.add('x3in');clearTimeout(el._x3);el._x3=setTimeout(()=>el.classList.remove('x3in'),900);}});
+  const mo=new MutationObserver(ms=>{for(const m of ms){const el=m.target;if(el.hidden)continue;if(el.id==='set')$('set-sound').setAttribute('aria-pressed',String(!muted));el.classList.add('x3in');clearTimeout(el._x3);el._x3=setTimeout(()=>el.classList.remove('x3in'),900);}});
   for(const id of ['shop','mis','crate','weap','lb','mode','stats','set','acc']){const el=document.getElementById(id);if(el)mo.observe(el,{attributes:true,attributeFilter:['hidden']});}
+}
+{   // refonte v4 : un ✕ rouge dans la barre de titre de chaque fenêtre ; il fait exactement la même chose que son bouton RETOUR (et porte le même nom, traduit)
+  for(const id of ['shop','mis','crate','weap','stats','lb','mode','acc','set','dev']){
+    const el=document.getElementById(id),head=el&&el.querySelector('.shop-head'),cl=el&&el.querySelector('.go[id$="-close"]');
+    if(!head||!cl)continue;
+    const x=document.createElement('button');x.type='button';x.className='x4-x';x.setAttribute('aria-labelledby',cl.id);
+    x.addEventListener('click',()=>cl.click());head.appendChild(x);
+  }
 }
 function openCrates(){
   clearInputs();crOpen=true;crateEl.hidden=false;$('crate-roll').hidden=true;$('crate-rev').hidden=true;$('crate-skip').hidden=true;renderCrates();
