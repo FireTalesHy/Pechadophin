@@ -2143,12 +2143,22 @@ const BUCKET=(()=>{
   return c;
 })();
 const BUCKET_W=tint(BUCKET,'#ffffff');
-function makeDirt(shade,v){
+function makeDirt(shade,v){   // terre : grain fin, mottes ombrées, cailloux (racines près de la surface, strates en profondeur)
   const c=mk(T,T),g=c.getContext('2d');
   const base=['#a06a38','#8a5a30','#6c4526'][shade],dark=['#855428','#714824','#583820'][shade],light=['#b9804a','#a06c3c','#7f5430'][shade];
+  const deep=['#6e4322','#5c3a1e','#472c17'][shade],stone=['#8f8578','#7a7166','#625b53'][shade],stoneL=['#b3a999','#9a9183','#7e776c'][shade],stoneD=['#5e564d','#4f4841','#3d3833'][shade];
   g.fillStyle=base;g.fillRect(0,0,T,T);
-  const r=mulberry32(v*977+shade*31+5);
-  for(let i=0;i<7;i++){g.fillStyle=r()<0.5?dark:light;g.fillRect(Math.floor(r()*14),Math.floor(r()*14),2,1+Math.floor(r()*2));}
+  const r=mulberry32(v*977+shade*31+5),R=n=>Math.floor(r()*n);
+  for(let i=0;i<14;i++){g.fillStyle=r()<0.55?dark:light;g.fillRect(R(16),R(16),1,1);}   // grain
+  for(let i=0;i<3;i++){const x=R(12),y=R(13),w=2+R(2);g.fillStyle=light;g.fillRect(x,y,w,1);g.fillStyle=dark;g.fillRect(x,y+1,w+1,1);g.fillStyle=deep;g.fillRect(x+1,y+2,w,1);}   // mottes : lumière dessus, ombre dessous
+  if(shade===2){g.fillStyle=dark;const y=3+R(9);for(let x=0;x<T;x++)if(r()<0.75)g.fillRect(x,y+(x>7&&v===1?1:0),1,1);}   // strate
+  const ns=0;
+  for(let i=0;i<ns;i++){   // cailloux : arête claire en haut, ombre en bas
+    const w=3+R(2),h=2,x=R(T-w-1),y=1+R(T-h-3);
+    g.fillStyle=stoneD;g.fillRect(x,y+1,w+1,h);g.fillRect(x+1,y+h+1,w-1,1);
+    g.fillStyle=stone;g.fillRect(x,y,w,h);
+    g.fillStyle=stoneL;g.fillRect(x+1,y,w-1,1);
+  }
   return c;
 }
 const DIRT=[0,1,2].map(s=>[0,1,2].map(v=>makeDirt(s,v)));
@@ -2161,6 +2171,8 @@ function makeGrass(dec,v){
   g.fillStyle='#37963b';
   for(let x=0;x<T;x++) if(r()<0.6) g.fillRect(x,10,1,1+(r()<0.5?1:0));
   for(let x=0;x<T;x++) if(r()<0.18) g.fillRect(x,8,1,1);
+  g.fillStyle='rgba(40,20,6,.38)';for(let x=0;x<T;x++){const d=g.getImageData(x,10,1,1).data;g.fillRect(x,d[1]>120?11:10,1,1);}g.fillStyle='rgba(40,20,6,.16)';g.fillRect(0,12,T,1);   // ombre portée sous le rebord d'herbe
+  g.fillStyle='#5a3a1c';for(let x=1;x<T-1;x++)if(r()<0.12)g.fillRect(x,12,1,1+Math.floor(r()*3));   // radicelles
   if(dec===1){g.fillStyle='#4fbf4a';g.fillRect(5,3,1,3);g.fillRect(7,2,1,4);g.fillRect(9,4,1,2);g.fillStyle='#8cec72';g.fillRect(7,2,1,1);}
   if(dec===2||dec===3){
     g.fillStyle='#37963b';g.fillRect(8,4,1,2);
@@ -2189,6 +2201,8 @@ function makeSand(shade,v){
   g.fillStyle=base;g.fillRect(0,0,T,T);
   const r=mulberry32(v*911+shade*37+3);
   for(let i=0;i<8;i++){g.fillStyle=r()<0.55?dark:light;g.fillRect(Math.floor(r()*15),Math.floor(r()*15),1+Math.floor(r()*2),1);}
+  for(let i=0;i<10;i++){g.fillStyle=r()<0.5?dark:light;g.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}   // grain fin
+  if(v!==2){const x=2+Math.floor(r()*10),y=2+Math.floor(r()*11);g.fillStyle=dark;g.fillRect(x,y+1,3,1);g.fillStyle=['#c8b49a','#b19c80','#957f63'][shade];g.fillRect(x,y,2,1);g.fillStyle=light;g.fillRect(x+1,y-1,1,1);}   // petit caillou
   return c;
 }
 const SAND=[0,1,2].map(s=>[0,1,2].map(v=>makeSand(s,v)));
@@ -5950,6 +5964,23 @@ function drawPalms(cx,cy){
     ctx.restore();
   }
 }
+const PEBBLES=[0,1,2].map(sh=>[0,1,2,3].map(k=>{   // cailloux et racines semés au hasard dans la terre (par position dans le monde, donc sans motif répété)
+  const st=['#8f8578','#7a7166','#625b53'][sh],sl=['#b3a999','#9a9183','#7e776c'][sh],sd=['#5e564d','#4f4841','#3d3833'][sh],rt=['#6e4322','#5c3a1e','#472c17'][sh];
+  const c=mk(8,9),g=c.getContext('2d');
+  if(k===3){g.fillStyle=rt;let x=3;for(let y=0;y<9;y++){g.fillRect(x,y,1,1);if(y===3)g.fillRect(x+1,y+1,2,1);if(y%3===2)x+=y<5?-1:1;}return c;}   // racine
+  const w=[3,4,2][k],h=k===2?2:2+(k===1?1:0);
+  g.fillStyle=sd;g.fillRect(1,1,w+1,h);g.fillRect(2,h+1,w-1,1);
+  g.fillStyle=st;g.fillRect(1,0,w,h);g.fillStyle=sl;g.fillRect(2,0,w-1,1);
+  return c;}));
+const transMemo=new Map();
+function transTile(set,sh,v){   // case de profondeur sh dont le bas se fond (tramage de Bayer) dans la case sh+1 : plus de marches d'escalier
+  let m=transMemo.get(set);if(!m){m=[[],[]];transMemo.set(set,m);}
+  let c=m[sh][v];if(c)return c;
+  const a=set[sh][v],b=set[sh+1][v];c=mk(T,T);const g=c.getContext('2d');g.drawImage(a,0,0);
+  const ia=g.getImageData(0,0,T,T),bb=mk(T,T).getContext('2d');bb.drawImage(b,0,0);const ib=bb.getImageData(0,0,T,T);
+  for(let y=6;y<T;y++){const t=(y-5)/11;for(let x=0;x<T;x++)if(t>(BAYER4[(y&3)*4+(x&3)]+0.5)/16){const o=(y*T+x)*4;for(let k=0;k<4;k++)ia.data[o+k]=ib.data[o+k];}}
+  g.putImageData(ia,0,0);m[sh][v]=c;return c;
+}
 function drawTiles(cx,cy){
   const tx0=Math.floor(cx/T),tx1=Math.floor((cx+VW)/T),ty0=Math.floor(cy/T)-1,ty1=Math.floor((cy+VH)/T)+1;
   for(let tx=tx0;tx<=tx1;tx++){
@@ -5969,16 +6000,23 @@ function drawTiles(cx,cy){
           else if(col.ice)ctx.drawImage(ICETOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
           else ctx.drawImage((col.swamp?SGRASS:GRASS)[dec<5?0:dec-4][v],tx*T,ty*T-6);
         }
-        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2;ctx.drawImage((sand?SAND:col.cloud?CLOUD:col.ice?ICE:col.swamp?SDIRT:DIRT)[sh][mod(tx*7+ty*3,3)],tx*T,ty*T);}
+        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2,set=sand?SAND:col.cloud?CLOUD:col.ice?ICE:col.swamp?SDIRT:DIRT,vv=mod(tx*7+ty*3,3);ctx.drawImage(dp===4||dp===10?transTile(set,sh,vv):set[sh][vv],tx*T,ty*T);
+          if((set===DIRT||set===SDIRT)&&!tun){const hh=hash2(tx*5+3,ty*7+1);if(hh<0.16){const k=hh<0.04&&dp<3?3:Math.floor(hh*19)%3;ctx.globalAlpha=set===SDIRT?0.7:1;ctx.drawImage(PEBBLES[sh][k],tx*T+Math.floor(hash2(tx,ty+90)*9),ty*T+Math.floor(hash2(tx+90,ty)*7));ctx.globalAlpha=1;}}}
         if(tun&&ty>col.g){   // bords éclairés / ombrés des parois de sable
           if(!solidTile(tx,ty-1)){ctx.fillStyle='#f6e2ac';ctx.fillRect(tx*T,ty*T,T,2);}
           if(!solidTile(tx,ty+1)){ctx.fillStyle='#6e5026';ctx.fillRect(tx*T,ty*T+T-2,T,2);}
         }
       }
-      const y0=Math.max(col.g,ty0)*T,hh=(ty1+1)*T-y0;
-      ctx.fillStyle='rgba(0,0,0,.28)';
-      if(column(tx-1).pit)ctx.fillRect(tx*T,y0,2,hh);
-      if(column(tx+1).pit)ctx.fillRect(tx*T+T-2,y0,2,hh);
+      {   // faces de falaise : côté gauche dans l'ombre, côté droit éclairé par le soleil, liseré sombre, herbe qui déborde
+        const L=column(tx-1),Rc=column(tx+1),lb=L.pit?ty1+1:L.g,rb=Rc.pit?ty1+1:Rc.g,grassy=!sand&&!col.cloud&&!col.ice&&!col.ar&&!tun;
+        const gc=col.swamp?'#22581b':'#37963b',gl=col.swamp?'#2f6f25':'#4fbf4a';
+        if(lb>col.g){const ya=Math.max(col.g,ty0)*T,yb=Math.min(lb,ty1+1)*T;
+          if(yb>ya){ctx.fillStyle='rgba(22,10,2,.5)';ctx.fillRect(tx*T,ya,1,yb-ya);ctx.fillStyle='rgba(22,10,2,.2)';ctx.fillRect(tx*T+1,ya,3,yb-ya);}
+          if(grassy&&col.g>=ty0){const n=2+Math.floor(hash2(tx,61)*4);ctx.fillStyle=gl;ctx.fillRect(tx*T,col.g*T,1,4);ctx.fillStyle=gc;ctx.fillRect(tx*T,col.g*T+4,1,n);ctx.fillRect(tx*T+1,col.g*T+4,1,Math.max(0,n-2));}}
+        if(rb>col.g){const ya=Math.max(col.g,ty0)*T,yb=Math.min(rb,ty1+1)*T;
+          if(yb>ya){ctx.fillStyle='rgba(22,10,2,.42)';ctx.fillRect(tx*T+T-1,ya,1,yb-ya);ctx.fillStyle='rgba(255,236,190,.16)';ctx.fillRect(tx*T+T-3,ya,2,yb-ya);}
+          if(grassy&&col.g>=ty0){const n=2+Math.floor(hash2(tx,62)*4);ctx.fillStyle=gl;ctx.fillRect(tx*T+T-1,col.g*T,1,4);ctx.fillStyle=gc;ctx.fillRect(tx*T+T-1,col.g*T+4,1,n);ctx.fillRect(tx*T+T-2,col.g*T+4,1,Math.max(0,n-2));}}
+      }
     }
     if(col.wall){
       const closed=col.dx<0?col.ar.gateL:col.ar.gateR;
@@ -6098,17 +6136,57 @@ function drawSkinBack(sk,p,cx){   // appendices dessinés derrière le personnag
     }
   }
 }
+/* ---- Animation du pêcheur (refonte v3) : écrasement à l'atterrissage, étirement au saut, poussière, ombre, respiration.
+   Tout se fait à l'affichage, donc ça marche pour tous les skins sans toucher à leurs dessins. ---- */
+const pfx={was:true,landT:-9,landK:0,jumpT:-9,lastVy:0,lastVx:0,lastT:0,runT:0,dust:[]};
+function dustCol(){const c=column(Math.floor((player.x+player.w/2)/T));return c.cloud||c.ice?'#ffffff':c.beach?'#fff0c8':c.swamp?'#b8c0a2':'#efe2c2';}
+function puff(x,y,n,spread,push){const c=dustCol();for(let i=0;i<n;i++)pfx.dust.push({x:x+(Math.random()-0.5)*spread,y:y-Math.random()*2,vx:(Math.random()-0.5)*30+(push||0),vy:-8-Math.random()*16,t:0,life:0.3+Math.random()*0.25,c});}
+function stepPlayerFx(){
+  const p=player,dt=clamp(time-pfx.lastT,0,0.05);pfx.lastT=time;
+  if(state==='play'){
+    const fy=Math.round(p.y)+p.h,cx=p.x+p.w/2;
+    if(p.onGround&&!pfx.was){const k=clamp(pfx.lastVy/420,0.2,1);pfx.landT=time;pfx.landK=k;const n=Math.round(2+k*4);puff(cx-3,fy,n,4,-28*k);puff(cx+3,fy,n,4,28*k);}
+    if(!p.onGround&&pfx.was&&p.vy<-50){pfx.jumpT=time;puff(cx,fy,4,8,0);}
+    if(p.onGround&&Math.abs(p.vx)>60){pfx.runT-=dt;if(pfx.runT<=0){pfx.runT=0.12;puff(cx-p.face*4,fy,1,2,-p.face*18);}}else pfx.runT=0;
+    if(p.onGround&&p.vx*pfx.lastVx<0&&Math.abs(pfx.lastVx)>40)puff(cx+p.face*2,fy,3,4,p.face*22);   // demi-tour : petit dérapage
+    pfx.was=p.onGround;pfx.lastVy=p.vy;pfx.lastVx=p.vx;
+  } else pfx.was=true;
+  for(const d of pfx.dust){d.t+=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vx*=0.88;d.vy+=24*dt;}
+  if(pfx.dust.length)pfx.dust=pfx.dust.filter(d=>d.t<d.life);
+}
 function drawPlayer(){
   const p=player;
+  stepPlayerFx();
+  for(const d of pfx.dust){const a=1-d.t/d.life,z=d.t<d.life*0.3?3:d.t<d.life*0.65?2:1;ctx.globalAlpha=Math.min(1,a*1.1);ctx.fillStyle=d.c;ctx.fillRect(Math.round(d.x),Math.round(d.y)-z,z,z);}
+  ctx.globalAlpha=1;
   if(state==='play'&&p.invuln>0&&Math.floor(time*18)%2)return;
   const moving=p.onGround&&Math.abs(p.vx)>12;
   const SP=curSkin().spr;
   const sp=state==='dying'||!p.onGround?SP.jump:moving?(Math.floor(time*10)%2?SP.a:SP.b):SP.idle;
-  const cx=Math.round(p.x+p.w/2);
+  const cx=Math.round(p.x+p.w/2),fy=Math.round(p.y)+p.h;
+  if(state!=='dying'){   // ombre au sol : sous les pieds, ou projetée sur le sol en dessous pendant un saut (plus petite et plus pâle avec la hauteur)
+    let gy=null,h=0;
+    if(p.onGround)gy=fy;
+    else{const c=column(Math.floor(cx/T));if(!c.pit&&!c.tun){gy=c.g*T;h=gy-fy;if(h<0||h>72)gy=null;}}
+    if(gy!==null){const w=Math.max(4,Math.round(11-h*0.09));ctx.fillStyle='rgba(10,14,30,'+Math.max(0.08,0.3-h*0.003).toFixed(3)+')';ctx.fillRect(cx-(w>>1)+1,gy-1,w-2,1);ctx.fillRect(cx-(w>>1),gy,w,1);}
+  }
+  let sx=1,sy=1;   // écrasement à l'atterrissage, étirement en l'air (selon la vitesse) et juste après l'impulsion
+  const lt=(time-pfx.landT)/0.18,jt=(time-pfx.jumpT)/0.2;
+  if(state==='play'){
+    if(p.onGround&&lt<1){const e=1-lt;sx=1+0.22*pfx.landK*e;sy=1-0.19*pfx.landK*e;}
+    else if(!p.onGround){sy=1+clamp(Math.abs(p.vy)/800,0,0.12)+(jt<1?0.1*(1-jt):0);sx=1/sy;}
+  }
   drawSkinBack(curSkin(),p,cx);
   ctx.save();
   if(state==='dying'){ctx.translate(cx,Math.round(p.y+7));ctx.scale(p.face,-1);ctx.drawImage(sp,-8,-9);}
-  else{ctx.translate(cx,0);ctx.scale(p.face,1);ctx.drawImage(sp,-8,Math.round(p.y)-2);}
+  else{
+    ctx.translate(cx,0);ctx.scale(p.face,1);
+    const dw=Math.round(16*sx),dh=Math.round(16*sy);
+    if(dw!==16||dh!==16)ctx.drawImage(sp,-Math.round(dw/2),fy-dh,dw,dh);
+    else if(sp===SP.idle&&p.onGround&&Math.sin(time*2.4)>0.2){   // respiration : le torse gonfle d'un pixel, la tête monte
+      ctx.drawImage(sp,0,0,16,9,-8,fy-17,16,9);ctx.drawImage(sp,0,9,16,1,-8,fy-8,16,1);ctx.drawImage(sp,0,9,16,7,-8,fy-7,16,7);
+    } else ctx.drawImage(sp,-8,fy-16);
+  }
   ctx.restore();
   if(state==='dying')return;
   if(reloadBar>=0&&state==='play')drawReloadBar(cx,p.y,reloadBar);
