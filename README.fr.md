@@ -55,4 +55,5 @@ Voir [CHANGELOG.fr.md](CHANGELOG.fr.md).
 ## 👥 Crédits
 
 - dev : [L'taleshy](https://github.com/FireTalesHy) et [cocobat](https://github.com/cocobatard)
+- visuels : Sacha (refonte visuelle de la V0.7)
 - testeurs : moustik, ofodile, wyzan, nad l'arnaque et bergoute

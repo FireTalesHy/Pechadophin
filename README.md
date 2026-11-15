@@ -56,4 +56,5 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## 👥 Credits
 
 - dev: [L'taleshy](https://github.com/FireTalesHy) and [cocobat](https://github.com/cocobatard)
+- visuals: Sacha (V0.7 visual overhaul)
 - testers: moustik, ofodile, wyzan, nad l'arnaque and bergoute
