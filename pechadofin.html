@@ -156,7 +156,7 @@ body{
 #merch-btn:active{transform:translateX(-50%) translateY(2px)}
 @keyframes mbob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){#merch-btn{animation:none}}
-#overlay[data-mode="pause"] #weap-btn{display:none}   /* en pleine partie, on passe par le marchand */
+#overlay[data-mode="pause"] #weap-btn,#overlay[data-mode="pause"] #mp-btn{display:none}   /* en pleine partie, on passe par le marchand */
 #shop.merchant .tabs{display:none}
 .ov-big.small{font-size:max(7px,calc(var(--p)*7))}
 .ov-mini{display:flex;gap:calc(var(--p)*4);justify-content:flex-end;min-height:calc(var(--p)*22)}
@@ -249,10 +249,15 @@ body{
 .mp-info{display:flex;flex-direction:column;gap:6px;font:400 11px var(--pf);min-width:0}
 .mp-info small{font-size:7px;opacity:.8;line-height:1.6}
 .mp-name{font:400 11px var(--pf);padding:6px 8px;border-radius:8px;border:2px solid var(--btn-line);background:#fff;color:#14182c;width:180px;max-width:100%}
-.mp-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.mp-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
 .mp-tabs .sbtn{font-size:9px;padding:8px 4px}
 .mp-tabs .sbtn.on{border-color:#ffd23f;box-shadow:0 0 0 2px #ffd23f inset}
 .mp-body{text-align:center}
+.mp-weap{display:flex;align-items:center;gap:10px;margin:6px 0;padding:6px 10px;border:2px solid var(--btn-line);background:var(--btn);border-radius:10px;text-align:left}
+.mp-weap canvas{width:40px;height:40px;image-rendering:pixelated}
+.mp-weap div{flex:1;font:400 9px/1.6 var(--pf)}.mp-weap b{font-weight:400;display:block}.mp-weap small{font-size:7px;opacity:.8}
+.mp-weap .go{margin:0;min-width:0;width:auto;padding:8px 12px}
+
 .mp-maps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
 .mp-maps .sbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 3px;font-size:8px}
 .mp-maps .sbtn.on{border-color:#ffd23f;box-shadow:0 0 0 2px #ffd23f inset}
@@ -648,6 +653,9 @@ body.kb #controls{display:none}
 #crate-roll{flex:none;overflow:visible}   /* le design v3 le rognait : il ne doit ni rétrécir ni couper les roulettes */
 #crate-skip{margin:8px auto 0}#crate-skip[hidden]{display:none}.crm .sbtn{flex:1;min-width:0;padding-left:2px;padding-right:2px}
 .ov-sq.crb{background:linear-gradient(#c98a4b,#7a4a1e)}
+.ov-sq.wpb{background:linear-gradient(#ff9a4a,#c8501f)}
+.ov-sq.wpb canvas{width:calc(var(--p)*13);height:calc(var(--p)*13);image-rendering:pixelated;display:block;margin:auto}
+.ov-big.multi{background:linear-gradient(#4fd1a0,#178a6a)}
 .ov-sq.crb canvas{width:calc(var(--p)*14);height:calc(var(--p)*11);image-rendering:pixelated;display:block;margin:auto}
 .card.hay{background:linear-gradient(180deg,#fff0b8,#e8c25a)}
 .card.hay .nm,.card.hay .pr{color:#4a3208}
@@ -921,7 +929,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <button class="ov-big shopb" id="merch-btn" type="button" hidden>MARCHAND (E)</button>
     <div id="overlay" class="show" data-mode="title">
       <div class="ov-top">
-        <div class="ov-chips"><button class="ov-chip" id="mis-btn" type="button">MISSIONS<span class="rdot" id="mis-dot" hidden></span></button><button class="ov-chip" id="lb-btn" type="button">TOP 10</button><button class="ov-chip" id="mp-btn" type="button">MULTIJOUEUR</button></div>
+        <div class="ov-chips"><button class="ov-chip" id="mis-btn" type="button">MISSIONS<span class="rdot" id="mis-dot" hidden></span></button><button class="ov-chip" id="lb-btn" type="button" hidden>TOP 10</button></div>   <!-- le TOP 10 est dans le menu MULTIJOUEUR -->
         <div class="ov-right">
           <button class="ov-gear ov-acc" id="acc-btn" type="button" aria-label="Compte Google" title="Compte Google"></button>
           <button class="ov-gear ov-lang" id="lang-btn" type="button" aria-label="English" title="English"></button>
@@ -940,14 +948,14 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
         </div>
       </div>
       <div class="ov-bot">
-        <div class="ov-left"><button class="ov-big weap" id="weap-btn" type="button">ARMES</button><button class="ov-big skins" id="skins-btn" type="button">MODE</button></div>
+        <div class="ov-left"><button class="ov-big multi" id="mp-btn" type="button">MULTIJOUEUR</button><button class="ov-big skins" id="skins-btn" type="button">MODE</button></div>
         <div class="ov-mid">
           <p id="ov-cp" hidden>★ CHECKPOINT : LA PLAGE ★</p>
           <button class="sbtn equip" id="ana-save" type="button" hidden style="width:auto;padding:8px 14px">SAUVEGARDER LE SCORE</button>
           <button class="go alt" id="ov-restart" type="button" hidden>RECOMMENCER</button>
           <p class="credits" id="credits">dev : L'taleshy et cocobat<br>testeurs : moustik, ofodile, wyzan, nad l'arnaque et bergoute</p>
         </div>
-        <div class="ov-left"><div class="ov-mini" id="ov-mini"><button class="ov-sq crb" id="crate-btn" type="button" aria-label="Caisses" title="Caisses"><canvas id="crate-ic" width="14" height="11" aria-hidden="true"></canvas></button><button class="ov-sq rbb" id="rb-btn" type="button" hidden aria-label="Renaissance" title="Renaissance">↻</button></div><button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button></div>
+        <div class="ov-left"><div class="ov-mini" id="ov-mini"><button class="ov-sq wpb" id="weap-btn" type="button" aria-label="Armes" title="Armes"><canvas id="weap-ic" width="11" height="11" aria-hidden="true"></canvas></button><button class="ov-sq crb" id="crate-btn" type="button" aria-label="Caisses" title="Caisses"><canvas id="crate-ic" width="14" height="11" aria-hidden="true"></canvas></button><button class="ov-sq rbb" id="rb-btn" type="button" hidden aria-label="Renaissance" title="Renaissance">↻</button></div><button class="ov-big shopb" id="shop-btn" type="button">BOUTIQUE</button></div>
       </div>
     </div>
   </div>
@@ -1118,7 +1126,7 @@ const EN={
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
-'BOUTIQUE':'SHOP','ARÈNE (CHOISIE PAR CELUI QUI CRÉE)':'ARENA (CHOSEN BY THE CREATOR)','Aléatoire':'Random','Prairie':'Meadow','Ruines':'Ruins','Glacier':'Glacier','CRÉER UN COMBAT':'CREATE A FIGHT','PRIVÉ (CODE)':'PRIVATE (CODE)','PUBLIC':'PUBLIC','COMBATS PUBLICS':'PUBLIC FIGHTS','COMBAT RAPIDE':'QUICK FIGHT','REJOINDRE UN AMI (PRIVÉ)':'JOIN A FRIEND (PRIVATE)','Privé : seuls ceux qui ont le code peuvent entrer. Public : ton salon apparaît dans la liste ci-dessous pour tout le monde.':'Private: only people with the code can join. Public: your room shows up in the list below for everyone.','Liste indisponible pour le moment.':'List unavailable right now.','Aucun combat public en attente. Crée le tien ou lance un combat rapide !':'No public fight waiting. Create yours or start a quick fight!','RECHERCHE D\'UN ADVERSAIRE…':'LOOKING FOR AN OPPONENT…','Ton salon est visible dans la liste des combats publics : n\'importe qui peut le rejoindre. Tu peux aussi envoyer le code à un ami.':'Your room is visible in the public fights list: anyone can join. You can also send the code to a friend.','MULTIJOUEUR':'MULTIPLAYER','EN DIRECT':'LIVE','FANTÔME':'GHOST','HISTORIQUE':'HISTORY','TON PSEUDO':'YOUR NICKNAME','Ton pseudo':'Your nickname','TON ARME':'YOUR WEAPON','CRÉER':'CREATE','REJOINDRE UN AMI':'JOIN A FRIEND','REJOINDRE UN DUEL':'JOIN A DUEL','Quitte ta partie (menu pause, RETOUR MENU) pour jouer en multijoueur.':'Leave your game (pause menu, MAIN MENU) to play multiplayer.','Affronte un ami en direct dans l\'arène. Chacun choisit son arme (améliorée au maximum). 5 cœurs, le premier à 2 manches gagne.':'Fight a friend live in the arena. Each player picks a weapon (fully upgraded). 5 hearts, first to win 2 rounds wins.','Aucune partie pour le moment. Lance un combat en direct ou un duel !':'No games yet. Start a live fight or a duel!','À L\'INSTANT':'JUST NOW','COMBAT EN DIRECT (PvP)':'LIVE FIGHT (PvP)','COMBAT EN DIRECT':'LIVE FIGHT','Affronte un ami en direct dans l\'arène. Chacun choisit son arme (améliorée au maximum). 5 cœurs, le premier à 2 manches gagne. Choisis ton arme :':'Fight a friend live in the arena. Each player picks a weapon (fully upgraded). 5 hearts, first to win 2 rounds wins. Pick your weapon:','CRÉER UN SALON':'CREATE A ROOM','Code du salon':'Room code','CRÉATION DU SALON…':'CREATING ROOM…','CONNEXION…':'CONNECTING…','ANNULER':'CANCEL','Envoie ce code (ou le lien) à ton adversaire. Le combat commence dès qu\'il rejoint.':'Send this code (or the link) to your opponent. The fight starts as soon as they join.','En attente de ton adversaire…':'Waiting for your opponent…','Salon introuvable (ou expiré).':'Room not found (or expired).','Ce salon est déjà complet.':'This room is already full.','Serveur injoignable, réessaie plus tard.':'Server unreachable, try again later.','Le salon a expiré.':'The room expired.','Le salon n\'est pas prêt. Réessaie dans un instant.':'The room isn\'t ready. Try again in a moment.','Connexion impossible : vos réseaux bloquent la connexion directe. Essayez avec un autre réseau (4G, autre wifi…).':'Can\'t connect: your networks block direct connections. Try another network (4G, another wifi…).','Connexion perdue avec ton adversaire.':'Lost connection with your opponent.','Ton adversaire s\'est déconnecté.':'Your opponent disconnected.','Ton adversaire a quitté le combat.':'Your opponent left the fight.','VICTOIRE !':'VICTORY!','DÉFAITE…':'DEFEAT…','REVANCHE':'REMATCH','EN ATTENTE DE L\'ADVERSAIRE…':'WAITING FOR OPPONENT…','QUITTER':'QUIT','QUITTER LE COMBAT ?':'QUIT THE FIGHT?','Ton adversaire continue de jouer pendant ce temps.':'Your opponent keeps playing meanwhile.','CONTINUER':'CONTINUE','MES DUELS':'MY DUELS','Défie un ami sur la même course : même monde, même arme améliorée au maximum. Il verra ton fantôme pendant sa course. Le plus rapide contre le Roi Cacamille 2 gagne.':'Challenge a friend on the same run: same world, same fully upgraded weapon. They\'ll see your ghost during their run. Fastest against King Cacamille 2 wins.','CRÉER UN DUEL':'CREATE A DUEL','REJOINDRE':'JOIN','JOUER':'PLAY','RÉESSAYER':'RETRY','TEMPS':'TIME','CHARGEMENT…':'LOADING…','Choisis l\'arme du duel (ton adversaire aura la même). Fais ta meilleure course : quand le Roi Cacamille 2 tombe, tu reçois un code à partager.':'Pick the duel weapon (your opponent gets the same one). Do your best run: when King Cacamille 2 falls, you get a code to share.','Le code fait 6 caractères.':'The code is 6 characters long.','Bats son temps sur la même course. Son fantôme court avec toi. Si tu meurs, tout recommence.':'Beat their time on the same run. Their ghost runs with you. If you die, everything restarts.','Duel créé ! Envoie ce code (ou le lien) à ton adversaire :':'Duel created! Send this code (or the link) to your opponent:','COPIER LE LIEN':'COPY LINK','LIEN COPIÉ !':'LINK COPIED!','PARTAGER':'SHARE','Code introuvable (ou duel expiré).':'Code not found (or duel expired).','Trop de requêtes, attends une minute.':'Too many requests, wait a minute.','Serveur de duels injoignable, réessaie plus tard.':'Duel server unreachable, try again later.','Touche un duel pour voir les temps de tes adversaires (ou le refaire).':'Tap a duel to see your opponents\' times (or replay it).','DUEL : quitte ta partie (menu) pour lancer un duel.':'DUEL: leave your game (menu) to start a duel.','Code du duel':'Duel code','Duel Pechadophin : bats mon temps':'Pechadophin duel: beat my time','PROCHAINEMENT':'COMING SOON','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Ange':'Angel','Fée':'Fairy','Démon':'Demon','Nécromancien':'Necromancer','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','SKINS BLOQUÉS':'LOCKED SKINS','SKINS DÉBLOQUÉS':'UNLOCKED SKINS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'BOUTIQUE':'SHOP','Armes':'Weapons','Ton arme équipée, avec tes améliorations. Change-la dans ARMES.':'Your equipped weapon, with your upgrades. Change it in WEAPONS.','ARMES':'WEAPONS','Affronte un autre joueur en direct dans une arène. Chacun se bat avec l\'arme équipée dans le menu principal. 5 cœurs, le premier à 2 manches gagne.':'Fight another player live in an arena. Each one fights with the weapon equipped in the main menu. 5 hearts, first to win 2 rounds wins.','ARÈNE (CHOISIE PAR CELUI QUI CRÉE)':'ARENA (CHOSEN BY THE CREATOR)','Aléatoire':'Random','Prairie':'Meadow','Ruines':'Ruins','Glacier':'Glacier','CRÉER UN COMBAT':'CREATE A FIGHT','PRIVÉ (CODE)':'PRIVATE (CODE)','PUBLIC':'PUBLIC','COMBATS PUBLICS':'PUBLIC FIGHTS','COMBAT RAPIDE':'QUICK FIGHT','REJOINDRE UN AMI (PRIVÉ)':'JOIN A FRIEND (PRIVATE)','Privé : seuls ceux qui ont le code peuvent entrer. Public : ton salon apparaît dans la liste ci-dessous pour tout le monde.':'Private: only people with the code can join. Public: your room shows up in the list below for everyone.','Liste indisponible pour le moment.':'List unavailable right now.','Aucun combat public en attente. Crée le tien ou lance un combat rapide !':'No public fight waiting. Create yours or start a quick fight!','RECHERCHE D\'UN ADVERSAIRE…':'LOOKING FOR AN OPPONENT…','Ton salon est visible dans la liste des combats publics : n\'importe qui peut le rejoindre. Tu peux aussi envoyer le code à un ami.':'Your room is visible in the public fights list: anyone can join. You can also send the code to a friend.','MULTIJOUEUR':'MULTIPLAYER','EN DIRECT':'LIVE','FANTÔME':'GHOST','HISTORIQUE':'HISTORY','TON PSEUDO':'YOUR NICKNAME','Ton pseudo':'Your nickname','TON ARME':'YOUR WEAPON','CRÉER':'CREATE','REJOINDRE UN AMI':'JOIN A FRIEND','REJOINDRE UN DUEL':'JOIN A DUEL','Quitte ta partie (menu pause, RETOUR MENU) pour jouer en multijoueur.':'Leave your game (pause menu, MAIN MENU) to play multiplayer.','Affronte un ami en direct dans l\'arène. Chacun choisit son arme (améliorée au maximum). 5 cœurs, le premier à 2 manches gagne.':'Fight a friend live in the arena. Each player picks a weapon (fully upgraded). 5 hearts, first to win 2 rounds wins.','Aucune partie pour le moment. Lance un combat en direct ou un duel !':'No games yet. Start a live fight or a duel!','À L\'INSTANT':'JUST NOW','COMBAT EN DIRECT (PvP)':'LIVE FIGHT (PvP)','COMBAT EN DIRECT':'LIVE FIGHT','Affronte un ami en direct dans l\'arène. Chacun choisit son arme (améliorée au maximum). 5 cœurs, le premier à 2 manches gagne. Choisis ton arme :':'Fight a friend live in the arena. Each player picks a weapon (fully upgraded). 5 hearts, first to win 2 rounds wins. Pick your weapon:','CRÉER UN SALON':'CREATE A ROOM','Code du salon':'Room code','CRÉATION DU SALON…':'CREATING ROOM…','CONNEXION…':'CONNECTING…','ANNULER':'CANCEL','Envoie ce code (ou le lien) à ton adversaire. Le combat commence dès qu\'il rejoint.':'Send this code (or the link) to your opponent. The fight starts as soon as they join.','En attente de ton adversaire…':'Waiting for your opponent…','Salon introuvable (ou expiré).':'Room not found (or expired).','Ce salon est déjà complet.':'This room is already full.','Serveur injoignable, réessaie plus tard.':'Server unreachable, try again later.','Le salon a expiré.':'The room expired.','Le salon n\'est pas prêt. Réessaie dans un instant.':'The room isn\'t ready. Try again in a moment.','Connexion impossible : vos réseaux bloquent la connexion directe. Essayez avec un autre réseau (4G, autre wifi…).':'Can\'t connect: your networks block direct connections. Try another network (4G, another wifi…).','Connexion perdue avec ton adversaire.':'Lost connection with your opponent.','Ton adversaire s\'est déconnecté.':'Your opponent disconnected.','Ton adversaire a quitté le combat.':'Your opponent left the fight.','VICTOIRE !':'VICTORY!','DÉFAITE…':'DEFEAT…','REVANCHE':'REMATCH','EN ATTENTE DE L\'ADVERSAIRE…':'WAITING FOR OPPONENT…','QUITTER':'QUIT','QUITTER LE COMBAT ?':'QUIT THE FIGHT?','Ton adversaire continue de jouer pendant ce temps.':'Your opponent keeps playing meanwhile.','CONTINUER':'CONTINUE','MES DUELS':'MY DUELS','Défie un ami sur la même course : même monde, même arme améliorée au maximum. Il verra ton fantôme pendant sa course. Le plus rapide contre le Roi Cacamille 2 gagne.':'Challenge a friend on the same run: same world, same fully upgraded weapon. They\'ll see your ghost during their run. Fastest against King Cacamille 2 wins.','CRÉER UN DUEL':'CREATE A DUEL','REJOINDRE':'JOIN','JOUER':'PLAY','RÉESSAYER':'RETRY','TEMPS':'TIME','CHARGEMENT…':'LOADING…','Choisis l\'arme du duel (ton adversaire aura la même). Fais ta meilleure course : quand le Roi Cacamille 2 tombe, tu reçois un code à partager.':'Pick the duel weapon (your opponent gets the same one). Do your best run: when King Cacamille 2 falls, you get a code to share.','Le code fait 6 caractères.':'The code is 6 characters long.','Bats son temps sur la même course. Son fantôme court avec toi. Si tu meurs, tout recommence.':'Beat their time on the same run. Their ghost runs with you. If you die, everything restarts.','Duel créé ! Envoie ce code (ou le lien) à ton adversaire :':'Duel created! Send this code (or the link) to your opponent:','COPIER LE LIEN':'COPY LINK','LIEN COPIÉ !':'LINK COPIED!','PARTAGER':'SHARE','Code introuvable (ou duel expiré).':'Code not found (or duel expired).','Trop de requêtes, attends une minute.':'Too many requests, wait a minute.','Serveur de duels injoignable, réessaie plus tard.':'Duel server unreachable, try again later.','Touche un duel pour voir les temps de tes adversaires (ou le refaire).':'Tap a duel to see your opponents\' times (or replay it).','DUEL : quitte ta partie (menu) pour lancer un duel.':'DUEL: leave your game (menu) to start a duel.','Code du duel':'Duel code','Duel Pechadophin : bats mon temps':'Pechadophin duel: beat my time','PROCHAINEMENT':'COMING SOON','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Ange':'Angel','Fée':'Fairy','Démon':'Demon','Nécromancien':'Necromancer','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','SKINS BLOQUÉS':'LOCKED SKINS','SKINS DÉBLOQUÉS':'UNLOCKED SKINS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche ou F pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click or F to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
 'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
@@ -8009,7 +8017,7 @@ function pvpErr(e){return e&&e.message==='notfound'?'Salon introuvable (ou expir
 function pvpMenu(code){mpOpen('live',code);}
 function pvpInit(role,code){
   if(pvp)pvpEnd();
-  pvp={role,code,w:pvpW,pc:new RTCPeerConnection(PVP_ICE),ch:null,on:false,phase:'lobby',t:0,sendT:0,oppInv:0,score:[0,0],round:0,os:null,ox:0,oy:0,opp:null,lastMsg:0};
+  pvp={role,code,w:shop.weapon,pc:new RTCPeerConnection(PVP_ICE),ch:null,on:false,phase:'lobby',t:0,sendT:0,oppInv:0,score:[0,0],round:0,os:null,ox:0,oy:0,opp:null,lastMsg:0};
   const my=pvp;
   my.pc.addEventListener('connectionstatechange',()=>{if(pvp===my&&my.on&&(my.pc.connectionState==='failed'||my.pc.connectionState==='closed'))pvpLost('Connexion perdue avec ton adversaire.');});
   return my;
@@ -8027,7 +8035,7 @@ async function pvpHost(pub){
   pub=pub===true;
   const w=pvpWait('COMBAT EN DIRECT','CRÉATION DU SALON…');
   try{
-    const {code}=await duelApi(pub?{act:'room',pub:1,n:duelName(),w:pvpW,sk:shop.equipped}:{act:'room'});
+    const {code}=await duelApi(pub?{act:'room',pub:1,n:duelName(),w:shop.weapon,sk:shop.equipped}:{act:'room'});
     const my=pvpInit('host',code);my.pub=pub;
     pvpBind(my.pc.createDataChannel('pvp'));
     await my.pc.setLocalDescription(await my.pc.createOffer());await pvpIce(my.pc);
@@ -8067,7 +8075,7 @@ async function pvpJoin(code){
 }
 function pvpMsg(m){
   const P=pvp;
-  if(m.t==='hi'){P.opp={n:String(m.n||'JOUEUR').replace(/[<>]/g,'').slice(0,16),sk:String(m.sk||''),w:DUEL_W.includes(m.w)?m.w:'trident'};
+  if(m.t==='hi'){P.opp={n:String(m.n||'JOUEUR').replace(/[<>]/g,'').slice(0,16),sk:String(m.sk||''),w:WEAPONS.some(x=>x.id===m.w)?m.w:'rod'};
     if(P.role==='host'){const id=pvpMapPick();pvpSend({t:'go',map:id});pvpStartMatch(id);}return;}
   if(m.t==='go'){if(P.role==='guest'&&!P.on)pvpStartMatch(m.map);return;}
   if(!P.on)return;
@@ -8085,7 +8093,7 @@ function pvpMsg(m){
 function pvpStartMatch(mapId){
   const P=pvp;if(!P||P.on)return;
   P.map=PVP_MAPS.find(m=>m.id===mapId)||PVP_MAPS[0];
-  P.on=true;P.backup=shop;shop=speedShop(P.w,P.backup);speedMax(P.w);
+  P.on=true;P.backup=shop;shop=JSON.parse(JSON.stringify(P.backup));P.w=shop.weapon;   // PvP : l'arme équipée dans le menu principal, avec ses propres améliorations (copie : la vraie sauvegarde n'est pas touchée)
   anarchyWant=false;anarchyOn=false;speedWant=false;
   spdOpen=false;$('spd').hidden=true;clearInputs();
   ensureAudio();resetWorld();hole=null;
@@ -8127,18 +8135,28 @@ function pvpRoundEnd(won){
   P.msg=P.over?(P.score[0]>P.score[1]?'VICTOIRE !':'DÉFAITE…'):won?'MANCHE GAGNÉE !':'MANCHE PERDUE';
   if(won)try{sfx.heal();}catch(e){}
 }
-function pvpState(){
-  const p=player,a=!p.onGround?3:Math.abs(p.vx)>12?(Math.floor(time*10)%2?1:2):0,w=shop.weapon;let l=null;
-  if(w==='trident')l=tridents.slice(0,10).map(h=>[Math.round(h.x),Math.round(h.y),+h.ux.toFixed(2),+h.uy.toFixed(2),h.g?1:0]);
-  else if(w==='tarot')l=tcards.slice(0,14).map(c=>[Math.round(c.x),Math.round(c.y),+(c.sp+c.t*16).toFixed(1),c.star?1:0]);
-  else if(w==='tentacle')l=teFx.map(f=>[+f.a.toFixed(2),Math.round(f.R),+(f.t/f.life).toFixed(2)]);
-  else if(w==='dagger')l=p.dash?1:0;
-  return {t:'s',x:Math.round(p.x),y:Math.round(p.y),f:p.face>0?1:0,a,hp:lives,inv:p.invuln>0?1:0,fx:{k:w,l}};
+function pvpState(){   // ma position + les effets de mon arme (projectiles, coups) pour que l'adversaire les voie
+  const p=player,a=!p.onGround?3:Math.abs(p.vx)>12?(Math.floor(time*10)%2?1:2):0;
+  const cl=(k,v)=>v instanceof Set||k==='hit'||k==='e'||k==='tgt'||k==='grp'||k==='target'?undefined:typeof v==='number'?Math.round(v*100)/100:v;
+  let fx=null;
+  try{fx=JSON.parse(JSON.stringify({k:shop.weapon,aa:Math.atan2(aim.y,aim.x),tr:tridents.slice(0,12),cd:tcards.slice(0,14),kt:katFx,sc:scyFx,bm:booms.slice(0,8),sj:sixJet.slice(0,30),sb:scepBeams.slice(0,6),hk:hooks.slice(0,6),hp:harp,te:teFx.map(f=>[f.a,f.R,f.t/f.life]),dash:p.dash?1:0},cl));}catch(e){}
+  return {t:'s',x:Math.round(p.x),y:Math.round(p.y),f:p.face>0?1:0,a,hp:lives,inv:p.invuln>0?1:0,fx};
+}
+function pvpDrawFx(o,ox,oy){   // dessine les effets de l'arme de l'adversaire avec les fonctions de dessin du jeu (on échange un instant mes états avec les siens)
+  const f=o.fx;if(!f)return;
+  const sv=[tridents,tcards,katFx,scyFx,booms,sixJet,scepBeams,harp,scyEff,player.x,player.y,player.face,aim.x,aim.y];
+  try{
+    tridents=f.tr||[];tcards=f.cd||[];katFx=f.kt||null;scyFx=f.sc||null;booms=f.bm||[];sixJet=f.sj||[];scepBeams=f.sb||[];harp=f.hp||null;scyEff=[];
+    player.x=ox;player.y=oy;player.face=o.f;aim.x=Math.cos(f.aa||0);aim.y=Math.sin(f.aa||0);
+    drawTridents();drawSixJet();drawScepterFx();
+    for(const h of f.hk||[]){pixLine(ox+5+o.f*7,oy-3,h.x,h.y,'#f4f7ff');ctx.save();ctx.translate(Math.round(h.x),Math.round(h.y));ctx.rotate(Math.atan2(h.uy||0,h.ux||1));if((h.ux||1)<0)ctx.scale(1,-1);ctx.drawImage(LURE,-5,-3);ctx.restore();}
+  }catch(e){}
+  [tridents,tcards,katFx,scyFx,booms,sixJet,scepBeams,harp,scyEff]=sv;player.x=sv[9];player.y=sv[10];player.face=sv[11];aim.x=sv[12];aim.y=sv[13];
 }
 function stepPvp(dt){
   const P=pvp;
   P.t-=dt;if(P.oppInv>0)P.oppInv-=dt;
-  if(P.phase==='fight'){stepPlayer(dt);stepHook(dt);if(P.ent){P.ent.x=P.ox;P.ent.y=P.oy;}}
+  if(P.phase==='fight'){stepPlayer(dt);stepHook(dt);stepSixJet(dt);stepScepterBeams(dt);if(P.ent){P.ent.x=P.ox;P.ent.y=P.oy;}}
   else{if(player.invuln>0)player.invuln-=dt;}
   pvpCam(false);
   stepSoulFx(dt);stepFx(dt);
@@ -8153,6 +8171,7 @@ function stepPvp(dt){
   if(P.os){const k=Math.min(1,dt*18);P.ox+=(P.os.x-P.ox)*k;P.oy+=(P.os.y-P.oy)*k;if(Math.abs(P.os.x-P.ox)>64)P.ox=P.os.x;}
   if(!P.ent)P.ent={pvp:true,kind:'pvp',x:0,y:0,w:player.w,h:player.h,vx:0,vy:0,dir:1,hp:1e9,maxHp:1e9,tier:0,speed:0,state:'alive',t:0,flash:0,onGround:true,frost:0,poison:0,stun:0};
   Object.assign(P.ent,{x:P.ox,y:P.oy,hp:1e9,state:'alive',vx:0,vy:0});
+  if(P.phase==='fight'&&(P.ent.frost>0||P.ent.burn>0||P.ent.poison>0)){P.ent.frost=P.ent.burn=P.ent.poison=0;if(P.oppInv<=0)pvpHit(1);}   // gel, brûlure, poison posés par une arme : ça compte comme un coup
   enemies=P.phase==='fight'&&P.os&&P.oppInv<=0?[P.ent]:[];   // l'adversaire n'est touchable que pendant le combat (et pas pendant son invincibilité)
   if(P.phase!=='over'&&performance.now()-P.lastMsg>7000)pvpLost('Connexion perdue avec ton adversaire.');
 }
@@ -8160,23 +8179,14 @@ function drawPvpOpp(){
   const P=pvp;if(!P||!P.on||!P.os||!P.opp)return;
   const o=P.os,sk=SKINS.find(s=>s.id===P.opp.sk)||SKINS[0],ox=Math.round(P.ox),oy=Math.round(P.oy),cx=ox+5,fy=oy+player.h;
   const fx=o.fx;
-  if(fx&&fx.k==='trident'&&Array.isArray(fx.l))for(const h of fx.l){   // projectiles de l'adversaire (même dessin que les miens)
-    const x=h[0],y=h[1];
-    if(h[4]){ctx.fillStyle='#ffe14d';ctx.fillRect(x-1,y-1,3,2);continue;}
-    ctx.fillStyle='rgba(255,70,50,.28)';disc(x,y,8);ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(h[3],h[2]));ctx.drawImage(TRIDENT_P,-6,-3);ctx.restore();
-  }
-  if(fx&&fx.k==='tarot'&&Array.isArray(fx.l))for(const c of fx.l){
-    ctx.save();ctx.translate(c[0],c[1]);ctx.rotate(c[2]);
-    if(c[3])ctx.drawImage(STAR_ICON,-5,-5);else{ctx.fillStyle='#14182c';ctx.fillRect(-3,-5,6,10);ctx.fillStyle='#f4f1e6';ctx.fillRect(-2,-4,4,8);ctx.fillStyle='#c0392b';ctx.fillRect(-1,-1,2,2);}
-    ctx.restore();
-  }
-  if(fx&&fx.k==='tentacle'&&Array.isArray(fx.l)){const cols=tentCols(sk);
-    for(const e of fx.l){const L=e[1]*Math.sin(Math.PI*clamp(e[2],0,1)),ux=Math.cos(e[0]),uy=Math.sin(e[0]);
+  pvpDrawFx(o,ox,oy);
+  if(fx&&Array.isArray(fx.te)){const cols=tentCols(sk);   // coups de tentacules
+    for(const e of fx.te){const L=e[1]*Math.sin(Math.PI*clamp(e[2],0,1)),ux=Math.cos(e[0]),uy=Math.sin(e[0]);
       for(let d=0;d<L;d+=2){ctx.fillStyle=d>L-4?cols[2]:cols[1];ctx.fillRect(Math.round(cx+ux*d)-1,Math.round(oy+6+uy*d)-1,3,3);}}}
   if(o.inv&&Math.floor(time*18)%2)return;
   if(pvpMapOn()&&pvpHidden(ox+5,oy+7))return;   // caché dans un buisson / du lierre / une congère : invisible pour moi
   const sp=[sk.spr.idle,sk.spr.a,sk.spr.b,sk.spr.jump][o.a];
-  if(fx&&fx.k==='dagger'&&fx.l){ctx.save();ctx.globalAlpha=0.3;ctx.translate(cx-o.f*8,0);ctx.scale(o.f,1);ctx.drawImage(sp,-8,fy-16);ctx.restore();}   // ruée : image fantôme derrière
+  if(fx&&fx.dash){ctx.save();ctx.globalAlpha=0.3;ctx.translate(cx-o.f*8,0);ctx.scale(o.f,1);ctx.drawImage(sp,-8,fy-16);ctx.restore();}   // ruée : image fantôme derrière
   ctx.save();ctx.translate(cx,0);ctx.scale(o.f,1);ctx.drawImage(sp,-8,fy-16);ctx.restore();
 }
 function drawPvpHud(){   // score, cœurs de l'adversaire, compte à rebours
@@ -8258,9 +8268,9 @@ function mpOpen(tab,code){
   pr.appendChild(info);p.appendChild(pr);
   // onglets
   const tabs=document.createElement('div');tabs.className='mp-tabs';tabs.setAttribute('role','tablist');
-  for(const [id,t] of [['live','EN DIRECT'],['ghost','FANTÔME'],['hist','HISTORIQUE']]){
+  for(const [id,t] of [['live','EN DIRECT'],['ghost','FANTÔME'],['top','TOP 10'],['hist','HISTORIQUE']]){
     const b=document.createElement('button');b.type='button';b.className='sbtn'+(mpTab===id?' on':'');b.textContent=t;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(mpTab===id));
-    b.addEventListener('click',()=>mpOpen(id));tabs.appendChild(b);}
+    b.addEventListener('click',()=>{if(id==='top'){spdOpen=false;$('spd').hidden=true;openLb();return;}mpOpen(id);});tabs.appendChild(b);}
   p.appendChild(tabs);
   const body=document.createElement('div');body.className='mp-body';p.appendChild(body);
   if(state==='play'){duelNote(body,'Quitte ta partie (menu pause, RETOUR MENU) pour jouer en multijoueur.');}
@@ -8278,14 +8288,12 @@ function mpCodeRow(body,code,label,fn){
 }
 function mpSec(body,t){const h=document.createElement('div');h.className='prem-h';h.textContent=t;body.appendChild(h);}
 function mpLive(body,code){
-  duelNote(body,'Affronte un ami en direct dans l\'arène. Chacun choisit son arme (améliorée au maximum). 5 cœurs, le premier à 2 manches gagne.');
+  duelNote(body,'Affronte un autre joueur en direct dans une arène. Chacun se bat avec l\'arme équipée dans le menu principal. 5 cœurs, le premier à 2 manches gagne.');
   mpSec(body,'TON ARME');
-  const g=document.createElement('div');g.id='spd-w';
-  for(const id of DUEL_W){const w=WEAPONS.find(x=>x.id===id);if(!w)continue;
-    const b=document.createElement('button');b.type='button';b.className='sbtn'+(id===pvpW?' on':'');b.appendChild(weapImg(w,28));
-    const nm=document.createElement('span');nm.textContent=w.name;b.appendChild(nm);
-    b.addEventListener('click',()=>{pvpW=id;for(const x of g.children)x.classList.toggle('on',x===b);});g.appendChild(b);}
-  body.appendChild(g);
+  {const w=WEAPONS.find(x=>x.id===shop.weapon)||WEAPONS[0],row=document.createElement('div');row.className='mp-weap';
+   row.appendChild(weapImg(w,28));const nm=document.createElement('div');const b1=document.createElement('b');b1.textContent=w.name;nm.appendChild(b1);
+   const sm=document.createElement('small');sm.textContent='Ton arme équipée, avec tes améliorations. Change-la dans ARMES.';nm.appendChild(sm);row.appendChild(nm);
+   row.appendChild(spdBtn('ARMES',()=>{spdOpen=false;$('spd').hidden=true;openWeap();}));body.appendChild(row);}
   mpSec(body,'ARÈNE (CHOISIE PAR CELUI QUI CRÉE)');
   const ag=document.createElement('div');ag.className='mp-maps';
   for(const m of PVP_MAPS.concat([{id:'rand',name:'Aléatoire'}])){
@@ -8802,6 +8810,7 @@ function closeCrates(){
 }
 $('crate-btn').addEventListener('click',()=>{ensureAudio();openCrates();});
 $('crate-close').addEventListener('click',closeCrates);
+{const im=spr(["........ww",".......wWw","......wWw.",".....wWw..","....wWw...","..y.wWw...","...yWw....","...by.....","..b..y....",".b........"],{w:'#dfe6f5',W:'#ffffff',y:'#ffd23f',b:'#6b3f1c'},true),cv=$('weap-ic');cv.width=im.width;cv.height=im.height;cv.getContext('2d').drawImage(im,0,0);}   // bouton ARMES : une épée
 {const im=crSpr(CRATES[0]),cv=$('crate-ic');cv.width=im.width;cv.height=im.height;cv.getContext('2d').drawImage(im,0,0);}
 function openShop(tab){
   shopMerchant=tab==='merchant';
@@ -9045,7 +9054,7 @@ function anaSaveRefresh(){
 }
 $('ana-save').addEventListener('click',()=>{if(!gUser||score<=anaBestGet())return;lbPending=score;const b=$('ana-save');b.disabled=true;b.textContent='ENVOI…';lbSubmit();});
 function openLb(){clearInputs();lbOpen=true;lbEl.hidden=false;lbMsg='Chargement…';lbRender();lbLoad();try{$('lb-close').focus({preventScroll:true});}catch(e){}}
-function closeLb(){lbOpen=false;lbEl.hidden=true;try{$('lb-btn').focus({preventScroll:true});}catch(e){}}
+function closeLb(){lbOpen=false;lbEl.hidden=true;try{$('mp-btn').focus({preventScroll:true});}catch(e){}}
 $('lb-btn').addEventListener('click',openLb);$('lb-close').addEventListener('click',closeLb);
 lbEl.addEventListener('pointerdown',e=>{if(e.target===lbEl)closeLb();});
 addEventListener('keydown',e=>{if(lbOpen&&e.code==='Escape'){e.preventDefault();e.stopPropagation();closeLb();}},true);
