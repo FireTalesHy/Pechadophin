@@ -242,6 +242,14 @@ body{
 .spd-who small{display:block;font-size:7px;opacity:.75}
 .spd-stats{font:400 8px/1.9 var(--pf);opacity:.9;margin-bottom:8px}
 #spd .go{margin:4px}
+.duel-join{display:flex;gap:6px;justify-content:center;align-items:center;margin:6px 0}
+.duel-join input{width:120px;font:400 14px var(--pf);text-align:center;letter-spacing:3px;padding:9px 6px;border-radius:10px;border:2px solid var(--btn-line);background:#fff;color:#14182c;text-transform:uppercase}
+.duel-code{font:400 26px/1.3 var(--pf);letter-spacing:6px;color:#ffd23f;text-shadow:0 3px 0 rgba(0,0,0,.55);margin:6px 0;user-select:all}
+.duel-board{display:flex;flex-direction:column;gap:4px;margin:8px auto;max-width:340px}
+.duel-row{display:flex;justify-content:space-between;gap:10px;font:400 9px/1.6 var(--pf);padding:6px 10px;border-radius:8px;border:2px solid var(--btn-line);background:var(--btn);text-align:left}
+.duel-row.crea{border-color:#ffd23f}.duel-row.me{border-color:#7dff9a;box-shadow:0 0 0 2px #7dff9a inset}
+.duel-verdict{font:400 11px/1.8 var(--pf);margin:6px 0}.duel-verdict.win{color:#2fae5a}.duel-verdict.lose{color:#d6404a}
+
 .mode-card{text-align:center;font-size:11px}
 .mode-card.lock{opacity:.5;filter:grayscale(.7)}
 .mode-card.on{border-color:var(--on);box-shadow:0 0 0 2px var(--on) inset}
@@ -992,6 +1000,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <button class="sbtn mode-card" id="mode-classic" type="button">CLASSIQUE</button>
     <button class="sbtn mode-card" id="mode-ana" type="button">ANARCHIE</button>
     <button class="sbtn mode-card" id="mode-speed" type="button">SPEEDRUN</button>
+    <button class="sbtn mode-card" id="mode-duel" type="button">DUEL</button>
     <p class="shop-note" id="mode-note"></p>
     <button class="go" id="mode-close" type="button">RETOUR</button>
   </div>
@@ -1080,7 +1089,7 @@ const EN={
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
-'BOUTIQUE':'SHOP','PROCHAINEMENT':'COMING SOON','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Ange':'Angel','Fée':'Fairy','Démon':'Demon','Nécromancien':'Necromancer','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','SKINS BLOQUÉS':'LOCKED SKINS','SKINS DÉBLOQUÉS':'UNLOCKED SKINS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
+'BOUTIQUE':'SHOP','MES DUELS':'MY DUELS','Défie un ami sur la même course : même monde, même arme améliorée au maximum. Il verra ton fantôme pendant sa course. Le plus rapide contre le Roi Cacamille 2 gagne.':'Challenge a friend on the same run: same world, same fully upgraded weapon. They\'ll see your ghost during their run. Fastest against King Cacamille 2 wins.','CRÉER UN DUEL':'CREATE A DUEL','REJOINDRE':'JOIN','JOUER':'PLAY','RÉESSAYER':'RETRY','TEMPS':'TIME','CHARGEMENT…':'LOADING…','Choisis l\'arme du duel (ton adversaire aura la même). Fais ta meilleure course : quand le Roi Cacamille 2 tombe, tu reçois un code à partager.':'Pick the duel weapon (your opponent gets the same one). Do your best run: when King Cacamille 2 falls, you get a code to share.','Le code fait 6 caractères.':'The code is 6 characters long.','Bats son temps sur la même course. Son fantôme court avec toi. Si tu meurs, tout recommence.':'Beat their time on the same run. Their ghost runs with you. If you die, everything restarts.','Duel créé ! Envoie ce code (ou le lien) à ton adversaire :':'Duel created! Send this code (or the link) to your opponent:','COPIER LE LIEN':'COPY LINK','LIEN COPIÉ !':'LINK COPIED!','PARTAGER':'SHARE','Code introuvable (ou duel expiré).':'Code not found (or duel expired).','Trop de requêtes, attends une minute.':'Too many requests, wait a minute.','Serveur de duels injoignable, réessaie plus tard.':'Duel server unreachable, try again later.','Touche un duel pour voir les temps de tes adversaires (ou le refaire).':'Tap a duel to see your opponents\' times (or replay it).','DUEL : quitte ta partie (menu) pour lancer un duel.':'DUEL: leave your game (menu) to start a duel.','Code du duel':'Duel code','Duel Pechadophin : bats mon temps':'Pechadophin duel: beat my time','PROCHAINEMENT':'COMING SOON','Une grande faux qui tranche en arc. Combo en 4 coups : 2 coups normaux, le 3e ramène l\'ennemi vers toi, le 4e le repousse. Arbre de compétences : dégâts, portée, vitesse et poison. S\'achète avec des âmes rouges.':'A big scythe that slashes in an arc. 4-hit combo: 2 normal hits, the 3rd pulls the enemy toward you, the 4th knocks it back. Skill tree: damage, range, speed and poison. Bought with red souls.','Un harpon à câble. Sur un ennemi : il l\'empale et le ramène à toi en le blessant sur tout le trajet, puis un dernier coup. Sur le décor : il te tire jusqu\'au point d\'accroche (saute pour te décrocher). Coup lourd (x3) sur les boss. S\'achète avec des âmes rouges.':'A cable harpoon. On an enemy: it impales it and reels it in, hurting it all the way, then a final hit. On terrain: it pulls you to the anchor point (jump to let go). Heavy hit (x3) on bosses. Bought with red souls.','Chaque coup empoisonne l\'ennemi (4 s, un tick par seconde).':'Each hit poisons the enemy (4 s, one tick per second).','Faux':'Scythe','FAUX REQUISE':'SCYTHE REQUIRED','Obtenir la faux':'Get the scythe','Faux : une branche au niveau max':'Scythe: one branch at max level','Poison':'Poison','Aucun':'None','CAISSES':'CRATES','OUVRIR':'OPEN','COMPLET':'COMPLETE','EN CAISSE':'IN CRATES','Caisse Héros':'Hero Crate','Ange':'Angel','Fée':'Fairy','Démon':'Demon','Nécromancien':'Necromancer','Caisse Vilain':'Villain Crate','DÉTAIL':'DETAILS','SKINS BLOQUÉS':'LOCKED SKINS','SKINS DÉBLOQUÉS':'UNLOCKED SKINS','POSSÉDÉ':'OWNED','OUVERTURE…':'OPENING…','SKINS':'SKINS','CANNE':'ROD','ARMES':'WEAPONS','TRIDENT':'TRIDENT','RETOUR':'BACK','CHOIX DU MODE':'CHOOSE A MODE','CLASSIQUE':'CLASSIC','ANARCHIE':'ANARCHY',
 'RÉGLAGES':'SETTINGS','Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche ou F pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).':'Keyboard: A/D or ←/→ to move, W/↑/Space to jump, mouse to aim, left click or F to fish, Esc or P to pause. Tablet: left joystick to move, right joystick for the camera and aiming (with aim assist).',
 'RÉINITIALISER LA SAVE':'RESET SAVE','RENAISSANCE':'REBIRTH','RENAISSANCE ?':'REBIRTH?','RENAÎTRE':'BE REBORN','Le mode classique recommence depuis le début : checkpoints effacés, et les boss redonnent leurs récompenses comme la première fois. Tu gardes tes armes, leurs améliorations, tes skins, ton or et tes âmes.':'Classic mode starts over from the beginning: checkpoints erased, and bosses give their rewards again as if for the first time. You keep your weapons, their upgrades, your skins, gold and souls.','RÉINITIALISER ?':'RESET?','ANNULER':'CANCEL','CONTINUER':'CONTINUE','MENU DEV':'DEV MENU',
 'Outil de test : donne-toi des monnaies (enregistrées) et active l\'invincibilité. Le jeu est en pause tant que ce menu est ouvert.':'Test tool: give yourself currency (saved) and turn on invincibility. The game is paused while this menu is open.',
@@ -1144,6 +1153,9 @@ const EN_RULES=[
   [/^DOUBLON · (.+) · \+(\d+) OR$/,m=>'DUPLICATE · '+trStr(m[1])+' · +'+m[2]+' GOLD'],
   [/^\+(\d+) OR$/,m=>'+'+m[1]+' GOLD'],
   [/^\+1 VIE$/,()=>'+1 LIFE'],
+  [/^DUEL · TENTATIVE (\d+)$/,m=>'DUEL · ATTEMPT '+m[1]],
+  [/^MES DUELS \((\d+)\)$/,m=>'MY DUELS ('+m[1]+')'],
+  [/^(VICTOIRE ! |DÉFAITE… )([-+]\S+) contre (.+)$/,m=>(m[1][0]==='V'?'VICTORY! ':'DEFEAT… ')+m[2]+' vs '+m[3]],
   [/^SPEEDRUN · TENTATIVE (\d+)$/,m=>'SPEEDRUN · ATTEMPT '+m[1]],
  [/^TENTATIVES : (\d+)(.*)$/,m=>'ATTEMPTS: '+m[1]+m[2].replace('MEILLEUR','BEST')],
  [/^MEILLEUR (\d+:\d\d\.\d\d)$/,m=>'BEST '+m[1]],
@@ -4853,7 +4865,7 @@ function renderTw(){
     if(e.frost>0&&e.state==='alive'){ctx.fillStyle='rgba(150,225,255,.4)';ctx.fillRect(Math.round(e.x)-1,Math.round(e.y)-1,e.w+2,e.h+2);}
     statusTint(e);
   }
-  drawKing();drawPickups();drawBossShots();drawKingBalls();drawTridents();drawPlayer();drawSixJet();drawReticle();drawSoulFx();drawFx();
+  drawKing();drawPickups();drawBossShots();drawKingBalls();drawTridents();drawGhost();drawPlayer();drawSixJet();drawReticle();drawSoulFx();drawFx();
   ctx.restore();
   if(state==='dying'&&dyingT<0.25){ctx.fillStyle='rgba(255,60,60,.28)';ctx.fillRect(0,0,VW,VH);}
   if(twTr)drawTwFade();
@@ -6974,7 +6986,7 @@ function renderRz(){
   ctx.fillStyle='#000000';ctx.fillRect(0,0,VW,VH);
   let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
   ctx.save();ctx.translate(-cx+sx,-cy+sy);
-  drawRz(cx,cy);drawSix();drawTridents();drawPlayer();drawSixJet();drawReticle();drawSoulFx();drawFx();
+  drawRz(cx,cy);drawSix();drawTridents();drawGhost();drawPlayer();drawSixJet();drawReticle();drawSoulFx();drawFx();
   ctx.restore();
   if(state==='dying'&&dyingT<0.25){ctx.fillStyle='rgba(255,60,60,.28)';ctx.fillRect(0,0,VW,VH);}
   if(rzTr)drawRzFade();
@@ -7035,6 +7047,7 @@ function render(){
   drawSix();
   drawBossShots();
   drawTridents();
+  drawGhost();
   drawPlayer();
   if(rngR&&state!=='dying')drawRngRoll(Math.round(player.x+player.w/2),Math.round(player.y)-2);
   drawReticle();
@@ -7082,7 +7095,7 @@ function showTitle(){
   try{ovBtn.focus({preventScroll:true});}catch(e){}
 }
 function resetWorld(){
-  SEED=(Math.random()*4294967296)|0;
+  SEED=(speedOn&&duel)?duel.seed:(Math.random()*4294967296)|0;   // duel : même graine pour les deux joueurs
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
   cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];crows=[];rngLas=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
@@ -7609,7 +7622,7 @@ function speedMax(wid){   // l'arme choisie est déjà au maximum : ses 2 branch
 }
 function beginSpeedrun(wid){
   if(!speedOn){speedBackup=shop;speedOn=true;speedTry=0;}
-  speedWeapon=wid;speedTry++;speedT=0;speedEnd=false;speedShown=false;speedResultIn=0;speedLast='';
+  speedWeapon=wid;speedTry++;speedT=0;ghRec=duel?{x:[],y:[],c:[]}:null;ghNext=0;speedEnd=false;speedShown=false;speedResultIn=0;speedLast='';
   shop=speedShop(wid,speedBackup);speedMax(wid);
   anarchyWant=false;anarchyOn=false;
   closeSpeed();
@@ -7618,13 +7631,13 @@ function beginSpeedrun(wid){
 }
 function endSpeedrun(){   // retour à la vraie boutique
   if(!speedOn)return;
-  shop=speedBackup;speedBackup=null;speedOn=false;speedEnd=false;spdOpen=false;
+  shop=speedBackup;speedBackup=null;speedOn=false;speedEnd=false;spdOpen=false;duel=null;ghRec=null;
   $('spd').hidden=true;$('spd-t').hidden=true;
   try{misDot();}catch(e){}
 }
 function speedMsg(t){speedMsgT=1.6;const el=$('spd-t');el.classList.add('flash');el.dataset.msg=t;speedLast='';}
 function speedTick(dt){
-  if(state==='play'&&!speedEnd&&!paused)speedT+=dt;
+  if(state==='play'&&!speedEnd&&!paused){speedT+=dt;if(ghRec)ghostRec();}
   if(speedMsgT>0){speedMsgT-=dt;if(speedMsgT<=0){$('spd-t').classList.remove('flash');delete $('spd-t').dataset.msg;speedLast='';}}
   if(speedEnd&&!speedShown&&state==='play'){speedResultIn-=dt;if(speedResultIn<=0)showSpeedResult();}
   speedHud(false);
@@ -7634,7 +7647,8 @@ function speedHud(force){
   const msg=el.dataset.msg||'',k=fmtT(speedT)+'|'+speedTry+'|'+msg;
   if(!force&&k===speedLast)return;speedLast=k;
   el.textContent='';el.appendChild(document.createTextNode(msg||fmtT(speedT)));
-  const sm=document.createElement('small');sm.textContent='SPEEDRUN · TENTATIVE '+speedTry;el.appendChild(sm);
+  const sm=document.createElement('small');sm.textContent=(duel?'DUEL':'SPEEDRUN')+' · TENTATIVE '+speedTry;el.appendChild(sm);
+  if(duel&&duel.opp){const o=document.createElement('small');o.textContent='VS '+duel.opp.n+' '+fmtT(duel.opp.t);el.appendChild(o);}
 }
 function closeSpeed(){spdOpen=false;$('spd').hidden=true;speedHud(true);}
 function spdPanel(){const p=$('spd-panel');p.textContent='';return p;}
@@ -7657,6 +7671,7 @@ function openSpeedPick(){
 }
 function showSpeedResult(){
   if(speedShown)return;speedShown=true;clearInputs();spdOpen=true;
+  if(duel){duelResult();return;}   // duel : écran de résultat dédié
   const wid=speedWeapon,t=speedT,old=speedBests[wid],rec=!old||t<old;
   if(rec){speedBests[wid]=t;try{localStorage.setItem(SPEED_KEY,JSON.stringify(speedBests));}catch(e){}}
   const w=WEAPONS.find(x=>x.id===wid),sk=curSkin(),name=(gUser&&(gUser.pseudo||gUser.name))||'JOUEUR';
@@ -7677,6 +7692,161 @@ function showSpeedResult(){
   $('spd').hidden=false;$('spd-t').hidden=true;
   try{sfx.bossDie();}catch(e){}
 }
+/* ===== DUEL asynchrone avec fantôme =====
+   Règles du speedrun (arme au max, pas de checkpoint), mais sur une graine partagée. Le créateur fait sa course : on garde son temps et
+   son « fantôme » (position 15 fois par seconde). Les autres rejoignent avec le code, refont la même course en voyant le fantôme. */
+const DUEL_KEY='pechadophin-duels',GH_HZ=15,DUEL_W=['trident','tarot','dagger','tentacle'];
+let duel=null,ghRec=null,ghNext=0,duelMine=[];
+try{duelMine=JSON.parse(localStorage.getItem(DUEL_KEY)||'[]')||[];}catch(e){}
+const duelName=()=>(gUser&&(gUser.pseudo||gUser.name))||'JOUEUR';
+const ghZone=()=>rz?2:tw?1:0;
+function ghostRec(){
+  while(speedT>=ghNext&&ghRec.x.length<GH_HZ*1200){
+    const p=player,a=!p.onGround?3:Math.abs(p.vx)>12?(Math.floor(time*10)%2?1:2):0;
+    ghRec.x.push(Math.round(p.x));ghRec.y.push(Math.round(p.y));ghRec.c.push((p.face>0?1:0)+a*2+ghZone()*8);
+    ghNext+=1/GH_HZ;
+  }
+}
+function ghEnc(g){const d=a=>{let o=0;return a.map(v=>{const r=v-o;o=v;return r;}).join(',');};return d(g.x)+'|'+d(g.y)+'|'+g.c.join(',');}
+function ghDec(s){
+  const [xs,ys,cs]=String(s||'').split('|');if(!cs)return null;
+  const u=t=>{let o=0;return t.split(',').map(v=>o+=(+v||0));};
+  const g={x:u(xs),y:u(ys),c:cs.split(',').map(v=>+v||0)};
+  return g.x.length&&g.x.length===g.y.length&&g.y.length===g.c.length?g:null;
+}
+function drawGhost(){   // appelé dans l'espace du monde (caméra déjà appliquée)
+  if(!duel||!duel.opp||!duel.opp.g||!speedOn||state==='dying')return;
+  const g=duel.opp.g,n=g.x.length,f=Math.min(speedT*GH_HZ,n-1),i=Math.floor(f),j=Math.min(i+1,n-1),c=g.c[i];
+  if((c>>3)!==ghZone())return;   // pas dans la même zone (tour, monde du trou)
+  const tele=(g.c[j]>>3)!==(c>>3)||Math.abs(g.x[j]-g.x[i])>48||Math.abs(g.y[j]-g.y[i])>48,k=tele?0:f-i;   // téléportation : pas d'interpolation
+  const x=g.x[i]+(g.x[j]-g.x[i])*k,y=g.y[i]+(g.y[j]-g.y[i])*k;
+  const sk=SKINS.find(s=>s.id===duel.opp.sk)||SKINS[0],sp=[sk.spr.idle,sk.spr.a,sk.spr.b,sk.spr.jump][(c>>1)&3];
+  const cx=Math.round(x+player.w/2),fy=Math.round(y)+player.h,vx=Math.round(cam.x),vy=Math.round(cam.y);
+  ctx.save();
+  if(cx<vx-6||cx>vx+VW+6){   // hors de l'écran : petite flèche sur le bord, du côté du fantôme
+    const d=cx<vx?-1:1,ax=d<0?vx+3:vx+VW-4,ay=clamp(fy-8,vy+24,vy+VH-12);
+    ctx.globalAlpha=0.8;ctx.fillStyle='#c9e6ff';
+    for(let r=0;r<4;r++)ctx.fillRect(ax+d*r-(d>0?3:-3),ay-(3-r),1,(3-r)*2+1);
+    ctx.restore();return;
+  }
+  ctx.globalAlpha=0.45;ctx.translate(cx,0);ctx.scale(c&1?1:-1,1);ctx.drawImage(sp,-8,fy-16);
+  ctx.restore();ctx.save();
+  const nm=String(duel.opp.n||'').slice(0,10);
+  ctx.globalAlpha=0.75;ctx.font="8px 'Press Start 2P', monospace";ctx.textAlign='center';ctx.textBaseline='bottom';
+  ctx.fillStyle='#0a1430';ctx.fillText(nm,cx+1,fy-16);ctx.fillStyle='#c9e6ff';ctx.fillText(nm,cx,fy-17);
+  ctx.restore();
+}
+async function duelApi(body,code){
+  const r=code?await fetch('/api/duel?c='+encodeURIComponent(code)):await fetch('/api/duel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||'server');
+  return j;
+}
+const duelErr=e=>e&&e.message==='notfound'?'Code introuvable (ou duel expiré).':e&&e.message==='slow'?'Trop de requêtes, attends une minute.':'Serveur de duels injoignable, réessaie plus tard.';
+function duelHead(p,t){const h=document.createElement('div');h.className='shop-head';const ti=document.createElement('h2');ti.textContent=t;h.appendChild(ti);p.appendChild(h);}
+function duelNote(p,t,cls){const n=document.createElement('p');n.className=cls||'shop-note';n.textContent=t;p.appendChild(n);return n;}
+function openDuel(){
+  clearInputs();spdOpen=true;const p=spdPanel();duelHead(p,'DUEL');
+  duelNote(p,'Défie un ami sur la même course : même monde, même arme améliorée au maximum. Il verra ton fantôme pendant sa course. Le plus rapide contre le Roi Cacamille 2 gagne.');
+  p.appendChild(spdBtn('CRÉER UN DUEL',duelPick));
+  const row=document.createElement('div');row.className='duel-join';
+  const inp=document.createElement('input');inp.id='duel-code';inp.maxLength=6;inp.placeholder='CODE';inp.autocomplete='off';inp.setAttribute('aria-label','Code du duel');
+  inp.addEventListener('input',()=>{inp.value=inp.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
+  inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')duelJoin(inp.value);});
+  row.appendChild(inp);row.appendChild(spdBtn('REJOINDRE',()=>duelJoin(inp.value)));p.appendChild(row);
+  if(duelMine.length)p.appendChild(spdBtn('MES DUELS ('+duelMine.length+')',duelList));
+  p.appendChild(spdBtn('RETOUR',()=>{spdOpen=false;$('spd').hidden=true;}));
+  $('spd').hidden=false;
+}
+function duelWeapGrid(p,fn,only){
+  const g=document.createElement('div');g.id='spd-w';
+  for(const id of only?[only]:DUEL_W){const w=WEAPONS.find(x=>x.id===id);if(!w)continue;
+    const b=document.createElement('button');b.type='button';b.className='sbtn';b.appendChild(weapImg(w,28));
+    const nm=document.createElement('span');nm.textContent=w.name;b.appendChild(nm);b.addEventListener('click',()=>fn(w.id));g.appendChild(b);}
+  p.appendChild(g);
+}
+function duelPick(){
+  const p=spdPanel();duelHead(p,'CRÉER UN DUEL');
+  duelNote(p,'Choisis l\'arme du duel (ton adversaire aura la même). Fais ta meilleure course : quand le Roi Cacamille 2 tombe, tu reçois un code à partager.');
+  duelWeapGrid(p,w=>duelStart({mode:'create',seed:(Math.random()*4294967296)|0,w}));
+  p.appendChild(spdBtn('RETOUR',openDuel));
+}
+async function duelJoin(code){
+  code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+  clearInputs();spdOpen=true;$('spd').hidden=false;
+  const p=spdPanel();duelHead(p,'DUEL '+code);
+  if(code.length!==6){duelNote(p,'Le code fait 6 caractères.');p.appendChild(spdBtn('RETOUR',openDuel));return;}
+  duelNote(p,'CHARGEMENT…');
+  let d;try{d=await duelApi(null,code);}catch(e){const q=spdPanel();duelHead(q,'DUEL '+code);duelNote(q,duelErr(e));q.appendChild(spdBtn('RETOUR',openDuel));return;}
+  const g=ghDec(d.gh),q=spdPanel();duelHead(q,'DUEL '+code);
+  duelWho(q,d.n,d.sk,d.w,fmtT(d.t));
+  if(d.res&&d.res.length)duelBoard(q,d,null);
+  duelNote(q,'Bats son temps sur la même course. Son fantôme court avec toi. Si tu meurs, tout recommence.');
+  q.appendChild(spdBtn('JOUER',()=>duelStart({mode:'join',code,seed:d.seed|0,w:d.w,opp:{n:d.n,t:d.t,sk:d.sk,g}})));
+  q.appendChild(spdBtn('RETOUR',openDuel));
+}
+function duelWho(p,n,skid,wid,tt){
+  const who=document.createElement('div');who.className='spd-who';
+  const sk=SKINS.find(s=>s.id===skid)||SKINS[0],cs=document.createElement('canvas');cs.width=16;cs.height=16;{const g=cs.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(sk.spr.idle,0,0);}who.appendChild(cs);
+  const info=document.createElement('div');const b1=document.createElement('b');b1.textContent=n;info.appendChild(b1);
+  const s1=document.createElement('small');s1.textContent='TEMPS';info.appendChild(s1);info.appendChild(document.createTextNode(tt));who.appendChild(info);
+  const w=WEAPONS.find(x=>x.id===wid);if(w){const wc=weapImg(w,32);wc.style.width='48px';wc.style.height='48px';wc.style.imageRendering='pixelated';who.appendChild(wc);}
+  p.appendChild(who);
+}
+function duelBoard(p,d,me){   // classement : créateur + tous les résultats
+  const all=[{n:d.n,t:d.t,c:1}].concat((d.res||[]).map(r=>({n:r.n,t:r.t,m:me&&r.at===me.at}))).sort((a,b)=>a.t-b.t);
+  const b=document.createElement('div');b.className='duel-board';
+  all.slice(0,8).forEach((r,i)=>{const l=document.createElement('div');l.className='duel-row'+(r.m?' me':'')+(r.c?' crea':'');
+    const a=document.createElement('span');a.textContent=(i+1)+'. '+r.n+(r.c?' ★':'');const t=document.createElement('span');t.textContent=fmtT(r.t);l.appendChild(a);l.appendChild(t);b.appendChild(l);});
+  p.appendChild(b);
+}
+function duelStart(d){
+  duel=d;speedWant=false;
+  if(speedOn){speedTry=0;beginSpeedrun(d.w);}else beginSpeedrun(d.w);
+}
+function duelLink(code){return location.origin+location.pathname+'?duel='+code;}
+async function duelResult(){
+  const t=speedT,d=duel,p=spdPanel();
+  duelHead(p,'ROI CACAMILLE VAINCU !');
+  const tm=document.createElement('div');tm.className='spd-time';tm.textContent=fmtT(t);p.appendChild(tm);
+  $('spd').hidden=false;$('spd-t').hidden=true;try{sfx.bossDie();}catch(e){}
+  const wait=duelNote(p,'ENVOI…');
+  const menu=()=>{endSpeedrun();showTitle();};
+  if(d.mode==='create'){
+    let j;try{j=await duelApi({act:'create',seed:d.seed,w:d.w,t,sk:shop.equipped,n:duelName(),gh:ghEnc(ghRec)});}
+    catch(e){wait.textContent=duelErr(e);p.appendChild(spdBtn('RÉESSAYER',()=>{speedShown=false;showSpeedResult();}));p.appendChild(spdBtn('MENU',menu));return;}
+    duelMine.unshift({c:j.code,w:d.w,t,at:Date.now()});duelMine=duelMine.slice(0,20);try{localStorage.setItem(DUEL_KEY,JSON.stringify(duelMine));}catch(e){}
+    wait.textContent='Duel créé ! Envoie ce code (ou le lien) à ton adversaire :';
+    const c=document.createElement('div');c.className='duel-code';c.textContent=j.code;p.appendChild(c);
+    const cp=spdBtn('COPIER LE LIEN',async()=>{try{await navigator.clipboard.writeText(duelLink(j.code));cp.textContent='LIEN COPIÉ !';}catch(e){cp.textContent=duelLink(j.code);}});p.appendChild(cp);
+    if(navigator.share)p.appendChild(spdBtn('PARTAGER',()=>{navigator.share({title:'Pechadophin',text:'Duel Pechadophin : bats mon temps de '+fmtT(t)+' ! Code '+j.code,url:duelLink(j.code)}).catch(()=>{});}));
+    p.appendChild(spdBtn('MENU',menu));
+    return;
+  }
+  let j;try{j=await duelApi({act:'result',c:d.code,t,sk:shop.equipped,n:duelName()});}
+  catch(e){wait.textContent=duelErr(e);p.appendChild(spdBtn('RÉESSAYER',()=>{speedShown=false;showSpeedResult();}));p.appendChild(spdBtn('MENU',menu));return;}
+  const win=t<d.opp.t,diff=Math.abs(d.opp.t-t);
+  wait.className='duel-verdict '+(win?'win':'lose');wait.textContent=(win?'VICTOIRE ! ':'DÉFAITE… ')+(win?'-':'+')+fmtT(diff)+' contre '+d.opp.n;
+  const mine=(j.res||[]).filter(r=>Math.abs(r.t-Math.round(t*100)/100)<0.005&&r.n===duelName()).pop();
+  duelBoard(p,{n:d.opp.n,t:d.opp.t,res:j.res},mine);
+  p.appendChild(spdBtn('REJOUER',()=>{speedShown=false;closeSpeed();duelStart(d);}));
+  p.appendChild(spdBtn('MENU',menu));
+}
+async function duelList(){
+  const p=spdPanel();duelHead(p,'MES DUELS');
+  const b=document.createElement('div');b.className='duel-board';
+  for(const m of duelMine){const l=document.createElement('button');l.type='button';l.className='duel-row sbtn';
+    const w=WEAPONS.find(x=>x.id===m.w);const a=document.createElement('span');a.textContent=m.c+' · '+(w?w.name:m.w);const t=document.createElement('span');t.textContent=fmtT(m.t);
+    l.appendChild(a);l.appendChild(t);l.addEventListener('click',()=>duelJoin(m.c));b.appendChild(l);}
+  p.appendChild(b);duelNote(p,'Touche un duel pour voir les temps de tes adversaires (ou le refaire).');
+  p.appendChild(spdBtn('RETOUR',openDuel));
+}
+$('mode-duel').addEventListener('click',()=>{
+  if(state==='play'){$('mode-note').textContent='DUEL : quitte ta partie (menu) pour lancer un duel.';return;}
+  closeMode();openDuel();
+});
+{const qd=new URLSearchParams(location.search).get('duel');   // lien de duel partagé : ?duel=CODE
+ if(qd){try{history.replaceState(null,'',location.pathname);}catch(e){}setTimeout(()=>{if(state!=='play')duelJoin(qd);},900);}}
 $('mode-speed').addEventListener('click',()=>{
   if(!speedOk()){updateMode();return;}
   speedWant=true;anarchyWant=false;anarchyOn=false;
