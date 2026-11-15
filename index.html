@@ -1621,6 +1621,10 @@ function spr(rows,pal,outline){
   }
   return c;
 }
+function outlineRows(rows){   // contour noir automatique tout autour (skins de profil) : chaque case vide qui touche une couleur devient noire
+  const g=rows.map(r=>r.split('')),at=(x,y)=>(g[y]&&g[y][x])||'.',col=c=>c!=='.'&&c!=='k';
+  return g.map((r,y)=>r.map((c,x)=>c==='.'&&(col(at(x-1,y))||col(at(x+1,y))||col(at(x,y-1))||col(at(x,y+1))||col(at(x-1,y-1))||col(at(x+1,y-1))||col(at(x-1,y+1))||col(at(x+1,y+1)))?'k':c).join(''));
+}
 function tint(src,color){
   const c=mk(src.width,src.height),g=c.getContext('2d');
   g.drawImage(src,0,0);g.globalCompositeOperation='source-atop';g.fillStyle=color;g.fillRect(0,0,c.width,c.height);return c;
@@ -1929,7 +1933,7 @@ for(const c of CRATES){c.w=[];for(const id of c.skins){const sk=SKINS.find(x=>x.
 for(const sk of SKINS){
   sk.spr={};
   const pal=Object.assign({},PAL_P,sk.pal);
-  for(const k in LEGS) sk.spr[k]=spr(sk.side?sk.side.body.concat(sk.side.legs[k]):sk.hat.concat(sk.face,sk.torso,LEGS[k]),pal,false);   // skin de profil (Dino) : corps + pattes dessinés de côté, regard vers la droite
+  for(const k in LEGS) sk.spr[k]=spr(sk.side?outlineRows(sk.side.body.concat(sk.side.legs[k])):sk.hat.concat(sk.face,sk.torso,LEGS[k]),pal,false);   // skin de profil (Dino) : corps + pattes dessinés de côté, regard vers la droite
 }
 
 const DOL=[
