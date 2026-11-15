@@ -615,9 +615,16 @@ body.kb #controls{display:none}
 .ov-sq.crb canvas{width:calc(var(--p)*14);height:calc(var(--p)*11);image-rendering:pixelated;display:block;margin:auto}
 .card.hay{background:linear-gradient(180deg,#fff0b8,#e8c25a)}
 .card.hay .nm,.card.hay .pr{color:#4a3208}
-.card.hay{animation:haycard 2.6s ease-in-out infinite}
-@keyframes haycard{0%,100%{box-shadow:0 3px 0 var(--btn-shadow),0 0 0 rgba(224,176,74,0)}50%{box-shadow:0 3px 0 var(--btn-shadow),0 0 14px rgba(224,176,74,.9)}}
-@media (prefers-reduced-motion:reduce){.card.hay{animation:none}}
+.card.hay{animation:haycard 2.4s ease-in-out infinite}   /* skin Épouvofodille : halo orange qui pulse autour de la case */
+@keyframes haycard{
+ 0%,100%{border-color:#e06a10;box-shadow:0 0 0 2px #e06a10,0 0 8px 1px #e06a10}
+ 50%{border-color:#ffc070;box-shadow:0 0 0 2px #ffc070,0 0 18px 4px #ff8a1e}}
+@media (prefers-reduced-motion:reduce){.card.hay{animation:none;border-color:#ff8a1e}}
+.card.hay .sbtn:not(:disabled){color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.45);animation:haybtn 2.4s ease-in-out infinite}
+@keyframes haybtn{
+ 0%,100%{background:linear-gradient(#ffad5a,#f07a1a 55%,#c4520a);border-color:#5a2604;box-shadow:0 3px 0 #5a2604,0 0 6px 1px #f07a1a,inset 0 1px 0 rgba(255,255,255,.4)}
+ 50%{background:linear-gradient(#ffd8a8,#ff8a1e 55%,#e06a10);border-color:#7a3608;box-shadow:0 3px 0 #7a3608,0 0 14px 3px #ff8a1e,inset 0 1px 0 rgba(255,255,255,.5)}}
+@media (prefers-reduced-motion:reduce){.card.hay .sbtn:not(:disabled){animation:none;background:linear-gradient(#ffad5a,#e06a10)}}
 /* ================= Refonte de l'interface (v3) : cadre, accueil, boutons, menus, caisses ================= */
 :root{--bg-top:#eef5f9;--bg-bot:#c6d9e4;--bg-dot:rgba(18,34,47,.07);--frame:#f4f9fc;--frame-line:#12222f;--frame-glow:rgba(74,151,255,.18)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg-top:#102434;--bg-bot:#03090e;--bg-dot:rgba(140,200,240,.06);--frame:#1b3448;--frame-line:#02070b;--frame-glow:rgba(40,160,220,.22)}}
