@@ -1880,10 +1880,15 @@ SKINS.push({id:'scarecrow',name:'Épouvofodille',price:0,frag:12,rod:'#5a3a6a',g
   face:["...kssssssssk...","...ksyssssysk...","...kssSSSSssk...","....kksnsnskk..."],
   torso:["...kbbbbbbbbk...","..wkbbgbbbbswk..","..wkBBBBBBBBkw.."]});   // skin premium : s'obtient par 6 fragments (Caisse à skin)
 SKINS.push({id:'dinopremium',name:'Dino',price:0,soon:true,rod:'#3fae6a',glow:'#ffd23f',   // skin premium « prochainement » : visible mais pas encore obtenable
-  pal:{h:'#3fae6a',H:'#2a7a4a',y:'#ff9a2a',w:'#fff6ee',b:'#3fae6a',B:'#2a7a4a',p:'#3fae6a',n:'#2a7a4a'},
+  pal:{h:'#3fae6a',H:'#2a7a4a',l:'#c8f0a0',y:'#ff9a2a',w:'#fff6ee',b:'#3fae6a',B:'#2a7a4a',p:'#3fae6a',n:'#2a7a4a'},
   hat:["....y..y..y.....",".....kkkkkk.....","....khhhhhhk....","...khhhhhhhhk...","..khhHhhhhHhhk.."],
   face:["..kHhhhhhhhhHk..","..kHhwkhhkwhHk..","..kHhhhhhhhhHk..","...kkwwwwwwkk..."],
-  torso:["...kbbbbbbbbk...","...kbbyyyybbbk..","...kBBBBBBBBk..."]});
+  torso:["...kbbbbbbbbk...","...kbbyyyybbbk..","...kBBBBBBBBk..."],
+  side:{body:["...........kkkk.","..........khhhhk","....y.y..khwkhhk","...y.y.khhhhhhhk","..khhhhhhhhhwwk.","..khhhhhhhhhkkk.",".kHhhhhhhhhk....","kHhhhllllhhk.kk.","kHhhllllllhhk...","kHhhllllllhhk...",".kHhhllllhhHk...","..kkHhhhhHkk...."],
+   legs:{idle:["....kHk..kHk....","....khk..khk....","...khhk..khhk...","...kkkk..kkkk..."],
+         a:["...kHk....kHk...","..kHk......kHk..",".khhk......khhk.",".kkkk......kkkk."],
+         b:[".....kHHHHk.....",".....khhhhk.....","....khhhhhhk....","....kkkkkkkk...."],
+         jump:["....kHk...kHk...","...kHk.....kHk..","...khk.....khk..","...kkk.....kkk.."]}}});
 SKINS.push(
  {id:'angel',name:'Ange',price:34,rod:'#ffd23f',glow:'#ffffff',fx:'',
   pal:{h:'#fff0a0',H:'#e0c060',b:'#f4f4ff',B:'#c0c8e8',g:'#ffd23f'},
@@ -1927,7 +1932,7 @@ for(const c of CRATES){c.w=[];for(const id of c.skins){const sk=SKINS.find(x=>x.
 for(const sk of SKINS){
   sk.spr={};
   const pal=Object.assign({},PAL_P,sk.pal);
-  for(const k in LEGS) sk.spr[k]=spr(sk.hat.concat(sk.face,sk.torso,LEGS[k]),pal,false);
+  for(const k in LEGS) sk.spr[k]=spr(sk.side?sk.side.body.concat(sk.side.legs[k]):sk.hat.concat(sk.face,sk.torso,LEGS[k]),pal,false);   // skin de profil (Dino) : corps + pattes dessinés de côté, regard vers la droite
 }
 
 const DOL=[
