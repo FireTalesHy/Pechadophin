@@ -5931,9 +5931,18 @@ function update(dt){
 }
 
 /* ================= Rendu ================= */
-function disc(cx,cy,r){
+const discCache=new Map();
+function disc(cx,cy,r){   // disque en pixels ; optimisation : chaque (couleur, rayon) est dessiné une fois puis recopié
   cx=Math.round(cx);cy=Math.round(cy);r=Math.round(r);
-  for(let dy=-r;dy<=r;dy++){const dx=Math.floor(Math.sqrt(r*r-dy*dy+0.5));ctx.fillRect(cx-dx,cy+dy,dx*2+1,1);}
+  if(r<=0){ctx.fillRect(cx,cy,1,1);return;}
+  const col=ctx.fillStyle,key=col+'|'+r;let c=discCache.get(key);
+  if(!c){
+    if(discCache.size>800)discCache.clear();
+    c=mk(r*2+1,r*2+1);const g=c.getContext('2d');g.fillStyle=col;
+    for(let dy=-r;dy<=r;dy++){const dx=Math.floor(Math.sqrt(r*r-dy*dy+0.5));g.fillRect(r-dx,r+dy,dx*2+1,1);}
+    discCache.set(key,c);
+  }
+  ctx.drawImage(c,cx-r,cy-r);
 }
 function pixLine(x0,y0,x1,y1,col){
   x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
@@ -6057,10 +6066,7 @@ function drawBackground(cx,cy,P){
   ctx.globalAlpha=A;
   if(P.noHills){drawLandmarks(cx,0,0,P,K,'sky');return;}   // monde nuage : un ciel pur, sans mer ni montagnes (mais des îles flottantes)
   const seaTop=Math.round(VH*0.6-(cy-200)*0.10);
-  if(seaTop>0)for(let x=0;x<VW;x++){   // montagnes lointaines, presque fondues dans le ciel
-    const wx=x+cx*0.07,h=noise1(wx/70,21)*46+noise1(wx/23,22)*9-12;
-    if(h>0){const top=Math.round(seaTop+1-h);ctx.fillStyle=K.far;ctx.fillRect(x,top,1,seaTop+1-top);const cap=P.snowCap&&h>30;ctx.fillStyle=cap?'#ffffff':K.farT;ctx.fillRect(x,top,1,cap?Math.min(4,Math.round(h-30)+1):1);}
-  }
+  if(seaTop>0)bgStrip(P,K,0,cx*0.07,seaTop);   // montagnes lointaines, presque fondues dans le ciel (bandes précalculées)
   ctx.globalAlpha=A*0.55;ctx.fillStyle=K.low;ctx.fillRect(0,seaTop-4,VW,4);ctx.globalAlpha=A;   // brume sur l'horizon
   if(seaTop<VH){
     const st=Math.max(0,seaTop);
@@ -6081,13 +6087,7 @@ function drawBackground(cx,cy,P){
     }
   }
   const base1=seaTop+8;
-  if(base1>0){   // collines du milieu : versant à l'ombre du soleil plus sombre
-    let prev=noise1((cx*0.22-1)/52,11)*34+noise1((cx*0.22-1)/19,12)*8-14;
-    for(let x=0;x<VW;x++){
-      const wx=x+cx*0.22,h=noise1(wx/52,11)*34+noise1(wx/19,12)*8-14,sh=h>prev+0.12;prev=h;
-      if(h>0){const top=Math.round(base1-h);ctx.fillStyle=sh?K.h1s:P.h1;ctx.fillRect(x,top,1,base1-top);ctx.fillStyle=sh?P.h1:P.h1t;ctx.fillRect(x,top,1,1);}
-    }
-  }
+  if(base1>0)bgStrip(P,K,1,cx*0.22,base1);   // collines du milieu : versant à l'ombre du soleil plus sombre
   drawLandmarks(cx,seaTop,base1,P,K,'land');   // moulins, ruines, tours… posés sur les collines du milieu
   const base2=seaTop+46-(cy-200)*0.08,h2=wx=>noise1(wx/40,13)*46+noise1(wx/15,14)*10,off=cx*0.45;
   if(P.tree){   // arbres plantés sur la crête (dessinés avant la colline, qui cache leur pied)
@@ -6098,11 +6098,34 @@ function drawBackground(cx,cy,P){
       if(top<VH+2)drawBgTree(Math.round(wx-off),top+2,P,2+Math.floor(hash2(k,79)*3));
     }
   }
-  let prev2=h2(off-1);
-  for(let x=0;x<VW;x++){
-    const h=h2(x+off),top=Math.round(base2-h),sh=h>prev2+0.2;prev2=h;
-    if(top<VH){ctx.fillStyle=sh?K.h2s:P.h2;ctx.fillRect(x,top,1,VH-top);ctx.fillStyle=P.h2t;ctx.fillRect(x,top,1,sh?1:2);}
+  bgStrip(P,K,2,off,base2);   // collines de devant
+  if(base2+BG_FILL<VH){ctx.fillStyle=P.h2;ctx.fillRect(0,Math.round(base2+BG_FILL),VW,VH);}
+}
+/* Optimisation : les 3 couches de collines étaient redessinées colonne par colonne à chaque image (~1 200 calculs de bruit + 2 300 rectangles).
+   On les dessine une fois par morceaux de 128 px (gardés en cache), puis on les recopie : même rendu, bien moins de calcul. */
+const BG_CW=128,BG_FILL=280,hillCache=new Map();
+const BG_L=[   // hauteur au-dessus de la ligne de base, fonction de hauteur
+ {up:64,h:wx=>noise1(wx/70,21)*46+noise1(wx/23,22)*9-12},
+ {up:52,h:wx=>noise1(wx/52,11)*34+noise1(wx/19,12)*8-14},
+ {up:70,h:wx=>noise1(wx/40,13)*46+noise1(wx/15,14)*10}];
+function bgChunk(P,K,l,ci){
+  let m=hillCache.get(P);if(!m){m=new Map();hillCache.set(P,m);}
+  const key=l*1e7+ci;let c=m.get(key);if(c)return c;
+  if(m.size>240)m.clear();
+  const L=BG_L[l],H=L.up+(l===2?BG_FILL:2),B=L.up;c=mk(BG_CW,H);const g=c.getContext('2d');
+  let prev=L.h(ci*BG_CW-1);
+  for(let x=0;x<BG_CW;x++){
+    const wx=ci*BG_CW+x,h=L.h(wx);
+    if(l===0){if(h>0){const top=Math.round(B+1-h);g.fillStyle=K.far;g.fillRect(x,top,1,B+1-top);const cap=P.snowCap&&h>30;g.fillStyle=cap?'#ffffff':K.farT;g.fillRect(x,top,1,cap?Math.min(4,Math.round(h-30)+1):1);}}
+    else if(l===1){const sh=h>prev+0.12;if(h>0){const top=Math.round(B-h);g.fillStyle=sh?K.h1s:P.h1;g.fillRect(x,top,1,B-top);g.fillStyle=sh?P.h1:P.h1t;g.fillRect(x,top,1,1);}}
+    else{const sh=h>prev+0.2,top=Math.round(B-h);g.fillStyle=sh?K.h2s:P.h2;g.fillRect(x,top,1,H-top);g.fillStyle=P.h2t;g.fillRect(x,top,1,sh?1:2);}
+    prev=h;
   }
+  m.set(key,c);return c;
+}
+function bgStrip(P,K,l,off,base){   // recopie la couche l (décalage de parallaxe off) posée sur la ligne base
+  const o=Math.round(off),i0=Math.floor(o/BG_CW),i1=Math.floor((o+VW)/BG_CW),y=Math.round(base)-BG_L[l].up;
+  for(let i=i0;i<=i1;i++)ctx.drawImage(bgChunk(P,K,l,i),i*BG_CW-o,y);
 }
 
 /* ===== Repères au loin (refonte v5) : un monument à l'horizon environ tous les 10 écrans, propre à chaque biome.
@@ -6299,43 +6322,57 @@ function transTile(set,sh,v){   // case de profondeur sh dont le bas se fond (tr
   for(let y=6;y<T;y++){const t=(y-5)/11;for(let x=0;x<T;x++)if(t>(BAYER4[(y&3)*4+(x&3)]+0.5)/16){const o=(y*T+x)*4;for(let k=0;k<4;k++)ia.data[o+k]=ib.data[o+k];}}
   g.putImageData(ia,0,0);m[sh][v]=c;return c;
 }
-function drawTiles(cx,cy){
-  const tx0=Math.floor(cx/T),tx1=Math.floor((cx+VW)/T),ty0=Math.floor(cy/T)-1,ty1=Math.floor((cy+VH)/T)+1;
-  for(let tx=tx0;tx<=tx1;tx++){
-    const col=column(tx);
-    if(!col.pit){
+/* Optimisation : le sol d'une colonne (herbe/sable/glace + terre, cailloux, ombres des falaises) ne change jamais :
+   on le dessine une fois dans une petite image (16 lignes de haut) gardée en cache, puis on la recopie à chaque image. */
+const GC_R=16,groundCache=new Map();
+function groundCol(tx,col){
+  let c=groundCache.get(tx);if(c&&c.g===col.g)return c;
+  if(groundCache.size>500)groundCache.clear();
+  c=mk(T,GC_R*T+6);c.g=col.g;const g=c.getContext('2d');g.translate(-tx*T,-(col.g*T-6));
+  drawGroundCol(g,tx,col,col.g,col.g+GC_R-1);
+  groundCache.set(tx,c);return c;
+}
+function drawGroundCol(G,tx,col,ty0,ty1){
       const v=Math.floor(hash2(tx,10)*3),dec=Math.floor(hash2(tx,9)*10),sand=col.beach,tun=col.tun;
       for(let ty=Math.max(col.g,ty0);ty<=ty1;ty++){
         if(tun&&!solidTile(tx,ty)){   // intérieur du tunnel : fond sombre
-          ctx.fillStyle=ty-col.g<3?'#4a3622':'#2e2014';ctx.fillRect(tx*T,ty*T,T,T);
-          if(hash2(tx*3+1,ty+500)<0.18){ctx.fillStyle='#3d2c1c';ctx.fillRect(tx*T+4,ty*T+6,3,2);}
+          G.fillStyle=ty-col.g<3?'#4a3622':'#2e2014';G.fillRect(tx*T,ty*T,T,T);
+          if(hash2(tx*3+1,ty+500)<0.18){G.fillStyle='#3d2c1c';G.fillRect(tx*T+4,ty*T+6,3,2);}
           continue;
         }
         if(ty===col.g){
-          if(col.ar&&col.ar.type!=='castle'&&col.ar.type!=='eskimo'&&col.dx>=-13&&col.dx<=12)ctx.drawImage(STONE_TOP,tx*T,ty*T);
-          else if(sand)ctx.drawImage(SANDTOP[dec<5?0:dec-4][v],tx*T,ty*T-6);
-          else if(col.cloud)ctx.drawImage(CLOUDTOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
-          else if(col.ice)ctx.drawImage(ICETOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
-          else ctx.drawImage((col.swamp?SGRASS:GRASS)[dec<5?0:dec-4][v],tx*T,ty*T-6);
+          if(col.ar&&col.ar.type!=='castle'&&col.ar.type!=='eskimo'&&col.dx>=-13&&col.dx<=12)G.drawImage(STONE_TOP,tx*T,ty*T);
+          else if(sand)G.drawImage(SANDTOP[dec<5?0:dec-4][v],tx*T,ty*T-6);
+          else if(col.cloud)G.drawImage(CLOUDTOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
+          else if(col.ice)G.drawImage(ICETOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
+          else G.drawImage((col.swamp?SGRASS:GRASS)[dec<5?0:dec-4][v],tx*T,ty*T-6);
         }
-        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2,set=sand?SAND:col.cloud?CLOUD:col.ice?ICE:col.swamp?SDIRT:DIRT,vv=mod(tx*7+ty*3,3);ctx.drawImage(dp===4||dp===10?transTile(set,sh,vv):set[sh][vv],tx*T,ty*T);
-          if((set===DIRT||set===SDIRT)&&!tun){const hh=hash2(tx*5+3,ty*7+1);if(hh<0.16){const k=hh<0.04&&dp<3?3:Math.floor(hh*19)%3;ctx.globalAlpha=set===SDIRT?0.7:1;ctx.drawImage(PEBBLES[sh][k],tx*T+Math.floor(hash2(tx,ty+90)*9),ty*T+Math.floor(hash2(tx+90,ty)*7));ctx.globalAlpha=1;}}}
+        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2,set=sand?SAND:col.cloud?CLOUD:col.ice?ICE:col.swamp?SDIRT:DIRT,vv=mod(tx*7+ty*3,3);G.drawImage(dp===4||dp===10?transTile(set,sh,vv):set[sh][vv],tx*T,ty*T);
+          if((set===DIRT||set===SDIRT)&&!tun){const hh=hash2(tx*5+3,ty*7+1);if(hh<0.16){const k=hh<0.04&&dp<3?3:Math.floor(hh*19)%3;G.globalAlpha=set===SDIRT?0.7:1;G.drawImage(PEBBLES[sh][k],tx*T+Math.floor(hash2(tx,ty+90)*9),ty*T+Math.floor(hash2(tx+90,ty)*7));G.globalAlpha=1;}}}
         if(tun&&ty>col.g){   // bords éclairés / ombrés des parois de sable
-          if(!solidTile(tx,ty-1)){ctx.fillStyle='#f6e2ac';ctx.fillRect(tx*T,ty*T,T,2);}
-          if(!solidTile(tx,ty+1)){ctx.fillStyle='#6e5026';ctx.fillRect(tx*T,ty*T+T-2,T,2);}
+          if(!solidTile(tx,ty-1)){G.fillStyle='#f6e2ac';G.fillRect(tx*T,ty*T,T,2);}
+          if(!solidTile(tx,ty+1)){G.fillStyle='#6e5026';G.fillRect(tx*T,ty*T+T-2,T,2);}
         }
       }
       {   // faces de falaise : côté gauche dans l'ombre, côté droit éclairé par le soleil, liseré sombre, herbe qui déborde
         const L=column(tx-1),Rc=column(tx+1),lb=L.pit?ty1+1:L.g,rb=Rc.pit?ty1+1:Rc.g,grassy=!sand&&!col.cloud&&!col.ice&&!col.ar&&!tun;
         const gc=col.swamp?'#22581b':'#37963b',gl=col.swamp?'#2f6f25':'#4fbf4a';
         if(lb>col.g){const ya=Math.max(col.g,ty0)*T,yb=Math.min(lb,ty1+1)*T;
-          if(yb>ya){ctx.fillStyle='rgba(22,10,2,.5)';ctx.fillRect(tx*T,ya,1,yb-ya);ctx.fillStyle='rgba(22,10,2,.2)';ctx.fillRect(tx*T+1,ya,3,yb-ya);}
-          if(grassy&&col.g>=ty0){const n=2+Math.floor(hash2(tx,61)*4);ctx.fillStyle=gl;ctx.fillRect(tx*T,col.g*T,1,4);ctx.fillStyle=gc;ctx.fillRect(tx*T,col.g*T+4,1,n);ctx.fillRect(tx*T+1,col.g*T+4,1,Math.max(0,n-2));}}
+          if(yb>ya){G.fillStyle='rgba(22,10,2,.5)';G.fillRect(tx*T,ya,1,yb-ya);G.fillStyle='rgba(22,10,2,.2)';G.fillRect(tx*T+1,ya,3,yb-ya);}
+          if(grassy&&col.g>=ty0){const n=2+Math.floor(hash2(tx,61)*4);G.fillStyle=gl;G.fillRect(tx*T,col.g*T,1,4);G.fillStyle=gc;G.fillRect(tx*T,col.g*T+4,1,n);G.fillRect(tx*T+1,col.g*T+4,1,Math.max(0,n-2));}}
         if(rb>col.g){const ya=Math.max(col.g,ty0)*T,yb=Math.min(rb,ty1+1)*T;
-          if(yb>ya){ctx.fillStyle='rgba(22,10,2,.42)';ctx.fillRect(tx*T+T-1,ya,1,yb-ya);ctx.fillStyle='rgba(255,236,190,.16)';ctx.fillRect(tx*T+T-3,ya,2,yb-ya);}
-          if(grassy&&col.g>=ty0){const n=2+Math.floor(hash2(tx,62)*4);ctx.fillStyle=gl;ctx.fillRect(tx*T+T-1,col.g*T,1,4);ctx.fillStyle=gc;ctx.fillRect(tx*T+T-1,col.g*T+4,1,n);ctx.fillRect(tx*T+T-2,col.g*T+4,1,Math.max(0,n-2));}}
+          if(yb>ya){G.fillStyle='rgba(22,10,2,.42)';G.fillRect(tx*T+T-1,ya,1,yb-ya);G.fillStyle='rgba(255,236,190,.16)';G.fillRect(tx*T+T-3,ya,2,yb-ya);}
+          if(grassy&&col.g>=ty0){const n=2+Math.floor(hash2(tx,62)*4);G.fillStyle=gl;G.fillRect(tx*T+T-1,col.g*T,1,4);G.fillStyle=gc;G.fillRect(tx*T+T-1,col.g*T+4,1,n);G.fillRect(tx*T+T-2,col.g*T+4,1,Math.max(0,n-2));}}
       }
     }
+function drawTiles(cx,cy){
+  const tx0=Math.floor(cx/T),tx1=Math.floor((cx+VW)/T),ty0=Math.floor(cy/T)-1,ty1=Math.floor((cy+VH)/T)+1;
+  for(let tx=tx0;tx<=tx1;tx++){
+    const col=column(tx);
+    if(!col.pit){
+      if(!col.tun&&ty1<col.g+GC_R)ctx.drawImage(groundCol(tx,col),tx*T,col.g*T-6);   // colonne de sol précalculée (optimisation)
+      else drawGroundCol(ctx,tx,col,ty0,ty1);
+}
     if(col.wall){
       const closed=col.dx<0?col.ar.gateL:col.ar.gateR;
       for(let ty=Math.max(col.g-WALL_H,ty0);ty<=Math.min(col.g-1,ty1);ty++){
@@ -7156,6 +7193,7 @@ function showTitle(){
   try{ovBtn.focus({preventScroll:true});}catch(e){}
 }
 function resetWorld(){
+  groundCache.clear();
   SEED=(speedOn&&duel)?duel.seed:(Math.random()*4294967296)|0;   // duel : même graine pour les deux joueurs
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
   cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];crows=[];rngLas=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
