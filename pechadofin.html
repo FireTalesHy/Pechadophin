@@ -848,7 +848,8 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #mode .mode-card{position:relative;text-align:left;font-size:12px;padding:16px 16px 16px 44px;border:3px solid #14182c;border-radius:14px;color:#fff;-webkit-text-stroke:0;text-shadow:0 2px 0 rgba(0,0,0,.45);box-shadow:0 4px 0 #14182c,inset 0 2px 0 rgba(255,255,255,.35)}
 #mode-classic{background:linear-gradient(#5aa4ff,#1f62c8)}
 #mode-ana{background:linear-gradient(#ff6a6a,#8e1428)}
-#mode-speed{background:linear-gradient(#ffd84f,#d8861f);color:#2a1600 !important;text-shadow:0 1px 0 rgba(255,255,255,.4) !important}
+#mode-speed[hidden]{display:none}
+#mode-duel,#mode-speed{background:linear-gradient(#ffd84f,#d8861f);color:#2a1600 !important;text-shadow:0 1px 0 rgba(255,255,255,.4) !important}
 #mode .mode-card::before{content:"";position:absolute;left:14px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;border:3px solid #14182c;background:rgba(255,255,255,.25)}
 #mode .mode-card.on::before{background:#fff;box-shadow:inset 0 0 0 3px #14182c}
 #mode .mode-card.on{box-shadow:0 0 0 3px #ffd23f,0 4px 0 #14182c,inset 0 2px 0 rgba(255,255,255,.35)}
@@ -999,7 +1000,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <div class="shop-head"><h2 id="mode-title">CHOIX DU MODE</h2></div>
     <button class="sbtn mode-card" id="mode-classic" type="button">CLASSIQUE</button>
     <button class="sbtn mode-card" id="mode-ana" type="button">ANARCHIE</button>
-    <button class="sbtn mode-card" id="mode-speed" type="button">SPEEDRUN</button>
+    <button class="sbtn mode-card" id="mode-speed" type="button" hidden>SPEEDRUN</button>   <!-- remplacé par le DUEL (le moteur du speedrun sert au duel) -->
     <button class="sbtn mode-card" id="mode-duel" type="button">DUEL</button>
     <p class="shop-note" id="mode-note"></p>
     <button class="go" id="mode-close" type="button">RETOUR</button>
@@ -7118,7 +7119,7 @@ function initTitle(){
 function startGame(){
   if(speedOn){beginSpeedrun(speedWeapon);return;}   // speedrun : chaque redémarrage repart du début, sans checkpoint
   if(speedWant&&!speedOk())speedWant=false;
-  if(speedWant){openSpeedPick();return;}
+  if(speedWant){speedWant=false;updateMode();}   // le speedrun seul n'existe plus (remplacé par le duel)
   startGameCore();
 }
 function startGameCore(){
@@ -7494,7 +7495,7 @@ function updateMode(){
   $('mode-classic').classList.toggle('on',!anarchyWant&&!speedWant);$('mode-ana').classList.toggle('on',anarchyWant&&!speedWant);$('mode-speed').classList.toggle('on',speedWant);
   $('mode-classic').setAttribute('aria-pressed',String(!anarchyWant&&!speedWant));$('mode-ana').setAttribute('aria-pressed',String(anarchyWant&&!speedWant));$('mode-speed').setAttribute('aria-pressed',String(speedWant));
   $('mode-speed').classList.toggle('lock',!speedOk());$('mode-speed').setAttribute('aria-disabled',String(!speedOk()));
-  $('mode-note').textContent=!speedOk()?'SPEEDRUN : se débloque après ta première renaissance.':speedWant?'SPEEDRUN : choisis une arme déjà améliorée au maximum et bats le Roi Cacamille 2 le plus vite possible. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence.':anarchyWant!==anarchyOn?'Le mode choisi sera actif à la prochaine partie.':'';
+  $('mode-note').textContent=speedWant?'SPEEDRUN : choisis une arme déjà améliorée au maximum et bats le Roi Cacamille 2 le plus vite possible. Pas de checkpoint, pas de boutique : si tu meurs, tout recommence.':anarchyWant!==anarchyOn?'Le mode choisi sera actif à la prochaine partie.':'';
   $('skins-btn').textContent='MODE';
 }
 function setMode(want){
@@ -7687,7 +7688,7 @@ function showSpeedResult(){
   if(w){const wc=weapImg(w,32);wc.style.width='64px';wc.style.height='64px';wc.style.imageRendering='pixelated';who.appendChild(wc);}
   p.appendChild(who);
   const st=document.createElement('div');st.className='spd-stats';st.textContent='TENTATIVES : '+speedTry+(old&&!rec?'   ·   MEILLEUR : '+fmtT(old):'');p.appendChild(st);
-  p.appendChild(spdBtn('REJOUER',()=>{endSpeedrun();showTitle();openSpeedPick();}));
+  p.appendChild(spdBtn('REJOUER',()=>{endSpeedrun();showTitle();openDuel();}));
   p.appendChild(spdBtn('MENU',()=>{endSpeedrun();showTitle();}));
   $('spd').hidden=false;$('spd-t').hidden=true;
   try{sfx.bossDie();}catch(e){}
