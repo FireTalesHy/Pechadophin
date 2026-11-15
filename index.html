@@ -8057,9 +8057,9 @@ function pvpRelay(my){   // « canal » de secours qui passe par le serveur (Ver
   const post=(keep)=>fetch('/api/duel',{method:'POST',keepalive:!!keep,headers:{'Content-Type':'application/json'},body:JSON.stringify({act:'rl',c:my.code,r:role,s:blob()})});
   ch.send=str=>{let m;try{m=JSON.parse(str);}catch(e){return;}if(m.t==='s'){ch.st=m;ch.sn++;}else ch.out.push({i:++ch.seq,m});};
   ch.close=()=>{if(ch.readyState==='closed')return;const flush=ch.out.length>0;ch.readyState='closed';clearInterval(ch.iv);if(flush)post(true).catch(()=>{});};
-  let busy=false;
+  let busy=0;
   ch.iv=setInterval(async()=>{
-    if(busy||ch.readyState==='closed')return;busy=true;
+    if(busy>=2||ch.readyState==='closed')return;busy++;   // 2 requêtes en vol : deux fois plus de nouvelles quand le serveur est lent
     try{
       const r=await fetch('/api/duel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({act:'rl',c:my.code,r:role,s:blob()})});
       const j=await r.json();
@@ -8068,11 +8068,11 @@ function pvpRelay(my){   // « canal » de secours qui passe par le serveur (Ver
         if(ch.readyState==='connecting'){ch.readyState='open';if(ch.onopen)ch.onopen();}
         ch.out=ch.out.filter(e=>e.i>(o.ack||0));   // l'adversaire a reçu ces messages
         for(const e of o.ev||[])if(e.i>ch.ack){ch.ack=e.i;if(ch.onmessage)ch.onmessage({data:JSON.stringify(e.m)});}
-        if(o.st&&o.sn!==ch.lastSn){ch.lastSn=o.sn;if(ch.onmessage)ch.onmessage({data:JSON.stringify(o.st)});}
+        if(o.st&&o.sn>ch.lastSn){ch.lastSn=o.sn;if(ch.onmessage)ch.onmessage({data:JSON.stringify(o.st)});}   // les réponses peuvent arriver dans le désordre
       }
     }catch(e){}
-    busy=false;
-  },125);
+    busy--;
+  },100);
   return ch;
 }
 function pvpUseRelay(my){   // bascule sur le relais du serveur
@@ -8145,7 +8145,7 @@ function pvpMsg(m){
   if(m.t==='go'){if(P.role==='guest'&&!P.on)pvpStartMatch(m.map);return;}
   if(!P.on)return;
   if(m.t==='s'){
-    const first=!P.os;P.os={x:+m.x||0,y:+m.y||0,f:m.f?1:-1,a:(m.a|0)&3,hp:clamp(m.hp|0,0,PVP_HP),inv:!!m.inv,fx:m.fx||null};
+    const first=!P.os;P.os={x:+m.x||0,y:+m.y||0,vx:clamp(+m.vx||0,-600,600),vy:clamp(+m.vy||0,-900,900),at:performance.now(),f:m.f?1:-1,a:(m.a|0)&3,hp:clamp(m.hp|0,0,PVP_HP),inv:!!m.inv,fx:m.fx||null};
     if(first){P.ox=P.os.x;P.oy=P.os.y;}
     return;
   }
@@ -8167,6 +8167,7 @@ function pvpStartMatch(mapId){
   state='play';paused=false;ovRestart.hidden=true;overlayVisible=false;ov.classList.remove('show');
   if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
   P.lastMsg=performance.now();
+  P.keep=setInterval(()=>{if(pvp===P&&document.hidden)pvpSend(pvpState());},500);   // onglet en arrière-plan : le jeu est en pause mais on garde la connexion
   pvpRound(1);
 }
 function pvpReset(){const P=pvp;P.score=[0,0];P.over=false;P.again=P.oppAgain=false;spdOpen=false;$('spd').hidden=true;}
@@ -8205,7 +8206,7 @@ function pvpState(){   // ma position + les effets de mon arme (projectiles, cou
   const cl=(k,v)=>v instanceof Set||k==='hit'||k==='e'||k==='tgt'||k==='grp'||k==='target'?undefined:typeof v==='number'?Math.round(v*100)/100:v;
   let fx=null;
   try{fx=JSON.parse(JSON.stringify({k:shop.weapon,aa:Math.atan2(aim.y,aim.x),tr:tridents.slice(0,12),cd:tcards.slice(0,14),kt:katFx,sc:scyFx,bm:booms.slice(0,8),sj:sixJet.slice(0,30),sb:scepBeams.slice(0,6),hk:hooks.slice(0,6),hp:harp,te:teFx.map(f=>[f.a,f.R,f.t/f.life,f.slot]),th:throwAnim>0?1:0},cl));}catch(e){}
-  return {t:'s',x:Math.round(p.x),y:Math.round(p.y),f:p.face>0?1:0,a,hp:lives,inv:p.invuln>0?1:0,fx};
+  return {t:'s',x:Math.round(p.x),y:Math.round(p.y),vx:Math.round(p.vx),vy:Math.round(p.vy),f:p.face>0?1:0,a,hp:lives,inv:p.invuln>0?1:0,fx};
 }
 function stepPvp(dt){
   const P=pvp;
@@ -8222,12 +8223,28 @@ function stepPvp(dt){
     else P.t=99;   // l'invité attend le signal de l'hôte
   }
   P.sendT-=dt;if(P.sendT<=0){P.sendT=1/PVP_HZ;pvpSend(pvpState());}
-  if(P.os){const k=Math.min(1,dt*18);P.ox+=(P.os.x-P.ox)*k;P.oy+=(P.os.y-P.oy)*k;if(Math.abs(P.os.x-P.ox)>64)P.ox=P.os.x;}
+  if(P.os){   // position prédite : dernière position reçue + vitesse × temps écoulé (fluide même si les nouvelles arrivent lentement)
+    const o=P.os,age=Math.min(0.35,(performance.now()-o.at)/1000);
+    let tx=o.x+o.vx*age,ty=o.y+(o.a===3?o.vy*age+450*age*age:0);
+    if(solidAt(tx+5,ty+7)){tx=o.x;ty=o.y;}
+    const k=Math.min(1,dt*14);P.ox+=(tx-P.ox)*k;P.oy+=(ty-P.oy)*k;if(Math.abs(tx-P.ox)>80||Math.abs(ty-P.oy)>80){P.ox=tx;P.oy=ty;}
+    pvpAdvanceFx(o.fx,dt);
+  }
   if(!P.ent)P.ent={pvp:true,kind:'pvp',x:0,y:0,w:player.w,h:player.h,vx:0,vy:0,dir:1,hp:1e9,maxHp:1e9,tier:0,speed:0,state:'alive',t:0,flash:0,onGround:true,frost:0,poison:0,stun:0};
   Object.assign(P.ent,{x:P.ox,y:P.oy,hp:1e9,state:'alive',vx:0,vy:0});
   if(P.phase==='fight'&&(P.ent.frost>0||P.ent.burn>0||P.ent.poison>0)){P.ent.frost=P.ent.burn=P.ent.poison=0;if(P.oppInv<=0)pvpHit(1);}   // gel, brûlure, poison posés par une arme : ça compte comme un coup
   enemies=P.phase==='fight'&&P.os&&P.oppInv<=0?[P.ent]:[];   // l'adversaire n'est touchable que pendant le combat (et pas pendant son invincibilité)
   if(P.phase!=='over'&&performance.now()-P.lastMsg>7000)pvpLost('Connexion perdue avec ton adversaire.');
+}
+function pvpAdvanceFx(f,dt){   // fait avancer les projectiles de l'adversaire entre deux nouvelles (sinon ils sautent ou disparaissent)
+  if(!f)return;
+  for(const h of f.tr||[]){const v=h.g?300:TRIDENT_V;h.x+=(h.ux||0)*v*dt;h.y+=(h.uy||0)*v*dt;}
+  for(const c of f.cd||[]){c.x+=(c.vx||0)*dt;c.y+=(c.vy||0)*dt;c.t=(c.t||0)+dt;}
+  for(const b of f.bm||[]){b.x+=(b.ux||0)*BOOM.spd*(b.back?-1:1)*dt;b.y+=(b.uy||0)*BOOM.spd*(b.back?-1:1)*dt;b.sp=(b.sp||0)+dt*20;}
+  for(const m of f.sj||[]){m.x+=(m.vx||0)*dt;m.y+=(m.vy||0)*dt;m.vy=(m.vy||0)+400*dt;m.t=(m.t||0)+dt;}
+  if(f.kt){f.kt.t+=dt;if(f.kt.t>=f.kt.life)f.kt=null;}
+  if(f.sc){f.sc.t+=dt;if(f.sc.t>=f.sc.life)f.sc=null;}
+  if(f.te)f.te=f.te.filter(e=>(e[2]+=dt/0.24)<1);
 }
 function drawPvpOpp(){   // l'adversaire est dessiné par le vrai drawPlayer du jeu (skin, arme tenue, visée, tentacules…) : on échange un instant mon état avec le sien
   const P=pvp;if(!P||!P.on||!P.os||!P.opp)return;
@@ -8287,7 +8304,7 @@ function pvpPauseAsk(){
 }
 function pvpQuit(){pvpSend({t:'bye'});setTimeout(()=>{showTitle();},60);spdOpen=false;$('spd').hidden=true;}
 function pvpEnd(){   // ferme la connexion et remet la vraie sauvegarde
-  const P=pvp;if(!P)return;pvp=null;
+  const P=pvp;if(!P)return;pvp=null;clearInterval(P.keep);
   if(P.pub&&P.role==='host'&&!P.on)duelApi({act:'close',c:P.code}).catch(()=>{});   // salon public annulé : on le retire de la liste
   try{if(P.ch)P.ch.close();}catch(e){}try{if(P.pc)P.pc.close();}catch(e){}
   if(P.backup){shop=P.backup;}
