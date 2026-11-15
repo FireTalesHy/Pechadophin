@@ -10,6 +10,8 @@
 // GET  /api/duel?ice=1                                -> { iceServers, turn }   serveurs STUN/TURN pour la connexion PvP.
 //   Un serveur TURN (relais) est indispensable pour les navigateurs qui bloquent les connexions directes (Opera GX avec « Disable non-proxied UDP », Brave, VPN…).
 //   Cloudflare Realtime TURN : variables d'environnement CF_TURN_KEY_ID + CF_TURN_KEY_TOKEN ; ou un TURN fixe : TURN_URLS (séparées par des virgules), TURN_USERNAME, TURN_CREDENTIAL.
+// Relais par le serveur (quand le navigateur bloque WebRTC, ex. Opera GX) : POST { act:'rl', c, r:'h'|'g', s } dépose mon état (dernier seulement)
+//   et renvoie { o } = le dernier état de l'adversaire. Les messages importants (coups, manches…) sont répétés dans l'état jusqu'à accusé de réception.
 // Salons publics : POST { act:'room', pub:1, n, w, sk } les liste ; l'hôte envoie { act:'ping', c } toutes les 20 s, { act:'close', c } s'il annule.
 // GET  /api/duel?pub=1                                -> { rooms:[{c,n,w,sk,at}] }   salons publics en attente (ping de moins de 45 s, pas encore rejoints)
 const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -103,6 +105,13 @@ module.exports = async (req, res) => {
     }
     if (req.method !== 'POST') { res.status(405).json({ error: 'method' }); return; }
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+    if (body.act === 'rl') {   // relais PvP : 2 commandes par appel, pas de limite par IP (8 appels/s pendant un combat)
+      const c = normCode(body.c), r = body.r === 'g' ? 'g' : 'h', s = String(body.s || '');
+      if (c.length !== 6 || s.length > 30000) { res.status(400).json({ error: 'bad' }); return; }
+      const [, o] = await pipeline([['SET', 'pvp:' + c + ':r' + r, s, 'EX', 120], ['GET', 'pvp:' + c + ':r' + (r === 'h' ? 'g' : 'h')]]);
+      res.status(200).json({ o: o || null });
+      return;
+    }
     if (await limited(req)) { res.status(429).json({ error: 'slow' }); return; }
     if (body.act === 'room') {
       for (let i = 0; i < 6; i++) {
