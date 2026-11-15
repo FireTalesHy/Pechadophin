@@ -2577,7 +2577,7 @@ function loadShop(fresh){
       d.rb=clamp(Math.floor(Number(j.rb))||0,0,999);   // nombre de renaissances
       if(j.tl&&typeof j.tl==='object')for(const k of ['dmg','chariot','star','sorc'])d.tl[k]=clamp(Math.floor(Number(j.tl[k]))||0,0,k==='chariot'||k==='star'?3:5);
       d.treeV=Math.floor(Number(j.treeV))||0;d.gv=Math.floor(Number(j.gv))||0;
-      if(j.mc&&typeof j.mc==='object')for(const k in j.mc)if(j.mc[k]===true&&/^[a-z0-9]{1,12}$/.test(k))d.mc[k]=true;   // récompenses de missions déjà récupérées
+      if(j.mc&&typeof j.mc==='object')for(const k in j.mc)if(j.mc[k]===true&&/^[a-z0-9_]{1,16}$/.test(k))d.mc[k]=true;   // (le « _ » manquait : les missions o_trident, m_rod… se récupéraient à nouveau après un rechargement)   // récompenses de missions déjà récupérées
       d.harpoonOwned=j.harpoonOwned===true;
       if(j.hu&&typeof j.hu==='object')for(const k of ['dmg','range','reel','chain'])d.hu[k]=clamp(Math.floor(Number(j.hu[k]))||0,0,3);
       if(j.weapon==='harpoon'&&d.harpoonOwned)d.weapon='harpoon';
