@@ -7,6 +7,9 @@
 // POST /api/duel { act:'room' }                       -> { code }        salon gardé 10 min
 // POST /api/duel { act:'offer'|'answer', c, sdp }     -> { ok }          l'hôte dépose son offre, l'invité sa réponse (une seule)
 // GET  /api/duel?p=CODE&k=o|a                         -> { sdp }         sdp = null tant que rien n'est déposé
+// GET  /api/duel?ice=1                                -> { iceServers, turn }   serveurs STUN/TURN pour la connexion PvP.
+//   Un serveur TURN (relais) est indispensable pour les navigateurs qui bloquent les connexions directes (Opera GX avec « Disable non-proxied UDP », Brave, VPN…).
+//   Cloudflare Realtime TURN : variables d'environnement CF_TURN_KEY_ID + CF_TURN_KEY_TOKEN ; ou un TURN fixe : TURN_URLS (séparées par des virgules), TURN_USERNAME, TURN_CREDENTIAL.
 // Salons publics : POST { act:'room', pub:1, n, w, sk } les liste ; l'hôte envoie { act:'ping', c } toutes les 20 s, { act:'close', c } s'il annule.
 // GET  /api/duel?pub=1                                -> { rooms:[{c,n,w,sk,at}] }   salons publics en attente (ping de moins de 45 s, pas encore rejoints)
 const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -42,6 +45,30 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (!URL_ || !TOK) { res.status(500).json({ error: 'storage' }); return; }
   try {
+    if (req.method === 'GET' && (req.query && req.query.ice || /[?&]ice=/.test(req.url || ''))) {   // configuration réseau du PvP
+      const ice = [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun.cloudflare.com:3478'] }];
+      let turn = false;
+      if (process.env.CF_TURN_KEY_ID && process.env.CF_TURN_KEY_TOKEN) {
+        const [cached] = await pipeline([['GET', 'pvp:ice']]);
+        let list = null;
+        if (cached) { try { list = JSON.parse(cached); } catch (e) {} }
+        if (!list) {
+          try {
+            const r = await fetch('https://rtc.live.cloudflare.com/v1/turn/keys/' + process.env.CF_TURN_KEY_ID + '/credentials/generate-ice-servers', { method: 'POST', headers: { Authorization: 'Bearer ' + process.env.CF_TURN_KEY_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify({ ttl: 86400 }) });
+            const j = await r.json();
+            const arr = Array.isArray(j.iceServers) ? j.iceServers : j.iceServers ? [j.iceServers] : [];
+            list = arr.map(s => Object.assign({}, s, { urls: [].concat(s.urls || []).filter(u => !/:53(\?|$)/.test(u)) })).filter(s => s.urls.length && s.username);   // le port 53 est bloqué par les navigateurs
+            if (list.length) await pipeline([['SET', 'pvp:ice', JSON.stringify(list), 'EX', 12 * 3600]]);
+          } catch (e) { list = null; }
+        }
+        if (list && list.length) { ice.push(...list); turn = true; }
+      } else if (process.env.TURN_URLS && process.env.TURN_USERNAME) {
+        ice.push({ urls: process.env.TURN_URLS.split(',').map(s => s.trim()).filter(Boolean), username: process.env.TURN_USERNAME, credential: process.env.TURN_CREDENTIAL || '' });
+        turn = true;
+      }
+      res.status(200).json({ iceServers: ice, turn });
+      return;
+    }
     if (req.method === 'GET' && (req.query && req.query.pub || /[?&]pub=/.test(req.url || ''))) {   // liste des salons publics
       const now = Date.now();
       await pipeline([['ZREMRANGEBYSCORE', 'pvp:pub', '-inf', now - PUB_ALIVE]]);
