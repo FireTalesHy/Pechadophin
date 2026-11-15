@@ -8204,19 +8204,8 @@ function pvpState(){   // ma position + les effets de mon arme (projectiles, cou
   const p=player,a=!p.onGround?3:Math.abs(p.vx)>12?(Math.floor(time*10)%2?1:2):0;
   const cl=(k,v)=>v instanceof Set||k==='hit'||k==='e'||k==='tgt'||k==='grp'||k==='target'?undefined:typeof v==='number'?Math.round(v*100)/100:v;
   let fx=null;
-  try{fx=JSON.parse(JSON.stringify({k:shop.weapon,aa:Math.atan2(aim.y,aim.x),tr:tridents.slice(0,12),cd:tcards.slice(0,14),kt:katFx,sc:scyFx,bm:booms.slice(0,8),sj:sixJet.slice(0,30),sb:scepBeams.slice(0,6),hk:hooks.slice(0,6),hp:harp,te:teFx.map(f=>[f.a,f.R,f.t/f.life]),dash:p.dash?1:0},cl));}catch(e){}
+  try{fx=JSON.parse(JSON.stringify({k:shop.weapon,aa:Math.atan2(aim.y,aim.x),tr:tridents.slice(0,12),cd:tcards.slice(0,14),kt:katFx,sc:scyFx,bm:booms.slice(0,8),sj:sixJet.slice(0,30),sb:scepBeams.slice(0,6),hk:hooks.slice(0,6),hp:harp,te:teFx.map(f=>[f.a,f.R,f.t/f.life,f.slot]),th:throwAnim>0?1:0},cl));}catch(e){}
   return {t:'s',x:Math.round(p.x),y:Math.round(p.y),f:p.face>0?1:0,a,hp:lives,inv:p.invuln>0?1:0,fx};
-}
-function pvpDrawFx(o,ox,oy){   // dessine les effets de l'arme de l'adversaire avec les fonctions de dessin du jeu (on échange un instant mes états avec les siens)
-  const f=o.fx;if(!f)return;
-  const sv=[tridents,tcards,katFx,scyFx,booms,sixJet,scepBeams,harp,scyEff,player.x,player.y,player.face,aim.x,aim.y];
-  try{
-    tridents=f.tr||[];tcards=f.cd||[];katFx=f.kt||null;scyFx=f.sc||null;booms=f.bm||[];sixJet=f.sj||[];scepBeams=f.sb||[];harp=f.hp||null;scyEff=[];
-    player.x=ox;player.y=oy;player.face=o.f;aim.x=Math.cos(f.aa||0);aim.y=Math.sin(f.aa||0);
-    drawTridents();drawSixJet();drawScepterFx();
-    for(const h of f.hk||[]){pixLine(ox+5+o.f*7,oy-3,h.x,h.y,'#f4f7ff');ctx.save();ctx.translate(Math.round(h.x),Math.round(h.y));ctx.rotate(Math.atan2(h.uy||0,h.ux||1));if((h.ux||1)<0)ctx.scale(1,-1);ctx.drawImage(LURE,-5,-3);ctx.restore();}
-  }catch(e){}
-  [tridents,tcards,katFx,scyFx,booms,sixJet,scepBeams,harp,scyEff]=sv;player.x=sv[9];player.y=sv[10];player.face=sv[11];aim.x=sv[12];aim.y=sv[13];
 }
 function stepPvp(dt){
   const P=pvp;
@@ -8240,19 +8229,24 @@ function stepPvp(dt){
   enemies=P.phase==='fight'&&P.os&&P.oppInv<=0?[P.ent]:[];   // l'adversaire n'est touchable que pendant le combat (et pas pendant son invincibilité)
   if(P.phase!=='over'&&performance.now()-P.lastMsg>7000)pvpLost('Connexion perdue avec ton adversaire.');
 }
-function drawPvpOpp(){
+function drawPvpOpp(){   // l'adversaire est dessiné par le vrai drawPlayer du jeu (skin, arme tenue, visée, tentacules…) : on échange un instant mon état avec le sien
   const P=pvp;if(!P||!P.on||!P.os||!P.opp)return;
-  const o=P.os,sk=SKINS.find(s=>s.id===P.opp.sk)||SKINS[0],ox=Math.round(P.ox),oy=Math.round(P.oy),cx=ox+5,fy=oy+player.h;
-  const fx=o.fx;
-  pvpDrawFx(o,ox,oy);
-  if(fx&&Array.isArray(fx.te)){const cols=tentCols(sk);   // coups de tentacules
-    for(const e of fx.te){const L=e[1]*Math.sin(Math.PI*clamp(e[2],0,1)),ux=Math.cos(e[0]),uy=Math.sin(e[0]);
-      for(let d=0;d<L;d+=2){ctx.fillStyle=d>L-4?cols[2]:cols[1];ctx.fillRect(Math.round(cx+ux*d)-1,Math.round(oy+6+uy*d)-1,3,3);}}}
-  if(o.inv&&Math.floor(time*18)%2)return;
-  if(pvpMapOn()&&pvpHidden(ox+5,oy+7))return;   // caché dans un buisson / du lierre / une congère : invisible pour moi
-  const sp=[sk.spr.idle,sk.spr.a,sk.spr.b,sk.spr.jump][o.a];
-  if(fx&&fx.dash){ctx.save();ctx.globalAlpha=0.3;ctx.translate(cx-o.f*8,0);ctx.scale(o.f,1);ctx.drawImage(sp,-8,fy-16);ctx.restore();}   // ruée : image fantôme derrière
-  ctx.save();ctx.translate(cx,0);ctx.scale(o.f,1);ctx.drawImage(sp,-8,fy-16);ctx.restore();
+  const o=P.os,f=o.fx||{},ox=Math.round(P.ox),oy=Math.round(P.oy),hid=pvpMapOn()&&pvpHidden(ox+5,oy+7);
+  const pk=['x','y','vx','vy','face','onGround','invuln','stun'],sp={};for(const k of pk)sp[k]=player[k];
+  const sv=[tridents,tcards,katFx,scyFx,booms,sixJet,scepBeams,harp,scyEff,teFx,teZip,teJump,hooks,throwAnim,reloadBar,shop.weapon,shop.equipped,aim.x,aim.y],pf=Object.assign({},pfx);
+  try{
+    tridents=f.tr||[];tcards=f.cd||[];katFx=f.kt||null;scyFx=f.sc||null;booms=f.bm||[];sixJet=f.sj||[];scepBeams=f.sb||[];harp=f.hp||null;scyEff=[];
+    teFx=(f.te||[]).map(e=>({a:e[0],R:e[1],t:clamp(e[2],0,1)*0.24,life:0.24,slot:e[3]|0,i:0}));teZip=null;teJump=null;hooks=f.hk||[];
+    throwAnim=f.th?0.1:0;reloadBar=-1;
+    if(WEAPONS.some(w=>w.id===f.k))shop.weapon=f.k;if(SKINS.some(x=>x.id===P.opp.sk))shop.equipped=P.opp.sk;
+    Object.assign(player,{x:ox,y:oy,vx:o.a===1||o.a===2?40*o.f:0,vy:0,face:o.f,onGround:o.a!==3,invuln:o.inv?0.5:0,stun:0});
+    aim.x=Math.cos(f.aa||0);aim.y=Math.sin(f.aa||0);
+    pfx.dust=[];pfx.was=player.onGround;pfx.lastT=time;pfx.landT=-9;pfx.jumpT=-9;pfx.lastVx=player.vx;
+    drawTridents();drawSixJet();drawScepterFx();   // ses projectiles et coups
+    if(!hid)drawPlayer();   // lui, avec son arme en main (invisible s'il est dans une cachette)
+  }catch(e){}
+  [tridents,tcards,katFx,scyFx,booms,sixJet,scepBeams,harp,scyEff,teFx,teZip,teJump,hooks,throwAnim,reloadBar]=sv;shop.weapon=sv[15];shop.equipped=sv[16];aim.x=sv[17];aim.y=sv[18];
+  for(const k of pk)player[k]=sp[k];Object.assign(pfx,pf);
 }
 function drawPvpHud(){   // score, cœurs de l'adversaire, compte à rebours
   const P=pvp;
@@ -8262,6 +8256,8 @@ function drawPvpHud(){   // score, cœurs de l'adversaire, compte à rebours
   tx('TOI '+P.score[0]+' - '+P.score[1]+' '+on,VW/2,8,'#ffffff');
   const hp=P.os?P.os.hp:PVP_HP;
   for(let i=0;i<PVP_HP;i++)ctx.drawImage(i<hp?HEART:HEART_OFF,VW/2-(PVP_HP*10)/2+i*10,20);
+  {const wid=P.os&&P.os.fx&&P.os.fx.k,w=WEAPONS.find(x=>x.id===wid);   // l'arme de l'adversaire, à côté de ses cœurs
+   if(w){if(!P.wImg||P.wImgId!==wid){P.wImg=weapImg(w,16);P.wImgId=wid;}ctx.drawImage(P.wImg,VW/2+(PVP_HP*10)/2+3,17,12,12);}}
   ctx.font="16px 'Press Start 2P', monospace";ctx.textBaseline='middle';
   if(P.phase==='count')tx(P.t>2.6?'MANCHE '+P.round:String(Math.max(1,Math.ceil(P.t))),VW/2,VH/2-20,'#ffd23f');
   else if(P.go>0)tx('COMBAT !',VW/2,VH/2-20,'#ff6a3d');
