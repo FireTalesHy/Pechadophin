@@ -1,6 +1,6 @@
 # 🎣 Pechadophin 
 
-**Version V0.6 · CASE UPDATE**
+**Version V0.7 · ONLINE UPDATE**
 
 🇬🇧 [Read in English](README.md)
 
@@ -21,26 +21,31 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 | Se déplacer | `Q` / `D` ou `←` / `→` | Joystick de gauche |
 | Sauter | `Z`, `↑` ou `Espace` | Bouton SAUT |
 | Viser | Souris | Joystick de droite (aide à la visée) |
-| Pêcher | Clic gauche | Bouton PÊCHE |
+| Pêcher / tirer | Clic gauche, `F` ou `J` | Bouton PÊCHE |
 | Pause | `Échap` ou `P` | Bouton ⏸ |
 
 ## ✨ Contenu
 
 - Onze armes, présentées dans le menu ARMES, presque toutes avec leur arbre de compétences : une canne améliorable, un trident infernal (débloqué à la plage), des dagues qui attaquent en dash (dans le coffre rouge des marécages), l'arme Numéro 6 (boss secret des marécages), le sceptre de glace (laissé par l'esquimau), le jeu de tarot, le harpon, le katana, le boomerang, les tentacules qui sortent de ton dos et la faux (combo en 4 coups, poison)
-- Classement TOP 10 du mode Anarchie
+- **En ligne** (gros bouton vert de l'écran d'accueil) : profil, bilan victoires/défaites et historique de tes parties
+  - **Combat 1v1 en direct** avec ton arme équipée : salon privé (code ou lien) ou public (liste des salons, combat rapide), 5 cœurs, 2 manches gagnantes, revanche
+  - **3 arènes exclusives** (Prairie, Marécages, Glacier) avec plateformes, caisses qui arrêtent les tirs et cachettes qui rendent invisible
+  - **Duel contre un fantôme** : même monde et même arme pour les deux joueurs, tu cours contre le fantôme de ton adversaire
+  - Classement **TOP 10** du mode Anarchie
 - Des dauphins bleus, roses (volants) et rouges (tireurs de boules de feu), des vers de sable et des mouettes en piqué sur la plage
 - Un démon requin à laser, accompagné d'une nuit rouge sang
 - Une arène avec un poulpe géant, de chaque côté du départ
 - La plage : une zone en sable avec des tunnels, des vers, un checkpoint et des cocotiers qui servent de plateformes, un boss volant (la méduse, lasers blancs et tentacules rotatives) et le château de sable (vagues de sable, seau d'eau à viser)
 - Les marécages : herbe sombre, flaques, tours en ruine qui servent de plateformes, mini zombies, mini vaches et la vache géante (roulades et crachats de lait)
 - Des coffres à ouvrir en chemin pour gagner de l'or
-- Trois modes de jeu : Classique, Anarchie (boss sans fin, zone tirée au hasard après chaque boss d'arène, ciel qui change à chaque requin) et Speedrun (débloqué après la première renaissance : bats le Roi Cacamille 2 au chrono, arme au choix déjà au maximum, sans checkpoint)
+- Modes de jeu : Classique, Anarchie (boss sans fin, zone tirée au hasard après chaque boss d'arène, ciel qui change à chaque requin) et Multijoueur
 - Jeu en français ou en anglais (bouton drapeau)
 - Connexion avec un compte Google et sauvegarde cloud automatique dans ton Google Drive (voir [privacy.html](privacy.html))
 - Collab avec le jeu RNG∞ : skin RNG∞ à débloquer avec le même compte Google
 - Des marchands en pleine partie pour améliorer l'arme équipée
-- Un système de caisses : 36 skins à débloquer par fragments dans la Caisse Héros et la Caisse Vilain (roulette animée), dont l'épouvantail Épouvofodille
-- Une boutique : skins débloqués / bloqués, catégorie premium (Clown, Épouvofodille, RNG∞), améliorations (or) et âmes rouges
+- Un système de caisses : 36 skins à débloquer par fragments dans la Caisse Héros et la Caisse Vilain (roulette animée, ouvertures x2 et x4), dont l'épouvantail Épouvofodille
+- Une boutique : skins débloqués / bloqués, catégorie premium (Clown, Épouvofodille, RNG∞, et bientôt le Dino), améliorations (or) et âmes rouges
+- Des décors vivants : monuments à l'horizon selon le biome, montagnes, collines, particules d'ambiance, pêcheur animé (atterrissage, saut, poussière, ombre)
 - Nouveau menu principal, menu pause, sauvegarde locale du meilleur score et de la boutique, bouton de réinitialisation de la save (double confirmation)
 
 ## 📝 Historique

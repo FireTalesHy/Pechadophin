@@ -4,6 +4,46 @@
 
 All notable changes to **Pechadophin** (formerly Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.7] - 2026-11-15 · ONLINE UPDATE
+
+### Added
+- **ONLINE mode** (big green button on the home screen): a full multiplayer menu with your profile (skin, nickname, win/loss record) and 4 tabs: **LIVE**, **GHOST**, **TOP 10** and **HISTORY** (your last 30 games).
+- **Live 1v1 fight (PvP)**:
+  - each player fights with the **weapon equipped** in the main menu, with their own upgrades; **5 hearts**, first to win **2 rounds** wins, one-click **rematch**;
+  - **private** room (code or link to share) or **public** room (list of waiting fights, **quick fight** that finds you an opponent);
+  - **3 exclusive arenas**, 3 screens wide, using the game's scenery: **Meadow**, **Swamps** and **Glacier**. Platforms, **crates** that block shots and **hiding spots** (bushes, reeds, snowdrifts) that make you invisible to your opponent. The arena is chosen by the room's creator, or picked at random;
+  - you see your opponent with their skin, their weapon in hand and all their shots, with their weapon's icon next to their hearts;
+  - direct connection between the two players, with an **automatic relay** through the server when the browser blocks it (Opera GX, Brave, VPN…). The opponent's movements are predicted to stay smooth.
+- **Ghost duel** (replaces Speedrun): same world and same fully upgraded weapon for both players. You do your run, share the code or link, and your opponent races with your **ghost** on screen. Each duel has its own time leaderboard.
+- **Visual overhaul**:
+  - scenery: dithered sky gradient, sun with a halo and light shafts, glitter on the sea, distant mountains (snow-capped in the ice fields), lit hill slopes, trees per biome, ambient particles (pollen, fireflies, golden sparkles);
+  - **landmarks on the horizon** per biome: windmill, ruined temple, lighthouse, wreck, keep, ice arch, floating island…;
+  - reworked terrain: finer dirt, stones and roots, shaded and sunlit cliffs, grass spilling over edges;
+  - the fisherman comes to life, with every skin: squash on landing, stretch when jumping, dust, ground shadow and breathing;
+  - HUD on translucent plates: combo that heats up, pulsing last heart, boss bar with a damage trail;
+  - **every window** in one style: coloured title bar, close cross, tabs, TOP 10 podium, real sound switch;
+  - crates: rarity colours on the roulette, reveal with a shockwave, rays and confetti for rare prizes.
+- **Crates**: **x2 and x4** openings with several roulettes at once, **SKIP** button and an animation of the item you win.
+- **Premium Dino skin**, a dinosaur seen from the side: **coming soon**.
+- **Death screen**: **MAIN MENU** button.
+
+### Changed
+- **Home screen**: big **ONLINE** button; the WEAPONS menu becomes a small **sword** button next to the chest; the TOP 10 moves into the ONLINE menu.
+- **Mode select**: CLASSIC, ANARCHY and MULTIPLAYER (Speedrun is replaced by the ghost duel).
+- **Boss balance** (classic mode) for the rod and the trident: their HP adapts to your weapon's damage per second.
+- **Clown skin**: **13 red souls** (instead of 60).
+- **Épouvofodille**: **animated orange** outline and button in the shop.
+- **Performance**: scenery and ground are pre-rendered, each frame is drawn about **2.5x faster**.
+- **Small screens**: compact crate menu and touch controls over the game in landscape.
+- Keyboard shooting with **F** or **J**, joysticks hidden when you play with keyboard and mouse, confirmation before MAIN MENU.
+- Home screen banner: **ONLINE UPDATE**.
+
+### Fixed
+- Some mission rewards (infernal trident, katana, boomerang, tentacles…) could be claimed again after reloading the page.
+- Cloud save sync errors (expired token, deleted or unreadable file), with clearer messages.
+- You can no longer escape the octopus arena.
+- Missing English translations and crate texts.
+
 ## [V0.6] - 2026-11-13 · CASE UPDATE
 
 ### Added

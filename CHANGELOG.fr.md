@@ -4,6 +4,46 @@
 🇬🇧 [Read in English](CHANGELOG.md)
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.7] - 2026-11-15 · ONLINE UPDATE
+
+### Ajouté
+- **Mode EN LIGNE** (gros bouton vert de l'écran d'accueil) : un menu multijoueur complet avec ton profil (skin, pseudo, bilan victoires/défaites) et 4 onglets : **EN DIRECT**, **FANTÔME**, **TOP 10** et **HISTORIQUE** (tes 30 dernières parties).
+- **Combat 1v1 en direct (PvP)** :
+  - chacun se bat avec **l'arme équipée** dans le menu principal, avec ses propres améliorations ; **5 cœurs**, le premier à **2 manches** gagne, **revanche** en un clic ;
+  - salon **privé** (code ou lien à partager) ou **public** (liste des combats en attente, **combat rapide** qui te trouve un adversaire) ;
+  - **3 arènes exclusives** de 3 écrans de large, dans les décors du jeu : **Prairie**, **Marécages** et **Glacier**. Plateformes, **caisses** qui arrêtent les tirs et **cachettes** (buissons, roseaux, congères) qui te rendent invisible pour l'adversaire. L'arène est choisie par celui qui crée le salon, ou tirée au hasard ;
+  - tu vois ton adversaire avec son skin, son arme en main et tous ses tirs, avec l'icône de son arme à côté de ses cœurs ;
+  - connexion directe entre les deux joueurs, avec un **relais automatique** par le serveur quand le navigateur la bloque (Opera GX, Brave, VPN…). Les mouvements de l'adversaire sont prédits pour rester fluides.
+- **Duel contre un fantôme** (remplace le Speedrun) : même monde et même arme améliorée au maximum pour les deux joueurs. Tu fais ta course, tu partages le code ou le lien, et ton adversaire court avec ton **fantôme** à l'écran. Chaque duel a son classement des temps.
+- **Refonte visuelle** :
+  - décor : ciel en dégradé tramé, soleil avec halo et rayons de lumière, reflets sur la mer, montagnes lointaines (enneigées à la glacière), collines éclairées d'un côté, arbres selon le biome, particules d'ambiance (pollen, lucioles, paillettes dorées) ;
+  - **monuments à l'horizon** selon le biome : moulin, temple en ruine, phare, épave, donjon, arche de glace, île flottante… ;
+  - terrain retravaillé : terre plus fine, cailloux et racines, falaises ombrées et éclairées, herbe qui déborde ;
+  - le pêcheur prend vie, avec tous les skins : écrasement à l'atterrissage, étirement en saut, poussière, ombre au sol et respiration ;
+  - HUD sur plaques translucides : combo qui chauffe, dernier cœur qui bat, barre de boss avec traînée des dégâts ;
+  - **toutes les fenêtres** dans un même style : barre de titre colorée, croix de fermeture, onglets, podium du TOP 10, vrai interrupteur pour le son ;
+  - caisses : couleur de rareté sur la roulette, révélation avec onde de choc, rayons et confettis pour les lots rares.
+- **Caisses** : ouvertures **x2 et x4** avec plusieurs roulettes en même temps, bouton **PASSER** et animation de l'objet obtenu.
+- **Skin premium Dino**, un dinosaure vu de profil : **prochainement**.
+- **Écran de mort** : bouton **MENU PRINCIPAL**.
+
+### Modifié
+- **Écran d'accueil** : gros bouton **EN LIGNE** ; le menu ARMES devient un petit bouton **épée** à côté du coffre ; le TOP 10 passe dans le menu EN LIGNE.
+- **Choix du mode** : CLASSIQUE, ANARCHIE et MULTIJOUEUR (le Speedrun est remplacé par le duel contre un fantôme).
+- **Équilibrage des boss** (mode classique) pour la canne et le trident : leurs PV s'adaptent aux dégâts par seconde de ton arme.
+- **Skin Clown** : **13 âmes rouges** (au lieu de 60).
+- **Épouvofodille** : contour et bouton **orange animés** dans la boutique.
+- **Performances** : le décor et le sol sont précalculés, chaque image est dessinée environ **2,5 fois plus vite**.
+- **Petits écrans** : menu des caisses compact et commandes tactiles par-dessus le jeu en paysage.
+- Tir au clavier avec **F** ou **J**, joysticks masqués quand tu joues au clavier et à la souris, confirmation avant RETOUR MENU.
+- Bannière de l'écran d'accueil : **ONLINE UPDATE**.
+
+### Corrigé
+- Les récompenses de certaines missions (trident infernal, katana, boomerang, tentacules…) pouvaient être récupérées de nouveau après un rechargement de la page.
+- Erreurs de synchronisation de la sauvegarde cloud (jeton expiré, fichier supprimé ou illisible), avec des messages plus précis.
+- On ne peut plus s'échapper de l'arène du poulpe.
+- Traductions anglaises manquantes et textes des caisses.
+
 ## [V0.6] - 2026-11-13 · CASE UPDATE
 
 ### Ajouté
