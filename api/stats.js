@@ -1,7 +1,9 @@
 // Statistiques des joueurs actifs : réservées aux comptes développeurs.
 // POST /api/stats  { id, g, c, m, w, b, n, cred } : « battement » envoyé par chaque page ouverte (id aléatoire, g = connecté Google, c = sauvegarde cloud, m = mode, w = arme, b = biome 1 à 5).
 //   Si le jeton Google (cred) est valide, le compte (pseudo, mode, arme) est listé 10 minutes dans « act:acc » pour le détail réservé aux comptes développeurs.
-// GET  /api/stats[?detail=1]  (Authorization: Bearer <jeton Google>) : joueurs actifs à l'instant, par heure (24 h) et par jour (14 j) ; detail=1 ajoute la liste des comptes actifs. Le jeton est vérifié côté serveur
+//   Chaque compte vérifié est aussi gardé dans « acc:all » (pseudo, première et dernière visite, temps de jeu approximatif, nombre de sessions) :
+//   à chaque battement, l'écart avec le précédent (au plus 2 min 30) est ajouté au temps de jeu ; un écart plus long ouvre une nouvelle session.
+// GET  /api/stats[?detail=1][&all=1]  (all=1 ajoute la liste de tous les comptes connectés au jeu)  (Authorization: Bearer <jeton Google>) : joueurs actifs à l'instant, par heure (24 h) et par jour (14 j) ; detail=1 ajoute la liste des comptes actifs. Le jeton est vérifié côté serveur
 // et l'empreinte SHA-256 de l'e-mail doit figurer dans la liste des comptes développeurs.
 const crypto = require('crypto');
 const CLIENT_ID = '613987510700-0gp3rfu2tmcm32uu0aun7q1lmubl8vav.apps.googleusercontent.com';
@@ -10,6 +12,7 @@ const TOK = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKE
 const DEV_HASHES = ['e25b16544775982eeb8ea2148661d8046bfc4e0eded6e98f6f27dc69fae69eb7', '859183087dc35fabb8678f375619b54dcf4a6d7debc07857c1473d58642abd66', '07dbd3962802857fc4b3922f5288d16bfabd6a327ccb68906ba2b689c89169f8', '0a396f3832c858e95864aa6ad5572dd6b22caa6e3755c4552bde2713fdb5008f', '6917af166438ce49b81eef7409fe7b9d7ee94b19908f727f7ff91bbe4484922a'];
 const ACTIVE_MS = 90 * 1000;   // « actif à l'instant » = battement reçu dans les 90 dernières secondes
 const KEEP_MS = 10 * 60 * 1000;
+const SESSION_GAP = 150 * 1000;   // battements toutes les 60 s : au-delà de 2 min 30 sans battement, on compte une nouvelle session
 
 async function pipeline(cmds) {
   const r = await fetch(URL_ + '/pipeline', { method: 'POST', headers: { Authorization: 'Bearer ' + TOK, 'Content-Type': 'application/json' }, body: JSON.stringify(cmds) });
@@ -61,6 +64,10 @@ module.exports = async (req, res) => {
         const t = await verify(String(body.cred)).catch(() => null);
         if (t) {
           const cl = x => String(x || '').replace(/[<>]/g, '').trim();
+          let prev = null; try { const [pv] = await pipeline([['HGET', 'acc:all', t.sub]]); prev = pv ? JSON.parse(pv) : null; } catch (e) {}
+          const gap = prev ? now - prev.l : Infinity, cont = gap <= SESSION_GAP;
+          const rec = { n: cl(body.n).slice(0, 16) || (prev && prev.n) || 'Joueur', f: prev ? prev.f : now, l: now, p: (prev ? prev.p : 0) + (cont ? Math.round(gap / 1000) : 0), s: (prev ? prev.s : 0) + (cont ? 0 : 1), c };
+          cmds.push(['HSET', 'acc:all', t.sub, JSON.stringify(rec)]);
           cmds.push(['HSET', 'act:acc', t.sub, JSON.stringify({ n: cl(body.n).slice(0, 16) || 'Joueur', m: cl(body.m).slice(0, 8), w: cl(body.w).slice(0, 12), b: Math.max(1, Math.min(5, Math.floor(Number(body.b)) || 1)), c, t: now })]);
         }
       }
@@ -81,6 +88,8 @@ module.exports = async (req, res) => {
       for (const h of hours) cmds.push(['PFCOUNT', 'act:h:' + h], ['PFCOUNT', 'act:hg:' + h]);
       const detail = req.query && req.query.detail === '1';
       if (detail) cmds.push(['HGETALL', 'act:acc']);
+      const all = req.query && req.query.all === '1';
+      if (all) cmds.push(['HGETALL', 'acc:all']);
       const r = await pipeline(cmds);
       let k = 3;
       const out = { now: { all: r[0], google: r[1], cloud: r[2] }, days: [], hours: [] };
@@ -97,6 +106,17 @@ module.exports = async (req, res) => {
         if (stale.length) pipeline([['HDEL', 'act:acc', ...stale]]).catch(() => {});
         accs.sort((a, b) => a.ago - b.ago);
         out.accounts = accs;
+        k++;
+      }
+      if (all) {
+        const flat = r[k] || [], list = [];
+        for (let i = 0; i < flat.length; i += 2) {
+          let o = null; try { o = JSON.parse(flat[i + 1]); } catch (e) {}
+          if (!o) continue;
+          list.push({ n: o.n || 'Joueur', p: o.p || 0, s: o.s || 1, f: o.f, l: o.l, on: now - o.l <= ACTIVE_MS ? 1 : 0, c: o.c ? 1 : 0 });
+        }
+        list.sort((a, b) => b.p - a.p || b.l - a.l);
+        out.all = { count: list.length, total: list.reduce((x, y) => x + y.p, 0), list: list.slice(0, 500) };
       }
       res.status(200).json(out); return;
     }
