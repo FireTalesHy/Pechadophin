@@ -1128,6 +1128,7 @@ const LANG_KEY='canne-dauphins-langue';
 let lang='fr';
 try{const sv=localStorage.getItem(LANG_KEY);lang=sv==='en'||sv==='fr'?sv:((navigator.language||'fr').toLowerCase().startsWith('fr')?'fr':'en');}catch(e){}
 const EN={
+'Trident royal':'Royal trident','Le trident du Roi des dauphins : transperce 3 ennemis de plus, frappe 40 % plus fort et fait jaillir un geyser doré à chaque coup. Utilise les améliorations du trident. Laissé par le Roi des dauphins.':'The Dolphin King\'s trident: pierces 3 more enemies, hits 40% harder and makes a golden geyser burst on every hit. Uses the trident upgrades. Dropped by the Dolphin King.','TRÉSORS CACHÉS':'HIDDEN TREASURES','★ CHECKPOINT : LA CITÉ DES DAUPHINS ★':'★ CHECKPOINT: THE DOLPHIN CITY ★',
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
 'dev : L\'taleshy et cocobat':'dev: L\'taleshy and cocobat','visuels : Sacha':'visuals: Sacha','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute':'testers: moustik, ofodile, wyzan, nad l\'arnaque and bergoute',
@@ -1175,6 +1176,7 @@ const EN={
 'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
+  [/^TRÉSORS (\d)\/6$/,m=>'TREASURES '+m[1]+'/6'],
   [/^TOUS LES COMPTES CONNECTÉS AU JEU \((\d+)\)$/,m=>'ALL ACCOUNTS SIGNED IN TO THE GAME ('+m[1]+')'],
   [/^Première visite : (.+)$/,m=>'First visit: '+m[1]],
   [/^Erreur de sauvegarde cloud \((\d+)\) : déconnecte-toi, reconnecte-toi et accepte l'accès à la sauvegarde\.$/,m=>'Cloud save error ('+m[1]+'): sign out, sign back in and accept the backup access.'],
@@ -1634,6 +1636,7 @@ function genChunk(cx){
   for(let i=0;i<ne;i++){
     const tx=x0+1+Math.floor(rng()*14);
     if(Math.abs(tx)<14) continue;
+    if(!anarchyOn&&rng()<0.3){const k=worldEnemyKind(tx);if(k){spawnWorldEnemy(k,tx);continue;}}   // un ennemi dauphin propre au monde
     if(beachC){const col=column(tx);if(col.pit||col.tun||col.ar)continue;
       if(rng()<0.38)enemies.push(mkEnemy('gull',tx*T,(col.g-7-Math.floor(rng()*3))*T));
       else enemies.push(mkEnemy('shoot',tx*T,col.g*T-9.01));continue;}   // sur le sable : seulement les dauphins rouges
@@ -1779,7 +1782,7 @@ const SKINS=[
   hat:["................",".......kk.......","......krrk......","...kkkkkkkkkk...","...khhhhhhhhk..."],
   face:["...khHHHHHHhk...","...kHrrHHrrHk...","...kHHkkkkHHk...","....kkHHHHkk...."],
   torso:["...kbbbbbbbbk...","...kbbyybbbbHk..","...kBBBBBBBBk..."]},
- {id:'clown',name:'Clown',price:20000,souls:13,rod:'#d92b3a',
+ {id:'clown',name:'Clown',price:20000,souls:13,treasure:true,rod:'#d92b3a',
   pal:{h:'#ff8a2a',g:'#ffe14d',r:'#e0262e',s:'#fff6ee',S:'#e6d8cc',b:'#7a4ad8',B:'#4a2a98',p:'#f2b630',n:'#d92b3a'},
   hat:["................","...h.g.r.g.h....","..hhhgrrrghhh...","..hhhhgggrrhh...","...khhhhhhhhk..."],
   face:["...kssssssssk...","...kskssskssk...","...ksssrrsssk...","....kkssssskk..."],
@@ -2621,6 +2624,7 @@ function loadShop(fresh){
       d.ice=(j.ice===1||j.ice===-1)?1:0;   // checkpoint de la glacière (mode classique)
       d.cloud=(j.cloud===1||j.cloud===-1)?1:0;
       d.city=(j.city===1||j.city===-1)?1:0;d.won=j.won===true;   // checkpoint de la cité, roi des dauphins vaincu
+      d.clownP=(j.clownP|0)&63;d.royalOwned=j.royalOwned===true;   // trésors du clown, trident royal
       d.pants=j.pants===true||d.beach!==0||(j.beach===1||j.beach===-1);   // histoire : pantalon retrouvé (tuto fait)   // checkpoint du monde nuage (mode classique)
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
@@ -2645,6 +2649,7 @@ function loadShop(fresh){
       if(j.kt&&typeof j.kt==='object')for(const k of ['dmg','reach','speed','finish'])d.kt[k]=clamp(Math.floor(Number(j.kt[k]))||0,0,5);
       if(j.bt&&typeof j.bt==='object')for(const k of ['dmg','range','rate','multi'])d.bt[k]=clamp(Math.floor(Number(j.bt[k]))||0,0,k==='multi'?2:5);
       if(j.weapon==='katana'&&d.katanaOwned)d.weapon='katana';
+      if(j.weapon==='royal'&&d.royalOwned)d.weapon='royal';
       if(j.weapon==='boomerang'&&d.boomOwned)d.weapon='boomerang';
       d.faOwned=j.faOwned===true;
       if(j.fa&&typeof j.fa==='object')for(const k of ['dmg','reach','speed','poison'])d.fa[k]=clamp(Math.floor(Number(j.fa[k]))||0,0,5);
@@ -2773,6 +2778,7 @@ function mkEnemy(kind,x,y){
 function mkEnemy0(kind,x,y){
   const dir=Math.random()<0.5?1:-1;
   const tier=Math.min(8,Math.floor(Math.abs(x)/2400));
+  if(WE_SIZE[kind])return mkWorldEnemy(kind,x,y,tier);   // ennemis propres à chaque monde
   if(kind==='hop') return {kind,x,y,w:14,h:9,vx:0,vy:0,dir,hp:1+tier,maxHp:1+tier,tier,speed:30+Math.random()*14,state:'alive',t:0,flash:0,onGround:false,hopT:0.4+Math.random(),turnT:0};
   if(kind==='worm') return {kind,x,y,w:16,h:8,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:22+Math.random()*10,state:'alive',t:Math.random()*6,flash:0,onGround:false,turnT:0};
   if(kind==='zombie') return {kind,x,y,w:12,h:12,vx:0,vy:0,dir,hp:2+tier,maxHp:2+tier,tier,speed:24+Math.random()*10,state:'alive',t:0,flash:0,onGround:false,hopT:0.4+Math.random(),turnT:0};
@@ -2879,6 +2885,7 @@ function rodTip(casting){
 
 function stepPlayer(dt){
   const p=player;
+  const wm=worldMods(p);   // mécaniques des mondes
   updateAim();
   if(p.invuln>0)p.invuln-=dt;
   if(p.stun>0)p.stun-=dt;
@@ -2888,13 +2895,13 @@ function stepPlayer(dt){
   if(p.onGround)p.mom=0;
   if(p.mom>0)p.mom-=dt;
   if(p.stun<=0&&!(p.mom>0)){
-    if(d!==0){const sg=d>0?1:-1,lim=MAXV*Math.abs(d)*(p.boost?2:1)*(shop.weapon==='dagger'&&!glockOn?DAG.spd:1);p.vx+=sg*(p.onGround?(onIce?ICE_ACC:1500):900)*dt;p.vx=clamp(p.vx,-lim,lim);p.face=sg;}
+    if(d!==0){const sg=d>0?1:-1,lim=wm.spd*MAXV*Math.abs(d)*(p.boost?2:1)*(shop.weapon==='dagger'&&!glockOn?DAG.spd:1);p.vx+=sg*(p.onGround?(onIce?ICE_ACC:1500):900)*dt;p.vx=clamp(p.vx,-lim,lim);p.face=sg;}
     else{const f=(p.onGround?(onIce?ICE_FRIC:1400):350)*dt;p.vx=Math.abs(p.vx)<=f?0:p.vx-Math.sign(p.vx)*f;}
   }
   if(aim.active&&Math.abs(aim.x)>0.25&&p.stun<=0)p.face=aim.x>0?1:-1;   // le pêcheur regarde du côté où il vise
   if(p.onGround)p.coyote=0.1;else p.coyote-=dt;
   const tjm=shop.weapon==='tentacle'&&!glockOn?Math.sqrt(1.25):1;   // Tentacules : elles prennent appui sur le sol et boostent le saut (hauteur x1,25)
-  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*tjm*(shop.weapon==='dagger'&&!glockOn?Math.sqrt(dagV('jump')):1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();
+  if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*wm.jump*tjm*(shop.weapon==='dagger'&&!glockOn?Math.sqrt(dagV('jump')):1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();
     if(tjm>1){teJump={x:p.x+5,gy:p.y+p.h,t:0};burst(p.x+5,p.y+p.h,'#c9b48a',6,70);}}
   if(!inp.jump&&p.vy<-140*tjm&&p.stun<=0&&!p.boost&&!p.spring)p.vy=-140*tjm;
   p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
@@ -2906,6 +2913,7 @@ function stepPlayer(dt){
     }
   }
   moveY(p,p.vy*dt);
+  if(wm.push&&state==='play')moveX(p,wm.push*dt);
   if(p.onGround&&p.boost&&p.vy>=0)p.boost=false;
   if(p.onGround){
     const yb=p.y+p.h+1;
@@ -3030,7 +3038,7 @@ function stepTrident(dt){
     const base=Math.atan2(aim.y,aim.x),sg=aim.x>=0?1:-1;
     for(const deg of TM_DIRS[n]){   // le 1er part vers la visée, les autres autour du personnage
       const a=base+deg*Math.PI/180*sg,ux=Math.cos(a),uy=Math.sin(a);
-      tridents.push({x:cx+ux*14,y:cy+uy*14,ux,uy,d:0,hit:new Set(),n:0});
+      tridents.push({x:cx+ux*14,y:cy+uy*14,ux,uy,d:0,hit:new Set(),n:0,r:shop.weapon==='royal'});
     }
     sfx.trident();
     }
@@ -3038,13 +3046,13 @@ function stepTrident(dt){
   if(!tridents.length)return;
   const range0=TUP.range.vals[shop.tup.range],dmg0=TUP.dmg.vals[shop.tup.dmg],pierce0=TUP.pierce.vals[shop.tup.pierce];
   for(const h of tridents){
-    const range=h.g?GLOCK.range:range0,dmg=h.g?GLOCK.dmg:dmg0,pierce=h.g?1:pierce0;
+    const range=h.g?GLOCK.range:range0,dmg=h.g?GLOCK.dmg:(h.r?Math.round(dmg0*1.4):dmg0),pierce=h.g?1:(h.r?pierce0+3:pierce0);
     const st=(h.g?GLOCK.speed:TRIDENT_V)*dt;
     h.x+=h.ux*st;h.y+=h.uy*st;h.d+=st;
     if(solidAt(h.x+h.ux*6,h.y+h.uy*6)||h.d>=range){h.done=true;burst(h.x,h.y,'#ff6a3d',6,70);continue;}
     for(const e of enemies){
       if(e.state!=='alive'||h.hit.has(e))continue;
-      if(rectsOverlap(h.x-5,h.y-5,10,10,e.x,e.y,e.w,e.h)){h.hit.add(e);hitEnemy(e,dmg);h.n++;if(h.n>=pierce)break;}
+      if(rectsOverlap(h.x-5,h.y-5,10,10,e.x,e.y,e.w,e.h)){h.hit.add(e);hitEnemy(e,dmg);if(h.r)vfx('splashg',e.x+e.w/2,e.y+e.h,{tint:'#ffd23f'});h.n++;if(h.n>=pierce)break;}
     }
     const b=boss;
     if(h.n<pierce&&b&&b.state==='alive'&&b.spawnT<=0&&!h.hit.has(b)&&rectsOverlap(h.x-5,h.y-5,10,10,b.x,b.y,b.w,b.h)){h.hit.add(b);hitBoss(b,dmg);h.n++;}
@@ -3707,7 +3715,7 @@ function stepHook(dt){
   if(shop.weapon==='dagger'&&!glockOn){stepDagger(dt);return;}
   if(shop.weapon==='scepter'&&!glockOn){stepScepter(dt);return;}
   if(shop.weapon==='six'&&!glockOn){stepSixGun(dt);return;}
-  if(shop.weapon==='trident'||glockOn){stepTrident(dt);return;}
+  if(shop.weapon==='trident'||shop.weapon==='royal'||glockOn){stepTrident(dt);return;}
   const p=player;
   if(fireBuf>0)fireBuf-=dt;
   if(castCd>0)castCd-=dt;
@@ -3917,7 +3925,7 @@ function stepEnemies(dt){
     if(e.psn>0){e.psn-=dt;e.psnT=(e.psnT||0)-dt;if(e.psnT<=0){e.psnT=1;hitEnemy(e,e.dot||1);parts.push({x:e.x+e.w/2,y:e.y+e.h/2,vx:(Math.random()-0.5)*30,vy:-30,g:0,life:0.5,col:'#7cff6a',sz:2});if(e.state==='dead')continue;}}
     if(e.stunT2>0)e.stunT2-=dt;
     const edt=(e.stunT2>0?0:1)*(e.frost>0?dt*(1-(e.fslow||45)/100):dt);
-    if(e.kind==='gull')aiGull(e,edt);else if(e.kind==='mcow')aiMcow(e,edt);else if(e.kind==='fly')aiFly(e,edt);else if(e.kind==='worm')aiWorm(e,edt);else if(e.kind==='bear')aiBear(e,edt);else if(e.kind==='knight')aiKnight(e,edt);else if(e.kind==='archer')aiArcher(e,edt);else aiHop(e,edt);
+    if(WORLD_AI[e.kind])WORLD_AI[e.kind](e,edt);else if(e.kind==='gull')aiGull(e,edt);else if(e.kind==='mcow')aiMcow(e,edt);else if(e.kind==='fly')aiFly(e,edt);else if(e.kind==='worm')aiWorm(e,edt);else if(e.kind==='bear')aiBear(e,edt);else if(e.kind==='knight')aiKnight(e,edt);else if(e.kind==='archer')aiArcher(e,edt);else aiHop(e,edt);
     if(state==='play'&&p.invuln<=0&&e.state==='alive'&&rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,e.x,e.y,e.w,e.h)&&!tryParry()) hurtPlayer(e.x+e.w/2);
   }
   enemies=enemies.filter(e=>!(e.state==='dead'&&(e.y>(WATER_ROW+4)*T||e.t>3))&&Math.abs(e.x-p.x)<2400);
@@ -5819,7 +5827,7 @@ function killKingD(){
   const b=kingD;b.hp=0;b.state='dying';b.dieT=3.2;kingDone=true;bfx=[];vfxBoss(b);
   for(const e of enemies)if(e.kd&&e.state==='alive'){e.state='dead';e.t=0;e.vy=-120;vfx('kill',e.x+e.w/2,e.y+e.h);}
   kills++;shake=1;sfx.bossDie();sfx.gate();
-  const again=!!shop.bossSouls.roi,gs=soulReward('roi',10),gold=again?100:1000;shop.gold+=gold;shop.won=true;saveShop();
+  const again=!!shop.bossSouls.roi,gs=soulReward('roi',10),gold=again?100:1000;shop.gold+=gold;shop.won=true;const newW=!shop.royalOwned;shop.royalOwned=true;saveShop();if(newW)floatText(b.x,b.y-74,lang==='en'?'ROYAL TRIDENT OBTAINED!':'TRIDENT ROYAL OBTENU !','#ffd23f');
   if(gs)floatText(b.x,b.y-62,lang==='en'?'+10 RED SOULS':'+10 ÂMES ROUGES','#ff6a7a');floatText(b.x,b.y-50,'+'+gold+(lang==='en'?' GOLD':' OR'),'#ffd23f');
   b.endT=3.4;
 }
@@ -6048,6 +6056,169 @@ Object.assign(CINE,{
     fcu('palace',LG('Le dernier dauphin qui m\'a parlé comme ça a fini en tartine.','The last dolphin who talked to me like that ended up on toast.')),
     VS(LG('ROI DES DAUPHINS','DOLPHIN KING'),LG('BOSS FINAL','FINAL BOSS'),(x,y,t)=>cineKing(x,y-50,5,t),'#14305a','#3b9bff','#ffd23f')]
 });
+
+/* ================= Mondes uniques : mécanique propre, ennemis dauphins, décor vivant, trésors du clown ================= */
+const worldOf=tx=>inCity(tx)?6:inCloud(tx)?5:inIce(tx)?4:inSwamp(tx)?3:inBeach(tx)?2:1;
+const H2=(a,b)=>hash2(a,b);
+/* --- géographie des mécaniques (déterministe par colonne) --- */
+const mudAt=tx=>{if(anarchyOn||!inSwamp(tx))return false;const c=Math.floor(tx/9),k=mod(tx,9);return H2(c,991)<0.32&&k>=1&&k<=6;};
+const convAt=tx=>{if(anarchyOn||!inCity(tx))return 0;const a=Math.abs(tx);if(a<CITY_TX+20||Math.abs(a-KINGD_CX)<50)return 0;const c=Math.floor(tx/12),k=mod(tx,12);return H2(c,992)<0.4&&k>=2&&k<=9?(H2(c,993)<0.5?-1:1):0;};
+const laserAt=tx=>{if(anarchyOn||!inCity(tx))return false;const a=Math.abs(tx);if(a<CITY_TX+24||Math.abs(a-KINGD_CX)<50)return false;return mod(tx,20)===15&&H2(Math.floor(tx/20),994)<0.45;};
+const vineAt=tx=>{if(anarchyOn||!inSwamp(tx))return false;return mod(tx,15)===7&&H2(Math.floor(tx/15),995)<0.5;};
+const bounceAt=tx=>{if(anarchyOn||!inCloud(tx)||skyDx(tx)||mecaDx(tx))return false;const k=mod(tx,18);return H2(Math.floor(tx/18),996)<0.45&&k>=8&&k<=10;};
+/* --- vent des plaines, marée de la plage, stalactites de la glace --- */
+let gust={t:0,dur:0,dir:1,next:6},icicles=[],bounceT=new Map();
+const tideY=()=>(21-2.8*(0.5+0.5*Math.sin(time*Math.PI*2/26)))*T;   // marée : de la ligne 21 (basse) à 18 (haute), les creux de la plage sont inondés
+function worldMods(p){   // vitesse, saut et poussée selon le sol sous les pieds
+  const tx=Math.floor((p.x+5)/T),c=column(tx),m={spd:1,jump:1,push:0};
+  if(anarchyOn)return m;
+  if(p.onGround&&mudAt(tx)&&!c.pit){m.spd=0.55;m.jump=0.8;}
+  if(c.beach&&p.y+p.h>tideY()+4){m.spd*=0.68;}
+  const cv=p.onGround?convAt(tx):0;if(cv&&!c.pit)m.push+=cv*70;
+  if(gust.t>0&&worldOf(tx)===1)m.push+=gust.dir*50*Math.min(1,gust.t*3,(gust.dur-gust.t)*3+0.2);
+  return m;
+}
+function stepWorldMech(dt){
+  if(state!=='play'||anarchyOn)return;
+  const p=player,tx=Math.floor((p.x+5)/T),w=worldOf(tx),busy=octo||castle||witch||eskimo||cloudB||mecaB||kingD||king||boss;
+  // rafales dans les plaines
+  if(gust.t>0){gust.t+=dt;if(gust.t>=gust.dur)gust.t=0;}
+  else if(w===1&&!busy){gust.next-=dt;if(gust.next<=0){gust={t:0.001,dur:2.6,dir:Math.random()<0.5?-1:1,next:9+Math.random()*6};floatText(p.x+5,p.y-22,lang==='en'?'GUST!':'RAFALE !','#dfe8f0');}}
+  // lianes des marécages : on grimpe en tenant le saut, on glisse doucement sinon
+  for(let k=tx-1;k<=tx+1;k++)if(vineAt(k)){const c=column(k),vx=k*T+8,top=(c.g-9)*T;
+    if(Math.abs(p.x+5-vx)<6&&p.y+p.h>top&&p.y<c.g*T){if(inp.jump){p.vy=-120;p.coyote=0.12;}else if(p.vy>50)p.vy=50;}}
+  // nuages-trampolines
+  if(p.onGround&&bounceAt(tx)&&p.stun<=0){p.vy=-JUMPV*1.55;p.onGround=false;p.coyote=0;bounceT.set(tx,time);try{sfx.jump();}catch(e){}vfx('splashg',p.x+5,p.y+p.h,{tint:'#ffd0ec'});}
+  // lasers de sécurité de la cité
+  for(let k=tx-1;k<=tx+1;k++)if(laserAt(k)&&laserOn(k)){const c=column(k),lx=k*T+8;if(Math.abs(p.x+5-lx)<4&&p.y+p.h>(c.g-6)*T&&p.y<c.g*T)hurtP(lx);}
+  // stalactites qui tombent dans la glacière
+  if(w===4&&!busy){stepWorldMech.ic=(stepWorldMech.ic||4)-dt;if(stepWorldMech.ic<=0){stepWorldMech.ic=3.5+Math.random()*3;icicles.push({x:p.x+5+p.vx*0.6+(Math.random()-0.5)*90,y:cam.y-8,vy:0,t:0,warn:0.8});}}
+  for(const i of icicles){i.t+=dt;if(i.t<i.warn)continue;i.vy+=700*dt;i.y+=i.vy*dt;
+    if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,i.x-3,i.y-10,6,10)){i.dead=true;hurtP(i.x);vfx('frost',i.x,i.y);}
+    else if(solidAt(i.x,i.y)||i.y>cam.y+VH+40){i.dead=true;vfx('frost',i.x,i.y);}}
+  icicles=icicles.filter(i=>!i.dead);
+}
+const laserOn=tx=>mod(time+H2(tx,997)*3,3.4)<1.9;
+function drawWorldMech(cx,cy){
+  if(anarchyOn)return;
+  const tx0=Math.floor(cx/T)-1,tx1=Math.floor((cx+VW)/T)+1;
+  // marée : l'eau recouvre le sable bas
+  const ty=tideY();
+  for(let tx=tx0;tx<=tx1;tx++){const c=column(tx);
+    if(c.beach&&!c.pit&&c.g*T>ty){ctx.fillStyle='rgba(54,162,224,.45)';ctx.fillRect(tx*T,Math.round(ty),T,Math.ceil(c.g*T-ty));ctx.fillStyle='rgba(196,236,255,.85)';ctx.fillRect(tx*T,Math.round(ty+Math.sin(time*2+tx*0.7)),T,1);}
+    if(c.pit)continue;
+    if(mudAt(tx)){ctx.fillStyle='#4a3622';ctx.fillRect(tx*T,c.g*T,T,3);ctx.fillStyle='#6b4f2e';ctx.fillRect(tx*T,c.g*T,T,1);
+      const b=mod(time*0.8+H2(tx,5),1.6);if(b<0.5){ctx.fillStyle='#8a6a3e';ctx.fillRect(tx*T+5+Math.floor(H2(tx,6)*6),c.g*T-Math.round(b*4),2,2);}}
+    const cv=convAt(tx);if(cv){ctx.fillStyle='#14102a';ctx.fillRect(tx*T,c.g*T-1,T,4);ctx.fillStyle='#ffd23f';for(let k=0;k<T;k+=6){const x=tx*T+mod(k+cv*time*70,T);ctx.fillRect(Math.round(x),c.g*T,2,1);}ctx.fillStyle='#4ce8d8';ctx.fillRect(tx*T,c.g*T-1,T,1);}
+    if(vineAt(tx)){const top=(c.g-9)*T,vx=tx*T+8;for(let y=top;y<c.g*T-2;y+=2){const sw=Math.round(Math.sin(time*1.2+y*0.06)*2*(y-top)/(9*T));ctx.fillStyle=(y/2)%5===0?'#4f9a3a':'#2f6f25';ctx.fillRect(vx+sw-1,y,2,2);if((y/2)%6===3){ctx.fillStyle='#7cc048';ctx.fillRect(vx+sw+1,y,3,2);}}
+      ctx.fillStyle='#5a3a1e';ctx.fillRect(vx-6,top-3,12,3);}
+    if(bounceAt(tx)){const k=mod(tx,18)-9,dt2=time-(bounceT.get(tx)||-9),sq=dt2<0.3?Math.sin(dt2/0.3*Math.PI)*3:0;const x=tx*T,y=c.g*T-4+sq;
+      ctx.fillStyle='#d48ab8';ctx.fillRect(x,y+2,T,4-sq/2);ctx.fillStyle='#ffd0ec';ctx.fillRect(x,y,T,3);ctx.fillStyle='#ffffff';if(k===0)ctx.fillRect(x+4,y-1,8,2);}
+    if(laserAt(tx)){const x=tx*T+8,top=(c.g-6)*T;ctx.fillStyle='#14182c';ctx.fillRect(x-4,top-6,8,6);ctx.fillStyle='#6e7a90';ctx.fillRect(x-3,top-5,6,4);
+      if(laserOn(tx)){ctx.fillStyle='rgba(255,59,47,.45)';ctx.fillRect(x-2,top,5,c.g*T-top);ctx.fillStyle='#ffd0c0';ctx.fillRect(x,top,1,c.g*T-top);}else{ctx.fillStyle='#ff3b2f';ctx.fillRect(x-1,top-2,2,1);}}
+  }
+  for(const i of icicles){const x=Math.round(i.x);
+    if(i.t<i.warn){const gy=(column(Math.floor(i.x/T)).g)*T;ctx.globalAlpha=0.25+0.5*(i.t/i.warn);ctx.fillStyle='#14305a';ctx.fillRect(x-4,gy-1,8,1);ctx.globalAlpha=1;}
+    ctx.fillStyle='#14182c';ctx.fillRect(x-3,Math.round(i.y)-11,6,8);ctx.fillRect(x-2,Math.round(i.y)-3,4,3);ctx.fillStyle='#bfe9ff';ctx.fillRect(x-2,Math.round(i.y)-10,4,7);ctx.fillStyle='#ffffff';ctx.fillRect(x-1,Math.round(i.y)-10,1,5);ctx.fillRect(x-1,Math.round(i.y)-3,2,2);}
+  if(gust.t>0){const a=Math.min(1,gust.t*3,(gust.dur-gust.t)*3);ctx.fillStyle='#ffffff';for(let i=0;i<14;i++){const y=cy+(i*41)%VH,len=24+(i*17)%30,x=cx+mod(gust.dir*time*420+i*97,VW+len)-len;ctx.globalAlpha=a*(0.25+(i%3)*0.1);ctx.fillRect(Math.round(x),Math.round(y),len,1);}
+    ctx.fillStyle='#4fbf4a';for(let i=0;i<6;i++){const x=cx+mod(gust.dir*time*300+i*71,VW),y=cy+60+(i*29)%90+Math.sin(time*6+i)*6;ctx.globalAlpha=a;ctx.fillRect(Math.round(x),Math.round(y),2,1);}ctx.globalAlpha=1;}
+}
+/* --- décor vivant --- */
+function drawAmbient(cx,cy){
+  if(anarchyOn)return;
+  const tx0=Math.floor(cx/T)-2,tx1=Math.floor((cx+VW)/T)+2;
+  for(let tx=tx0;tx<=tx1;tx++){const c=column(tx);if(c.pit)continue;const h=H2(tx,555),w=worldOf(tx);
+    if(w===1&&h<0.035){const x=tx*T+Math.sin(time*0.7+tx)*24,y=c.g*T-22-Math.sin(time*1.3+tx)*8,f=Math.floor(time*10+tx)%2;ctx.fillStyle=['#ff9ad8','#ffd23f','#ffffff'][tx%3];ctx.fillRect(Math.round(x)-2,Math.round(y),2,f?2:1);ctx.fillRect(Math.round(x)+1,Math.round(y),2,f?2:1);ctx.fillStyle='#14182c';ctx.fillRect(Math.round(x),Math.round(y),1,2);}   // papillons
+    else if(w===2&&h<0.03&&!c.tun){const x=tx*T+Math.sin(time*0.5+tx)*20,y=c.g*T,leg=Math.floor(time*8)%2;ctx.fillStyle='#14182c';ctx.fillRect(Math.round(x)-4,y-5,9,4);ctx.fillStyle='#e0482e';ctx.fillRect(Math.round(x)-3,y-5,7,3);ctx.fillRect(Math.round(x)-5,y-7,2,2);ctx.fillRect(Math.round(x)+4,y-7,2,2);ctx.fillStyle='#14182c';ctx.fillRect(Math.round(x)-3+leg,y-2,1,2);ctx.fillRect(Math.round(x)+2-leg,y-2,1,2);}   // crabes
+    else if(w===3&&h<0.07){const k=mod(time*0.25+h*7,1),x=tx*T+Math.sin(time+tx)*10,y=c.g*T-6-k*36,g=0.5+0.5*Math.sin(time*4+tx);ctx.globalAlpha=(1-k)*(0.4+0.6*g);ctx.fillStyle='#e0ff8a';ctx.fillRect(Math.round(x),Math.round(y),2,2);ctx.globalAlpha=(1-k)*0.25*g;disc(Math.round(x+1),Math.round(y+1),4);ctx.globalAlpha=1;}   // lucioles
+    else if(w===4&&h<0.02){const x=tx*T+Math.sin(time*0.4+tx)*18,y=c.g*T,wd=Math.round(Math.sin(time*6+tx));ctx.fillStyle='#14182c';ctx.fillRect(Math.round(x)-3,y-10+Math.abs(wd),7,10);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(x)-1,y-8+Math.abs(wd),3,6);ctx.fillStyle='#ffb347';ctx.fillRect(Math.round(x)+3*(Math.cos(time*0.4+tx)>0?1:-1),y-8,2,1);}   // manchots
+    else if(w===5&&h<0.015){const x=tx*T+mod(time*30+tx*13,200)-100,y=(c.g-12)*T+Math.sin(time*2+tx)*6,f=Math.floor(time*6+tx)%2;ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(x)-3,Math.round(y)+(f?0:-1),3,1);ctx.fillRect(Math.round(x)+1,Math.round(y)+(f?0:-1),3,1);ctx.fillRect(Math.round(x),Math.round(y),1,1);}   // oiseaux
+    else if(w===6&&h<0.025){const x=tx*T+mod(time*140+tx*37,500)-250,y=(c.g-11)*T+(tx%3)*14;ctx.fillStyle='#14182c';ctx.fillRect(Math.round(x)-6,Math.round(y)-2,12,4);ctx.fillStyle=['#ff5ad8','#4ce8d8','#ffd23f'][tx%3];ctx.fillRect(Math.round(x)-5,Math.round(y)-1,10,2);ctx.fillStyle='#ffffff';ctx.fillRect(Math.round(x)+5,Math.round(y),1,1);ctx.globalAlpha=0.3;ctx.fillRect(Math.round(x)-16,Math.round(y),10,1);ctx.globalAlpha=1;}   // voitures volantes
+  }
+}
+/* --- nouveaux ennemis dauphins --- */
+function worldEnemyKind(tx){return [null,'mole','surf','croco','sled','para','drone'][worldOf(tx)];}
+function spawnWorldEnemy(k,tx){const c=column(tx);if(c.pit||c.tun||c.ar)return;
+  if(k==='para')enemies.push(mkEnemy('para',tx*T,(c.g-13)*T));else if(k==='drone')enemies.push(mkEnemy('drone',tx*T,(c.g-5)*T));else enemies.push(mkEnemy(k,tx*T,c.g*T-(k==='croco'?8.01:k==='sled'?10.01:9.01)));}
+const WE_SIZE={mole:[14,9,2],surf:[16,10,3],croco:[20,8,3],sled:[18,10,3],para:[14,9,2],drone:[16,10,3]};
+function mkWorldEnemy(kind,x,y,tier){const s=WE_SIZE[kind];return {kind,x,y,w:s[0],h:s[1],vx:0,vy:0,dir:Math.random()<0.5?1:-1,hp:s[2]+tier,maxHp:s[2]+tier,tier,speed:30,state:kind==='mole'?'hidden':'alive',t:0,flash:0,onGround:false,mode:'idle',mt:Math.random()*2,gy:y};}
+const groundAI=(e,dt,v)=>{e.vy=Math.min(e.vy+GRAV*dt,MAXFALL);const hit=moveX(e,v*dt);moveY(e,e.vy*dt);if(e.y>WATER_ROW*T+10){e.state='dead';e.t=9;}return hit;};
+const edgeAhead=e=>e.onGround&&!supportAt(e.dir>0?e.x+e.w+1:e.x-1,e.y+e.h+2);
+const WORLD_AI={
+  mole(e,dt){const p=player,dx=p.x+5-(e.x+e.w/2);e.mt+=dt;   // dauphin-taupe : sort du sol quand on approche, puis replonge
+    if(e.mode==='idle'){e.state='hidden';e.y=e.gy+12;if(Math.abs(dx)<80&&Math.abs(p.y-e.gy)<60&&e.mt>1.2){e.mode='up';e.mt=0;e.dir=dx>0?1:-1;vfx('kill',e.x+e.w/2,e.gy+9);}}
+    else if(e.mode==='up'){e.state='alive';e.y=e.gy+12-Math.min(1,e.mt/0.25)*12;if(e.mt>1.8){e.mode='down';e.mt=0;}}
+    else{e.y=e.gy+Math.min(1,e.mt/0.3)*12;if(e.mt>0.3){e.mode='idle';e.mt=0;}}},
+  surf(e,dt){e.mt+=dt;const v=e.dir*95;if(groundAI(e,dt,v)){if(e.onGround){e.vy=-230;e.onGround=false;}else e.dir=-e.dir;}if(edgeAhead(e)&&e.mt>0.4){e.dir=-e.dir;e.mt=0;}
+    if(Math.random()<0.3)parts.push({x:e.x+(e.dir>0?0:e.w),y:e.y+e.h,vx:-e.dir*40,vy:-20,g:200,life:0.3,col:'#c4ecff',sz:1});},
+  croco(e,dt){const p=player,dx=p.x+5-(e.x+e.w/2);e.mt+=dt;let v=e.dir*18;
+    if(e.mode==='snap'){v=e.dir*150;if(e.mt>0.35){e.mode='rest';e.mt=0;}}else if(e.mode==='rest'){v=0;if(e.mt>0.8){e.mode='idle';e.mt=0;}}
+    else if(Math.abs(dx)<64&&Math.abs(p.y-e.y)<20&&e.mt>0.6){e.dir=dx>0?1:-1;e.mode='snap';e.mt=0;}
+    if(groundAI(e,dt,v))e.dir=-e.dir;if(e.mode==='idle'&&edgeAhead(e))e.dir=-e.dir;},
+  sled(e,dt){const p=player,dx=p.x+5-(e.x+e.w/2);e.mt+=dt;
+    if(e.mode==='idle'){e.vx*=0.9;if(Math.abs(dx)<150&&Math.abs(p.y-e.y)<40){e.mode='go';e.dir=dx>0?1:-1;}}
+    else if(e.mode==='go'){e.vx=clamp(e.vx+e.dir*260*dt,-165,165);if(Math.random()<0.5)parts.push({x:e.x+e.w/2,y:e.y+e.h,vx:-e.dir*30,vy:-30,g:200,life:0.3,col:'#ffffff',sz:1});}
+    else{e.vx=0;if(e.mt>1){e.mode='idle';e.mt=0;}}
+    if(groundAI(e,dt,e.vx)){e.mode='stun';e.mt=0;e.vx=0;vfx('frost',e.x+e.w/2,e.y+e.h);}
+    if(e.mode==='go'&&Math.sign(dx)!==e.dir&&Math.abs(dx)>120){e.mode='stun';e.mt=0;}},
+  para(e,dt){const p=player;e.mt+=dt;   // parachutiste : descend en se balançant puis devient un dauphin normal
+    e.y+=30*dt;e.x+=(Math.sign(p.x-e.x)*18+Math.sin(e.mt*2)*20)*dt;
+    if(solidAt(e.x+e.w/2,e.y+e.h+1)||oneWay(Math.floor((e.x+e.w/2)/T),Math.floor((e.y+e.h+1)/T))){e.kind='hop';e.hopT=0.5;e.turnT=0;vfx('kill',e.x+e.w/2,e.y+e.h);}
+    if(e.y>WATER_ROW*T+10){e.state='dead';e.t=9;}},
+  drone(e,dt){const p=player;e.mt+=dt;   // drone-dauphin policier : suit le joueur de haut et tire
+    const tx=p.x+5+(e.x<p.x?-70:70),ty=p.y-46;e.x+=clamp(tx-e.x,-60*dt,60*dt);e.y+=clamp(ty-e.y,-50*dt,50*dt)+Math.sin(e.mt*3)*0.3;e.dir=p.x>e.x?1:-1;
+    if(e.mt>2.6&&Math.abs(p.x-e.x)<220){e.mt=0;const a=Math.atan2(p.y+7-e.y,p.x+5-e.x);bfx.push({type:'bolt',x:e.x+e.w/2,y:e.y+e.h,vx:Math.cos(a)*130,vy:Math.sin(a)*130,c:'#4ce8d8',t:0});try{sfx.bossFire();}catch(er){}}}
+};
+function drawWorldEnemy(e){
+  const dead=e.state==='dead',fl=e.flash>0,img=fl?DOLB_W:(e.kind==='sled'?DOLB_I:DOLB),cx=Math.round(e.x+e.w/2),by=Math.round(e.y+e.h);
+  if(e.kind==='mole'){if(e.state==='hidden'&&e.mode==='idle'){ctx.fillStyle='#6e5a40';ctx.fillRect(cx-6,Math.round(e.gy+8),12,2);ctx.fillStyle='#4f3f2c';ctx.fillRect(cx-4,Math.round(e.gy+7),8,1);return;}
+    ctx.save();ctx.beginPath();ctx.rect(cx-20,Math.round(e.gy)-30,40,39);ctx.clip();ctx.translate(cx,Math.round(e.y+4));ctx.rotate(-Math.PI/2*e.dir*0.6);ctx.scale(e.dir,dead?-1:1);ctx.drawImage(img,-9,-5);
+    ctx.fillStyle='#ffd23f';ctx.fillRect(1,-8,6,2);ctx.fillStyle='#14182c';ctx.fillRect(3,-6,1,1);ctx.restore();   // casque de mineur
+    ctx.fillStyle='#6e5a40';ctx.fillRect(cx-7,Math.round(e.gy+8),14,2);return;}
+  ctx.save();ctx.translate(cx,Math.round(e.y+e.h/2));ctx.scale(e.dir,dead?-1:1);
+  if(e.kind==='surf'){ctx.fillStyle='#14182c';ctx.fillRect(-10,4,21,3);ctx.fillStyle='#ffd23f';ctx.fillRect(-9,4,19,2);ctx.fillStyle='#e0262e';ctx.fillRect(-2,4,4,2);ctx.drawImage(img,-9,-7);}
+  else if(e.kind==='croco'){const open=e.mode==='snap'?2:0;ctx.fillStyle='#14182c';ctx.fillRect(-11,-4,23,9);ctx.fillStyle='#3f7a2a';ctx.fillRect(-10,-3,21,7);ctx.fillStyle='#5aa83a';for(let x=-8;x<6;x+=4)ctx.fillRect(x,-4,2,1);
+    ctx.fillStyle='#3f7a2a';ctx.fillRect(9,-2-open,6,3);ctx.fillRect(9,1+open,6,2);ctx.fillStyle='#ffffff';ctx.fillRect(10,1,1,1);ctx.fillRect(12,1,1,1);ctx.fillStyle='#4aa8e8';ctx.fillRect(-4,-7,3,3);   // l'aileron du dauphin dépasse du costume
+    ctx.fillStyle='#14182c';ctx.fillRect(5,-3,2,2);ctx.fillStyle='#3f7a2a';ctx.fillRect(-14,0,4,2);}
+  else if(e.kind==='sled'){ctx.fillStyle='#5a3a1e';ctx.fillRect(-9,3,19,3);ctx.fillStyle='#14182c';ctx.fillRect(-10,6,21,1);ctx.fillRect(10,4,2,2);ctx.drawImage(img,-9,-7);ctx.fillStyle='#e0262e';ctx.fillRect(2,-4,4,2);ctx.fillRect(1,-3,2,4);}
+  else if(e.kind==='para'){ctx.drawImage(img,-9,-5);const sw=Math.sin(e.mt*2)*0.15;ctx.rotate(sw);ctx.strokeStyle='#d0d8e6';ctx.beginPath();ctx.moveTo(-6,-3);ctx.lineTo(-10,-18);ctx.moveTo(6,-3);ctx.lineTo(10,-18);ctx.stroke();
+    for(let i=0;i<5;i++){ctx.fillStyle=i%2?'#ffffff':'#e0262e';ctx.fillRect(-12+i*5,-23+(i===0||i===4?2:0),5,6-(i===0||i===4?2:0));}ctx.fillStyle='#14182c';ctx.fillRect(-12,-18,25,1);}
+  else if(e.kind==='drone'){ctx.drawImage(img,-9,-5);ctx.fillStyle='#14182c';ctx.fillRect(-1,-10,2,5);const f=Math.floor(time*20)%2;ctx.fillStyle='#9aa6ba';ctx.fillRect(f?-8:-4,-11,f?16:8,1);
+    ctx.fillStyle=Math.floor(time*5)%2?'#ff3b2f':'#3b9bff';ctx.fillRect(-2,-8,4,2);ctx.fillStyle='#14182c';ctx.fillRect(0,-6,8,3);ctx.fillStyle='#9aa6ba';ctx.fillRect(1,-5,6,1);}
+  ctx.restore();
+}
+/* --- trésors du clown : un morceau caché en hauteur dans chaque monde --- */
+const CLOWN_PIECES=[LG('NEZ ROUGE','RED NOSE'),LG('PERRUQUE','WIG'),LG('NŒUD PAPILLON','BOW TIE'),LG('GANTS','GLOVES'),LG('GRANDES CHAUSSURES','BIG SHOES'),LG('KLAXON','HORN')];
+const PIECE_COLS=['#e0262e','#ff9a2a','#ffd23f','#ffffff','#3b7fd4','#ff5ad8'];
+let treasures=[];
+function placeTreasures(){
+  treasures=[];if(anarchyOn||speedOn)return;
+  const bases=[Math.round(BEACH_TX*0.6),Math.round((BEACH_TX+SWAMP_TX)/2)+7,Math.round((SWAMP_TX+ICE_TX)/2)+11,ICE_TX+60,CLOUD_TX+90,CITY_TX+120];
+  bases.forEach((b,i)=>{
+    let t=b;
+    for(let k=0;k<300;k++,t++){let ok=true;for(let d=-8;d<=3&&ok;d++){const c=column(t+d);if(c.pit||c.tun||c.ar||c.wall||c.cs||c.cf||skyDx(t+d)||mecaDx(t+d)||palDx(t+d))ok=false;}if(ok)break;}
+    const g=column(t).g;
+    for(const [a,r] of[[-7,3],[-4,6],[-1,9]])for(let d=0;d<3;d++)plat.add(pkey(t+a+d,g-r));
+    treasures.push({i,x:(t)*T+8,y:(g-9)*T,got:!!(shop.clownP&(1<<i))});
+  });
+}
+function stepTreasures(){
+  if(state!=='play')return;const p=player;
+  for(const tr of treasures)if(!tr.got&&rectsOverlap(p.x,p.y,p.w,p.h,tr.x-7,tr.y-14,14,14)){
+    tr.got=true;shop.clownP=(shop.clownP||0)|(1<<tr.i);const n=[0,1,2,3,4,5].filter(k=>shop.clownP&(1<<k)).length;
+    vfx('shine',tr.x,tr.y-6);sfx.heal();floatText(tr.x,tr.y-24,lgS(CLOWN_PIECES[tr.i])+' '+n+'/6','#ffd23f');
+    if(n>=6&&!shop.owned.includes('clown')){shop.owned.push('clown');floatText(tr.x,tr.y-36,lang==='en'?'CLOWN SKIN UNLOCKED!':'SKIN CLOWN DÉBLOQUÉ !','#ff5ad8');}
+    saveShop();
+  }
+}
+function drawTreasures(){
+  for(const tr of treasures){if(tr.got)continue;const y=Math.round(tr.y-8+Math.sin(time*2.5+tr.i)*2),x=Math.round(tr.x),c=PIECE_COLS[tr.i];
+    ctx.globalAlpha=0.25+0.15*Math.sin(time*3);ctx.fillStyle=c;disc(x,y,9);ctx.globalAlpha=1;
+    ctx.fillStyle='#14182c';disc(x,y,5);ctx.fillStyle=c;disc(x,y,4);ctx.fillStyle='#ffffff';ctx.fillRect(x-2,y-2,2,2);
+    if(Math.floor(time*3+tr.i)%3===0){ctx.fillStyle='#fff6c4';ctx.fillRect(x+6,y-7,1,3);ctx.fillRect(x+5,y-6,3,1);}}
+}
+/* --- arme du roi : le trident royal --- */
+const TRIDENT_R=spr(["...........yyYw","..........y....","oOoOoOoOoyyyyYw","..........y....","...........yyYw"],{y:'#c48412',Y:'#ffe066',w:'#ffffff',o:'#3b7fd4',O:'#1c3f6e'},true);
 
 const CLOUDB_HP=900;
 let cloudB=null,cloudBalls=[],cloudDone=false;
@@ -6607,7 +6778,7 @@ function update(dt){
   maybeSpawnSix(dt);stepSix(dt);
   stepOcto(dt);
   stepCastle(dt);
-  stepWitch(dt);stepPoison(dt);stepEskimo(dt);stepCloudBoss(dt);stepMeca(dt);stepKingD(dt);stepBfx(dt);stepScepterBeams(dt);stepPedestal(dt);
+  stepWitch(dt);stepPoison(dt);stepEskimo(dt);stepCloudBoss(dt);stepWorldMech(dt);stepTreasures();stepMeca(dt);stepKingD(dt);stepBfx(dt);stepScepterBeams(dt);stepPedestal(dt);
   stepBossShots(dt);
   stepSoulFx(dt);
   stepPickups(dt);
@@ -7131,6 +7302,7 @@ function drawEnemy(e){
   drawEnemy0(e);
 }
 function drawEnemy0(e){
+  if(WE_SIZE[e.kind]){drawWorldEnemy(e);return;}
   if(e.kind==='worm'){drawWorm(e);return;}
   if(e.kind==='gull'){drawGull(e);return;}
   if(e.kind==='zombie'){drawZombie(e);return;}
@@ -7237,7 +7409,7 @@ function drawPlayer(){
   ctx.restore();
   if(state==='dying')return;
   if(reloadBar>=0&&state==='play')drawReloadBar(cx,p.y,reloadBar);
-  const isTri=shop.weapon==='trident',tip=rodTip(isTri?throwAnim>0:hooks.length>0),hx=p.x+5+p.face*5,hy=p.y+8;
+  const isTri=shop.weapon==='trident'||shop.weapon==='royal',tip=rodTip(isTri?throwAnim>0:hooks.length>0),hx=p.x+5+p.face*5,hy=p.y+8;
   if(glockOn){   // pistolet tenu dans la direction de la visée
     const a=Math.atan2(aim.y,aim.x);ctx.save();ctx.translate(Math.round(hx),Math.round(hy-1));ctx.rotate(a);if(aim.x<0)ctx.scale(1,-1);
     for(const oy of[-3,3]){   // akimbo : un pistolet dans chaque main
@@ -7639,7 +7811,7 @@ function drawReticle(){
   ctx.fillStyle='#ff5a4a';ctx.fillRect(x,y,1,1);
 }
 function drawTridentHeld(hx,hy,tx,ty){
-  if(TRIDENT_P){ctx.save();ctx.translate(Math.round(hx),Math.round(hy));ctx.rotate(Math.atan2(ty-hy,tx-hx));ctx.drawImage(TRIDENT_P,Math.round(Math.hypot(tx-hx,ty-hy))-TRIDENT_P.width+2,-4);ctx.restore();return;}
+  if(TRIDENT_P){const TI=shop.weapon==='royal'?TRIDENT_R:TRIDENT_P;ctx.save();ctx.translate(Math.round(hx),Math.round(hy));ctx.rotate(Math.atan2(ty-hy,tx-hx));ctx.drawImage(TI,Math.round(Math.hypot(tx-hx,ty-hy))-TI.width+2,-4);ctx.restore();return;}
   pixLine(hx,hy,tx,ty,'#e0a93b');
   const L=Math.hypot(tx-hx,ty-hy)||1,ux=(tx-hx)/L,uy=(ty-hy)/L,nx=-uy,ny=ux;
   pixLine(tx+nx*-2,ty+ny*-2,tx+nx*2,ty+ny*2,'#ff5a4a');
@@ -7650,7 +7822,7 @@ function drawTridents(){
     const x=Math.round(h.x),y=Math.round(h.y);
     if(h.g){ctx.fillStyle='rgba(255,220,120,.35)';ctx.fillRect(x-Math.round(h.ux*6),y-Math.round(h.uy*6),2,2);ctx.fillStyle='#ffe14d';ctx.fillRect(x-1,y-1,3,2);ctx.fillStyle='#fff';ctx.fillRect(x,y-1,1,1);continue;}
     ctx.fillStyle='rgba(255,70,50,.28)';disc(x,y,8);
-    ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(h.uy,h.ux));ctx.drawImage(TRIDENT_P,-9,-4);ctx.restore();
+    ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(h.uy,h.ux));ctx.drawImage(h.r?TRIDENT_R:TRIDENT_P,-9,-4);ctx.restore();
   }
 }
 function drawBossShots(){
@@ -7816,10 +7988,10 @@ function render(){
   drawWater(cx,cy);
   drawOcto();
   drawCastle();
-  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();drawMecaGate(cx);drawPalace(cx);drawCloudBoss();drawMeca();drawKingD();drawBfx();drawTutoWorld();
+  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();drawMecaGate(cx);drawPalace(cx);drawAmbient(cx,cy);drawTreasures();drawCloudBoss();drawMeca();drawKingD();drawBfx();drawTutoWorld();
   drawPalms(cx,cy);
   drawSwampTowers(cx);
-  drawTiles(cx,cy);drawCloudGear(cx,cy);
+  drawTiles(cx,cy);drawCloudGear(cx,cy);drawWorldMech(cx,cy);   // boue, marée, tapis roulants, lianes, trampolines, lasers
   if(hole&&!hole.shut&&cx<(hole.r+1)*T&&cx+VW>hole.l*T){const gy=hole.g*T;ctx.fillStyle='#000000';ctx.fillRect(hole.l*T,gy,(hole.r-hole.l+1)*T,VH*3);if(Math.sin(time*3)>0.6){ctx.globalAlpha=0.5;ctx.drawImage(RNG_DIGITS['6'],(hole.l+1)*T+4,gy+10);ctx.globalAlpha=1;}}   // le trou secret
   drawPuddles(cx);
   drawTents();
@@ -7896,7 +8068,7 @@ function resetWorld(){
   groundCache.clear();
   SEED=(speedOn&&duel)?duel.seed:(Math.random()*4294967296)|0;   // duel : même graine pour les deux joueurs
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;mecaB=null;mecaDone=false;kingD=null;kingDone=false;bfx=[];tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];crows=[];rngLas=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  gust={t:0,dur:0,dir:1,next:6};icicles=[];treasures=[];cloudB=null;cloudBalls=[];cloudDone=false;mecaB=null;mecaDone=false;kingD=null;kingDone=false;bfx=[];tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];crows=[];rngLas=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -7942,7 +8114,7 @@ function startGameCore(){
     placePlayer(shop.beach*(BEACH_TX+10)*T);
   } else {placePlayer();fromStart=true;}
   state='play';
-  cineGameStart(fromStart);   // histoire : intro + tuto (depuis le début) ou chapitre du checkpoint
+  placeTreasures();cineGameStart(fromStart);   // histoire : intro + tuto (depuis le début) ou chapitre du checkpoint
   if(anarchyOn)floatText(player.x+5,player.y-30,'ANARCHIE !','#ff4a4a');
   paused=false;ovRestart.hidden=true;
   overlayVisible=false;ov.classList.remove('show');
@@ -8309,6 +8481,7 @@ function setMode(want){
 /* ---------- Menu ARMES (menu principal) : une case par arme, cliquer ouvre sa fiche et ses améliorations ---------- */
 const WEAPONS=[
   {id:'rod',name:'Canne à pêche',desc:'Grappin qui déclenche une zone de dégâts.',icon:()=>ROD_ICON,owned:()=>true,locked:()=>rodLocked(),render:()=>renderRod()},
+  {id:'royal',name:'Trident royal',desc:'Le trident du Roi des dauphins : transperce 3 ennemis de plus, frappe 40 % plus fort et fait jaillir un geyser doré à chaque coup. Utilise les améliorations du trident. Laissé par le Roi des dauphins.',icon:()=>TRIDENT_R,owned:()=>shop.royalOwned,render:()=>renderTrident()},
   {id:'trident',name:'Trident infernal',desc:'Transperce plusieurs ennemis. Débloqué à la plage.',icon:()=>TRIDENT_P,owned:()=>shop.tridentOwned,render:()=>renderTrident()},
   {id:'dagger',name:'Dagues',desc:'Chaque attaque est un dash qui blesse tout sur son passage. Plus rapide et saute plus haut. Dans le coffre rouge des marécages.',icon:()=>DAGGER_ICON,owned:()=>shop.daggerOwned,render:()=>renderDagger()},
   {id:'six',name:'Numéro 6',desc:'Un jet continu de chiffres qui retombent en arc, comme le lait de la vache. Laissé par le boss n°6.',icon:()=>RNG_DIGITS['6'],owned:()=>shop.sixOwned,render:()=>renderSix()},
@@ -8320,7 +8493,7 @@ const WEAPONS=[
   {id:'tarot',name:'Jeu de tarot',desc:'Lance une carte en ligne droite. Arbre de compétences : dégâts, Silver Chariot (plus de cartes), Star Platinum (étoiles perforantes autoguidées) et Sorcellerie (potions aléatoires). Laissé par le Roi Cacamille 2.',icon:()=>TAROT_ICON,owned:()=>shop.tarotOwned,render:()=>renderTarot()},
   {id:'scepter',name:'Sceptre de glace',desc:'Un souffle de glace qui ralentit les ennemis et les blesse sur la durée. Des lasers de glace jaillissent parfois du sol (niveau 3 : 2 lasers, niveau 5 : 3). Laissé par l\'esquimau.',icon:()=>SCEPTER_ICON,owned:()=>shop.scepterOwned,render:()=>renderScepter()}
 ];
-const WEAP_ORDER=['rod','trident','dagger','scepter','six','tarot','harpoon','katana','boomerang','tentacle','scythe'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
+const WEAP_ORDER=['rod','trident','royal','dagger','scepter','six','tarot','harpoon','katana','boomerang','tentacle','scythe'];   // 1re ligne : armes de base (+ 2 places réservées), 2e ligne : les suivantes
 WEAPONS.sort((a,b)=>WEAP_ORDER.indexOf(a.id)-WEAP_ORDER.indexOf(b.id));
 let weapOpen=false,weapSel=null;
 const weapEl=$('weap'),weapGrid=$('weap-grid'),weapDet=$('weap-detail');
@@ -9409,6 +9582,7 @@ function renderSkins(){
     else if(sk.collab){pr.textContent='COLLAB RNG∞';}
     else if(sk.frag){pr.textContent='FRAGMENTS '+(shop.fr[sk.id]||0)+'/'+sk.frag;}
     else if(sk.crate){pr.textContent='EN CAISSE';}
+    else if(sk.treasure){pr.textContent='TRÉSORS '+[0,1,2,3,4,5].filter(k=>(shop.clownP||0)&(1<<k)).length+'/6';}
     else if(sk.souls){const ic=document.createElement('canvas');ic.width=7;ic.height=8;drawIcon(ic,SOUL);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.souls;pr.appendChild(sp);}   // skin Clown : s'achète avec des âmes
     else{const ic=document.createElement('canvas');ic.width=7;ic.height=6;drawIcon(ic,GOLD);pr.appendChild(ic);const sp=document.createElement('span');sp.textContent=sk.price;pr.appendChild(sp);}
     card.appendChild(pr);
@@ -9416,6 +9590,7 @@ function renderSkins(){
     if(sk.soon){b.textContent='PROCHAINEMENT';b.disabled=true;}
     else if(eq){b.textContent='ÉQUIPÉ';b.disabled=true;}
     else if(owned){b.textContent='ÉQUIPER';b.classList.add('equip');b.addEventListener('click',()=>{shop.equipped=sk.id;saveShop();renderShop();});}
+    else if(sk.treasure){b.textContent='TRÉSORS CACHÉS';b.disabled=true;}
     else if(sk.frag||sk.crate){b.textContent='CAISSES';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();openCrates();});}
     else if(sk.collab){b.textContent='DÉBLOQUER';b.classList.add('equip');b.addEventListener('click',()=>{closeShop();accHint='rng';openAcc();});}   // skin collab : renvoie à la connexion Google
     else if(sk.souls){if(shop.souls>=sk.souls){b.textContent='ACHETER';b.addEventListener('click',()=>buySkin(sk));}else{const m=sk.souls-shop.souls;b.textContent='IL MANQUE '+m+' ÂME'+(m>1?'S':'');b.disabled=true;}}
@@ -9442,7 +9617,7 @@ function renderSkins(){
   }
 }
 let skLockedOpen=false;
-function buySkin(sk){if(sk.soon)return;
+function buySkin(sk){if(sk.soon||sk.treasure)return;
   if(shop.owned.includes(sk.id)||sk.crate||sk.frag)return;
   if(sk.souls){if(shop.souls<sk.souls)return;shop.souls-=sk.souls;}
   else{if(shop.gold<sk.price)return;shop.gold-=sk.price;}
