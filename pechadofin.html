@@ -1316,12 +1316,14 @@ function cowFieldAt(tx){   // grand pré plat (1 écran) où la vache géante at
 const cowPlat=(tx,ty)=>{const f=cowFieldAt(tx);if(!f||ty!==f.floor-4)return false;const d=Math.abs(Math.abs(tx)-f.fc);return d>=3&&d<=6;};
 const inSwamp=tx=>Math.abs(tx)>=BEACH_TX&&(anarchyOn?!!zoneDefK(zoneK(tx)).swamp:(Math.abs(tx)>=SWAMP_TX&&Math.abs(tx)<ICE_TX));
 const CLOUD_TX=ICE_TX+ICE_SCREENS*(VW/T)+120;   // classique : le monde nuage commence après le château de glace (on y accède par la fenêtre du roi)
-const inCloud=tx=>!anarchyOn&&Math.abs(tx)>=CLOUD_TX;
+const inCloud=tx=>!anarchyOn&&Math.abs(tx)>=CLOUD_TX&&Math.abs(tx)<CITY_TX;
 const SKY_CX=CLOUD_TX+170,SKY_G=16,SKY_P=[   // arène du dauphin des nuages : des plateformes fixes au-dessus du vide [dx début, dx fin, hauteur en cases]
   [-22,-19,2],[-14,-11,2],[-6,-3,2],[2,5,2],[10,13,2],[18,21,2],
   [-18,-15,5],[-10,-7,5],[-2,1,5],[6,9,5],[14,17,5],
   [-14,-11,8],[-6,-3,8],[2,5,8],[10,13,8],
   [-10,-7,11],[-2,1,11],[6,9,11]];
+const MECA_CX=SKY_CX+160,CITY_TX=MECA_CX+31,KINGD_CX=CITY_TX+14*(VW/T),PAL_G=20;   // bout des nuages : arène du méca-dauphin, portail, puis la cité et le palais du roi
+const inCity=tx=>!anarchyOn&&Math.abs(tx)>=CITY_TX;
 const skyDx=tx=>{if(anarchyOn)return null;const a=Math.abs(tx);if(a<SKY_CX-46||a>SKY_CX+46)return null;const sg=tx<0?-1:1,dx=(tx-sg*SKY_CX)*sg;return {dx,sg};};
 const skyPlat=(tx,ty)=>{const a=Math.abs(tx);if(a<SKY_CX-24||a>SKY_CX+24||anarchyOn)return false;const sg=tx<0?-1:1,dx=(tx-sg*SKY_CX)*sg;for(const q of SKY_P)if(dx>=q[0]&&dx<=q[1]&&ty===SKY_G-q[2])return true;return false;};
 function skyCol(tx,dx){
@@ -1352,6 +1354,7 @@ function pitInfo(cell){
   for(const o of[-12,11,34])if(castleAt(cell*22+o))return null;   // pas de trou autour du château
   const s=cell*22+6+Math.floor(hash2(cell,78)*9);
   if(cl&&Math.abs(s)<CLOUD_TX+30)return null;   // l'arrivée par la fenêtre reste sur du plat
+  if(!anarchyOn&&(Math.abs(Math.abs(s)-MECA_CX)<60||Math.abs(Math.abs(s)-KINGD_CX)<60||(Math.abs(s)>=CITY_TX&&Math.abs(s)<CITY_TX+20)))return null;   // pas de trou autour du méca, du portail et du palais
   const w=cl?7+Math.floor(hash2(cell,79)*6):2+Math.floor(hash2(cell,79)*2);
   const hl=Math.round(spawnBlend(s-3)), hr=Math.round(spawnBlend(s+w+2));
   if(Math.abs(hl-hr)>2) return null;
@@ -1461,6 +1464,8 @@ function column(tx){
   }
   if(rzIn(tx))return (tx<RZC-RZW||tx>=RZC+RZW)?RZ_WALL:RZ_FLOOR;   // arène du boss n°6
   {const sk=skyDx(tx);if(sk)return skyCol(tx,sk.dx);}   // arène du dauphin des nuages
+  {const md=mecaDx(tx);if(md)return mecaCol(tx,md.dx);}   // arène du méca-dauphin
+  {const pd=palDx(tx);if(pd)return palCol(tx,pd.dx);}   // palais du roi des dauphins
   let c=colCache.get(tx); if(c!==undefined) return c;
   const ar=arenaAt(tx);
   if(ar){
@@ -1480,7 +1485,8 @@ function column(tx){
   else if(p&&tx>=p.s+p.w&&tx<=p.s+p.w+1) g=p.hr;
   else if(beach){const bg=beachGround(tx);g=bg.g;tun=bg.tun;}
   else g=Math.round(spawnBlend(tx));
-  c={g,pit,beach,tun,swamp:inSwamp(tx),ice:inIce(tx),cloud:inCloud(tx)}; colCache.set(tx,c); return c;
+  if(inCity(tx)&&!pit)g=cityG(tx);   // cité : sol en paliers réguliers
+  c={g,pit,beach,tun,swamp:inSwamp(tx),ice:inIce(tx),cloud:inCloud(tx),city:inCity(tx)}; colCache.set(tx,c); return c;
 }
 function solidTile(tx,ty){
   if(pvpMapOn()&&pvpIn(tx))return pvpSolid(tx,ty);   // arène PvP
@@ -1505,7 +1511,7 @@ const palmPlat=(tx,ty)=>{   // la couronne de feuilles d'un cocotier sert de pla
   for(let d=-1;d<=1;d++){const pm=palmAt(tx+d);if(pm&&ty===pm.g-2&&(pm.flip?d===1||d===0:d===0||d===-1))return true;}
   return false;
 };
-const oneWay=(tx,ty)=>pvpMapOn()&&pvpIn(tx)?pvpTile(tx,ty)==='=':twIn(tx)?twOne(tx,ty):!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty)||skyPlat(tx,ty));
+const oneWay=(tx,ty)=>pvpMapOn()&&pvpIn(tx)?pvpTile(tx,ty)==='=':twIn(tx)?twOne(tx,ty):!rzIn(tx)&&((plat.has(tx*512+ty+200)&&!column(tx).ar&&!column(tx).cf&&!inBeach(tx))||palmPlat(tx,ty)||cowPlat(tx,ty)||skyPlat(tx,ty)||mecaPlat(tx,ty)||palPlat(tx,ty));
 /* ---------- Monde nuage : éléments de plateforme (nuages mobiles, nuages friables, ressorts, courants ascendants) ---------- */
 const movers=[],fragMap=new Map(),fragList=[],springs=new Set(),springAnim=new Map(),drafts=[];
 const pkey=(tx,ty)=>tx*512+ty+200;
@@ -2614,6 +2620,7 @@ function loadShop(fresh){
       d.beach=(j.beach===1||j.beach===-1)?1:0;   // le chemin est toujours à droite
       d.ice=(j.ice===1||j.ice===-1)?1:0;   // checkpoint de la glacière (mode classique)
       d.cloud=(j.cloud===1||j.cloud===-1)?1:0;
+      d.city=(j.city===1||j.city===-1)?1:0;d.won=j.won===true;   // checkpoint de la cité, roi des dauphins vaincu
       d.pants=j.pants===true||d.beach!==0||(j.beach===1||j.beach===-1);   // histoire : pantalon retrouvé (tuto fait)   // checkpoint du monde nuage (mode classique)
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
@@ -2755,6 +2762,7 @@ function moveY(e,dy){
 /* ================= Entités ================= */
 function mkEnemy(kind,x,y){
   const e=mkEnemy0(kind,x,y);
+  if(inCity(Math.floor(x/T))){e.robo=true;e.hp=e.maxHp=e.hp+2;}   // cité : dauphins robotisés, un peu plus solides
   if(anarchyOn){   // anarchie : palier de distance sans plafond, PV et vitesse qui montent à chaque boss rencontré
     const extra=Math.max(0,Math.floor(Math.abs(x)/2400)-8);
     e.tier+=extra;e.hp=e.maxHp=Math.ceil((e.hp+extra)*anaHp());
@@ -2925,6 +2933,8 @@ function allTargets(){
   {const wr=witchRect();if(wr)targets.push({r:wr,hit:d=>hitWitch(d)});}
   {const er=eskRect();if(er)targets.push({r:er,hit:d=>hitEskimo(d)});}
   {const cr=cloudRect();if(cr)targets.push({r:cr,hit:d=>hitCloudBoss(d)});}
+  {const mr=mecaRect();if(mr)targets.push({r:mr,hit:d=>hitMeca(d)});}
+  {const kr=kingRectD();if(kr)targets.push({r:kr,hit:d=>hitKingD(d)});}
   {const kr=kingRect();if(kr)targets.push({r:kr,hit:d=>hitKing(d)});}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)targets.push({r:[cow.x,cow.y,cow.w,cow.h],hit:d=>hitCow(d)});
   if(six&&six.state==='alive'&&six.spawnT<=0)targets.push({r:[six.x,six.y,six.w,six.h],hit:d=>hitSix(d)});
@@ -2983,6 +2993,8 @@ function stepDagger(dt){
   {const wr=witchRect();if(wr)tryHit(witch,wr,x=>hitWitch(x));}
   {const er=eskRect();if(er)tryHit(eskimo,er,x=>hitEskimo(x));}
   {const cr=cloudRect();if(cr)tryHit(cloudB,cr,x=>hitCloudBoss(x));}
+  {const mr=mecaRect();if(mr)tryHit(mecaB,mr,x=>hitMeca(x));}
+  {const kr=kingRectD();if(kr)tryHit(kingD,kr,x=>hitKingD(x));}
   {const kr=kingRect();if(kr)tryHit(king,kr,x=>hitKing(x));}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)tryHit(cow,[cow.x,cow.y,cow.w,cow.h],x=>hitCow(x));
   if(six&&six.state==='alive'&&six.spawnT<=0)tryHit(six,[six.x,six.y,six.w,six.h],x=>hitSix(x));
@@ -3045,6 +3057,8 @@ function stepTrident(dt){
     }
     {const wr=witchRect();if(h.n<pierce&&wr&&!h.hit.has(witch)&&rectsOverlap(h.x-5,h.y-5,10,10,wr[0],wr[1],wr[2],wr[3])){h.hit.add(witch);hitWitch(dmg);h.n++;}}
     {const cr=cloudRect();if(h.n<pierce&&cr&&!h.hit.has(cloudB)&&rectsOverlap(h.x-5,h.y-5,10,10,cr[0],cr[1],cr[2],cr[3])){h.hit.add(cloudB);hitCloudBoss(dmg);h.n++;}}
+    {const mr=mecaRect();if(h.n<pierce&&mr&&!h.hit.has(mecaB)&&rectsOverlap(h.x-5,h.y-5,10,10,mr[0],mr[1],mr[2],mr[3])){h.hit.add(mecaB);hitMeca(dmg);h.n++;}}
+    {const kr=kingRectD();if(h.n<pierce&&kr&&!h.hit.has(kingD)&&rectsOverlap(h.x-5,h.y-5,10,10,kr[0],kr[1],kr[2],kr[3])){h.hit.add(kingD);hitKingD(dmg);h.n++;}}
     {const er=eskRect();if(h.n<pierce&&er&&!h.hit.has(eskimo)&&rectsOverlap(h.x-5,h.y-5,10,10,er[0],er[1],er[2],er[3])){h.hit.add(eskimo);hitEskimo(dmg);h.n++;}}
     {const kr=kingRect();if(h.n<pierce&&kr&&!h.hit.has(king)&&rectsOverlap(h.x-5,h.y-5,10,10,kr[0],kr[1],kr[2],kr[3])){h.hit.add(king);hitKing(dmg);h.n++;}}
     if(h.n<pierce&&castle&&castle.state==='fight'&&!h.hit.has(castle)){const r=bucketRect(castle);if(rectsOverlap(h.x-5,h.y-5,10,10,r[0],r[1],r[2],r[3])){h.hit.add(castle);hitCastle(dmg);h.n++;}}
@@ -3950,7 +3964,7 @@ function killBoss(b){
   if(kills%HEAL_EVERY===0)healDrop();
 }
 function maybeSpawnBoss(){
-  if(boss||octo||castle||witch||eskimo||cloudB||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
+  if(boss||octo||castle||witch||eskimo||cloudB||mecaB||kingD||cow||six||(anarchyOn?jelly:bossSpawned))return;   // un seul requin par partie (anarchie : un requin tous les 18 écrans)
   const p=player;let k,sx,slk=0;
   if(anarchyOn){const sl=slotFree();if(!sl||sl.type!=='shark')return;slk=sl.key;k=sl.key*1000;sx=p.x+p.face*110;}
   else{
@@ -4999,7 +5013,7 @@ function drawIceCastle(cx0){
 const COW_HP=600, COW_SCREENS=20;
 let cow=null,cowSpawned=false,cowDone=new Set(),milk=[];
 function maybeSpawnCow(){
-  if(cow||boss||octo||castle||witch||eskimo||cloudB||jelly||six)return;
+  if(cow||boss||octo||castle||witch||eskimo||cloudB||mecaB||kingD||jelly||six)return;
   const p=player,tx=Math.floor((p.x+5)/T),f=cowFieldAt(tx);
   if(!f||Math.abs(Math.abs(tx)-f.fc)>9)return;
   let key;
@@ -5410,8 +5424,460 @@ function buyHu(key){
   shop.souls-=u.cost[lv];shop.hu[key]=lv+1;saveShop();sfx.heal();renderShop();renderWeap();
 }
 /* ---------- Boss du monde nuage : le dauphin des nuages (arène de plateformes fixes au-dessus du vide) ---------- */
+/* ================= Histoire et cinématiques (mode classique) =================
+   Les dauphins ont pris le contrôle du monde. Dans la panique, le pêcheur a perdu son pantalon (on le retrouve au début : c'est le tuto).
+   Chaque monde s'ouvre sur un chapitre, chaque boss fait son entrée avec une réplique. Toutes les scènes se passent (bouton PASSER / Échap). */
+const LG=(fr,en)=>({fr,en}),lgS=o=>typeof o==='string'?o:(lang==='en'?o.en:o.fr);
+const PANTS_ROWS=["bbbbbbbbbb","bBBBBBBBBb","bBBBkkBBBb","bBBB..BBBb","bBBB..BBBb","bBBB..BBBb","bBBB..BBBb","bddd..dddb"];
+const PANTS=spr(PANTS_ROWS,{b:'#245a98',B:'#3b7fd4',k:'#ffd23f',d:'#1c3f6e'},true);
+const CROWN=spr(["y...y...y","yy.yyy.yy","yyyyyyyyy","yrrybyyry","yyyyyyyyy"],{y:'#ffd23f',r:'#e0262e',b:'#3b9bff'},true);
+const noPantsMemo=new Map();
+function noPants(sp){   // le même sprite, mais en caleçon (rangée 12 : caleçon blanc à cœurs, rangée 13 : jambes nues)
+  let c=noPantsMemo.get(sp);if(c)return c;
+  c=mk(sp.width,sp.height);const g=c.getContext('2d');g.drawImage(sp,0,0);
+  const d=g.getImageData(0,0,c.width,c.height),W=c.width;
+  for(const y of[12,13])for(let x=0;x<W;x++){const o=(y*W+x)*4;if(!d.data[o+3])continue;const lum=d.data[o]+d.data[o+1]+d.data[o+2];if(lum<120)continue;
+    const col=y===12?((x%3===1)?[224,38,46]:[244,241,230]):[245,196,156];d.data[o]=col[0];d.data[o+1]=col[1];d.data[o+2]=col[2];}
+  g.putImageData(d,0,0);noPantsMemo.set(sp,c);return c;
+}
+const PECHEUR={n:LG('LE PÊCHEUR','THE FISHERMAN'),c:'#ffd23f'},NARR={n:null,c:'#ffffff'},ROI={n:LG('ROI DES DAUPHINS','DOLPHIN KING'),c:'#7fc4ff'};
+const bossSpk=(fr,en,c)=>({n:LG(fr,en),c});
+/* ---- petites scènes dessinées (coordonnées écran) ---- */
+function cineGround(y,tint){   // bande d'herbe + terre en bas de l'écran
+  for(let x=0;x<VW;x+=T){ctx.drawImage(GRASS[0][(x/T)%3],x,y-6);for(let yy=y+10,r=0;yy<VH;yy+=T,r++)ctx.drawImage(DIRT[0][(x/T+r)%3],x,yy);}
+  if(tint){ctx.fillStyle=tint;ctx.fillRect(0,y-6,VW,VH-y+6);}
+}
+function cineFisher(x,y,s,opt){   // le pêcheur (skin équipé), s = échelle, opt.np = en caleçon, opt.f = sens
+  const SP=curSkin().spr;let sp=opt&&opt.jump?SP.jump:SP.idle;if(opt&&opt.np)sp=noPants(sp);
+  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale((opt&&opt.f||1)*s,s);ctx.drawImage(sp,-8,-16);ctx.restore();
+}
+function cineDolph(x,y,s,a,img){ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a||0);ctx.scale(s,s);ctx.drawImage(img||DOLB,-9,-5);ctx.restore();}
+function cineKing(x,y,s,t){   // le roi des dauphins : un dauphin bleu normal... mais énorme, avec une couronne
+  const bob=Math.sin(t*2)*2*s/6;
+  cineDolph(x,y+bob,s,Math.sin(t*1.3)*0.05,DOLB);
+  ctx.save();ctx.translate(Math.round(x+2*s),Math.round(y+bob-5*s));ctx.rotate(-0.12+Math.sin(t*1.3)*0.05);ctx.scale(s*0.7,s*0.7);ctx.drawImage(CROWN,-6,-7);ctx.restore();
+}
+function cineDock(x,y){ctx.fillStyle='#14182c';ctx.fillRect(x-1,y-1,92,6);ctx.fillStyle='#8a5a2b';ctx.fillRect(x,y,90,4);ctx.fillStyle='#b47c40';ctx.fillRect(x,y,90,1);
+  for(const px of[6,40,80]){ctx.fillStyle='#5a3a1e';ctx.fillRect(x+px,y+4,4,30);}}
+const SC={
+  calm:t=>{drawBackground(t*8,200,BG_GRASS);cineDock(232,150);cineFisher(268,150,1,{f:-1});
+    ctx.strokeStyle='#e8e8e8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(258,138);ctx.lineTo(230,126);ctx.lineTo(214,168+Math.sin(t*2)*2);ctx.stroke();
+    ctx.fillStyle='#ff4a4a';ctx.fillRect(213,166+Math.round(Math.sin(t*2)*2),3,3);},
+  rise:t=>{drawBackground(60+t*20,200,BG_GRASS);ctx.fillStyle='rgba(160,20,30,'+Math.min(0.45,t*0.12).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);
+    for(let i=0;i<9;i++){const ph=(t*0.9+i*0.37)%1.6;if(ph>1.2)continue;const k=ph/1.2,x=20+i*42+k*30,y=190-Math.sin(k*Math.PI)*(70+(i%3)*20);cineDolph(x,y,2,-1+k*2,i%4===3?DOLR:i%3===2?DOLP:DOLB);}},
+  conquer:t=>{drawBackground(200,200,BG_SWAMP);ctx.fillStyle='rgba(70,0,12,.45)';ctx.fillRect(0,0,VW,VH);cineGround(152);
+    for(let i=0;i<7;i++){const x=((i*60+t*26)%(VW+60))-30,hop=Math.abs(Math.sin(t*6+i))*4;cineDolph(x,144-hop,2,0,i%2?DOLP:DOLB);
+      ctx.fillStyle='#5a3a1e';ctx.fillRect(Math.round(x)-2,116-hop,1,22);ctx.fillStyle='#3b7fd4';ctx.fillRect(Math.round(x)-1,116-hop,10,6);ctx.fillStyle='#ffd23f';ctx.fillRect(Math.round(x)+2,118-hop,3,2);}},
+  king:t=>{ctx.fillStyle='#120a26';ctx.fillRect(0,0,VW,VH);
+    ctx.fillStyle='rgba(127,196,255,.12)';ctx.beginPath();ctx.moveTo(VW/2-30,0);ctx.lineTo(VW/2+30,0);ctx.lineTo(VW/2+110,VH);ctx.lineTo(VW/2-110,VH);ctx.fill();
+    for(let i=0;i<6;i++){const x=40+i*62,hop=Math.abs(Math.sin(t*5+i*1.3))*6;cineDolph(x,148-hop,2,0,i%2?DOLP:DOLR);}
+    cineKing(VW/2,92,7,t);},
+  splash:t=>{drawBackground(30,200,BG_GRASS);cineDock(232,150);
+    const k=clamp((t-0.3)/0.75,0,1);   // le dauphin jaillit, percute le pêcheur, le pantalon s'envole
+    if(t>0.3&&k<1)cineDolph(170+k*96,200-k*62-Math.sin(k*Math.PI)*40,2,-0.9+k*1.2);
+    const hit=t>1.05,ft=t-1.05;
+    cineFisher(268+(hit?Math.min(ft,0.4)*30:0),150-(hit&&ft<0.5?Math.sin(ft/0.5*Math.PI)*22:0),1,{f:-1,np:hit,jump:hit&&ft<0.5});
+    if(hit){const pt=Math.min(ft,2.2);ctx.save();ctx.translate(268-pt*70,150-30-pt*60+pt*pt*20);ctx.rotate(pt*7);ctx.drawImage(PANTS,-6,-5);ctx.restore();}
+    if(hit&&ft<0.4){ctx.fillStyle='#ffffff';ctx.globalAlpha=1-ft/0.4;ctx.fillRect(0,0,VW,VH);ctx.globalAlpha=1;}},
+  angry:t=>{drawBackground(30,200,BG_GRASS);cineGround(150);cineFisher(VW/2,138,3,{np:true});
+    if(Math.floor(t*3)%2){ctx.fillStyle='#e0262e';ctx.fillRect(VW/2+14,84,3,8);ctx.fillRect(VW/2+19,80,3,8);ctx.fillRect(VW/2+24,84,3,8);}},
+  freed:t=>{drawBackground(t*10,200,BG_GRASS);cineDock(232,150);cineFisher(268,150,1,{f:-1});
+    for(let i=0;i<5;i++){const ph=(t*0.7+i*0.31)%1.4;if(ph>1)continue;const x=30+i*40+ph*20;cineDolph(x,196-Math.sin(ph*Math.PI)*30,2,-1+ph*2);}
+    const ct=Math.min(1,t/2);ctx.save();ctx.translate(120,150-ct*40+ct*ct*60);ctx.rotate(ct*9);ctx.scale(1.5,1.5);ctx.drawImage(CROWN,-6,-3);ctx.restore();},
+  credits:t=>{ctx.fillStyle='#0e1430';ctx.fillRect(0,0,VW,VH);ctx.font="8px 'Press Start 2P', monospace";
+    const L=['PECHADOPHIN','',lgS(LG('FIN','THE END')),'','dev : L\'taleshy et cocobat','visuels : Sacha','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute','',lgS(LG('MERCI D\'AVOIR JOUÉ !','THANKS FOR PLAYING!'))];
+    L.forEach((s,i)=>txt(s,VW/2,Math.round(VH+10-t*22+i*16),i===0?'#ffd23f':'#ffffff','center'));cineFisher(VW/2,VH-12,2,{});}
+};
+/* ---- scripts : chaque étape = une réplique (who, l) et, pour les scènes plein écran, un dessin (sc) ---- */
+const CINE={
+  intro:[
+    {sc:'calm',who:NARR,l:LG('Il était une fois un pêcheur, un ponton et une mer bien tranquille.','Once upon a time there was a fisherman, a jetty and a very quiet sea.')},
+    {sc:'rise',who:NARR,l:LG('Jusqu\'au jour où les dauphins sortirent de l\'eau... tous en même temps.','Until the day the dolphins came out of the water... all at once.')},
+    {sc:'conquer',who:NARR,l:LG('En une nuit, ils prirent le contrôle du monde : les plaines, la plage, les marécages, la glace et même les nuages.','In one night they took over the world: the plains, the beach, the swamps, the ice and even the clouds.')},
+    {sc:'king',who:ROI,l:LG('Hi hi hi ! Ce monde appartient désormais aux dauphins ! Et à leur roi : MOI !','Hee hee hee! This world now belongs to the dolphins! And to their king: ME!')},
+    {sc:'splash',who:NARR,l:LG('Dans la panique, notre pêcheur perdit quelque chose de très précieux...','In the panic, our fisherman lost something very precious...')},
+    {sc:'angry',who:PECHEUR,l:LG('MON PANTALON !! Ces dauphins vont me le payer. Je vais jusqu\'au palais de leur roi !','MY PANTS!! Those dolphins will pay. I\'m going all the way to their king\'s palace!')}
+  ],
+  ch1:[{card:LG('CHAPITRE 1 · LES PLAINES','CHAPTER 1 · THE PLAINS'),who:PECHEUR,l:LG('Il fait frais aux jambes... Mon pantalon doit être tombé tout près.','It\'s chilly on the legs... My pants must have landed nearby.')}],
+  ch2:[{card:LG('CHAPITRE 2 · LA PLAGE','CHAPTER 2 · THE BEACH'),who:PECHEUR,l:LG('Du sable plein les bottes et des dauphins plein la plage. Ils sont partout !','Sand in my boots and dolphins all over the beach. They\'re everywhere!')}],
+  ch3:[{card:LG('CHAPITRE 3 · LES MARÉCAGES','CHAPTER 3 · THE SWAMPS'),who:PECHEUR,l:LG('Ça sent la vase et le poisson pas frais. On dit qu\'une sorcière s\'est alliée aux dauphins.','It smells of mud and stale fish. They say a witch has sided with the dolphins.')}],
+  ch4:[{card:LG('CHAPITRE 4 · LA GLACIÈRE','CHAPTER 4 · THE ICE FIELDS'),who:PECHEUR,l:LG('Brrr ! Heureusement que j\'ai retrouvé mon pantalon.','Brrr! Good thing I found my pants.')}],
+  ch5:[{card:LG('CHAPITRE 5 · LE MONDE NUAGE','CHAPTER 5 · THE CLOUD WORLD'),who:PECHEUR,l:LG('Les dauphins volent, maintenant ?! Leur capitale doit être au bout des nuages.','Dolphins fly now?! Their capital must be past the clouds.')}],
+  ch6:[{card:LG('CHAPITRE 6 · LA CITÉ DES DAUPHINS','CHAPTER 6 · THE DOLPHIN CITY'),who:PECHEUR,l:LG('Leur capitale... Le palais du roi est tout au bout de la ville. On y est presque.','Their capital... The king\'s palace is at the far end of town. Almost there.')}],
+  b_shark:[{who:bossSpk('DÉMON REQUIN','SHARK DEMON','#ff5a4a'),l:LG('Les dauphins m\'ont promis ta canne à pêche. Et tes jambes, si elles sont bonnes.','The dolphins promised me your fishing rod. And your legs, if they taste good.')}],
+  b_octo:[{who:bossSpk('POULPE GÉANT','GIANT OCTOPUS','#c9a0ff'),l:LG('Huit bras, zéro pitié. La plage est aux dauphins, pêcheur.','Eight arms, zero mercy. The beach belongs to the dolphins, fisherman.')}],
+  b_jelly:[{who:bossSpk('MÉDUSE','JELLYFISH','#ff9ad8'),l:LG('Bzzz... Un pas de plus et je t\'électrise le caleçon.','Bzzz... One more step and I\'ll electrify your boxers.')}],
+  b_castle:[{who:bossSpk('CHÂTEAU DE SABLE','SANDCASTLE','#e4c882'),l:LG('Aucun pêcheur ne franchira mes remparts ! Enfin... sauf avec un seau d\'eau.','No fisherman shall pass my walls! Well... unless he has a bucket of water.')}],
+  b_witch:[{who:bossSpk('SORCIÈRE','WITCH','#9fe870'),l:LG('Le roi des dauphins paie bien. Goûte donc à mes potions !','The dolphin king pays well. Have a taste of my potions!')}],
+  b_cow:[{who:bossSpk('VACHE GÉANTE','GIANT COW','#ffffff'),l:LG('Meuuuh. Les dauphins m\'ont dit que tu volais le lait. MEUUUH !','Mooo. The dolphins told me you steal milk. MOOOO!')}],
+  b_six:[{who:bossSpk('N°6','No. 6','#ffd23f'),l:LG('6 6 6 6 6 6. (Il ne sait dire que ça.)','6 6 6 6 6 6. (That\'s all it can say.)')}],
+  b_eskimo:[{who:bossSpk('ESQUIMAU','ESKIMO','#bfe9ff'),l:LG('Les dauphins m\'ont donné ce sceptre. Tu vas finir en glaçon !','The dolphins gave me this scepter. You\'ll end up an ice cube!')}],
+  b_king2:[{who:bossSpk('ROI CACAMILLE 2','KING CACAMILLE 2','#e8c8ff'),l:LG('Je ne suis qu\'un roi de pacotille... le vrai roi, c\'est un dauphin. Mais je défendrai son passage !','I\'m only a puppet king... the real one is a dolphin. But I\'ll guard his way!')}],
+  b_cloud:[{who:bossSpk('DAUPHIN DES NUAGES','CLOUD DOLPHIN','#ffffff'),l:LG('Personne ne monte plus haut que les dauphins. Redescends... en chute libre !','No one climbs higher than the dolphins. Go back down... in free fall!')}]
+};
+/* ---- moteur ---- */
+const cineOk=()=>!anarchyOn&&!speedOn&&!(pvp&&pvp.on);
+function cinePlay(id,after){
+  const S=CINE[id];if(!S||!cineOk()){if(after)after();return false;}
+  cine={id,S,i:0,t:0,st:0,after};clearInputs();return true;
+}
+let cineQ=[];
+function cineOnce(id){if(cineSeen.has(id))return false;cineSeen.add(id);if(cine){cineQ.push(id);return true;}return cinePlay(id);}   // une scène en cours : la suivante attend son tour
+function bossCine(k){cineOnce('b_'+k);}
+function cineEnd(){const a=cine&&cine.after;cine=null;clearInputs();if(a)a();if(!cine&&cineQ.length)cinePlay(cineQ.shift());}
+function cineNext(){if(!cine)return;const s=cine.S[cine.i],n=lgS(s.l).length;
+  if(cine.st*42<n){cine.st=n/42+0.01;return;}   // le texte s'affichait encore : on le montre en entier
+  cine.i++;cine.t=0;cine.st=0;if(cine.i>=cine.S.length)cineEnd();}
+function stepCine(dt){
+  const c=cine;c.t+=dt;c.st+=dt;
+  const s=c.S[c.i],n=lgS(s.l).length;
+  if(c.st*42>=n&&c.st-n/42>2.4+n*0.025)cineNext();   // avance seule après un temps de lecture
+}
+const CINE_SKIP=[VW-66,4,62,13];
+function wrapLines(s,w){const out=[];let cur='';for(const word of s.split(' ')){const tt=cur?cur+' '+word:word;if(ctx.measureText(tt).width>w&&cur){out.push(cur);cur=word;}else cur=tt;}if(cur)out.push(cur);return out;}
+function drawCine(){
+  const c=cine,s=c.S[c.i];
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;
+  if(s.sc)SC[s.sc](c.t);
+  const bar=Math.round(Math.min(1,(c.i?1:c.t*4))*22);   // bandes noires de cinéma
+  ctx.fillStyle='#000';ctx.fillRect(0,0,VW,bar);ctx.fillRect(0,VH-bar,VW,bar);
+  ctx.font="8px 'Press Start 2P', monospace";
+  if(s.card){const k=Math.min(1,c.t*3);ctx.globalAlpha=k;plate(VW/2-120,40,240,22,0.7);txt(lgS(s.card),VW/2,47,'#ffd23f','center');ctx.globalAlpha=1;}
+  const txtS=lgS(s.l),shown=txtS.slice(0,Math.floor(c.st*42));
+  const lines=wrapLines(txtS,VW-36),h=14+lines.length*11+(s.who.n?10:0),y=VH-bar-h-4;
+  plate(8,y,VW-16,h,0.82);
+  let ty=y+6;
+  if(s.who.n){txt(lgS(s.who.n),16,ty,s.who.c);ty+=12;}
+  let left=shown.length;
+  for(const ln of lines){if(left<=0)break;txt(ln.slice(0,left),16,ty,'#ffffff');left-=ln.length+1;ty+=11;}
+  if(shown.length>=txtS.length&&Math.floor(time*3)%2)txt('▼',VW-20,y+h-12,'#ffd23f');
+  plate(CINE_SKIP[0],CINE_SKIP[1],CINE_SKIP[2],CINE_SKIP[3],0.6);txt(lang==='en'?'SKIP ▶▶':'PASSER ▶▶',VW-8,7,'#ffffff','right');
+  ctx.restore();
+}
+addEventListener('keydown',e=>{if(!cine)return;
+  if(e.code==='Escape'){cineEnd();}else if(['Space','Enter','KeyF','KeyJ','ArrowUp','KeyW'].includes(e.code)&&!e.repeat)cineNext();else return;
+  e.preventDefault();e.stopImmediatePropagation();},true);
+addEventListener('pointerdown',e=>{if(!cine)return;
+  const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*VW,y=(e.clientY-r.top)/r.height*VH;
+  if(x>=CINE_SKIP[0]-6&&y<=CINE_SKIP[1]+CINE_SKIP[3]+8)cineEnd();else cineNext();
+  e.preventDefault();e.stopImmediatePropagation();},true);
+/* ---- tuto du pantalon (1re partie seulement) ---- */
+function tutoStart(){
+  if(shop.pants||!cineOk())return;
+  const p=player,tx=Math.floor((p.x+5)/T)+12;
+  tuto={st:0,x0:p.x,jumped:false,px:tx*T+8,py:column(tx).g*T,got:false,t:0};
+}
+function tutoHint(){
+  const st=tuto.st,k=kbMode;
+  return st===0?(k?LG('← → OU A D : MARCHER','← → OR A D: WALK'):LG('JOYSTICK GAUCHE : MARCHER','LEFT STICK: WALK'))
+    :st===1?(k?LG('ESPACE OU ↑ : SAUTER','SPACE OR ↑: JUMP'):LG('BOUTON SAUT : SAUTER','JUMP BUTTON: JUMP'))
+    :st===2?LG('RÉCUPÈRE TON PANTALON →','GET YOUR PANTS BACK →')
+    :(k?LG('F OU CLIC : LANCER LA CANNE SUR LES DAUPHINS','F OR CLICK: CAST AT THE DOLPHINS'):LG('BOUTON TIR : LANCER LA CANNE','FIRE BUTTON: CAST YOUR ROD'));
+}
+function stepTuto(dt){
+  if(!tuto||state!=='play')return;const p=player;tuto.t+=dt;
+  if(tuto.st===0&&Math.abs(p.x-tuto.x0)>2*T)tuto.st=1;
+  if(tuto.st===1&&!p.onGround)tuto.st=2;
+  if(!tuto.got&&rectsOverlap(p.x,p.y,p.w,p.h,tuto.px-8,tuto.py-40,16,40)){
+    tuto.got=true;tuto.st=3;shop.pants=true;saveShop();sfx.heal();vfx('shine',p.x+5,p.y+6);
+    floatText(p.x+5,p.y-24,lang==='en'?'PANTS FOUND!':'PANTALON RETROUVÉ !','#ffd23f');}
+  if(tuto.st===3&&(inp.fire||mouse.fire||tuto.t>40))tuto.st=4;
+  if(tuto.st===4)tuto=null;
+}
+function drawTutoWorld(){   // le pantalon posé par terre, qui brille
+  if(!tuto||tuto.got)return;const y=tuto.py-10+Math.round(Math.sin(time*3)*1.5);
+  ctx.drawImage(PANTS,Math.round(tuto.px-6),y);
+  if(Math.floor(time*4)%3===0){ctx.fillStyle='#fff6c4';ctx.fillRect(Math.round(tuto.px+5),y-2,1,3);ctx.fillRect(Math.round(tuto.px+4),y-1,3,1);}
+}
+function drawTutoHud(){
+  if(!tuto||tuto.st>3||cine)return;ctx.font="8px 'Press Start 2P', monospace";
+  const s=lgS(tutoHint()),w=ctx.measureText(s).width+16,a=0.75+0.25*Math.sin(time*4);
+  plate(Math.round(VW/2-w/2),24,Math.round(w),15,0.7);ctx.globalAlpha=a;txt(s,VW/2,28,'#ffffff','center');ctx.globalAlpha=1;
+}
+/* ---- déclencheurs : début de partie et arrivée dans chaque monde ---- */
+function cineGameStart(fromStart){
+  cineSeen=new Set();cineQ=[];tuto=null;cineBiome=curBiome();
+  if(!cineOk())return;
+  if(fromStart){cineSeen.add('ch1');cinePlay('intro',()=>{cinePlay('ch1');tutoStart();});}
+  else cineOnce('ch'+cineBiome);
+}
+function stepCineTriggers(){
+  if(state!=='play'||cine||!cineOk())return;
+  const b=curBiome();if(b!==cineBiome){cineBiome=b;if(b>1)cineOnce('ch'+b);}
+}
+
+/* ================= Fin du monde nuage : le Méca-dauphin, puis la Cité des dauphins et le palais du Roi des dauphins ================= */
+const MECA_HP=1500,KINGD_HP=2200;
+const MECA_SPR=(()=>{   // machine de guerre en forme de dauphin (80 x 48), regarde à droite
+  const c=mk(80,48),g=c.getContext('2d'),R=(col,x,y,w,h)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  const ell=(cx,cy,rx,ry,col)=>{g.fillStyle=col;for(let y=-ry;y<=ry;y++){const w=Math.round(rx*Math.sqrt(1-(y*y)/(ry*ry)));g.fillRect(cx-w,cy+y,w*2,1);}};
+  // queue
+  g.fillStyle='#14182c';g.beginPath();g.moveTo(14,24);g.lineTo(1,8);g.lineTo(5,24);g.lineTo(1,40);g.closePath();g.fill();
+  g.fillStyle='#4a5468';g.beginPath();g.moveTo(13,24);g.lineTo(3,11);g.lineTo(6,24);g.lineTo(3,37);g.closePath();g.fill();
+  // aileron dorsal + antenne
+  g.fillStyle='#14182c';g.beginPath();g.moveTo(30,15);g.lineTo(42,3);g.lineTo(48,15);g.closePath();g.fill();
+  g.fillStyle='#6e7a90';g.beginPath();g.moveTo(32,15);g.lineTo(42,5);g.lineTo(46,15);g.closePath();g.fill();
+  R('#14182c',43,0,1,6);
+  // corps
+  ell(40,25,32,12,'#14182c');ell(40,25,31,11,'#6e7a90');ell(40,21,28,6,'#9aa6ba');ell(42,31,24,4,'#4a5468');
+  // rostre
+  R('#14182c',68,22,11,9);R('#6e7a90',68,23,10,7);R('#9aa6ba',68,23,10,2);R('#4a5468',68,28,10,2);
+  // lignes de plaques et rivets
+  for(const x of[24,36,50,62]){R('#2e3648',x,15,1,20);}
+  for(let x=18;x<68;x+=6){R('#d0d8e6',x,17,1,1);R('#2e3648',x,33,1,1);}
+  // visière rouge
+  R('#14182c',55,18,10,6);R('#a8101c',56,19,8,4);R('#ff3b2f',57,19,6,2);R('#ffd0c0',61,19,2,1);
+  // canon sous le ventre
+  R('#14182c',38,35,16,7);R('#2e3648',39,36,14,5);R('#14182c',52,37,6,3);R('#6e7a90',40,36,12,1);
+  // réacteurs
+  for(const x of[20,56]){R('#14182c',x-1,34,8,7);R('#4a5468',x,35,6,5);R('#1c1c24',x+1,39,4,2);}
+  // nageoire
+  g.fillStyle='#14182c';g.beginPath();g.moveTo(30,30);g.lineTo(24,42);g.lineTo(36,33);g.closePath();g.fill();
+  g.fillStyle='#4a5468';g.beginPath();g.moveTo(30,31);g.lineTo(26,40);g.lineTo(34,33);g.closePath();g.fill();
+  return c;})();
+const MECA_SPR_W=tint(MECA_SPR,'#ffffff');
+/* --- géographie : arène du méca (bout des nuages), cité, palais --- */
+const mecaDx=tx=>{if(anarchyOn)return null;const a=Math.abs(tx);if(a<MECA_CX-46||a>MECA_CX+33)return null;const sg=tx<0?-1:1;return {dx:(tx-sg*MECA_CX)*sg,sg};};
+const palDx=tx=>{if(anarchyOn)return null;const a=Math.abs(tx);if(a<KINGD_CX-46||a>KINGD_CX+46)return null;const sg=tx<0?-1:1;return {dx:(tx-sg*KINGD_CX)*sg,sg};};
+const mecaPlat=(tx,ty)=>{const m=mecaDx(tx);if(!m||Math.abs(m.dx)>30)return false;const d=m.dx;return (ty===SKY_G-4&&((d>=-22&&d<=-17)||(d>=17&&d<=22)))||(ty===SKY_G-7&&d>=-4&&d<=4);};
+const palPlat=(tx,ty)=>{const m=palDx(tx);if(!m||Math.abs(m.dx)>30)return false;const d=m.dx;return (ty===PAL_G-4&&((d>=-20&&d<=-15)||(d>=15&&d<=20)))||(ty===PAL_G-8&&((d>=-9&&d<=-5)||(d>=5&&d<=9)));};
+function mecaCol(tx,dx){
+  let c=colCache.get(tx);if(c)return c;
+  const base={pit:false,beach:false,tun:null,swamp:false,ice:false};
+  if(dx<-30)c={...base,cloud:true,g:Math.round(lerp(spawnBlend(tx),SKY_G,clamp(1-(-dx-30)/14,0,1)))};
+  else if(dx<=30)c={...base,meca:true,g:SKY_G};
+  else c={...base,city:true,g:SKY_G};
+  colCache.set(tx,c);return c;
+}
+const cityG=tx=>{const a=Math.abs(tx),q=2*Math.round(spawnBlend(tx)/2),w=clamp((a-(MECA_CX+33))/24,0,1);return Math.round(lerp(SKY_G,q,w));};
+function palCol(tx,dx){
+  let c=colCache.get(tx);if(c)return c;
+  const ad=Math.abs(dx),base={pit:false,beach:false,tun:null,swamp:false,ice:false,city:true};
+  c=ad<=30?{...base,pal:true,g:PAL_G}:{...base,g:Math.round(lerp(cityG(tx),PAL_G,clamp(1-(ad-30)/14,0,1)))};
+  colCache.set(tx,c);return c;
+}
+/* --- tuiles : acier (arène), béton et néons (cité), marbre (palais) --- */
+function makePanel(cols,v,sh,rv){const c=mk(T,T),g=c.getContext('2d');g.fillStyle=cols[sh];g.fillRect(0,0,T,T);
+  const r=mulberry32(v*131+sh*17+rv);g.fillStyle=cols[3];g.fillRect(0,0,T,1);g.fillRect(0,0,1,T);g.fillStyle=cols[4];g.fillRect(0,T-1,T,1);g.fillRect(T-1,0,1,T);
+  for(let i=0;i<3;i++){g.fillStyle=r()<0.5?cols[3]:cols[4];g.fillRect(2+Math.floor(r()*11),2+Math.floor(r()*11),2,1);}
+  if(rv===7){g.fillStyle=cols[5];g.fillRect(2,2,1,1);g.fillRect(13,2,1,1);g.fillRect(2,13,1,1);g.fillRect(13,13,1,1);}return c;}
+const METAL=[0,1,2].map(sh=>[0,1,2].map(v=>makePanel(['#4a5468','#3a4254','#2c3240','#6e7a90','#232836','#d0d8e6'],v,sh,7)));
+const CITYB=[0,1,2].map(sh=>[0,1,2].map(v=>makePanel(['#3a2f5a','#2e2549','#231c3a','#4c3f72','#1a142c','#ff5ad8'],v,sh,3)));
+const MARBLE=[0,1,2].map(sh=>[0,1,2].map(v=>makePanel(['#e8e2f4','#d4cce6','#c0b6d6','#ffffff','#a89cc4','#ffd23f'],v,sh,5)));
+function makeTopTile(set,v,a,b,glow){const c=mk(T,T+6),g=c.getContext('2d');g.drawImage(set[0][v],0,6);g.fillStyle=a;g.fillRect(0,6,T,3);g.fillStyle=b;g.fillRect(0,9,T,1);
+  if(glow){g.fillStyle=glow;g.fillRect(0,5,T,1);if(v===1){g.fillRect(6,10,4,1);}}return c;}
+const METALTOP=[0,1,2].map(v=>{const c=makeTopTile(METAL,v,'#9aa6ba','#232836');const g=c.getContext('2d');for(let x=v*2;x<T;x+=8){g.fillStyle='#ffd23f';g.fillRect(x,7,3,1);g.fillStyle='#14182c';g.fillRect(x+3,7,1,1);}return c;});
+const CITYTOP=[0,1,2].map(v=>makeTopTile(CITYB,v,'#5a4a86','#14102a',v===2?'#ff5ad8':'#4ce8d8'));
+const MARBLETOP=[0,1,2].map(v=>makeTopTile(MARBLE,v,'#ffffff','#a89cc4','#ffd23f'));
+const NEON_PLAT=(()=>{const c=mk(T,T),g=c.getContext('2d');g.fillStyle='#14102a';g.fillRect(0,4,T,5);g.fillStyle='#3a2f5a';g.fillRect(0,4,T,3);g.fillStyle='#4ce8d8';g.fillRect(0,4,T,1);g.fillStyle='#ff5ad8';g.fillRect(0,8,T,1);return c;})();
+const METAL_PLAT=(()=>{const c=mk(T,T),g=c.getContext('2d');g.fillStyle='#14182c';g.fillRect(0,4,T,5);g.fillStyle='#6e7a90';g.fillRect(0,4,T,3);g.fillStyle='#9aa6ba';g.fillRect(0,4,T,1);g.fillStyle='#ffd23f';g.fillRect(2,7,3,1);g.fillRect(10,7,3,1);return c;})();
+/* --- décor de la cité : ciel du soir, immeubles en parallaxe avec fenêtres et néons --- */
+const BG_CITY={sky:['#1a0e3a','#22114a','#2e1458','#3e1a66','#561f70','#762678','#a0307c','#d4487a'],sea:'#1c1238',seaTop:'#ff5ad8',spark:'#ff86e6',h1:'#2e1f52',h1t:'#4c3f72',h2:'#231a40',h2t:'#3a2f5a',noHills:true,city:true,sunA:0.4};
+const SKYLINE=[0,1,2].map(L=>{const W=768,H=150,c=mk(W,H),g=c.getContext('2d'),r=mulberry32(77+L*31);
+  const body=['#2a1c4e','#22163f','#170f2e'][L],win=['#4c3f72','#ffd23f','#4ce8d8'][L],neon=['#ff5ad8','#ff5ad8','#4ce8d8'];
+  for(let x=0;x<W;){const w=18+Math.floor(r()*30),h=40+Math.floor(r()*(70+L*20)),y=H-h;g.fillStyle=body;g.fillRect(x,y,w,h);
+    if(r()<0.4){g.fillRect(x+Math.floor(w/2)-1,y-10,2,10);g.fillStyle=neon[L];g.fillRect(x+Math.floor(w/2)-1,y-11,2,1);g.fillStyle=body;}
+    for(let yy=y+4;yy<H-4;yy+=6)for(let xx=x+3;xx<x+w-3;xx+=5)if(r()<(L?0.35:0.2)){g.fillStyle=r()<0.15?neon[L]:win;g.fillRect(xx,yy,2,3);}
+    if(L===2&&r()<0.35){g.fillStyle=neon[Math.floor(r()*2)];g.fillRect(x+3,y+8,w-6,1);g.fillRect(x+3,y+8,1,6);g.fillRect(x+w-4,y+8,1,6);}
+    x+=w+Math.floor(r()*6);}
+  return c;});
+function drawSkyline(cx,cy){
+  for(let L=0;L<3;L++){const par=[0.06,0.14,0.26][L],img=SKYLINE[L],y=Math.round(VH*(0.36+L*0.12)-(cy-200)*(0.05+L*0.04)),x0=-mod(Math.round(cx*par),img.width);
+    for(let x=x0;x<VW;x+=img.width)ctx.drawImage(img,x,y);
+    ctx.fillStyle=['#2a1c4e','#22163f','#170f2e'][L];if(y+img.height<VH)ctx.fillRect(0,y+img.height,VW,VH-y-img.height);}
+  const k=(Math.sin(time*1.1)+1)/2;ctx.globalAlpha=0.08+0.05*k;ctx.fillStyle='#ff5ad8';ctx.fillRect(0,VH-60,VW,60);ctx.globalAlpha=1;   // halo des néons sur la ville
+}
+/* --- outils communs aux deux boss : ondes de choc, tirs, missiles, lasers, geysers --- */
+const hurtP=x=>{if(state==='play'&&player.invuln<=0)hurtPlayer(x);};
+function stepBfx(dt){
+  const p=player,pcx=p.x+5,pcy=p.y+7;
+  for(const f of bfx){
+    f.t+=dt;
+    if(f.type==='wave'){f.x+=f.dir*f.spd*dt;if(f.t>3.2)f.dead=true;
+      if(Math.abs(pcx-f.x)<6&&p.y+p.h>f.y-f.h&&p.y+p.h<=f.y+2)hurtP(f.x);}
+    else if(f.type==='bolt'){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=(f.g||0)*dt;if(f.t>5||solidAt(f.x,f.y)){f.dead=true;burst(f.x,f.y,f.c,3,50);continue;}
+      if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-1,f.x-3,f.y-3,6,6)){f.dead=true;hurtP(f.x);}}
+    else if(f.type==='mis'){const a=Math.atan2(pcy-f.y,pcx-f.x),cur=Math.atan2(f.vy,f.vx);let da=Math.atan2(Math.sin(a-cur),Math.cos(a-cur));const na=cur+clamp(da,-f.turn*dt,f.turn*dt);
+      f.vx=Math.cos(na)*f.spd;f.vy=Math.sin(na)*f.spd;f.x+=f.vx*dt;f.y+=f.vy*dt;if(Math.random()<0.6)parts.push({x:f.x-f.vx*0.03,y:f.y-f.vy*0.03,vx:0,vy:-10,g:0,life:0.35,col:Math.random()<0.5?'#ffb347':'#6a6a78',sz:2});
+      if(f.t>4.5||solidAt(f.x,f.y)){f.dead=true;vfx('fire',f.x,f.y+8);continue;}
+      if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-1,f.x-4,f.y-3,8,6)){f.dead=true;vfx('fire',f.x,f.y+8);hurtP(f.x);}}
+    else if(f.type==='las'){if(f.t>f.warn+f.fire)f.dead=true;
+      else if(f.t>f.warn){if(!f.boom){f.boom=1;shake=Math.max(shake,0.15);try{sfx.bossFire();}catch(e){}}
+        const ux=Math.cos(f.a),uy=Math.sin(f.a),dx=pcx-f.x,dy=pcy-f.y,along=dx*ux+dy*uy;if(along>0&&Math.abs(dx*uy-dy*ux)<6)hurtP(f.x);}}
+    else if(f.type==='gey'){if(f.t>f.warn+0.7)f.dead=true;else if(f.t>f.warn){if(!f.boom){f.boom=1;vfx('splashg',f.x,f.y,{tint:'#7fd4ff'});}if(Math.abs(pcx-f.x)<9&&p.y+p.h>f.y-70)hurtP(f.x);}}
+  }
+  bfx=bfx.filter(f=>!f.dead);
+}
+function drawBfx(){
+  for(const f of bfx){const x=Math.round(f.x),y=Math.round(f.y);
+    if(f.type==='wave'){const k=1-f.t/3.2;ctx.fillStyle=f.c2||'#ffd23f';ctx.fillRect(x-4,y-f.h,8,f.h);ctx.fillStyle=f.c||'#ffffff';ctx.fillRect(x-2,y-f.h-2,4,f.h);ctx.globalAlpha=k*0.5;ctx.fillRect(x-f.dir*10-2,y-6,4,6);ctx.globalAlpha=1;}
+    else if(f.type==='bolt'){ctx.fillStyle=f.c;disc(x,y,3);ctx.fillStyle='#ffffff';ctx.fillRect(x-1,y-1,2,2);}
+    else if(f.type==='mis'){ctx.save();ctx.translate(x,y);ctx.rotate(Math.atan2(f.vy,f.vx));ctx.fillStyle='#14182c';ctx.fillRect(-5,-3,10,6);ctx.fillStyle='#9aa6ba';ctx.fillRect(-4,-2,8,4);ctx.fillStyle='#e0262e';ctx.fillRect(3,-2,2,4);
+      ctx.fillStyle=Math.floor(time*20)%2?'#ffd23f':'#ff8a2a';ctx.fillRect(-8,-1,3,2);ctx.restore();}
+    else if(f.type==='las'){const ux=Math.cos(f.a),uy=Math.sin(f.a),L=500;
+      if(f.t<f.warn){if(Math.floor(f.t*14)%2){ctx.strokeStyle='rgba(255,59,47,.7)';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(x+0.5,y+0.5);ctx.lineTo(x+ux*L,y+uy*L);ctx.stroke();ctx.setLineDash([]);}}
+      else{ctx.lineCap='butt';ctx.strokeStyle='rgba(255,59,47,.55)';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+ux*L,y+uy*L);ctx.stroke();ctx.strokeStyle='#ffd0c0';ctx.lineWidth=3;ctx.stroke();ctx.lineWidth=1;}}
+    else if(f.type==='gey'){if(f.t<f.warn){if(Math.floor(f.t*10)%2){ctx.fillStyle='#7fd4ff';ctx.fillRect(x-6,y-2,12,2);}}
+      else{const h=Math.min(70,(f.t-f.warn)*400);ctx.fillStyle='rgba(127,212,255,.8)';ctx.fillRect(x-7,y-h,14,h);ctx.fillStyle='#ffffff';ctx.fillRect(x-3,y-h,6,h);ctx.fillRect(x-8,y-h-3,16,4);}}
+  }
+}
+function slamWaves(x,y,n,c,c2){for(const d of[-1,1])bfx.push({type:'wave',x,y,dir:d,spd:150+n*20,h:10,t:0,c,c2});shake=Math.max(shake,0.5);vfx('slam',x,y);try{sfx.slam();}catch(e){}}
+/* --- le Méca-dauphin : 3 phases (missiles + laser, puis charges + drones, puis armure brisée : écrasements et anneaux) --- */
+function mecaRect(){const b=mecaB;if(!b||b.state!=='fight')return null;return [b.x-34,b.y-16,68,34];}
+function startMeca(sg){
+  const cx=sg*MECA_CX*T+8,hp=rodAdapt(MECA_HP);
+  enemies=enemies.filter(e=>Math.abs(e.x-cx)>46*T);bfx=[];
+  mecaB={sg,cx,hp,maxHp:hp,state:'intro',t:0,intro:2.4,ph:1,flash:0,x:player.x+5+sg*10*T,y:(SKY_G-9)*T,face:-sg,tx:cx,ty:(SKY_G-8)*T,mt:1.5,nM:2.2,nL:4.5,nC:6,nD:5,nS:5,mode:'fly',mt2:0,dieT:0};
+  shake=0.6;sfx.gate();sfx.bossSpawn();bossCine('meca');
+}
+function hitMeca(dmg){
+  const b=mecaB;if(!b||b.state!=='fight')return;
+  const removed=Math.min(dmg,b.hp);b.hp-=dmg;b.flash=0.12;combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;score+=pts;floatText(b.x,b.y-26,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  vfx('hit',b.x,b.y);burst(b.x,b.y,'#d0d8e6',4,90);
+  if(b.hp<=0){killMeca();return;}
+  const ph=b.hp<=b.maxHp/3?3:b.hp<=b.maxHp*2/3?2:1;
+  if(ph!==b.ph){b.ph=ph;shake=0.8;sfx.bossSpawn();vfx('boom',b.x,b.y+10);floatText(b.x,b.y-40,ph===2?(lang==='en'?'OVERDRIVE!':'SURCHAUFFE !'):(lang==='en'?'ARMOR BROKEN!':'ARMURE BRISÉE !'),'#ff4a4a');}
+  else sfx.hit();
+}
+function killMeca(){
+  const b=mecaB;b.hp=0;b.state='dying';b.dieT=3;mecaDone=true;bfx=[];vfxBoss(b);
+  for(const e of enemies)if(e.mb&&e.state==='alive'){e.state='dead';e.t=0;e.vy=-120;vfx('kill',e.x+e.w/2,e.y+e.h);}
+  kills++;shake=1;sfx.bossDie();sfx.gate();
+  const again=!!shop.bossSouls.meca,gs=soulReward('meca',5),gold=again?60:600;shop.gold+=gold;saveShop();
+  if(gs)floatText(b.x,b.y-62,lang==='en'?'+5 RED SOULS':'+5 ÂMES ROUGES','#ff6a7a');
+  floatText(b.x,b.y-50,'+'+gold+(lang==='en'?' GOLD':' OR'),'#ffd23f');floatText(b.x,b.y-39,lang==='en'?'THE PORTAL IS OPEN!':'LE PORTAIL EST OUVERT !','#7ff0e8');
+  if(kills%HEAL_EVERY===0)healDrop();
+}
+function stepMeca(dt){
+  const p=player;
+  if(!mecaB&&!mecaDone&&state==='play'&&!anarchyOn){const m=mecaDx(Math.floor((p.x+5)/T));if(m&&m.dx>-18&&m.dx<18)startMeca(m.sg);}
+  if(!mecaDone&&!anarchyOn){const m=mecaDx(Math.floor((p.x+5)/T));if(m){const lim=(MECA_CX+30)*T;if(m.sg>0&&p.x+10>lim){p.x=lim-10;if(p.vx>0)p.vx=0;}else if(m.sg<0&&-p.x>lim){p.x=-lim;if(p.vx<0)p.vx=0;}}}   // champ de force vers la cité
+  const b=mecaB;if(!b)return;
+  b.t+=dt;if(b.flash>0)b.flash-=dt;
+  if(b.state==='dying'){b.dieT-=dt;b.y+=40*dt;if(Math.random()<0.25)vfx('fire',b.x+(Math.random()-0.5)*60,b.y+(Math.random()-0.5)*30);if(b.dieT<=0){vfx('boom',b.x,b.y+20);mecaB=null;}return;}
+  {const lim=29*T;p.x=clamp(p.x,b.cx-lim,b.cx+lim-10);}
+  if(b.state==='intro'){b.intro-=dt;b.face=p.x+5>b.x?1:-1;if(b.intro<=0)b.state='fight';return;}
+  const fl=SKY_G*T,ph=b.ph,sp=ph===1?55:ph===2?75:95;
+  if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x-30,b.y-12,60,26))hurtP(b.x);
+  if(b.mode==='fly'){
+    b.face=p.x+5>b.x?1:-1;
+    b.mt-=dt;if(b.mt<=0){b.mt=ph===3?1.4:2.2;b.tx=clamp(p.x+(Math.random()*2-1)*8*T,b.cx-22*T,b.cx+22*T);b.ty=clamp(p.y-(3+Math.random()*3)*T,(SKY_G-9)*T,(SKY_G-5)*T);}
+    b.x+=clamp(b.tx-b.x,-sp*dt,sp*dt);b.y+=clamp(b.ty-b.y,-sp*0.7*dt,sp*0.7*dt);
+    b.nM-=dt;if(b.nM<=0){b.nM=ph===3?2.4:3.2;const n=ph===1?2:3;for(let i=0;i<n;i++){const a=-Math.PI/2+(i-(n-1)/2)*0.6;bfx.push({type:'mis',x:b.x,y:b.y-10,vx:Math.cos(a)*90,vy:Math.sin(a)*90,spd:ph===3?110:90,turn:2.2,t:0});}try{sfx.bossFire();}catch(e){}}
+    b.nL-=dt;if(b.nL<=0){b.nL=ph===1?5:6.5;const ex=b.x+b.face*26,ey=b.y-3;bfx.push({type:'las',x:ex,y:ey,a:Math.atan2(p.y+7-ey,p.x+5-ex),t:0,warn:0.8,fire:0.45});}
+    if(ph>=2){b.nC-=dt;if(b.nC<=0){b.nC=ph===3?5.5:6.5;b.mode='chargeW';b.mt2=0.8;b.cy=fl-22;b.cdir=p.x+5>b.x?1:-1;}
+      b.nD-=dt;if(b.nD<=0){b.nD=7;let n=0;for(const e of enemies)if(e.mb&&e.state==='alive')n++;for(let i=0;i<Math.min(2,3-n);i++){const e=mkEnemy('fly',b.x+(i?30:-30),b.y+16);e.mb=true;e.robo=true;enemies.push(e);vfx('magic',e.x+e.w/2,e.y+e.h/2);}}}
+    if(ph===3){b.nS-=dt;if(b.nS<=0){b.nS=4.2;b.mode='slamUp';b.mt2=0.6;b.sx=clamp(p.x+5,b.cx-24*T,b.cx+24*T);}}
+  } else if(b.mode==='chargeW'){b.mt2-=dt;b.y+=clamp(b.cy-b.y,-200*dt,200*dt);b.x+=Math.sin(time*60)*0.6;if(b.mt2<=0){b.mode='charge';b.face=b.cdir;}}
+  else if(b.mode==='charge'){b.x+=b.cdir*300*dt;if(Math.random()<0.8)parts.push({x:b.x-b.cdir*34,y:b.y+4,vx:-b.cdir*60,vy:0,g:0,life:0.3,col:'#ffb347',sz:2});
+    if((b.cdir>0&&b.x>b.cx+25*T)||(b.cdir<0&&b.x<b.cx-25*T)){b.mode='fly';b.mt=0;shake=Math.max(shake,0.3);}}
+  else if(b.mode==='slamUp'){b.mt2-=dt;b.x+=clamp(b.sx-b.x,-260*dt,260*dt);b.y+=clamp((SKY_G-13)*T-b.y,-260*dt,260*dt);if(b.mt2<=0)b.mode='slam';}
+  else if(b.mode==='slam'){b.y+=420*dt;if(b.y>=fl-18){b.y=fl-18;b.mode='fly';b.mt=0.6;slamWaves(b.x,fl,3,'#ffffff','#ff5a3a');
+    for(let i=0;i<12;i++){const a=i/12*Math.PI*2;bfx.push({type:'bolt',x:b.x,y:b.y-8,vx:Math.cos(a)*85,vy:Math.sin(a)*85,c:'#ff5a3a',t:0});}}}
+}
+function drawMeca(){
+  const b=mecaB;if(!b)return;
+  const dead=b.state==='dying',img=b.flash>0?MECA_SPR_W:MECA_SPR,by=Math.round(b.y+(b.mode==='fly'&&!dead?Math.sin(time*2.4)*3:0));
+  // flammes des réacteurs
+  if(!dead)for(const ox of[-17,19]){const fx=Math.round(b.x+b.face*ox),fh=5+Math.floor(Math.random()*5);ctx.fillStyle='#ff8a2a';ctx.fillRect(fx-2,by+16,5,fh);ctx.fillStyle='#ffd23f';ctx.fillRect(fx-1,by+16,3,fh-3);}
+  ctx.save();ctx.translate(Math.round(b.x),by);if(dead&&Math.floor(time*16)%2)ctx.globalAlpha=0.6;ctx.scale(b.face,1);ctx.drawImage(img,-40,-24);
+  if(b.ph===3&&!dead){const k=0.6+0.4*Math.sin(time*10);ctx.fillStyle='#14182c';ctx.fillRect(-6,-6,14,12);ctx.fillStyle='rgba(76,232,216,'+k.toFixed(2)+')';disc(1,0,5);ctx.fillStyle='#e8fffc';disc(1,0,2);}
+  if(!dead&&Math.floor(time*3)%2){ctx.fillStyle='#ff3b2f';ctx.fillRect(3,-25,1,1);}
+  if(b.mode==='chargeW'&&Math.floor(time*16)%2){ctx.globalAlpha=0.4;ctx.drawImage(MECA_SPR_W,-40,-24);}
+  ctx.restore();
+}
+function drawMecaGate(cx){   // portail vers la cité : champ de force rouge tant que le méca vit, tourbillon bleu ensuite
+  for(const sg of[-1,1]){const x=sg*(MECA_CX+31)*T+8,y=SKY_G*T;if(Math.abs(x-(cx+VW/2))>VW)continue;
+    const open=mecaDone||shop.city;
+    ctx.fillStyle='#14182c';ctx.fillRect(x-14,y-58,6,58);ctx.fillRect(x+8,y-58,6,58);ctx.fillRect(x-14,y-62,28,6);
+    ctx.fillStyle='#6e7a90';ctx.fillRect(x-13,y-57,4,57);ctx.fillRect(x+9,y-57,4,57);ctx.fillRect(x-13,y-61,26,4);
+    if(!open){ctx.globalAlpha=0.35+0.15*Math.sin(time*8);ctx.fillStyle='#ff3b2f';ctx.fillRect(x-8,y-56,16,56);ctx.globalAlpha=1;for(let i=0;i<4;i++){ctx.fillStyle='#ffd0c0';ctx.fillRect(x-8,y-56+((Math.floor(time*40)+i*14)%56),16,1);}}
+    else{for(let r=24;r>2;r-=4){ctx.fillStyle=['#4ce8d8','#18b4b0','#b4fff0','#108088','#4ce8d8','#ffffff'][(r/4+Math.floor(time*8))%6];ctx.globalAlpha=0.85;ctx.beginPath();ctx.ellipse(x,y-28,Math.min(8,r*0.4),r,0,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
+  }
+}
+/* --- le Roi des dauphins : un dauphin bleu normal, mais énorme, avec une couronne --- */
+function kingRectD(){const b=kingD;if(!b||b.state!=='fight')return null;return [b.x-40,b.y-26,80,46];}
+function startKingD(sg){
+  const cx=sg*KINGD_CX*T+8,hp=rodAdapt(KINGD_HP);
+  enemies=enemies.filter(e=>Math.abs(e.x-cx)>46*T);bfx=[];
+  kingD={sg,cx,hp,maxHp:hp,state:'intro',t:0,intro:2.6,rage:false,flash:0,x:cx,y:(PAL_G-10)*T,face:-sg,mode:'float',mt:2,tx:cx,ty:(PAL_G-9)*T,nJ:3,nG:5,nW:7,nS:9,nR:4,dieT:0};
+  shake=0.7;sfx.gate();sfx.bossSpawn();bossCine('roi');
+}
+function hitKingD(dmg){
+  const b=kingD;if(!b||b.state!=='fight')return;
+  const removed=Math.min(dmg,b.hp);b.hp-=dmg;b.flash=0.12;combo.n++;combo.t=COMBO_TIME;
+  const mult=Math.min(combo.n,10),pts=100*mult*removed;score+=pts;floatText(b.x,b.y-34,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  vfx('hit',b.x,b.y);burst(b.x,b.y,'#7fc4ff',4,90);
+  if(b.hp<=0){killKingD();return;}
+  if(!b.rage&&b.hp<=b.maxHp/2){b.rage=true;shake=0.8;sfx.bossSpawn();floatText(b.x,b.y-50,lang==='en'?'THE KING IS FURIOUS!':'LE ROI EST FURIEUX !','#ff4a4a');}else sfx.hit();
+}
+function killKingD(){
+  const b=kingD;b.hp=0;b.state='dying';b.dieT=3.2;kingDone=true;bfx=[];vfxBoss(b);
+  for(const e of enemies)if(e.kd&&e.state==='alive'){e.state='dead';e.t=0;e.vy=-120;vfx('kill',e.x+e.w/2,e.y+e.h);}
+  kills++;shake=1;sfx.bossDie();sfx.gate();
+  const again=!!shop.bossSouls.roi,gs=soulReward('roi',10),gold=again?100:1000;shop.gold+=gold;shop.won=true;saveShop();
+  if(gs)floatText(b.x,b.y-62,lang==='en'?'+10 RED SOULS':'+10 ÂMES ROUGES','#ff6a7a');floatText(b.x,b.y-50,'+'+gold+(lang==='en'?' GOLD':' OR'),'#ffd23f');
+  b.endT=3.4;
+}
+function stepKingD(dt){
+  const p=player;
+  if(!kingD&&!kingDone&&state==='play'&&!anarchyOn){const m=palDx(Math.floor((p.x+5)/T));if(m&&m.dx>-16&&m.dx<16)startKingD(m.sg);}
+  const b=kingD;if(!b)return;
+  b.t+=dt;if(b.flash>0)b.flash-=dt;
+  if(b.state==='dying'){b.dieT-=dt;b.y+=20*dt;if(b.dieT<=0){kingD=null;cinePlay('fin');}return;}
+  {const lim=29*T;p.x=clamp(p.x,b.cx-lim,b.cx+lim-10);}
+  if(b.state==='intro'){b.intro-=dt;if(b.intro<=0)b.state='fight';return;}
+  const fl=PAL_G*T,r=b.rage;
+  if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,b.x-36,b.y-20,72,38))hurtP(b.x);
+  if(b.mode==='float'){
+    b.face=p.x+5>b.x?1:-1;
+    b.mt-=dt;if(b.mt<=0){b.mt=r?1.5:2.2;b.tx=clamp(p.x+(Math.random()*2-1)*8*T,b.cx-22*T,b.cx+22*T);b.ty=clamp(p.y-(4+Math.random()*3)*T,(PAL_G-12)*T,(PAL_G-7)*T);}
+    const sp=r?80:55;b.x+=clamp(b.tx-b.x,-sp*dt,sp*dt);b.y+=clamp(b.ty-b.y,-sp*0.7*dt,sp*0.7*dt);
+    b.nJ-=dt;if(b.nJ<=0){b.nJ=r?4:5.5;b.mode='up';b.mt2=0.7;b.sx=clamp(p.x+5,b.cx-24*T,b.cx+24*T);}   // plat royal : il bondit et s'écrase sur toi
+    b.nG-=dt;if(b.nG<=0){b.nG=r?4.5:6;const n=r?5:3;for(let i=0;i<n;i++){const gx=clamp(p.x+5+(i-(n-1)/2)*40+(Math.random()-0.5)*10,b.cx-26*T,b.cx+26*T);bfx.push({type:'gey',x:gx,y:fl,t:0,warn:0.9+i*0.12});}}   // geysers royaux
+    b.nW-=dt;if(b.nW<=0){b.nW=r?6:8;b.mode='tail';b.mt2=0.5;}   // coup de queue : une vague géante roule sur le sol
+    b.nS-=dt;if(b.nS<=0){b.nS=r?8:11;let n=0;for(const e of enemies)if(e.kd&&e.state==='alive')n++;for(let i=0;i<Math.min(r?3:2,4-n);i++){const e=mkEnemy(i%2?'shoot':'hop',b.x+(i-1)*40,(PAL_G-3)*T);e.kd=true;enemies.push(e);vfx('magic',e.x+e.w/2,e.y+e.h/2);}floatText(b.x,b.y-44,lang==='en'?'GUARDS!':'GARDES !','#7fc4ff');}
+    if(r){b.nR-=dt;if(b.nR<=0){b.nR=3.2;for(let i=0;i<6;i++)bfx.push({type:'bolt',x:b.cx+(Math.random()*2-1)*24*T,y:(PAL_G-16)*T,vx:0,vy:40,g:260,c:'#ffd23f',t:0});}}   // pluie de pièces de la couronne
+  } else if(b.mode==='up'){b.mt2-=dt;b.x+=clamp(b.sx-b.x,-280*dt,280*dt);b.y+=clamp((PAL_G-14)*T-b.y,-300*dt,300*dt);if(b.mt2<=0)b.mode='down';}
+  else if(b.mode==='down'){b.y+=460*dt;if(b.y>=fl-20){b.y=fl-20;b.mode='float';b.mt=0.8;slamWaves(b.x,fl,r?3:2,'#e6faff','#2a6fb0');}}
+  else if(b.mode==='tail'){b.mt2-=dt;b.y+=clamp(fl-22-b.y,-220*dt,220*dt);if(b.mt2<=0){b.mode='float';b.mt=0.6;const d=p.x+5>b.x?1:-1;bfx.push({type:'wave',x:b.x+d*30,y:fl,dir:d,spd:r?190:160,h:22,t:0,c:'#e6faff',c2:'#3b9bff'});shake=Math.max(shake,0.35);vfx('splashg',b.x+d*30,fl,{tint:'#7fd4ff'});}}
+}
+function drawKingD(){
+  const b=kingD;if(!b)return;
+  const dead=b.state==='dying';
+  ctx.save();if(dead&&Math.floor(time*16)%2)ctx.globalAlpha=0.6;
+  const img=b.flash>0?DOLB_W:DOLB,bob=b.mode==='float'?Math.sin(time*2)*3:0,s=6;
+  ctx.translate(Math.round(b.x),Math.round(b.y+bob));if(b.rage&&!dead){ctx.fillStyle='rgba(255,60,40,.18)';disc(0,0,52);}
+  ctx.scale(b.face*s,dead?-s:s);ctx.drawImage(img,-9,-5);ctx.restore();
+  if(!dead){ctx.save();ctx.translate(Math.round(b.x+b.face*10),Math.round(b.y+bob-30));ctx.scale(b.face*4,4);ctx.rotate(-0.12);ctx.drawImage(CROWN,-6,-5);ctx.restore();
+    if(b.rage&&Math.floor(time*6)%2){ctx.fillStyle='#fff6c4';ctx.fillRect(Math.round(b.x+b.face*16),Math.round(b.y+bob-44),2,2);}}
+  else{const k=Math.min(1,(3.2-b.dieT)/1.2);ctx.save();ctx.translate(Math.round(b.x+k*40),Math.round(b.y-30+k*k*60));ctx.rotate(k*6);ctx.scale(4,4);ctx.drawImage(CROWN,-6,-5);ctx.restore();}
+}
+function drawPalace(cx){   // salle du trône : colonnes de marbre, tentures bleues, trône
+  for(const sg of[-1,1]){const x0=sg*KINGD_CX*T+8;if(Math.abs(x0-(cx+VW/2))>VW+30*T)continue;const fl=PAL_G*T;
+    for(let i=-3;i<=3;i++){const x=x0+i*8*T;ctx.fillStyle='#14182c';ctx.fillRect(x-7,fl-150,14,150);ctx.fillStyle='#e8e2f4';ctx.fillRect(x-6,fl-150,12,150);ctx.fillStyle='#c0b6d6';ctx.fillRect(x+2,fl-150,4,150);
+      ctx.fillStyle='#ffd23f';ctx.fillRect(x-8,fl-152,16,4);ctx.fillRect(x-8,fl-6,16,4);
+      if(i<3){ctx.fillStyle='#2a6fb0';ctx.fillRect(x+10,fl-148,8*T-20,18);ctx.fillStyle='#4aa8e8';for(let k=0;k<8*T-20;k+=8)ctx.fillRect(x+10+k,fl-130,4,4);}}
+    ctx.fillStyle='#14182c';ctx.fillRect(x0+sg*24*T-16,fl-44,32,44);ctx.fillStyle='#2a6fb0';ctx.fillRect(x0+sg*24*T-15,fl-43,30,43);ctx.fillStyle='#ffd23f';ctx.fillRect(x0+sg*24*T-15,fl-43,30,3);ctx.fillRect(x0+sg*24*T-15,fl-20,30,3);
+  }
+}
+CINE.b_meca=[{who:bossSpk('MÉCA-DAUPHIN','MECHA-DOLPHIN','#ff5a3a'),l:LG('BIP. INTRUS DÉTECTÉ. PANTALON : CONFIRMÉ. PROTOCOLE D\'ÉLIMINATION ACTIVÉ.','BEEP. INTRUDER DETECTED. PANTS: CONFIRMED. ELIMINATION PROTOCOL ON.')},
+  {who:PECHEUR,l:LG('Un dauphin en ferraille... Derrière lui, il y a un portail. La capitale des dauphins !','A scrap-metal dolphin... There\'s a portal behind it. The dolphin capital!')}];
+CINE.b_roi=[{who:ROI,l:LG('Alors c\'est toi, le pêcheur qui a traversé mon royaume... en caleçon, au début, paraît-il.','So you\'re the fisherman who crossed my kingdom... in boxers at first, I hear.')},
+  {who:PECHEUR,l:LG('Rends-moi le monde, gros poisson.','Give the world back, you big fish.')},
+  {who:ROI,l:LG('Je suis un MAMMIFÈRE ! Gardes ! Et toi, prépare-toi à finir en filet !','I\'m a MAMMAL! Guards! And you, get ready to end up in a net!')}];
+CINE.fin=[{sc:'freed',who:NARR,l:LG('La couronne du roi roula jusqu\'à la mer. Sans leur roi, les dauphins retournèrent sagement dans l\'eau.','The king\'s crown rolled into the sea. Without their king, the dolphins went quietly back into the water.')},
+  {sc:'freed',who:PECHEUR,l:LG('Le monde est libre. Mon pantalon est sur mes jambes. La pêche peut reprendre.','The world is free. My pants are on my legs. Fishing can resume.')},
+  {sc:'credits',who:NARR,l:LG('Mais on raconte que la Cité des dauphins continue, plus loin... pour les pêcheurs qui en veulent encore.','But they say the Dolphin City goes on, further... for fishermen who want more.')}];
+CINE.ch6=[{card:LG('CHAPITRE 6 · LA CITÉ DES DAUPHINS','CHAPTER 6 · THE DOLPHIN CITY'),who:PECHEUR,l:LG('Leur capitale... Le palais du roi est tout au bout de la ville. On y est presque.','Their capital... The king\'s palace is at the far end of town. Almost there.')}];
+
 const CLOUDB_HP=900;
 let cloudB=null,cloudBalls=[],cloudDone=false;
+let mecaB=null,mecaDone=false,kingD=null,kingDone=false,bfx=[];
+let cine=null,cineSeen=new Set();
+let tuto=null;
+let cineBiome=0;
 function cloudRect(){const b=cloudB;if(!b||b.state!=='fight')return null;return [b.x-24,b.y-15,48,30];}
 function startCloudBoss(sg){
   const cx=sg*SKY_CX*T+8,hp=rodAdapt(CLOUDB_HP);
@@ -5685,7 +6151,7 @@ function killJelly(b){
   if(kills%HEAL_EVERY===0)healDrop();
 }
 function maybeSpawnJelly(){
-  if(jelly||octo||castle||witch||eskimo||cloudB||cow||six)return;
+  if(jelly||octo||castle||witch||eskimo||cloudB||mecaB||kingD||cow||six)return;
   const p=player,tx=Math.floor((p.x+5)/T),side=tx<0?-1:1,per=JELLY_SCREENS*(VW/T);
   let key;
   if(anarchyOn){   // anarchie : une méduse tous les 37 écrans après l'entrée de la plage, tant qu'aucun autre boss n'est là
@@ -5930,6 +6396,10 @@ function update(dt){
   if(!anarchyOn&&!shop.cloud&&inCloud(Math.floor((player.x+5)/T))){   // (sécurité) monde nuage atteint
     shop.cloud=player.x<0?-1:1;saveShop();refreshCp();
   }
+  if(!anarchyOn&&!shop.city&&inCity(Math.floor((player.x+5)/T))&&state==='play'){   // la cité est atteinte : dernier checkpoint
+    shop.city=player.x<0?-1:1;shop.cloud=shop.cloud||shop.city;saveShop();sfx.heal();shake=Math.max(shake,0.3);vfx('shine',player.x+5,player.y);
+    floatText(player.x+5,player.y-32,'CHECKPOINT !','#7ff0e8');refreshCp();
+  }
   if(!anarchyOn&&!shop.ice&&inIce(Math.floor((player.x+5)/T))){   // la glacière est atteinte : 3e checkpoint
     shop.ice=player.x<0?-1:1;if(!shop.swamp)shop.swamp=shop.ice;if(!shop.beach)shop.beach=shop.ice;saveShop();sfx.heal();shake=Math.max(shake,0.3);
     floatText(player.x+5,player.y-32,'CHECKPOINT !','#7ff0e8');
@@ -5960,7 +6430,7 @@ function update(dt){
   maybeSpawnSix(dt);stepSix(dt);
   stepOcto(dt);
   stepCastle(dt);
-  stepWitch(dt);stepPoison(dt);stepEskimo(dt);stepCloudBoss(dt);stepScepterBeams(dt);stepPedestal(dt);
+  stepWitch(dt);stepPoison(dt);stepEskimo(dt);stepCloudBoss(dt);stepMeca(dt);stepKingD(dt);stepBfx(dt);stepScepterBeams(dt);stepPedestal(dt);
   stepBossShots(dt);
   stepSoulFx(dt);
   stepPickups(dt);
@@ -6008,7 +6478,7 @@ const clouds=[{x:40,y:30,s:1,par:.10},{x:200,y:52,s:2,par:.16},{x:330,y:24,s:1,p
 
 const BG_GRASS={sky:SKY,sea:'#46a0e4',seaTop:'#78c4f4',spark:'#bfe6ff',h1:'#6fa7a0',h1t:'#8cc2b6',h2:'#3f9a5c',h2t:'#63bd72'};
 const BG_BEACH={sky:['#4db3ee','#5fc3f2','#76d0f5','#92dcf6','#b0e7f7','#cff1f6','#ecf8ef','#fdf6d8'],sea:'#2ec6cf',seaTop:'#9ff4ee',spark:'#d6fffb',h1:'#e6c987',h1t:'#f3deaa',h2:'#d9b877',h2t:'#f0d9a0'};
-let bzView=0,swView=0,iceView=0,clView=0;
+let bzView=0,swView=0,iceView=0,clView=0,ctView=0;
 const BG_SWAMP={sky:['#4f6a5e','#5a7666','#668270','#738d7a','#839a86','#95a893','#a8b6a0','#bcc4ad'],sea:'#3c6b5a',seaTop:'#6f9a86',spark:'#a9cdb9',h1:'#4f6b55',h1t:'#62806a',h2:'#35503a',h2t:'#4a6b4c'};   // 0 = herbe, 1 = plage (fondu progressif à la sortie de l'arène)
 const BG_ICE={sky:['#8ec9ee','#a4d6f3','#bbe3f7','#d0edfa','#e0f4fc','#ecf8fe','#f4fbff','#fbfdff'],sea:'#8cc4e8',seaTop:'#e8f8ff',spark:'#ffffff',h1:'#b4d6ec',h1t:'#e8f6ff',h2:'#88b4d6',h2t:'#d8eefa'};   // glacière : ciel pâle, mer gelée, montagnes de glace
 const BG_CLOUD={sky:['#4aa0f0','#62b0f4','#7cc0f7','#98d0f9','#b6e0fb','#d2eefc','#ecf8fe','#fff6e2'],sea:'#f2f7ff',seaTop:'#ffffff',spark:'#ffe9a8',h1:'#e4edfb',h1t:'#ffffff',h2:'#c4d6f0',h2t:'#f4f8ff',noHills:true};   // monde nuage : ciel haut et lumineux, mer de nuages
@@ -6104,6 +6574,7 @@ function drawBackground(cx,cy,P){
     cloud(mod(c.x-cx*c.par+time*(3+c.par*30),VW+220)-110,c.y-(cy-200)*0.04,c.s,K);
   }
   ctx.globalAlpha=A;
+  if(P.city){drawSkyline(cx,cy);return;}   // cité des dauphins : immeubles et néons
   if(P.noHills){drawLandmarks(cx,0,0,P,K,'sky');return;}   // monde nuage : un ciel pur, sans mer ni montagnes (mais des îles flottantes)
   const seaTop=Math.round(VH*0.6-(cy-200)*0.10);
   if(seaTop>0)bgStrip(P,K,0,cx*0.07,seaTop);   // montagnes lointaines, presque fondues dans le ciel (bandes précalculées)
@@ -6298,7 +6769,7 @@ function drawAmbient(cx){   // particules d'ambiance : pollen (plaines, plage), 
 function drawWater(cx,cy){
   const wy=WATER_ROW*T;
   if(wy>cy+VH+4)return;
-  const wc=clView>0.5?'#f2f7ff':iceView>0.5?'#8cc4e8':swView>0.5?'#2f5a4a':bzView>0.5?'#1fb3bd':'#2b78cf';
+  const wc=ctView>0.5?'#1c1238':clView>0.5?'#f2f7ff':iceView>0.5?'#8cc4e8':swView>0.5?'#2f5a4a':bzView>0.5?'#1fb3bd':'#2b78cf';
   ctx.fillStyle=wc;ctx.fillRect(cx-8,wy+3,VW+16,Math.max(0,cy+VH-wy));
   if(clView<0.5){   // l'eau fonce avec la profondeur (bords tramés) et la lumière ondule sous la surface
     for(const [dy,t] of [[12,0.2],[30,0.36]]){
@@ -6310,7 +6781,7 @@ function drawWater(cx,cy){
     for(let i=0;i<16;i++){const x=Math.round(cx+mod(i*53+time*(i%2?9:-7),VW)),y=wy+6+((i*7)%18);ctx.globalAlpha=0.25+0.2*Math.sin(time*2+i);ctx.fillRect(x,y,3+(i%3),1);}
     ctx.globalAlpha=1;
   }
-  ctx.fillStyle=clView>0.5?'#ffffff':iceView>0.5?'#e8f8ff':swView>0.5?'#5c8a74':bzView>0.5?'#4fd4d6':'#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
+  ctx.fillStyle=ctView>0.5?'#ff5ad8':clView>0.5?'#ffffff':iceView>0.5?'#e8f8ff':swView>0.5?'#5c8a74':bzView>0.5?'#4fd4d6':'#4a9be8';ctx.fillRect(cx-8,wy+2,VW+16,3);
   ctx.fillStyle='#d8f1ff';
   for(let x=Math.floor(cx/4)*4;x<cx+VW+4;x+=4){ctx.fillRect(x,wy+(Math.sin(time*3+x*0.15)>0?0:1),4,2);}
 }
@@ -6383,11 +6854,13 @@ function drawGroundCol(G,tx,col,ty0,ty1){
         if(ty===col.g){
           if(col.ar&&col.ar.type!=='castle'&&col.ar.type!=='eskimo'&&col.dx>=-13&&col.dx<=12)G.drawImage(STONE_TOP,tx*T,ty*T);
           else if(sand)G.drawImage(SANDTOP[dec<5?0:dec-4][v],tx*T,ty*T-6);
+          else if(col.meca)G.drawImage(METALTOP[v],tx*T,ty*T-6);
+          else if(col.city)G.drawImage((col.pal?MARBLETOP:CITYTOP)[v],tx*T,ty*T-6);
           else if(col.cloud)G.drawImage(CLOUDTOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
           else if(col.ice)G.drawImage(ICETOP[dec<5?0:dec-5][v],tx*T,ty*T-6);
           else G.drawImage((col.swamp?SGRASS:GRASS)[dec<5?0:dec-4][v],tx*T,ty*T-6);
         }
-        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2,set=sand?SAND:col.cloud?CLOUD:col.ice?ICE:col.swamp?SDIRT:DIRT,vv=mod(tx*7+ty*3,3);G.drawImage(dp===4||dp===10?transTile(set,sh,vv):set[sh][vv],tx*T,ty*T);
+        else{const dp=ty-col.g,sh=dp<5?0:dp<11?1:2,set=sand?SAND:col.meca?METAL:col.city?(col.pal?MARBLE:CITYB):col.cloud?CLOUD:col.ice?ICE:col.swamp?SDIRT:DIRT,vv=mod(tx*7+ty*3,3);G.drawImage(dp===4||dp===10?transTile(set,sh,vv):set[sh][vv],tx*T,ty*T);
           if((set===DIRT||set===SDIRT)&&!tun){const hh=hash2(tx*5+3,ty*7+1);if(hh<0.16){const k=hh<0.04&&dp<3?3:Math.floor(hh*19)%3;G.globalAlpha=set===SDIRT?0.7:1;G.drawImage(PEBBLES[sh][k],tx*T+Math.floor(hash2(tx,ty+90)*9),ty*T+Math.floor(hash2(tx+90,ty)*7));G.globalAlpha=1;}}}
         if(tun&&ty>col.g){   // bords éclairés / ombrés des parois de sable
           if(!solidTile(tx,ty-1)){G.fillStyle='#f6e2ac';G.fillRect(tx*T,ty*T,T,2);}
@@ -6395,7 +6868,7 @@ function drawGroundCol(G,tx,col,ty0,ty1){
         }
       }
       {   // faces de falaise : côté gauche dans l'ombre, côté droit éclairé par le soleil, liseré sombre, herbe qui déborde
-        const L=column(tx-1),Rc=column(tx+1),lb=L.pit?ty1+1:L.g,rb=Rc.pit?ty1+1:Rc.g,grassy=!sand&&!col.cloud&&!col.ice&&!col.ar&&!tun;
+        const L=column(tx-1),Rc=column(tx+1),lb=L.pit?ty1+1:L.g,rb=Rc.pit?ty1+1:Rc.g,grassy=!sand&&!col.cloud&&!col.ice&&!col.ar&&!tun&&!col.city&&!col.meca;
         const gc=col.swamp?'#22581b':'#37963b',gl=col.swamp?'#2f6f25':'#4fbf4a';
         if(lb>col.g){const ya=Math.max(col.g,ty0)*T,yb=Math.min(lb,ty1+1)*T;
           if(yb>ya){G.fillStyle='rgba(22,10,2,.5)';G.fillRect(tx*T,ya,1,yb-ya);G.fillStyle='rgba(22,10,2,.2)';G.fillRect(tx*T+1,ya,3,yb-ya);}
@@ -6431,7 +6904,7 @@ function drawTiles(cx,cy){
         let flat=true;for(let k=l;k<=r&&flat;k++){const ck=column(k);if(ck.pit||ck.g!==col.g)flat=false;}   // pilier seulement si le sol est plat sur toute la largeur de la plateforme
         if(flat&&tx===((l+r)>>1)&&!col.pit){const by=col.g*T,x=tx*T-4;ctx.fillStyle='#1e2420';ctx.fillRect(x-1,ty*T+6,26,by-ty*T-6);ctx.fillStyle='#6a7366';ctx.fillRect(x,ty*T+6,24,by-ty*T-6);ctx.fillStyle='#7c8577';ctx.fillRect(x,ty*T+6,3,by-ty*T-6);ctx.fillStyle='#545c51';for(let yy=ty*T+10,r=0;yy<by;yy+=8,r++){ctx.fillRect(x,yy,24,1);ctx.fillRect(x+(r%2?8:16),yy-7,1,7);}ctx.fillStyle='#4f7a3a';ctx.fillRect(x,by-7,4,7);ctx.fillRect(x+19,by-5,5,5);if(by-ty*T>30){ctx.fillStyle='#1e2420';ctx.fillRect(x+10,ty*T+14,4,7);ctx.fillRect(x+11,ty*T+13,2,1);}}
         ctx.drawImage(STONE_PLAT,tx*T,ty*T);
-      } else {const fr=col.cloud&&fragMap.get(pkey(tx,ty));ctx.drawImage(col.cloud?(fr?CLOUD_FRAG:CLOUD_PLAT):col.ice?ICE_PLAT:PLANK,tx*T+(fr&&fr.st==='crack'&&Math.random()<0.5?1:0),ty*T);}
+      } else {const fr=col.cloud&&fragMap.get(pkey(tx,ty));ctx.drawImage(col.meca?METAL_PLAT:col.city?NEON_PLAT:col.cloud?(fr?CLOUD_FRAG:CLOUD_PLAT):col.ice?ICE_PLAT:PLANK,tx*T+(fr&&fr.st==='crack'&&Math.random()<0.5?1:0),ty*T);}
     }
   }
 }
@@ -6495,6 +6968,7 @@ function drawEnemy0(e){
   if(e.kind!=='fly'&&!dead){const st=Math.min(0.25,Math.abs(e.vy)/700);ctx.scale(1-st*0.5,1+st*0.7);}
   ctx.scale(e.dir>0?1:-1,dead?-1:1);
   ctx.drawImage(img,-9,-5);
+  if(e.robo){ctx.fillStyle='#14182c';ctx.fillRect(0,-6,8,3);ctx.fillStyle='#9aa6ba';ctx.fillRect(1,-5,6,1);ctx.fillStyle='#ff3b2f';ctx.fillRect(4,-3,3,1);ctx.fillStyle='#14182c';ctx.fillRect(1,-9,1,3);ctx.fillStyle=Math.floor(time*4)%2?'#ff3b2f':'#4ce8d8';ctx.fillRect(1,-10,1,1);}   // casque, visière et antenne
   ctx.restore();
   if(e.kind==='shoot'&&e.charge>0&&!dead){   // boule de feu qui se charge dans la gueule
     const r=Math.round(1+(1-e.charge/0.6)*3);
@@ -6534,7 +7008,7 @@ function drawSkinBack(sk,p,cx){   // appendices dessinés derrière le personnag
 /* ---- Animation du pêcheur (refonte v3) : écrasement à l'atterrissage, étirement au saut, poussière, ombre, respiration.
    Tout se fait à l'affichage, donc ça marche pour tous les skins sans toucher à leurs dessins. ---- */
 const pfx={was:true,landT:-9,landK:0,jumpT:-9,lastVy:0,lastVx:0,lastT:0,runT:0,dust:[]};
-function dustCol(){const c=column(Math.floor((player.x+player.w/2)/T));return c.cloud||c.ice?'#ffffff':c.beach?'#fff0c8':c.swamp?'#b8c0a2':'#efe2c2';}
+function dustCol(){const c=column(Math.floor((player.x+player.w/2)/T));return c.city||c.meca?'#b8b0d0':c.cloud||c.ice?'#ffffff':c.beach?'#fff0c8':c.swamp?'#b8c0a2':'#efe2c2';}
 function puff(x,y,n,spread,push){const c=dustCol();for(let i=0;i<n;i++)pfx.dust.push({x:x+(Math.random()-0.5)*spread,y:y-Math.random()*2,vx:(Math.random()-0.5)*30+(push||0),vy:-8-Math.random()*16,t:0,life:0.3+Math.random()*0.25,c});}
 function stepPlayerFx(){
   const p=player,dt=clamp(time-pfx.lastT,0,0.05);pfx.lastT=time;
@@ -7075,7 +7549,11 @@ function drawHUD(){
   ctx.drawImage(GOLD,Math.round(VW-6-ctx.measureText(gt).width-9),31);
   txt(sl,VW-6,44,'#ff7a88','right');
   ctx.drawImage(SOUL,Math.round(VW-6-ctx.measureText(sl).width-12),42);
-  const bb=cloudB&&cloudB.state!=='dying'
+  const bb=kingD&&kingD.state!=='dying'
+    ?{name:lang==='en'?'DOLPHIN KING':'ROI DES DAUPHINS',hp:kingD.hp,max:kingD.maxHp,ticks:[0.5],name_c:kingD.rage?'#ff6a6a':'#ffd23f',col:kingD.rage?'#ff4a4a':'#3b9bff',dark:'#14305a',hi:'#d6f1ff'}
+    :mecaB&&mecaB.state!=='dying'
+    ?{name:lang==='en'?'MECHA-DOLPHIN':'MÉCA-DAUPHIN',hp:mecaB.hp,max:mecaB.maxHp,ticks:[0.66,0.33],name_c:mecaB.ph===3?'#ff6a6a':'#d0d8e6',col:mecaB.ph===3?'#ff4a3a':'#9aa6ba',dark:'#232836',hi:'#ffffff'}
+    :cloudB&&cloudB.state!=='dying'
     ?{name:'DAUPHIN DES NUAGES',hp:cloudB.hp,max:cloudB.maxHp,ticks:[0.5],name_c:cloudB.rage?'#ff6a6a':'#ffffff',col:cloudB.rage?'#ff7a5a':'#7fc4ff',dark:'#1a3a6a',hi:'#e8f6ff'}
     :king&&king.state!=='dying'
     ?{name:'ROI CACAMILLE 2',hp:king.hp,max:king.maxHp,ticks:[0.5],name_c:king.rage?'#ff6a6a':'#ffd23f',col:king.rage?'#ff4a4a':'#b04ad8',dark:'#2a1040',hi:'#e8c8ff'}
@@ -7144,13 +7622,14 @@ function render(){
   if(rz){renderRz();return;}
   if(tw){renderTw();return;}
   const cx=Math.round(cam.x),cy=Math.round(cam.y);
-  {const cc=Math.round((cx+VW/2)/T),tb=inBeach(cc)?1:0,ts=inSwamp(cc)?1:0,ti=inIce(cc)?1:0,tc=inCloud(cc)?1:0;iceView+=(ti-iceView)*0.06;if(Math.abs(ti-iceView)<0.01)iceView=ti;clView+=(tc-clView)*0.06;if(Math.abs(tc-clView)<0.01)clView=tc;   // fondu d'une zone à l'autre
+  {const cc=Math.round((cx+VW/2)/T),tb=inBeach(cc)?1:0,ts=inSwamp(cc)?1:0,ti=inIce(cc)?1:0,tc=inCloud(cc)?1:0,tct=inCity(cc)?1:0;ctView+=(tct-ctView)*0.06;if(Math.abs(tct-ctView)<0.01)ctView=tct;iceView+=(ti-iceView)*0.06;if(Math.abs(ti-iceView)<0.01)iceView=ti;clView+=(tc-clView)*0.06;if(Math.abs(tc-clView)<0.01)clView=tc;   // fondu d'une zone à l'autre
    bzView+=(tb-bzView)*0.06;if(Math.abs(tb-bzView)<0.01)bzView=tb;swView+=(ts-swView)*0.06;if(Math.abs(ts-swView)<0.01)swView=ts;}
   if(bzView<1)drawBackground(cx,cy,BG_GRASS);
   if(bzView>0){ctx.globalAlpha=bzView;drawBackground(cx,cy,BG_BEACH);ctx.globalAlpha=1;}
   if(swView>0){ctx.globalAlpha=swView;drawBackground(cx,cy,BG_SWAMP);ctx.globalAlpha=1;}
   if(iceView>0){ctx.globalAlpha=iceView;drawBackground(cx,cy,BG_ICE);ctx.globalAlpha=1;drawSnow(iceView);}
   if(clView>0){ctx.globalAlpha=clView;drawBackground(cx,cy,BG_CLOUD);ctx.globalAlpha=1;}
+  if(ctView>0){ctx.globalAlpha=ctView;drawBackground(cx,cy,BG_CITY);ctx.globalAlpha=1;}
   if(nightA>0.01){ctx.fillStyle='rgba(70,0,12,'+(0.62*nightA).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel rouge sang
   if(skyCur[3]>0.005){ctx.fillStyle='rgba('+Math.round(skyCur[0])+','+Math.round(skyCur[1])+','+Math.round(skyCur[2])+','+skyCur[3].toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel d'anarchie
   if(octo){ctx.fillStyle=octo.rage?'rgba(110,10,25,'+(0.22+0.08*Math.sin(time*6)).toFixed(2)+')':'rgba(25,8,50,0.38)';ctx.fillRect(0,0,VW,VH);}
@@ -7160,7 +7639,7 @@ function render(){
   drawWater(cx,cy);
   drawOcto();
   drawCastle();
-  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();drawCloudBoss();drawTutoWorld();
+  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();drawMecaGate(cx);drawPalace(cx);drawCloudBoss();drawMeca();drawKingD();drawBfx();drawTutoWorld();
   drawPalms(cx,cy);
   drawSwampTowers(cx);
   drawTiles(cx,cy);drawCloudGear(cx,cy);
@@ -7223,7 +7702,7 @@ function setShopBtn(mode){   // en pause : le bouton BOUTIQUE devient RETOUR MEN
 }
 function drawOvChar(){ovCtx.clearRect(0,0,16,16);ovCtx.imageSmoothingEnabled=false;ovCtx.drawImage(curSkin().spr.idle,0,0);}   // le skin équipé au centre des menus
 const OV_TEXT0=ovText.textContent,OV_TITLE0=ovTitle.textContent,ovCp=$('ov-cp');
-function refreshCp(){ovCp.hidden=!shop.beach;ovCp.textContent=shop.cloud?'★ CHECKPOINT : LE MONDE NUAGE ★':shop.ice?'★ CHECKPOINT : LA GLACIÈRE ★':shop.swamp?'★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT : LA PLAGE ★';}
+function refreshCp(){ovCp.hidden=!shop.beach;ovCp.textContent=shop.city?'★ CHECKPOINT : LA CITÉ DES DAUPHINS ★':shop.cloud?'★ CHECKPOINT : LE MONDE NUAGE ★':shop.ice?'★ CHECKPOINT : LA GLACIÈRE ★':shop.swamp?'★ CHECKPOINT : LES MARÉCAGES ★':'★ CHECKPOINT : LA PLAGE ★';}
 function showTitle(){
   if(speedOn)endSpeedrun();
   if(pvp)pvpEnd();
@@ -7240,7 +7719,7 @@ function resetWorld(){
   groundCache.clear();
   SEED=(speedOn&&duel)?duel.seed:(Math.random()*4294967296)|0;   // duel : même graine pour les deux joueurs
   colCache.clear();plat.clear();movers.length=0;fragMap.clear();fragList.length=0;springs.clear();drafts.length=0;chunks.clear();arenas.clear();tunnels.clear();cowFields.clear();csCache.clear();tw=null;twTr=null;twCd=0;king=null;kingBalls=[];
-  cloudB=null;cloudBalls=[];cloudDone=false;tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];crows=[];rngLas=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
+  cloudB=null;cloudBalls=[];cloudDone=false;mecaB=null;mecaDone=false;kingD=null;kingDone=false;bfx=[];tcards=[];harp=null;sixJet=[];enemies=[];pickups=[];grabs=[];clownFx=[];miniFx=[];crows=[];rngLas=[];teFx=[];teCd=0;teZip=null;teJump=null;parts=[];texts=[];worldPearls=[];boss=null;bossShots=[];soulFx=[];bossDone=new Set();bossWins=0;octo=null;tents=[];jelly=null;jellySpawned=false;castle=null;witch=null;witchRun=false;eskimo=null;eskimoRun=false;scepPed=null;scepBeams=[];scepLaserCd=6;anaLock=0;lockMsgT=0;octoRun=false;castleRun=false;cow=null;milk=[];cowSpawned=false;cowDone=new Set();rz=null;six=null;sixShots=[];sixJet=[];rzTr=null;
   anarchyOn=anarchyWant;anaEnc=0;anaMul=1;anaWins={};anaSlotDone=new Set();jellyDone=new Set();merchants.clear();nearMerch=null;
   night=false;nightA=0;bossSpawned=false;anaSky=0;skyCur.fill(0);
 }
@@ -7273,7 +7752,7 @@ function startGameCore(){
     const sg=shop.cloud||shop.ice;
     for(const tx of[sg*ARENA_START*(VW/T),sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T)),sg*(SWAMP_TX+WITCH_AFTER*(VW/T))]){const ar=arenaAt(tx);if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}}
     bossSpawned=true;octoRun=true;castleRun=true;jellySpawned=true;witchRun=true;
-    placePlayer(sg*((shop.cloud?CLOUD_TX:ICE_TX)+10)*T);
+    placePlayer(sg*((shop.city?CITY_TX:shop.cloud?CLOUD_TX:ICE_TX)+10)*T);if(shop.city){mecaDone=true;cloudDone=true;}
   } else if(shop.swamp&&!anarchyOn){   // checkpoint des marécages : poulpe, château et méduse derrière soi
     const sg=shop.swamp;
     for(const tx of[sg*ARENA_START*(VW/T),sg*(BEACH_TX+(JELLY_SCREENS_C+CASTLE_AFTER_JELLY)*(VW/T))]){const ar=arenaAt(tx);if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}}
@@ -7368,7 +7847,7 @@ $('rst-btn').addEventListener('click',openRst);
 function openRb(){rstMode='rebirth';clearInputs();rstOpen=true;rstStep=1;rstEl.hidden=false;renderRst();try{$('rst-no').focus({preventScroll:true});}catch(e){}}
 function doRebirth(){
   if(!shop.cloud)return;
-  shop.beach=0;shop.swamp=0;shop.ice=0;shop.cloud=0;shop.bossSouls={};   // les boss comptent de nouveau comme vaincus pour la 1re fois (âmes et or complets)
+  shop.beach=0;shop.swamp=0;shop.ice=0;shop.cloud=0;shop.city=0;shop.bossSouls={};   // les boss comptent de nouveau comme vaincus pour la 1re fois (âmes et or complets)
   shop.rb=(shop.rb||0)+1;
   if(shop.weapon==='rod'&&shop.tridentOwned&&rodLocked())shop.weapon='trident';
   saveShop();closeRst();try{closeSet();}catch(e){}rbRefresh();showTitle();
@@ -9128,190 +9607,6 @@ if(document.fonts&&document.fonts.load){document.fonts.load("8px 'Press Start 2P
 
 initTitle();refreshCp();drawOvChar();
 let last=performance.now(),acc=0;
-/* ================= Histoire et cinématiques (mode classique) =================
-   Les dauphins ont pris le contrôle du monde. Dans la panique, le pêcheur a perdu son pantalon (on le retrouve au début : c'est le tuto).
-   Chaque monde s'ouvre sur un chapitre, chaque boss fait son entrée avec une réplique. Toutes les scènes se passent (bouton PASSER / Échap). */
-const LG=(fr,en)=>({fr,en}),lgS=o=>typeof o==='string'?o:(lang==='en'?o.en:o.fr);
-const PANTS_ROWS=["bbbbbbbbbb","bBBBBBBBBb","bBBBkkBBBb","bBBB..BBBb","bBBB..BBBb","bBBB..BBBb","bBBB..BBBb","bddd..dddb"];
-const PANTS=spr(PANTS_ROWS,{b:'#245a98',B:'#3b7fd4',k:'#ffd23f',d:'#1c3f6e'},true);
-const CROWN=spr(["y...y...y","yy.yyy.yy","yyyyyyyyy","yrrybyyry","yyyyyyyyy"],{y:'#ffd23f',r:'#e0262e',b:'#3b9bff'},true);
-const noPantsMemo=new Map();
-function noPants(sp){   // le même sprite, mais en caleçon (rangée 12 : caleçon blanc à cœurs, rangée 13 : jambes nues)
-  let c=noPantsMemo.get(sp);if(c)return c;
-  c=mk(sp.width,sp.height);const g=c.getContext('2d');g.drawImage(sp,0,0);
-  const d=g.getImageData(0,0,c.width,c.height),W=c.width;
-  for(const y of[12,13])for(let x=0;x<W;x++){const o=(y*W+x)*4;if(!d.data[o+3])continue;const lum=d.data[o]+d.data[o+1]+d.data[o+2];if(lum<120)continue;
-    const col=y===12?((x%3===1)?[224,38,46]:[244,241,230]):[245,196,156];d.data[o]=col[0];d.data[o+1]=col[1];d.data[o+2]=col[2];}
-  g.putImageData(d,0,0);noPantsMemo.set(sp,c);return c;
-}
-const PECHEUR={n:LG('LE PÊCHEUR','THE FISHERMAN'),c:'#ffd23f'},NARR={n:null,c:'#ffffff'},ROI={n:LG('ROI DES DAUPHINS','DOLPHIN KING'),c:'#7fc4ff'};
-const bossSpk=(fr,en,c)=>({n:LG(fr,en),c});
-/* ---- petites scènes dessinées (coordonnées écran) ---- */
-function cineGround(y,tint){   // bande d'herbe + terre en bas de l'écran
-  for(let x=0;x<VW;x+=T){ctx.drawImage(GRASS[0][(x/T)%3],x,y-6);for(let yy=y+10,r=0;yy<VH;yy+=T,r++)ctx.drawImage(DIRT[0][(x/T+r)%3],x,yy);}
-  if(tint){ctx.fillStyle=tint;ctx.fillRect(0,y-6,VW,VH-y+6);}
-}
-function cineFisher(x,y,s,opt){   // le pêcheur (skin équipé), s = échelle, opt.np = en caleçon, opt.f = sens
-  const SP=curSkin().spr;let sp=opt&&opt.jump?SP.jump:SP.idle;if(opt&&opt.np)sp=noPants(sp);
-  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale((opt&&opt.f||1)*s,s);ctx.drawImage(sp,-8,-16);ctx.restore();
-}
-function cineDolph(x,y,s,a,img){ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a||0);ctx.scale(s,s);ctx.drawImage(img||DOLB,-9,-5);ctx.restore();}
-function cineKing(x,y,s,t){   // le roi des dauphins : un dauphin bleu normal... mais énorme, avec une couronne
-  const bob=Math.sin(t*2)*2*s/6;
-  cineDolph(x,y+bob,s,Math.sin(t*1.3)*0.05,DOLB);
-  ctx.save();ctx.translate(Math.round(x+2*s),Math.round(y+bob-5*s));ctx.rotate(-0.12+Math.sin(t*1.3)*0.05);ctx.scale(s*0.7,s*0.7);ctx.drawImage(CROWN,-6,-7);ctx.restore();
-}
-function cineDock(x,y){ctx.fillStyle='#14182c';ctx.fillRect(x-1,y-1,92,6);ctx.fillStyle='#8a5a2b';ctx.fillRect(x,y,90,4);ctx.fillStyle='#b47c40';ctx.fillRect(x,y,90,1);
-  for(const px of[6,40,80]){ctx.fillStyle='#5a3a1e';ctx.fillRect(x+px,y+4,4,30);}}
-const SC={
-  calm:t=>{drawBackground(t*8,200,BG_GRASS);cineDock(232,150);cineFisher(268,150,1,{f:-1});
-    ctx.strokeStyle='#e8e8e8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(258,138);ctx.lineTo(230,126);ctx.lineTo(214,168+Math.sin(t*2)*2);ctx.stroke();
-    ctx.fillStyle='#ff4a4a';ctx.fillRect(213,166+Math.round(Math.sin(t*2)*2),3,3);},
-  rise:t=>{drawBackground(60+t*20,200,BG_GRASS);ctx.fillStyle='rgba(160,20,30,'+Math.min(0.45,t*0.12).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);
-    for(let i=0;i<9;i++){const ph=(t*0.9+i*0.37)%1.6;if(ph>1.2)continue;const k=ph/1.2,x=20+i*42+k*30,y=190-Math.sin(k*Math.PI)*(70+(i%3)*20);cineDolph(x,y,2,-1+k*2,i%4===3?DOLR:i%3===2?DOLP:DOLB);}},
-  conquer:t=>{drawBackground(200,200,BG_SWAMP);ctx.fillStyle='rgba(70,0,12,.45)';ctx.fillRect(0,0,VW,VH);cineGround(152);
-    for(let i=0;i<7;i++){const x=((i*60+t*26)%(VW+60))-30,hop=Math.abs(Math.sin(t*6+i))*4;cineDolph(x,144-hop,2,0,i%2?DOLP:DOLB);
-      ctx.fillStyle='#5a3a1e';ctx.fillRect(Math.round(x)-2,116-hop,1,22);ctx.fillStyle='#3b7fd4';ctx.fillRect(Math.round(x)-1,116-hop,10,6);ctx.fillStyle='#ffd23f';ctx.fillRect(Math.round(x)+2,118-hop,3,2);}},
-  king:t=>{ctx.fillStyle='#120a26';ctx.fillRect(0,0,VW,VH);
-    ctx.fillStyle='rgba(127,196,255,.12)';ctx.beginPath();ctx.moveTo(VW/2-30,0);ctx.lineTo(VW/2+30,0);ctx.lineTo(VW/2+110,VH);ctx.lineTo(VW/2-110,VH);ctx.fill();
-    for(let i=0;i<6;i++){const x=40+i*62,hop=Math.abs(Math.sin(t*5+i*1.3))*6;cineDolph(x,148-hop,2,0,i%2?DOLP:DOLR);}
-    cineKing(VW/2,92,7,t);},
-  splash:t=>{drawBackground(30,200,BG_GRASS);cineDock(232,150);
-    const k=clamp((t-0.3)/0.75,0,1);   // le dauphin jaillit, percute le pêcheur, le pantalon s'envole
-    if(t>0.3&&k<1)cineDolph(170+k*96,200-k*62-Math.sin(k*Math.PI)*40,2,-0.9+k*1.2);
-    const hit=t>1.05,ft=t-1.05;
-    cineFisher(268+(hit?Math.min(ft,0.4)*30:0),150-(hit&&ft<0.5?Math.sin(ft/0.5*Math.PI)*22:0),1,{f:-1,np:hit,jump:hit&&ft<0.5});
-    if(hit){const pt=Math.min(ft,2.2);ctx.save();ctx.translate(268-pt*70,150-30-pt*60+pt*pt*20);ctx.rotate(pt*7);ctx.drawImage(PANTS,-6,-5);ctx.restore();}
-    if(hit&&ft<0.4){ctx.fillStyle='#ffffff';ctx.globalAlpha=1-ft/0.4;ctx.fillRect(0,0,VW,VH);ctx.globalAlpha=1;}},
-  angry:t=>{drawBackground(30,200,BG_GRASS);cineGround(150);cineFisher(VW/2,138,3,{np:true});
-    if(Math.floor(t*3)%2){ctx.fillStyle='#e0262e';ctx.fillRect(VW/2+14,84,3,8);ctx.fillRect(VW/2+19,80,3,8);ctx.fillRect(VW/2+24,84,3,8);}},
-  freed:t=>{drawBackground(t*10,200,BG_GRASS);cineDock(232,150);cineFisher(268,150,1,{f:-1});
-    for(let i=0;i<5;i++){const ph=(t*0.7+i*0.31)%1.4;if(ph>1)continue;const x=30+i*40+ph*20;cineDolph(x,196-Math.sin(ph*Math.PI)*30,2,-1+ph*2);}
-    const ct=Math.min(1,t/2);ctx.save();ctx.translate(120,150-ct*40+ct*ct*60);ctx.rotate(ct*9);ctx.scale(1.5,1.5);ctx.drawImage(CROWN,-6,-3);ctx.restore();},
-  credits:t=>{ctx.fillStyle='#0e1430';ctx.fillRect(0,0,VW,VH);ctx.font="8px 'Press Start 2P', monospace";
-    const L=['PECHADOPHIN','',lgS(LG('FIN','THE END')),'','dev : L\'taleshy et cocobat','visuels : Sacha','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute','',lgS(LG('MERCI D\'AVOIR JOUÉ !','THANKS FOR PLAYING!'))];
-    L.forEach((s,i)=>txt(s,VW/2,Math.round(VH+10-t*22+i*16),i===0?'#ffd23f':'#ffffff','center'));cineFisher(VW/2,VH-12,2,{});}
-};
-/* ---- scripts : chaque étape = une réplique (who, l) et, pour les scènes plein écran, un dessin (sc) ---- */
-const CINE={
-  intro:[
-    {sc:'calm',who:NARR,l:LG('Il était une fois un pêcheur, un ponton et une mer bien tranquille.','Once upon a time there was a fisherman, a jetty and a very quiet sea.')},
-    {sc:'rise',who:NARR,l:LG('Jusqu\'au jour où les dauphins sortirent de l\'eau... tous en même temps.','Until the day the dolphins came out of the water... all at once.')},
-    {sc:'conquer',who:NARR,l:LG('En une nuit, ils prirent le contrôle du monde : les plaines, la plage, les marécages, la glace et même les nuages.','In one night they took over the world: the plains, the beach, the swamps, the ice and even the clouds.')},
-    {sc:'king',who:ROI,l:LG('Hi hi hi ! Ce monde appartient désormais aux dauphins ! Et à leur roi : MOI !','Hee hee hee! This world now belongs to the dolphins! And to their king: ME!')},
-    {sc:'splash',who:NARR,l:LG('Dans la panique, notre pêcheur perdit quelque chose de très précieux...','In the panic, our fisherman lost something very precious...')},
-    {sc:'angry',who:PECHEUR,l:LG('MON PANTALON !! Ces dauphins vont me le payer. Je vais jusqu\'au palais de leur roi !','MY PANTS!! Those dolphins will pay. I\'m going all the way to their king\'s palace!')}
-  ],
-  ch1:[{card:LG('CHAPITRE 1 · LES PLAINES','CHAPTER 1 · THE PLAINS'),who:PECHEUR,l:LG('Il fait frais aux jambes... Mon pantalon doit être tombé tout près.','It\'s chilly on the legs... My pants must have landed nearby.')}],
-  ch2:[{card:LG('CHAPITRE 2 · LA PLAGE','CHAPTER 2 · THE BEACH'),who:PECHEUR,l:LG('Du sable plein les bottes et des dauphins plein la plage. Ils sont partout !','Sand in my boots and dolphins all over the beach. They\'re everywhere!')}],
-  ch3:[{card:LG('CHAPITRE 3 · LES MARÉCAGES','CHAPTER 3 · THE SWAMPS'),who:PECHEUR,l:LG('Ça sent la vase et le poisson pas frais. On dit qu\'une sorcière s\'est alliée aux dauphins.','It smells of mud and stale fish. They say a witch has sided with the dolphins.')}],
-  ch4:[{card:LG('CHAPITRE 4 · LA GLACIÈRE','CHAPTER 4 · THE ICE FIELDS'),who:PECHEUR,l:LG('Brrr ! Heureusement que j\'ai retrouvé mon pantalon.','Brrr! Good thing I found my pants.')}],
-  ch5:[{card:LG('CHAPITRE 5 · LE MONDE NUAGE','CHAPTER 5 · THE CLOUD WORLD'),who:PECHEUR,l:LG('Les dauphins volent, maintenant ?! Leur capitale doit être au bout des nuages.','Dolphins fly now?! Their capital must be past the clouds.')}],
-  ch6:[{card:LG('CHAPITRE 6 · LA CITÉ DES DAUPHINS','CHAPTER 6 · THE DOLPHIN CITY'),who:PECHEUR,l:LG('Leur capitale... Le palais du roi est tout au bout de la ville. On y est presque.','Their capital... The king\'s palace is at the far end of town. Almost there.')}],
-  b_shark:[{who:bossSpk('DÉMON REQUIN','SHARK DEMON','#ff5a4a'),l:LG('Les dauphins m\'ont promis ta canne à pêche. Et tes jambes, si elles sont bonnes.','The dolphins promised me your fishing rod. And your legs, if they taste good.')}],
-  b_octo:[{who:bossSpk('POULPE GÉANT','GIANT OCTOPUS','#c9a0ff'),l:LG('Huit bras, zéro pitié. La plage est aux dauphins, pêcheur.','Eight arms, zero mercy. The beach belongs to the dolphins, fisherman.')}],
-  b_jelly:[{who:bossSpk('MÉDUSE','JELLYFISH','#ff9ad8'),l:LG('Bzzz... Un pas de plus et je t\'électrise le caleçon.','Bzzz... One more step and I\'ll electrify your boxers.')}],
-  b_castle:[{who:bossSpk('CHÂTEAU DE SABLE','SANDCASTLE','#e4c882'),l:LG('Aucun pêcheur ne franchira mes remparts ! Enfin... sauf avec un seau d\'eau.','No fisherman shall pass my walls! Well... unless he has a bucket of water.')}],
-  b_witch:[{who:bossSpk('SORCIÈRE','WITCH','#9fe870'),l:LG('Le roi des dauphins paie bien. Goûte donc à mes potions !','The dolphin king pays well. Have a taste of my potions!')}],
-  b_cow:[{who:bossSpk('VACHE GÉANTE','GIANT COW','#ffffff'),l:LG('Meuuuh. Les dauphins m\'ont dit que tu volais le lait. MEUUUH !','Mooo. The dolphins told me you steal milk. MOOOO!')}],
-  b_six:[{who:bossSpk('N°6','No. 6','#ffd23f'),l:LG('6 6 6 6 6 6. (Il ne sait dire que ça.)','6 6 6 6 6 6. (That\'s all it can say.)')}],
-  b_eskimo:[{who:bossSpk('ESQUIMAU','ESKIMO','#bfe9ff'),l:LG('Les dauphins m\'ont donné ce sceptre. Tu vas finir en glaçon !','The dolphins gave me this scepter. You\'ll end up an ice cube!')}],
-  b_king2:[{who:bossSpk('ROI CACAMILLE 2','KING CACAMILLE 2','#e8c8ff'),l:LG('Je ne suis qu\'un roi de pacotille... le vrai roi, c\'est un dauphin. Mais je défendrai son passage !','I\'m only a puppet king... the real one is a dolphin. But I\'ll guard his way!')}],
-  b_cloud:[{who:bossSpk('DAUPHIN DES NUAGES','CLOUD DOLPHIN','#ffffff'),l:LG('Personne ne monte plus haut que les dauphins. Redescends... en chute libre !','No one climbs higher than the dolphins. Go back down... in free fall!')}]
-};
-/* ---- moteur ---- */
-let cine=null,cineSeen=new Set();
-const cineOk=()=>!anarchyOn&&!speedOn&&!(pvp&&pvp.on);
-function cinePlay(id,after){
-  const S=CINE[id];if(!S||!cineOk()){if(after)after();return false;}
-  cine={id,S,i:0,t:0,st:0,after};clearInputs();return true;
-}
-function cineOnce(id){if(cineSeen.has(id)||cine)return false;cineSeen.add(id);return cinePlay(id);}
-function bossCine(k){cineOnce('b_'+k);}
-function cineEnd(){const a=cine&&cine.after;cine=null;clearInputs();if(a)a();}
-function cineNext(){if(!cine)return;const s=cine.S[cine.i],n=lgS(s.l).length;
-  if(cine.st*42<n){cine.st=n/42+0.01;return;}   // le texte s'affichait encore : on le montre en entier
-  cine.i++;cine.t=0;cine.st=0;if(cine.i>=cine.S.length)cineEnd();}
-function stepCine(dt){
-  const c=cine;c.t+=dt;c.st+=dt;
-  const s=c.S[c.i],n=lgS(s.l).length;
-  if(c.st*42>=n&&c.st-n/42>2.4+n*0.025)cineNext();   // avance seule après un temps de lecture
-}
-const CINE_SKIP=[VW-66,4,62,13];
-function wrapLines(s,w){const out=[];let cur='';for(const word of s.split(' ')){const tt=cur?cur+' '+word:word;if(ctx.measureText(tt).width>w&&cur){out.push(cur);cur=word;}else cur=tt;}if(cur)out.push(cur);return out;}
-function drawCine(){
-  const c=cine,s=c.S[c.i];
-  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;
-  if(s.sc)SC[s.sc](c.t);
-  const bar=Math.round(Math.min(1,(c.i?1:c.t*4))*22);   // bandes noires de cinéma
-  ctx.fillStyle='#000';ctx.fillRect(0,0,VW,bar);ctx.fillRect(0,VH-bar,VW,bar);
-  ctx.font="8px 'Press Start 2P', monospace";
-  if(s.card){const k=Math.min(1,c.t*3);ctx.globalAlpha=k;plate(VW/2-120,40,240,22,0.7);txt(lgS(s.card),VW/2,47,'#ffd23f','center');ctx.globalAlpha=1;}
-  const txtS=lgS(s.l),shown=txtS.slice(0,Math.floor(c.st*42));
-  const lines=wrapLines(txtS,VW-36),h=14+lines.length*11+(s.who.n?10:0),y=VH-bar-h-4;
-  plate(8,y,VW-16,h,0.82);
-  let ty=y+6;
-  if(s.who.n){txt(lgS(s.who.n),16,ty,s.who.c);ty+=12;}
-  let left=shown.length;
-  for(const ln of lines){if(left<=0)break;txt(ln.slice(0,left),16,ty,'#ffffff');left-=ln.length+1;ty+=11;}
-  if(shown.length>=txtS.length&&Math.floor(time*3)%2)txt('▼',VW-20,y+h-12,'#ffd23f');
-  plate(CINE_SKIP[0],CINE_SKIP[1],CINE_SKIP[2],CINE_SKIP[3],0.6);txt(lang==='en'?'SKIP ▶▶':'PASSER ▶▶',VW-8,7,'#ffffff','right');
-  ctx.restore();
-}
-addEventListener('keydown',e=>{if(!cine)return;
-  if(e.code==='Escape'){cineEnd();}else if(['Space','Enter','KeyF','KeyJ','ArrowUp','KeyW'].includes(e.code)&&!e.repeat)cineNext();else return;
-  e.preventDefault();e.stopImmediatePropagation();},true);
-addEventListener('pointerdown',e=>{if(!cine)return;
-  const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*VW,y=(e.clientY-r.top)/r.height*VH;
-  if(x>=CINE_SKIP[0]-6&&y<=CINE_SKIP[1]+CINE_SKIP[3]+8)cineEnd();else cineNext();
-  e.preventDefault();e.stopImmediatePropagation();},true);
-/* ---- tuto du pantalon (1re partie seulement) ---- */
-let tuto=null;
-function tutoStart(){
-  if(shop.pants||!cineOk())return;
-  const p=player,tx=Math.floor((p.x+5)/T)+12;
-  tuto={st:0,x0:p.x,jumped:false,px:tx*T+8,py:column(tx).g*T,got:false,t:0};
-}
-function tutoHint(){
-  const st=tuto.st,k=kbMode;
-  return st===0?(k?LG('← → OU A D : MARCHER','← → OR A D: WALK'):LG('JOYSTICK GAUCHE : MARCHER','LEFT STICK: WALK'))
-    :st===1?(k?LG('ESPACE OU ↑ : SAUTER','SPACE OR ↑: JUMP'):LG('BOUTON SAUT : SAUTER','JUMP BUTTON: JUMP'))
-    :st===2?LG('RÉCUPÈRE TON PANTALON →','GET YOUR PANTS BACK →')
-    :(k?LG('F OU CLIC : LANCER LA CANNE SUR LES DAUPHINS','F OR CLICK: CAST AT THE DOLPHINS'):LG('BOUTON TIR : LANCER LA CANNE','FIRE BUTTON: CAST YOUR ROD'));
-}
-function stepTuto(dt){
-  if(!tuto||state!=='play')return;const p=player;tuto.t+=dt;
-  if(tuto.st===0&&Math.abs(p.x-tuto.x0)>2*T)tuto.st=1;
-  if(tuto.st===1&&!p.onGround)tuto.st=2;
-  if(!tuto.got&&rectsOverlap(p.x,p.y,p.w,p.h,tuto.px-8,tuto.py-40,16,40)){
-    tuto.got=true;tuto.st=3;shop.pants=true;saveShop();sfx.heal();vfx('shine',p.x+5,p.y+6);
-    floatText(p.x+5,p.y-24,lang==='en'?'PANTS FOUND!':'PANTALON RETROUVÉ !','#ffd23f');}
-  if(tuto.st===3&&(inp.fire||mouse.fire||tuto.t>40))tuto.st=4;
-  if(tuto.st===4)tuto=null;
-}
-function drawTutoWorld(){   // le pantalon posé par terre, qui brille
-  if(!tuto||tuto.got)return;const y=tuto.py-10+Math.round(Math.sin(time*3)*1.5);
-  ctx.drawImage(PANTS,Math.round(tuto.px-6),y);
-  if(Math.floor(time*4)%3===0){ctx.fillStyle='#fff6c4';ctx.fillRect(Math.round(tuto.px+5),y-2,1,3);ctx.fillRect(Math.round(tuto.px+4),y-1,3,1);}
-}
-function drawTutoHud(){
-  if(!tuto||tuto.st>3||cine)return;ctx.font="8px 'Press Start 2P', monospace";
-  const s=lgS(tutoHint()),w=ctx.measureText(s).width+16,a=0.75+0.25*Math.sin(time*4);
-  plate(Math.round(VW/2-w/2),24,Math.round(w),15,0.7);ctx.globalAlpha=a;txt(s,VW/2,28,'#ffffff','center');ctx.globalAlpha=1;
-}
-/* ---- déclencheurs : début de partie et arrivée dans chaque monde ---- */
-let cineBiome=0;
-function cineGameStart(fromStart){
-  cineSeen=new Set();tuto=null;cineBiome=curBiome();
-  if(!cineOk())return;
-  if(fromStart){cineSeen.add('ch1');cinePlay('intro',()=>{cinePlay('ch1');tutoStart();});}
-  else cineOnce('ch'+cineBiome);
-}
-function stepCineTriggers(){
-  if(state!=='play'||cine||!cineOk())return;
-  const b=curBiome();if(b!==cineBiome){cineBiome=b;if(b>1)cineOnce('ch'+b);}
-}
-
 function frame(now){
   const dt=Math.min(0.1,(now-last)/1000);last=now;acc+=dt;
   let n=0;
@@ -9522,7 +9817,7 @@ function closeStats(){statsOpen=false;statsEl.hidden=true;clearInterval(statsTim
 $('stats-close').addEventListener('click',closeStats);$('st-tab-ov').addEventListener('click',()=>{statsTab='ov';statsRender();});$('st-tab-acc').addEventListener('click',()=>{statsTab='acc';statsRender();if(!statsData||!statsData.all){statsMsg='Chargement…';statsRender();statsLoad();}});$('stats-refresh').addEventListener('click',()=>{statsMsg='Chargement…';statsRender();statsLoad();});
 statsEl.addEventListener('pointerdown',e=>{if(e.target===statsEl)closeStats();});
 addEventListener('keydown',e=>{if(statsOpen&&e.code==='Escape'){e.preventDefault();e.stopPropagation();closeStats();}},true);
-function curBiome(){const tx=(player.x+5)/T;return inCloud(tx)?5:inIce(tx)?4:inSwamp(tx)?3:inBeach(tx)?2:1;}   // numéro du biome où se trouve le joueur
+function curBiome(){const tx=(player.x+5)/T;return inCity(tx)?6:inCloud(tx)?5:inIce(tx)?4:inSwamp(tx)?3:inBeach(tx)?2:1;}   // numéro du biome où se trouve le joueur
 /* battement anonyme : permet de compter les joueurs actifs (identifiant aléatoire propre au navigateur, aucune donnée personnelle) */
 (function(){
   if(!/^https?:$/.test(location.protocol)||/^(localhost|127\.|\[::1\])/.test(location.hostname))return;   // pas de comptage en local / hors ligne
