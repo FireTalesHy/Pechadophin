@@ -2628,7 +2628,7 @@ function loadShop(fresh){
       d.pants=j.pants===true||d.beach!==0||(j.beach===1||j.beach===-1);   // histoire : pantalon retrouvé (tuto fait)   // checkpoint du monde nuage (mode classique)
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
-      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king','cloud'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
+      if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king','cloud','meca','roi'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
       d.wormKills=Math.max(0,Math.floor(Number(j.wormKills))||0);
       d.tmulti=clamp(Math.floor(Number(j.tmulti))||0,0,3);
       d.weapon=(d.tridentOwned&&j.weapon==='trident')?'trident':'rod';
@@ -2685,9 +2685,12 @@ function loadShop(fresh){
         if(d.tx.chariot)d.gold+=500;if(d.tx.star)d.gold+=1000;
         d.tx={chariot:false,star:false};d.treeV=2;mig=true;
       }
+      if(j.storyReset!==1){d.beach=0;d.swamp=0;d.ice=0;d.cloud=0;d.city=0;d.pants=false;mig=true;}   // V0.9 STORY UPDATE : tout le monde repart des plaines (intro + tuto), or, skins, armes et âmes gardés
+      d.storyReset=1;
       if(mig){try{localStorage.setItem(SHOP_KEY,JSON.stringify(d));}catch(e){}}
     }
   }catch(e){}
+  d.storyReset=1;
   return d;
 }
 let shop=loadShop();
