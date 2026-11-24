@@ -2946,6 +2946,7 @@ function allTargets(){
   {const er=eskRect();if(er)targets.push({r:er,hit:d=>hitEskimo(d)});}
   {const cr=cloudRect();if(cr)targets.push({r:cr,hit:d=>hitCloudBoss(d)});}
   {const mr=mecaRect();if(mr)targets.push({r:mr,hit:d=>hitMeca(d)});}
+  for(const tr of treasures)if(!tr.got&&Math.abs(tr.x-player.x)<400)targets.push({r:treasureRect(tr),hit:()=>collectTreasure(tr)});   // trésors du clown : on peut tirer dessus
   {const kr=kingRectD();if(kr)targets.push({r:kr,hit:d=>hitKingD(d)});}
   {const kr=kingRect();if(kr)targets.push({r:kr,hit:d=>hitKing(d)});}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)targets.push({r:[cow.x,cow.y,cow.w,cow.h],hit:d=>hitCow(d)});
@@ -3006,6 +3007,7 @@ function stepDagger(dt){
   {const er=eskRect();if(er)tryHit(eskimo,er,x=>hitEskimo(x));}
   {const cr=cloudRect();if(cr)tryHit(cloudB,cr,x=>hitCloudBoss(x));}
   {const mr=mecaRect();if(mr)tryHit(mecaB,mr,x=>hitMeca(x));}
+  for(const tr of treasures)if(!tr.got)tryHit(tr,treasureRect(tr),()=>collectTreasure(tr));
   {const kr=kingRectD();if(kr)tryHit(kingD,kr,x=>hitKingD(x));}
   {const kr=kingRect();if(kr)tryHit(king,kr,x=>hitKing(x));}
   if(cow&&cow.state==='alive'&&cow.spawnT<=0)tryHit(cow,[cow.x,cow.y,cow.w,cow.h],x=>hitCow(x));
@@ -3069,6 +3071,7 @@ function stepTrident(dt){
     }
     {const wr=witchRect();if(h.n<pierce&&wr&&!h.hit.has(witch)&&rectsOverlap(h.x-5,h.y-5,10,10,wr[0],wr[1],wr[2],wr[3])){h.hit.add(witch);hitWitch(dmg);h.n++;}}
     {const cr=cloudRect();if(h.n<pierce&&cr&&!h.hit.has(cloudB)&&rectsOverlap(h.x-5,h.y-5,10,10,cr[0],cr[1],cr[2],cr[3])){h.hit.add(cloudB);hitCloudBoss(dmg);h.n++;}}
+    for(const tr of treasures)if(!tr.got&&rectsOverlap(h.x-5,h.y-5,10,10,...treasureRect(tr)))collectTreasure(tr);
     {const mr=mecaRect();if(h.n<pierce&&mr&&!h.hit.has(mecaB)&&rectsOverlap(h.x-5,h.y-5,10,10,mr[0],mr[1],mr[2],mr[3])){h.hit.add(mecaB);hitMeca(dmg);h.n++;}}
     {const kr=kingRectD();if(h.n<pierce&&kr&&!h.hit.has(kingD)&&rectsOverlap(h.x-5,h.y-5,10,10,kr[0],kr[1],kr[2],kr[3])){h.hit.add(kingD);hitKingD(dmg);h.n++;}}
     {const er=eskRect();if(h.n<pierce&&er&&!h.hit.has(eskimo)&&rectsOverlap(h.x-5,h.y-5,10,10,er[0],er[1],er[2],er[3])){h.hit.add(eskimo);hitEskimo(dmg);h.n++;}}
@@ -6202,13 +6205,17 @@ function placeTreasures(){
     let t=b;
     for(let k=0;k<300;k++,t++){let ok=true;for(let d=-8;d<=3&&ok;d++){const c=column(t+d);if(c.pit||c.tun||c.ar||c.wall||c.cs||c.cf||skyDx(t+d)||mecaDx(t+d)||palDx(t+d))ok=false;}if(ok)break;}
     const g=column(t).g;
-    for(const [a,r] of[[-7,3],[-4,6],[-1,9]])for(let d=0;d<3;d++)plat.add(pkey(t+a+d,g-r));
-    treasures.push({i,x:(t)*T+8,y:(g-9)*T,got:!!(shop.clownP&(1<<i))});
+    for(const [a,r] of[[-6,2],[-3,4]])for(let d=0;d<3;d++)plat.add(pkey(t+a+d,g-r));
+    treasures.push({i,x:(t)*T+8,y:(g-5)*T,got:!!(shop.clownP&(1<<i))});
   });
 }
 function stepTreasures(){
   if(state!=='play')return;const p=player;
-  for(const tr of treasures)if(!tr.got&&rectsOverlap(p.x,p.y,p.w,p.h,tr.x-7,tr.y-14,14,14)){
+  for(const tr of treasures)if(!tr.got&&rectsOverlap(p.x,p.y,p.w,p.h,tr.x-8,tr.y-16,16,16))collectTreasure(tr);
+}
+const treasureRect=tr=>[tr.x-8,tr.y-16,16,16];
+function collectTreasure(tr){   // en le touchant ou en tirant dessus avec n'importe quelle arme
+  if(tr.got||state!=='play')return;const p=player;{
     tr.got=true;shop.clownP=(shop.clownP||0)|(1<<tr.i);const n=[0,1,2,3,4,5].filter(k=>shop.clownP&(1<<k)).length;
     vfx('shine',tr.x,tr.y-6);sfx.heal();floatText(tr.x,tr.y-24,lgS(CLOWN_PIECES[tr.i])+' '+n+'/6','#ffd23f');
     if(n>=6&&!shop.owned.includes('clown')){shop.owned.push('clown');floatText(tr.x,tr.y-36,lang==='en'?'CLOWN SKIN UNLOCKED!':'SKIN CLOWN DÉBLOQUÉ !','#ff5ad8');}
