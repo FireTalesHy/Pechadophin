@@ -1,12 +1,12 @@
 # 🎣 Pechadophin
 
-**Version V0.7 · ONLINE UPDATE**
+**Version V0.9 · STORY UPDATE**
 
 🇫🇷 [Lire en français](README.fr.md)
 
 <h2 align="center">▶️ <a href="https://pechadophin.vercel.app/">PLAY NOW: pechadophin.vercel.app</a></h2>
 
-A pixel-art platformer you play right in your browser: you are a fisherman fighting dolphins, a shark demon, a giant octopus, a jellyfish and a sand castle, in a world randomly generated every run.
+A pixel-art platformer you play right in your browser. The dolphins have taken over the world and the fisherman lost his pants: cross 6 worlds, from the plains to the Dolphin City, and defeat the Dolphin King. The world is randomly generated every run.
 
 The whole game fits in a single HTML file, with no installation and no dependencies (apart from the Google Fonts "Press Start 2P" font).
 
@@ -27,7 +27,10 @@ The whole game fits in a single HTML file, with no installation and no dependenc
 
 ## ✨ Content
 
-- Eleven weapons, shown in the WEAPONS menu, almost all with their own skill tree: an upgradable fishing rod, an infernal trident (unlocked on the beach), daggers that attack in a dash (in the red chest of the swamps), the Number 6 weapon (secret swamp boss), the ice scepter (dropped by the Eskimo), the tarot deck, the harpoon, the katana, the boomerang, the tentacles sprouting from your back, and the scythe (4-hit combo, poison)
+- **Story mode** (classic): animated intro, chapter cards, cinematics with dialogue before every arena boss, a pants tutorial, and an ending after the final boss, the Dolphin King
+- **6 worlds**, each with its own mechanic, dolphin enemy, living scenery and hidden clown-outfit treasure: plains, beach, swamps, ice fields, Cloud World and the Dolphin City
+- Bosses: shark demon, giant octopus, jellyfish, sand castle, witch, giant cow, No. 6, Eskimo, King Cacamille 2, Cloud Dolphin, Mecha-Dolphin and the Dolphin King
+- Twelve weapons, shown in the WEAPONS menu, almost all with their own skill tree: an upgradable fishing rod, an infernal trident (unlocked on the beach), daggers that attack in a dash (in the red chest of the swamps), the Number 6 weapon (secret swamp boss), the ice scepter (dropped by the Eskimo), the tarot deck, the harpoon, the katana, the boomerang, the tentacles sprouting from your back, the scythe (4-hit combo, poison) and the Royal Trident (dropped by the Dolphin King)
 - **Online** (big green button on the home screen): profile, win/loss record and history of your games
   - **Live 1v1 fight** with your equipped weapon: private room (code or link) or public (room list, quick fight), 5 hearts, best of 3 rounds, rematch
   - **3 exclusive arenas** (Meadow, Swamps, Glacier) with platforms, crates that block shots and hiding spots that make you invisible
@@ -45,7 +48,7 @@ The whole game fits in a single HTML file, with no installation and no dependenc
 - Collab with the game RNG∞: an RNG∞ skin to unlock with the same Google account
 - Merchants in the middle of a run to upgrade your equipped weapon
 - A crate system: 36 skins to unlock through fragments in the Hero Crate and the Villain Crate (animated roulette, x2 and x4 openings), including the Épouvofodille scarecrow
-- A shop: unlocked / locked skins, a premium category (Clown, Épouvofodille, RNG∞, and soon the Dino), upgrades (gold) and red souls
+- A shop: unlocked / locked skins, a premium category (Épouvofodille, RNG∞, and soon the Dino; the Clown is earned with the 6 hidden treasures), upgrades (gold) and red souls
 - Living scenery: landmarks on the horizon per biome, mountains, hills, ambient particles, an animated fisherman (landing, jumping, dust, shadow)
 - New main menu, pause menu, local save of your best score and the shop, and a save reset button (double confirmation)
 
@@ -58,3 +61,4 @@ See [CHANGELOG.md](CHANGELOG.md).
 - dev: [L'taleshy](https://github.com/FireTalesHy) and [cocobat](https://github.com/cocobatard)
 - visuals: Sacha (V0.7 visual overhaul)
 - testers: moustik, ofodile, wyzan, nad l'arnaque and bergoute
+- visual effects: [pixelfx](https://github.com/patch-gg/pixelfx) by Patch (MIT), some effects adapted from [Sprite Fusion](https://www.spritefusion.com/pixel-art-vfx) by Hugo Duprez (MIT)

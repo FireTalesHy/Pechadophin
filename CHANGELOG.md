@@ -4,6 +4,32 @@
 
 All notable changes to **Pechadophin** (formerly Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.9] - 2026-11-24 · STORY UPDATE
+
+### Added
+- **A real story** (classic mode): the dolphins have taken over the world and, in the panic, the fisherman lost his pants. Animated intro, a title card for each of the 6 worlds, and full **cinematics before every arena boss** (camera moves, close-ups, VS cards, funny dialogue). Every scene can be skipped.
+- **Pants tutorial** (first game only): you start in heart-print boxers and must get your pants back.
+- **King Cacamille 2** is the fisherman's **childhood best friend**, corrupted by the dolphins: flashback, special dialogue and a scene after the fight.
+- **End of the Cloud World**: the **Mecha-Dolphin** (3 phases: homing missiles and laser, charges and drones, broken armor with ground slams), then a portal.
+- **New world: the Dolphin City** (6th world): neon skyline, robot dolphins, its own checkpoint.
+- **Final boss: the Dolphin King**, a huge blue dolphin with a crown, in his marble palace (belly flops with shockwaves, geysers, tail wave, guards, raining coins). Ending cinematic and credits, then the city goes on forever.
+- **Unique worlds**: each world gets its own mechanic, a new dolphin enemy and living scenery:
+  - Plains: wind gusts · mole dolphin · butterflies
+  - Beach: rising and falling tide · surfer dolphin · crabs
+  - Swamps: slowing mud and climbable vines · dolphin dressed as a crocodile · fireflies
+  - Ice fields: falling icicles · sled dolphin · penguins
+  - Cloud World: trampoline clouds · parachute dolphin · birds
+  - Dolphin City: conveyor belts and security lasers · police drone dolphin · flying cars
+- **Hidden treasures**: one piece of the clown outfit hidden up high in each world. Find all 6 to unlock the **Clown skin**.
+- **Royal Trident**, dropped by the Dolphin King: hits harder, pierces more and makes a golden geyser burst on every hit.
+- **New visual effects** made with [pixelfx](https://github.com/patch-gg/pixelfx) (MIT): impacts, enemy poofs, hits, coins, hearts, POW, boss explosions, splashes, frost, fire, acid, sparkles.
+- **Fullscreen** button (⛶) and a game that fills the whole screen.
+
+### Changed
+- **Weapons**: pixelfx slashes for the katana and scythe, frost breath for the scepter, muzzle flash for the harpoon, a short hit-stop on melee hits, new sprites for the trident, boomerang, katana and daggers.
+- **Clown skin**: no longer sold in the shop, it is now earned with the 6 hidden treasures (players who already own it keep it).
+- Home screen banner: **STORY UPDATE**.
+
 ## [V0.7] - 2026-11-15 · ONLINE UPDATE
 
 ### Added

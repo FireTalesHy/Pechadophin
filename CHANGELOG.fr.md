@@ -4,6 +4,32 @@
 🇬🇧 [Read in English](CHANGELOG.md)
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.9] - 2026-11-24 · STORY UPDATE
+
+### Ajouté
+- **Une vraie histoire** (mode classique) : les dauphins ont pris le contrôle du monde et, dans la panique, le pêcheur a perdu son pantalon. Intro animée, une carte de chapitre pour chacun des 6 mondes, et de vraies **cinématiques avant chaque boss d'arène** (travellings, plans rapprochés, cartes VS, dialogues drôles). Toutes les scènes se passent.
+- **Tuto du pantalon** (1re partie seulement) : on démarre en caleçon à cœurs et il faut retrouver son pantalon.
+- **Le roi Cacamille 2** est l'**ami d'enfance** du pêcheur, corrompu par les dauphins : souvenir en sépia, dialogue spécial et scène après le combat.
+- **Fin du monde nuage** : le **Méca-dauphin** (3 phases : missiles à tête chercheuse et laser, charges et drones, armure brisée avec écrasements), puis un portail.
+- **Nouveau monde : la Cité des dauphins** (6e monde) : immeubles et néons, dauphins robots, checkpoint.
+- **Boss final : le Roi des dauphins**, un dauphin bleu énorme avec une couronne, dans son palais de marbre (plat royal avec ondes de choc, geysers, vague de queue, gardes, pluie de pièces). Cinématique de fin et générique, puis la cité continue à l'infini.
+- **Mondes uniques** : chaque monde a sa mécanique, un nouvel ennemi dauphin et un décor vivant :
+  - Plaines : rafales de vent · dauphin-taupe · papillons
+  - Plage : marée qui monte et descend · dauphin surfeur · crabes
+  - Marécages : boue qui ralentit et lianes à escalader · dauphin déguisé en crocodile · lucioles
+  - Glacière : stalactites qui tombent · dauphin sur luge · manchots
+  - Monde nuage : nuages-trampolines · dauphin parachutiste · oiseaux
+  - Cité des dauphins : tapis roulants et lasers de sécurité · drone-dauphin policier · voitures volantes
+- **Trésors cachés** : un morceau de la tenue de clown caché en hauteur dans chaque monde. Les 6 débloquent le **skin Clown**.
+- **Trident royal**, laissé par le Roi des dauphins : plus fort, transperce davantage et fait jaillir un geyser doré à chaque coup.
+- **Nouveaux effets visuels** faits avec [pixelfx](https://github.com/patch-gg/pixelfx) (MIT) : impacts, disparitions, blessures, pièces, cœurs, POW, explosions de boss, éclaboussures, givre, feu, acide, éclats.
+- Bouton **plein écran** (⛶) et jeu qui remplit tout l'écran.
+
+### Changé
+- **Armes** : traînées pixelfx pour le katana et la faux, souffle de givre pour le sceptre, éclair au départ du harpon, court arrêt sur image au corps à corps, nouveaux dessins du trident, du boomerang, du katana et des dagues.
+- **Skin Clown** : il n'est plus vendu en boutique, il se gagne avec les 6 trésors cachés (ceux qui l'ont déjà le gardent).
+- Bannière de l'écran d'accueil : **STORY UPDATE**.
+
 ## [V0.7] - 2026-11-15 · ONLINE UPDATE
 
 ### Ajouté
