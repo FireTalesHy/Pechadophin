@@ -1128,6 +1128,7 @@ const LANG_KEY='canne-dauphins-langue';
 let lang='fr';
 try{const sv=localStorage.getItem(LANG_KEY);lang=sv==='en'||sv==='fr'?sv:((navigator.language||'fr').toLowerCase().startsWith('fr')?'fr':'en');}catch(e){}
 const EN={
+'Vaincs le Roi des dauphins dans son palais, au bout de la Cité des dauphins.':'Defeat the Dolphin King in his palace, at the end of the Dolphin City.',
 'Trident royal':'Royal trident','Le trident doré du Roi des dauphins. Plus puissant que le trident infernal : il transperce encore plus d\'ennemis et fait jaillir un geyser doré à chaque coup. Partage les améliorations du trident. Laissé par le Roi des dauphins.':'The Dolphin King\'s golden trident. Stronger than the infernal trident: it pierces even more enemies and makes a golden geyser burst on every hit. Shares the trident upgrades. Dropped by the Dolphin King.','TRÉSORS CACHÉS':'HIDDEN TREASURES','★ CHECKPOINT : LA CITÉ DES DAUPHINS ★':'★ CHECKPOINT: THE DOLPHIN CITY ★',
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
 'APPUIE POUR JOUER':'TAP TO PLAY','MODE':'MODE','★ CHECKPOINT : LA PLAGE ★':'★ CHECKPOINT: THE BEACH ★','RECOMMENCER':'RESTART',
@@ -8521,7 +8522,7 @@ function renderWeap(){
   const w=WEAPONS.find(x=>x.id===weapSel);
   const big=$('weap-big');big.textContent='';big.appendChild(weapImg(w,64));
   $('weap-name').textContent=w.owned()||w.buy?w.name:'???';
-  $('weap-desc').textContent=w.owned()||w.buy?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':w.id==='scepter'?'Vaincs l\'esquimau dans la glacière.':w.id==='tarot'?'Le roi tout en haut du château de glace en détient un…':'Débloquée en atteignant la plage.');
+  $('weap-desc').textContent=w.owned()||w.buy?w.desc:(w.id==='dagger'?'Trouve le coffre rouge dans les marécages pour la débloquer.':w.id==='six'?'Un secret se cache dans les marécages…':w.id==='scepter'?'Vaincs l\'esquimau dans la glacière.':w.id==='tarot'?'Le roi tout en haut du château de glace en détient un…':w.id==='royal'?'Vaincs le Roi des dauphins dans son palais, au bout de la Cité des dauphins.':'Débloquée en atteignant la plage.');
   const eb=$('weap-eq');
   eb.disabled=!w.owned()||shop.weapon===w.id||(w.locked&&w.locked());
   eb.textContent=!w.owned()?(w.buy?'À ACHETER':'VERROUILLÉE'):shop.weapon===w.id?'ÉQUIPÉE':(w.locked&&w.locked())?'INDISPONIBLE':'ÉQUIPER';
