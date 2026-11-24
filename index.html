@@ -2613,7 +2613,8 @@ function loadShop(fresh){
       d.hp=clamp(Math.floor(Number(j.hp))||0,0,5);
       d.beach=(j.beach===1||j.beach===-1)?1:0;   // le chemin est toujours à droite
       d.ice=(j.ice===1||j.ice===-1)?1:0;   // checkpoint de la glacière (mode classique)
-      d.cloud=(j.cloud===1||j.cloud===-1)?1:0;   // checkpoint du monde nuage (mode classique)
+      d.cloud=(j.cloud===1||j.cloud===-1)?1:0;
+      d.pants=j.pants===true||d.beach!==0||(j.beach===1||j.beach===-1);   // histoire : pantalon retrouvé (tuto fait)   // checkpoint du monde nuage (mode classique)
       d.swamp=(j.swamp===1||j.swamp===-1)?1:0;   // checkpoint des marécages (mode classique)   // checkpoint : côté de la plage atteinte (0 = pas encore)
       d.tridentOwned=j.tridentOwned===true||d.beach!==0;   // plage atteinte = trident débloqué
       if(j.bossSouls&&typeof j.bossSouls==='object')for(const k of ['shark','octo','jelly','castle','cow','six','witch','eskimo','king','cloud'])if(j.bossSouls[k]===true)d.bossSouls[k]=true;   // âmes déjà reçues pour ce boss
@@ -3963,7 +3964,7 @@ function maybeSpawnBoss(){
   let by=p.y-64;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
   const bhp=anarchyOn?bossHp(BOSS_HP,'shark'):rodAdapt(Math.round(BOSS_HP*Math.pow(1.5,bossWins)));   // x1,5 à chaque boss vaincu, remis à 100 à la mort
-  boss={kind:'boss',k,x:bx,y:by,w,h,vx:0,vy:0,dir:p.x>sx?1:-1,hp:bhp,maxHp:bhp,state:'alive',spawnT:1.4,t:0,flash:0,fireCd:3,charge:0,laser:0,la:0,upT:0,onGround:false};
+  boss={kind:'boss',k,x:bx,y:by,w,h,vx:0,vy:0,dir:p.x>sx?1:-1,hp:bhp,maxHp:bhp,state:'alive',spawnT:1.4,t:0,flash:0,fireCd:3,charge:0,laser:0,la:0,upT:0,onGround:false};bossCine('shark');
   bossSpawned=true;
   if(anarchyOn){anaSlotDone.add(slk);anaSky++;night=SKY_NIGHT[anaSky%5];}   // anarchie : nouveau ciel à chaque requin
   else night=true;   // la nuit tombe, rouge sang, jusqu'au poulpe
@@ -4015,7 +4016,7 @@ function maybeStartArena(){
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
   const oh=anarchyOn?bossHp(OCTO_HP,'octo'):rodAdapt(OCTO_HP);
-  octo={ar,hp:oh,maxHp:oh,state:'intro',t:0,intro:2.2,rage:false,flash:0,nextT:1,sway:0,dieT:0};
+  octo={ar,hp:oh,maxHp:oh,state:'intro',t:0,intro:2.2,rage:false,flash:0,nextT:1,sway:0,dieT:0};bossCine('octo');
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
 /* ---------- Arène du château de sable ---------- */
@@ -4026,7 +4027,7 @@ function startCastle(ar,il,ir){
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
   const ch=anarchyOn?bossHp(CASTLE_HP,'castle'):CASTLE_HP;
-  castle={ar,hp:ch,maxHp:ch,state:'intro',t:0,intro:2.2,rage:false,flash:0,waves:[],nextW:2.2,nextG:7,bx:ar.cx*T+8+64,bf:0,hitCd:0,dieT:0};
+  castle={ar,hp:ch,maxHp:ch,state:'intro',t:0,intro:2.2,rage:false,flash:0,waves:[],nextW:2.2,nextG:7,bx:ar.cx*T+8+64,bf:0,hitCd:0,dieT:0};bossCine('castle');
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
 function relocBucket(c){
@@ -4180,7 +4181,7 @@ function startWitch(ar,il,ir){
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
   const wh=anarchyOn?bossHp(WITCH_HP,'witch'):rodAdapt(WITCH_HP);
-  witch={ar,hp:wh,maxHp:wh,state:'intro',t:0,intro:2.4,phase:1,flash:0,side:1,nextP:1.8,pot:null,last:'',burst:0,throwT:0,tt:0,cat:null,potions:[],zones:[],dieT:0};
+  witch={ar,hp:wh,maxHp:wh,state:'intro',t:0,intro:2.4,phase:1,flash:0,side:1,nextP:1.8,pot:null,last:'',burst:0,throwT:0,tt:0,cat:null,potions:[],zones:[],dieT:0};bossCine('witch');
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
 function witchHand(w,mode){   // position de la main qui lance
@@ -4337,7 +4338,7 @@ function startEskimo(ar,il,ir){
   enemies=enemies.filter(e=>!(e.x>il-40&&e.x<ir+40));
   boss=null;bossShots=[];tents=[];jelly=null;cow=null;
   const hp=anarchyOn?bossHp(ESK_HP,'eskimo'):rodAdapt(ESK_HP),cx=ar.cx*T+8;
-  eskimo={ar,hp,maxHp:hp,state:'intro',t:0,intro:2.4,rage:false,flash:0,x:cx+(player.x<cx?100:-100),face:player.x<cx?-1:1,tgt:cx,tgtT:1.5,nextB:2.4,nextL:3.5,cast:0,beams:[],lures:[],dieT:0};
+  eskimo={ar,hp,maxHp:hp,state:'intro',t:0,intro:2.4,rage:false,flash:0,x:cx+(player.x<cx?100:-100),face:player.x<cx?-1:1,tgt:cx,tgtT:1.5,nextB:2.4,nextL:3.5,cast:0,beams:[],lures:[],dieT:0};bossCine('eskimo');
   shake=0.6;sfx.gate();sfx.bossSpawn();
 }
 function hitEskimo(dmg){
@@ -4656,7 +4657,7 @@ const KING_HP=750;
 function kingRect(){const k=king;if(!k||k.state!=='fight')return null;return [k.x-7,k.y-49,14,49];}
 function startKing(){
   const F=TWB-TWR*TWN,p=player;
-  king={x:(TWC+17)*T+8,y:F*T,hp:rodAdapt(KING_HP),maxHp:rodAdapt(KING_HP),state:'intro',t:0,intro:1.6,rage:false,flash:0,face:-1,mode:'idle',mt:1.2,tgt:(TWC+17)*T+8,addT:4.5,n:3,dieT:0};
+  king={x:(TWC+17)*T+8,y:F*T,hp:rodAdapt(KING_HP),maxHp:rodAdapt(KING_HP),state:'intro',t:0,intro:1.6,rage:false,flash:0,face:-1,mode:'idle',mt:1.2,tgt:(TWC+17)*T+8,addT:4.5,n:3,dieT:0};bossCine('king2');
   shake=0.5;sfx.bossSpawn();sfx.gate();
   floatText(p.x+5,p.y-34,'ROI CACAMILLE 2','#ffd23f');
 }
@@ -5005,7 +5006,7 @@ function maybeSpawnCow(){
   if(anarchyOn){key=f.sg*(f.j+1);if(cowDone.has(key))return;}
   else if(cowSpawned)return;
   const w=44,h=30,ctx0=f.sg*f.fc,side=(tx-ctx0)>=0?-1:1,bx=(ctx0+side*8)*T+8-w/2,ch=anarchyOn?bossHp(COW_HP,'cow'):rodAdapt(COW_HP);
-  cow={x:bx,y:f.floor*T-h-80,w,h,vy:0,dir:-side,hp:ch,maxHp:ch,state:'alive',spawnT:1.2,mode:'walk',mt:0,rot:0,flash:0,t:0,rage:false,sx:0,spit:0};
+  cow={x:bx,y:f.floor*T-h-80,w,h,vy:0,dir:-side,hp:ch,maxHp:ch,state:'alive',spawnT:1.2,mode:'walk',mt:0,rot:0,flash:0,t:0,rage:false,sx:0,spit:0};bossCine('cow');
   cowSpawned=true;if(key!==undefined)cowDone.add(key);shake=0.6;sfx.bossSpawn();
   floatText(p.x+5,p.y-34,'LA VACHE GÉANTE !','#ffffff');
 }
@@ -5098,7 +5099,7 @@ function rzEnter(){
   hooks=[];tridents=[];milk=[];sixShots=[];sixJet=[];bossShots=[];
   Object.assign(player,{x:(RZC-8)*T,y:RZG*T-14,vx:0,vy:0,onGround:true,invuln:1,stun:0,dash:null});
   player.safe={x:player.x,y:player.y};
-  six={x:(RZC+4)*T-14,y:(RZG-8)*T,w:28,h:36,hp:rodAdapt(SIX_HP),maxHp:rodAdapt(SIX_HP),state:'alive',spawnT:1.4,t:0,cd:1.6,flash:0,rage:false,n:0,bx:(RZC+4)*T,by:(RZG-8)*T};
+  six={x:(RZC+4)*T-14,y:(RZG-8)*T,w:28,h:36,hp:rodAdapt(SIX_HP),maxHp:rodAdapt(SIX_HP),state:'alive',spawnT:1.4,t:0,cd:1.6,flash:0,rage:false,n:0,bx:(RZC+4)*T,by:(RZG-8)*T};bossCine('six');
   cam.x=(RZC-RZW)*T;cam.y=RZG*T-173;camLX=0;camLY=0;
 }
 function rzLeave(){
@@ -5415,7 +5416,7 @@ function cloudRect(){const b=cloudB;if(!b||b.state!=='fight')return null;return 
 function startCloudBoss(sg){
   const cx=sg*SKY_CX*T+8,hp=rodAdapt(CLOUDB_HP);
   enemies=enemies.filter(e=>Math.abs(e.x-cx)>46*T);
-  cloudB={sg,cx,hp,maxHp:hp,state:'intro',t:0,intro:2.2,rage:false,flash:0,x:clamp(player.x+9*T,cx-20*T,cx+20*T),y:clamp(player.y-5*T,(SKY_G-10)*T,(SKY_G-4)*T),face:-1,tx:cx,ty:(SKY_G-8)*T,mt:2,nextB:2.5,nextS:4,nextR:7,dieT:0};
+  cloudB={sg,cx,hp,maxHp:hp,state:'intro',t:0,intro:2.2,rage:false,flash:0,x:clamp(player.x+9*T,cx-20*T,cx+20*T),y:clamp(player.y-5*T,(SKY_G-10)*T,(SKY_G-4)*T),face:-1,tx:cx,ty:(SKY_G-8)*T,mt:2,nextB:2.5,nextS:4,nextR:7,dieT:0};bossCine('cloud');
   cloudBalls=[];shake=0.6;sfx.gate();sfx.bossSpawn();
   floatText(player.x+5,player.y-34,'DAUPHIN DES NUAGES','#ffffff');
 }
@@ -5700,7 +5701,7 @@ function maybeSpawnJelly(){
   const w=30,h=20,bx=p.x+5+p.face*150-w/2,jh=anarchyOn?bossHp(JELLY_HP,'jelly'):rodAdapt(JELLY_HP);
   let by=p.y-72;
   for(let i=0;i<14&&(solidAt(bx,by)||solidAt(bx+w,by)||solidAt(bx,by+h)||solidAt(bx+w,by+h));i++)by-=T;
-  jelly={kind:'jelly',x:bx,y:by,w,h,vx:0,vy:0,hp:jh,maxHp:jh,state:'alive',spawnT:1.6,t:0,flash:0,rot:0,fireCd:3,charge:0,fire:0,baseA:0,sweep:0,upT:0,onGround:false};
+  jelly={kind:'jelly',x:bx,y:by,w,h,vx:0,vy:0,hp:jh,maxHp:jh,state:'alive',spawnT:1.6,t:0,flash:0,rot:0,fireCd:3,charge:0,fire:0,baseA:0,sweep:0,upT:0,onGround:false};bossCine('jelly');
   jellySpawned=true;if(key!==undefined)jellyDone.add(key);shake=0.6;sfx.bossSpawn();
   floatText(p.x+5,p.y-34,'LA MÉDUSE !','#f6f0ff');
 }
@@ -5885,8 +5886,10 @@ function update(dt){
   nightA+=(((night&&(!anarchyOn||anaSky%5===1))?1:0)-nightA)*(1-Math.exp(-1.4*dt));
   {const tg=anarchyOn?SKY_PH[anaSky%5]:SKY_PH[0],k=1-Math.exp(-1.4*dt);for(let i=0;i<4;i++)skyCur[i]+=(tg[i]-skyCur[i])*k;}   // la nuit tombe (et se lève) progressivement
   if(state==='title'){return;}
+  if(cine){stepCine(dt);return;}   // cinématique : le jeu est figé
   if(hitStop>0&&state==='play'){hitStop-=dt;return;}   // arrêt sur image très court quand un coup porte
   if(pvp&&pvp.on){stepPvp(dt);return;}
+  if(state==='play'){stepTuto(dt);stepCineTriggers();}
   if(state==='dying'){
     dyingT+=dt;const p=player;p.vy+=GRAV*dt;p.y+=p.vy*dt;stepFx(dt);stepRngLasers(dt);
     if(dyingT>1.2){if(speedOn&&speedEnd)showSpeedResult();else if(speedOn){speedMsg('MORT : ON RECOMMENCE');beginSpeedrun(speedWeapon);}else showOver();}
@@ -6554,7 +6557,8 @@ function drawPlayer(){
   if(state==='play'&&p.invuln>0&&Math.floor(time*18)%2)return;
   const moving=p.onGround&&Math.abs(p.vx)>12;
   const SP=curSkin().spr;
-  const sp=state==='dying'||!p.onGround?SP.jump:moving?(Math.floor(time*10)%2?SP.a:SP.b):SP.idle;
+  let sp=state==='dying'||!p.onGround?SP.jump:moving?(Math.floor(time*10)%2?SP.a:SP.b):SP.idle;
+  if(tuto&&!tuto.got)sp=noPants(sp);   // début de l'histoire : le pêcheur a perdu son pantalon
   const cx=Math.round(p.x+p.w/2),fy=Math.round(p.y)+p.h;
   if(state!=='dying'){   // ombre au sol : sous les pieds, ou projetée sur le sol en dessous pendant un saut (plus petite et plus pâle avec la hauteur)
     let gy=null,h=0;
@@ -7156,7 +7160,7 @@ function render(){
   drawWater(cx,cy);
   drawOcto();
   drawCastle();
-  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();drawCloudBoss();
+  drawCabin(cx,cy);drawIceHall(cx,cy);drawIceCastle(cx);drawWitch();drawEskimo();drawCloudBoss();drawTutoWorld();
   drawPalms(cx,cy);
   drawSwampTowers(cx);
   drawTiles(cx,cy);drawCloudGear(cx,cy);
@@ -7261,7 +7265,7 @@ function startGame(){
   startGameCore();
 }
 function startGameCore(){
-  ensureAudio();
+  ensureAudio();let fromStart=false;
   resetWorld();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
   if(rodLocked()&&shop.weapon==='rod'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
@@ -7280,8 +7284,9 @@ function startGameCore(){
     if(ar){ar.state='won';ar.gateL=false;ar.gateR=false;}
     bossSpawned=true;octoRun=true;
     placePlayer(shop.beach*(BEACH_TX+10)*T);
-  } else placePlayer();
+  } else {placePlayer();fromStart=true;}
   state='play';
+  cineGameStart(fromStart);   // histoire : intro + tuto (depuis le début) ou chapitre du checkpoint
   if(anarchyOn)floatText(player.x+5,player.y-30,'ANARCHIE !','#ff4a4a');
   paused=false;ovRestart.hidden=true;
   overlayVisible=false;ov.classList.remove('show');
@@ -9123,12 +9128,197 @@ if(document.fonts&&document.fonts.load){document.fonts.load("8px 'Press Start 2P
 
 initTitle();refreshCp();drawOvChar();
 let last=performance.now(),acc=0;
+/* ================= Histoire et cinématiques (mode classique) =================
+   Les dauphins ont pris le contrôle du monde. Dans la panique, le pêcheur a perdu son pantalon (on le retrouve au début : c'est le tuto).
+   Chaque monde s'ouvre sur un chapitre, chaque boss fait son entrée avec une réplique. Toutes les scènes se passent (bouton PASSER / Échap). */
+const LG=(fr,en)=>({fr,en}),lgS=o=>typeof o==='string'?o:(lang==='en'?o.en:o.fr);
+const PANTS_ROWS=["bbbbbbbbbb","bBBBBBBBBb","bBBBkkBBBb","bBBB..BBBb","bBBB..BBBb","bBBB..BBBb","bBBB..BBBb","bddd..dddb"];
+const PANTS=spr(PANTS_ROWS,{b:'#245a98',B:'#3b7fd4',k:'#ffd23f',d:'#1c3f6e'},true);
+const CROWN=spr(["y...y...y","yy.yyy.yy","yyyyyyyyy","yrrybyyry","yyyyyyyyy"],{y:'#ffd23f',r:'#e0262e',b:'#3b9bff'},true);
+const noPantsMemo=new Map();
+function noPants(sp){   // le même sprite, mais en caleçon (rangée 12 : caleçon blanc à cœurs, rangée 13 : jambes nues)
+  let c=noPantsMemo.get(sp);if(c)return c;
+  c=mk(sp.width,sp.height);const g=c.getContext('2d');g.drawImage(sp,0,0);
+  const d=g.getImageData(0,0,c.width,c.height),W=c.width;
+  for(const y of[12,13])for(let x=0;x<W;x++){const o=(y*W+x)*4;if(!d.data[o+3])continue;const lum=d.data[o]+d.data[o+1]+d.data[o+2];if(lum<120)continue;
+    const col=y===12?((x%3===1)?[224,38,46]:[244,241,230]):[245,196,156];d.data[o]=col[0];d.data[o+1]=col[1];d.data[o+2]=col[2];}
+  g.putImageData(d,0,0);noPantsMemo.set(sp,c);return c;
+}
+const PECHEUR={n:LG('LE PÊCHEUR','THE FISHERMAN'),c:'#ffd23f'},NARR={n:null,c:'#ffffff'},ROI={n:LG('ROI DES DAUPHINS','DOLPHIN KING'),c:'#7fc4ff'};
+const bossSpk=(fr,en,c)=>({n:LG(fr,en),c});
+/* ---- petites scènes dessinées (coordonnées écran) ---- */
+function cineGround(y,tint){   // bande d'herbe + terre en bas de l'écran
+  for(let x=0;x<VW;x+=T){ctx.drawImage(GRASS[0][(x/T)%3],x,y-6);for(let yy=y+10,r=0;yy<VH;yy+=T,r++)ctx.drawImage(DIRT[0][(x/T+r)%3],x,yy);}
+  if(tint){ctx.fillStyle=tint;ctx.fillRect(0,y-6,VW,VH-y+6);}
+}
+function cineFisher(x,y,s,opt){   // le pêcheur (skin équipé), s = échelle, opt.np = en caleçon, opt.f = sens
+  const SP=curSkin().spr;let sp=opt&&opt.jump?SP.jump:SP.idle;if(opt&&opt.np)sp=noPants(sp);
+  ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale((opt&&opt.f||1)*s,s);ctx.drawImage(sp,-8,-16);ctx.restore();
+}
+function cineDolph(x,y,s,a,img){ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(a||0);ctx.scale(s,s);ctx.drawImage(img||DOLB,-9,-5);ctx.restore();}
+function cineKing(x,y,s,t){   // le roi des dauphins : un dauphin bleu normal... mais énorme, avec une couronne
+  const bob=Math.sin(t*2)*2*s/6;
+  cineDolph(x,y+bob,s,Math.sin(t*1.3)*0.05,DOLB);
+  ctx.save();ctx.translate(Math.round(x+2*s),Math.round(y+bob-5*s));ctx.rotate(-0.12+Math.sin(t*1.3)*0.05);ctx.scale(s*0.7,s*0.7);ctx.drawImage(CROWN,-6,-7);ctx.restore();
+}
+function cineDock(x,y){ctx.fillStyle='#14182c';ctx.fillRect(x-1,y-1,92,6);ctx.fillStyle='#8a5a2b';ctx.fillRect(x,y,90,4);ctx.fillStyle='#b47c40';ctx.fillRect(x,y,90,1);
+  for(const px of[6,40,80]){ctx.fillStyle='#5a3a1e';ctx.fillRect(x+px,y+4,4,30);}}
+const SC={
+  calm:t=>{drawBackground(t*8,200,BG_GRASS);cineDock(232,150);cineFisher(268,150,1,{f:-1});
+    ctx.strokeStyle='#e8e8e8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(258,138);ctx.lineTo(230,126);ctx.lineTo(214,168+Math.sin(t*2)*2);ctx.stroke();
+    ctx.fillStyle='#ff4a4a';ctx.fillRect(213,166+Math.round(Math.sin(t*2)*2),3,3);},
+  rise:t=>{drawBackground(60+t*20,200,BG_GRASS);ctx.fillStyle='rgba(160,20,30,'+Math.min(0.45,t*0.12).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);
+    for(let i=0;i<9;i++){const ph=(t*0.9+i*0.37)%1.6;if(ph>1.2)continue;const k=ph/1.2,x=20+i*42+k*30,y=190-Math.sin(k*Math.PI)*(70+(i%3)*20);cineDolph(x,y,2,-1+k*2,i%4===3?DOLR:i%3===2?DOLP:DOLB);}},
+  conquer:t=>{drawBackground(200,200,BG_SWAMP);ctx.fillStyle='rgba(70,0,12,.45)';ctx.fillRect(0,0,VW,VH);cineGround(152);
+    for(let i=0;i<7;i++){const x=((i*60+t*26)%(VW+60))-30,hop=Math.abs(Math.sin(t*6+i))*4;cineDolph(x,144-hop,2,0,i%2?DOLP:DOLB);
+      ctx.fillStyle='#5a3a1e';ctx.fillRect(Math.round(x)-2,116-hop,1,22);ctx.fillStyle='#3b7fd4';ctx.fillRect(Math.round(x)-1,116-hop,10,6);ctx.fillStyle='#ffd23f';ctx.fillRect(Math.round(x)+2,118-hop,3,2);}},
+  king:t=>{ctx.fillStyle='#120a26';ctx.fillRect(0,0,VW,VH);
+    ctx.fillStyle='rgba(127,196,255,.12)';ctx.beginPath();ctx.moveTo(VW/2-30,0);ctx.lineTo(VW/2+30,0);ctx.lineTo(VW/2+110,VH);ctx.lineTo(VW/2-110,VH);ctx.fill();
+    for(let i=0;i<6;i++){const x=40+i*62,hop=Math.abs(Math.sin(t*5+i*1.3))*6;cineDolph(x,148-hop,2,0,i%2?DOLP:DOLR);}
+    cineKing(VW/2,92,7,t);},
+  splash:t=>{drawBackground(30,200,BG_GRASS);cineDock(232,150);
+    const k=clamp((t-0.3)/0.75,0,1);   // le dauphin jaillit, percute le pêcheur, le pantalon s'envole
+    if(t>0.3&&k<1)cineDolph(170+k*96,200-k*62-Math.sin(k*Math.PI)*40,2,-0.9+k*1.2);
+    const hit=t>1.05,ft=t-1.05;
+    cineFisher(268+(hit?Math.min(ft,0.4)*30:0),150-(hit&&ft<0.5?Math.sin(ft/0.5*Math.PI)*22:0),1,{f:-1,np:hit,jump:hit&&ft<0.5});
+    if(hit){const pt=Math.min(ft,2.2);ctx.save();ctx.translate(268-pt*70,150-30-pt*60+pt*pt*20);ctx.rotate(pt*7);ctx.drawImage(PANTS,-6,-5);ctx.restore();}
+    if(hit&&ft<0.4){ctx.fillStyle='#ffffff';ctx.globalAlpha=1-ft/0.4;ctx.fillRect(0,0,VW,VH);ctx.globalAlpha=1;}},
+  angry:t=>{drawBackground(30,200,BG_GRASS);cineGround(150);cineFisher(VW/2,138,3,{np:true});
+    if(Math.floor(t*3)%2){ctx.fillStyle='#e0262e';ctx.fillRect(VW/2+14,84,3,8);ctx.fillRect(VW/2+19,80,3,8);ctx.fillRect(VW/2+24,84,3,8);}},
+  freed:t=>{drawBackground(t*10,200,BG_GRASS);cineDock(232,150);cineFisher(268,150,1,{f:-1});
+    for(let i=0;i<5;i++){const ph=(t*0.7+i*0.31)%1.4;if(ph>1)continue;const x=30+i*40+ph*20;cineDolph(x,196-Math.sin(ph*Math.PI)*30,2,-1+ph*2);}
+    const ct=Math.min(1,t/2);ctx.save();ctx.translate(120,150-ct*40+ct*ct*60);ctx.rotate(ct*9);ctx.scale(1.5,1.5);ctx.drawImage(CROWN,-6,-3);ctx.restore();},
+  credits:t=>{ctx.fillStyle='#0e1430';ctx.fillRect(0,0,VW,VH);ctx.font="8px 'Press Start 2P', monospace";
+    const L=['PECHADOPHIN','',lgS(LG('FIN','THE END')),'','dev : L\'taleshy et cocobat','visuels : Sacha','testeurs : moustik, ofodile, wyzan, nad l\'arnaque et bergoute','',lgS(LG('MERCI D\'AVOIR JOUÉ !','THANKS FOR PLAYING!'))];
+    L.forEach((s,i)=>txt(s,VW/2,Math.round(VH+10-t*22+i*16),i===0?'#ffd23f':'#ffffff','center'));cineFisher(VW/2,VH-12,2,{});}
+};
+/* ---- scripts : chaque étape = une réplique (who, l) et, pour les scènes plein écran, un dessin (sc) ---- */
+const CINE={
+  intro:[
+    {sc:'calm',who:NARR,l:LG('Il était une fois un pêcheur, un ponton et une mer bien tranquille.','Once upon a time there was a fisherman, a jetty and a very quiet sea.')},
+    {sc:'rise',who:NARR,l:LG('Jusqu\'au jour où les dauphins sortirent de l\'eau... tous en même temps.','Until the day the dolphins came out of the water... all at once.')},
+    {sc:'conquer',who:NARR,l:LG('En une nuit, ils prirent le contrôle du monde : les plaines, la plage, les marécages, la glace et même les nuages.','In one night they took over the world: the plains, the beach, the swamps, the ice and even the clouds.')},
+    {sc:'king',who:ROI,l:LG('Hi hi hi ! Ce monde appartient désormais aux dauphins ! Et à leur roi : MOI !','Hee hee hee! This world now belongs to the dolphins! And to their king: ME!')},
+    {sc:'splash',who:NARR,l:LG('Dans la panique, notre pêcheur perdit quelque chose de très précieux...','In the panic, our fisherman lost something very precious...')},
+    {sc:'angry',who:PECHEUR,l:LG('MON PANTALON !! Ces dauphins vont me le payer. Je vais jusqu\'au palais de leur roi !','MY PANTS!! Those dolphins will pay. I\'m going all the way to their king\'s palace!')}
+  ],
+  ch1:[{card:LG('CHAPITRE 1 · LES PLAINES','CHAPTER 1 · THE PLAINS'),who:PECHEUR,l:LG('Il fait frais aux jambes... Mon pantalon doit être tombé tout près.','It\'s chilly on the legs... My pants must have landed nearby.')}],
+  ch2:[{card:LG('CHAPITRE 2 · LA PLAGE','CHAPTER 2 · THE BEACH'),who:PECHEUR,l:LG('Du sable plein les bottes et des dauphins plein la plage. Ils sont partout !','Sand in my boots and dolphins all over the beach. They\'re everywhere!')}],
+  ch3:[{card:LG('CHAPITRE 3 · LES MARÉCAGES','CHAPTER 3 · THE SWAMPS'),who:PECHEUR,l:LG('Ça sent la vase et le poisson pas frais. On dit qu\'une sorcière s\'est alliée aux dauphins.','It smells of mud and stale fish. They say a witch has sided with the dolphins.')}],
+  ch4:[{card:LG('CHAPITRE 4 · LA GLACIÈRE','CHAPTER 4 · THE ICE FIELDS'),who:PECHEUR,l:LG('Brrr ! Heureusement que j\'ai retrouvé mon pantalon.','Brrr! Good thing I found my pants.')}],
+  ch5:[{card:LG('CHAPITRE 5 · LE MONDE NUAGE','CHAPTER 5 · THE CLOUD WORLD'),who:PECHEUR,l:LG('Les dauphins volent, maintenant ?! Leur capitale doit être au bout des nuages.','Dolphins fly now?! Their capital must be past the clouds.')}],
+  ch6:[{card:LG('CHAPITRE 6 · LA CITÉ DES DAUPHINS','CHAPTER 6 · THE DOLPHIN CITY'),who:PECHEUR,l:LG('Leur capitale... Le palais du roi est tout au bout de la ville. On y est presque.','Their capital... The king\'s palace is at the far end of town. Almost there.')}],
+  b_shark:[{who:bossSpk('DÉMON REQUIN','SHARK DEMON','#ff5a4a'),l:LG('Les dauphins m\'ont promis ta canne à pêche. Et tes jambes, si elles sont bonnes.','The dolphins promised me your fishing rod. And your legs, if they taste good.')}],
+  b_octo:[{who:bossSpk('POULPE GÉANT','GIANT OCTOPUS','#c9a0ff'),l:LG('Huit bras, zéro pitié. La plage est aux dauphins, pêcheur.','Eight arms, zero mercy. The beach belongs to the dolphins, fisherman.')}],
+  b_jelly:[{who:bossSpk('MÉDUSE','JELLYFISH','#ff9ad8'),l:LG('Bzzz... Un pas de plus et je t\'électrise le caleçon.','Bzzz... One more step and I\'ll electrify your boxers.')}],
+  b_castle:[{who:bossSpk('CHÂTEAU DE SABLE','SANDCASTLE','#e4c882'),l:LG('Aucun pêcheur ne franchira mes remparts ! Enfin... sauf avec un seau d\'eau.','No fisherman shall pass my walls! Well... unless he has a bucket of water.')}],
+  b_witch:[{who:bossSpk('SORCIÈRE','WITCH','#9fe870'),l:LG('Le roi des dauphins paie bien. Goûte donc à mes potions !','The dolphin king pays well. Have a taste of my potions!')}],
+  b_cow:[{who:bossSpk('VACHE GÉANTE','GIANT COW','#ffffff'),l:LG('Meuuuh. Les dauphins m\'ont dit que tu volais le lait. MEUUUH !','Mooo. The dolphins told me you steal milk. MOOOO!')}],
+  b_six:[{who:bossSpk('N°6','No. 6','#ffd23f'),l:LG('6 6 6 6 6 6. (Il ne sait dire que ça.)','6 6 6 6 6 6. (That\'s all it can say.)')}],
+  b_eskimo:[{who:bossSpk('ESQUIMAU','ESKIMO','#bfe9ff'),l:LG('Les dauphins m\'ont donné ce sceptre. Tu vas finir en glaçon !','The dolphins gave me this scepter. You\'ll end up an ice cube!')}],
+  b_king2:[{who:bossSpk('ROI CACAMILLE 2','KING CACAMILLE 2','#e8c8ff'),l:LG('Je ne suis qu\'un roi de pacotille... le vrai roi, c\'est un dauphin. Mais je défendrai son passage !','I\'m only a puppet king... the real one is a dolphin. But I\'ll guard his way!')}],
+  b_cloud:[{who:bossSpk('DAUPHIN DES NUAGES','CLOUD DOLPHIN','#ffffff'),l:LG('Personne ne monte plus haut que les dauphins. Redescends... en chute libre !','No one climbs higher than the dolphins. Go back down... in free fall!')}]
+};
+/* ---- moteur ---- */
+let cine=null,cineSeen=new Set();
+const cineOk=()=>!anarchyOn&&!speedOn&&!(pvp&&pvp.on);
+function cinePlay(id,after){
+  const S=CINE[id];if(!S||!cineOk()){if(after)after();return false;}
+  cine={id,S,i:0,t:0,st:0,after};clearInputs();return true;
+}
+function cineOnce(id){if(cineSeen.has(id)||cine)return false;cineSeen.add(id);return cinePlay(id);}
+function bossCine(k){cineOnce('b_'+k);}
+function cineEnd(){const a=cine&&cine.after;cine=null;clearInputs();if(a)a();}
+function cineNext(){if(!cine)return;const s=cine.S[cine.i],n=lgS(s.l).length;
+  if(cine.st*42<n){cine.st=n/42+0.01;return;}   // le texte s'affichait encore : on le montre en entier
+  cine.i++;cine.t=0;cine.st=0;if(cine.i>=cine.S.length)cineEnd();}
+function stepCine(dt){
+  const c=cine;c.t+=dt;c.st+=dt;
+  const s=c.S[c.i],n=lgS(s.l).length;
+  if(c.st*42>=n&&c.st-n/42>2.4+n*0.025)cineNext();   // avance seule après un temps de lecture
+}
+const CINE_SKIP=[VW-66,4,62,13];
+function wrapLines(s,w){const out=[];let cur='';for(const word of s.split(' ')){const tt=cur?cur+' '+word:word;if(ctx.measureText(tt).width>w&&cur){out.push(cur);cur=word;}else cur=tt;}if(cur)out.push(cur);return out;}
+function drawCine(){
+  const c=cine,s=c.S[c.i];
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;
+  if(s.sc)SC[s.sc](c.t);
+  const bar=Math.round(Math.min(1,(c.i?1:c.t*4))*22);   // bandes noires de cinéma
+  ctx.fillStyle='#000';ctx.fillRect(0,0,VW,bar);ctx.fillRect(0,VH-bar,VW,bar);
+  ctx.font="8px 'Press Start 2P', monospace";
+  if(s.card){const k=Math.min(1,c.t*3);ctx.globalAlpha=k;plate(VW/2-120,40,240,22,0.7);txt(lgS(s.card),VW/2,47,'#ffd23f','center');ctx.globalAlpha=1;}
+  const txtS=lgS(s.l),shown=txtS.slice(0,Math.floor(c.st*42));
+  const lines=wrapLines(txtS,VW-36),h=14+lines.length*11+(s.who.n?10:0),y=VH-bar-h-4;
+  plate(8,y,VW-16,h,0.82);
+  let ty=y+6;
+  if(s.who.n){txt(lgS(s.who.n),16,ty,s.who.c);ty+=12;}
+  let left=shown.length;
+  for(const ln of lines){if(left<=0)break;txt(ln.slice(0,left),16,ty,'#ffffff');left-=ln.length+1;ty+=11;}
+  if(shown.length>=txtS.length&&Math.floor(time*3)%2)txt('▼',VW-20,y+h-12,'#ffd23f');
+  plate(CINE_SKIP[0],CINE_SKIP[1],CINE_SKIP[2],CINE_SKIP[3],0.6);txt(lang==='en'?'SKIP ▶▶':'PASSER ▶▶',VW-8,7,'#ffffff','right');
+  ctx.restore();
+}
+addEventListener('keydown',e=>{if(!cine)return;
+  if(e.code==='Escape'){cineEnd();}else if(['Space','Enter','KeyF','KeyJ','ArrowUp','KeyW'].includes(e.code)&&!e.repeat)cineNext();else return;
+  e.preventDefault();e.stopImmediatePropagation();},true);
+addEventListener('pointerdown',e=>{if(!cine)return;
+  const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*VW,y=(e.clientY-r.top)/r.height*VH;
+  if(x>=CINE_SKIP[0]-6&&y<=CINE_SKIP[1]+CINE_SKIP[3]+8)cineEnd();else cineNext();
+  e.preventDefault();e.stopImmediatePropagation();},true);
+/* ---- tuto du pantalon (1re partie seulement) ---- */
+let tuto=null;
+function tutoStart(){
+  if(shop.pants||!cineOk())return;
+  const p=player,tx=Math.floor((p.x+5)/T)+12;
+  tuto={st:0,x0:p.x,jumped:false,px:tx*T+8,py:column(tx).g*T,got:false,t:0};
+}
+function tutoHint(){
+  const st=tuto.st,k=kbMode;
+  return st===0?(k?LG('← → OU A D : MARCHER','← → OR A D: WALK'):LG('JOYSTICK GAUCHE : MARCHER','LEFT STICK: WALK'))
+    :st===1?(k?LG('ESPACE OU ↑ : SAUTER','SPACE OR ↑: JUMP'):LG('BOUTON SAUT : SAUTER','JUMP BUTTON: JUMP'))
+    :st===2?LG('RÉCUPÈRE TON PANTALON →','GET YOUR PANTS BACK →')
+    :(k?LG('F OU CLIC : LANCER LA CANNE SUR LES DAUPHINS','F OR CLICK: CAST AT THE DOLPHINS'):LG('BOUTON TIR : LANCER LA CANNE','FIRE BUTTON: CAST YOUR ROD'));
+}
+function stepTuto(dt){
+  if(!tuto||state!=='play')return;const p=player;tuto.t+=dt;
+  if(tuto.st===0&&Math.abs(p.x-tuto.x0)>2*T)tuto.st=1;
+  if(tuto.st===1&&!p.onGround)tuto.st=2;
+  if(!tuto.got&&rectsOverlap(p.x,p.y,p.w,p.h,tuto.px-8,tuto.py-40,16,40)){
+    tuto.got=true;tuto.st=3;shop.pants=true;saveShop();sfx.heal();vfx('shine',p.x+5,p.y+6);
+    floatText(p.x+5,p.y-24,lang==='en'?'PANTS FOUND!':'PANTALON RETROUVÉ !','#ffd23f');}
+  if(tuto.st===3&&(inp.fire||mouse.fire||tuto.t>40))tuto.st=4;
+  if(tuto.st===4)tuto=null;
+}
+function drawTutoWorld(){   // le pantalon posé par terre, qui brille
+  if(!tuto||tuto.got)return;const y=tuto.py-10+Math.round(Math.sin(time*3)*1.5);
+  ctx.drawImage(PANTS,Math.round(tuto.px-6),y);
+  if(Math.floor(time*4)%3===0){ctx.fillStyle='#fff6c4';ctx.fillRect(Math.round(tuto.px+5),y-2,1,3);ctx.fillRect(Math.round(tuto.px+4),y-1,3,1);}
+}
+function drawTutoHud(){
+  if(!tuto||tuto.st>3||cine)return;ctx.font="8px 'Press Start 2P', monospace";
+  const s=lgS(tutoHint()),w=ctx.measureText(s).width+16,a=0.75+0.25*Math.sin(time*4);
+  plate(Math.round(VW/2-w/2),24,Math.round(w),15,0.7);ctx.globalAlpha=a;txt(s,VW/2,28,'#ffffff','center');ctx.globalAlpha=1;
+}
+/* ---- déclencheurs : début de partie et arrivée dans chaque monde ---- */
+let cineBiome=0;
+function cineGameStart(fromStart){
+  cineSeen=new Set();tuto=null;cineBiome=curBiome();
+  if(!cineOk())return;
+  if(fromStart){cineSeen.add('ch1');cinePlay('intro',()=>{cinePlay('ch1');tutoStart();});}
+  else cineOnce('ch'+cineBiome);
+}
+function stepCineTriggers(){
+  if(state!=='play'||cine||!cineOk())return;
+  const b=curBiome();if(b!==cineBiome){cineBiome=b;if(b>1)cineOnce('ch'+b);}
+}
+
 function frame(now){
   const dt=Math.min(0.1,(now-last)/1000);last=now;acc+=dt;
   let n=0;
   while(acc>=STEP&&n<6){update(STEP);acc-=STEP;n++;}
   if(n===6)acc=0;
   render();
+  if(cine)drawCine();else if(tuto)drawTutoHud();   // cinématique ou consigne du tuto par-dessus le jeu
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
