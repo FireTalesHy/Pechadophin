@@ -4716,7 +4716,7 @@ function stepKing(dt){
   const p=player;
   k.t+=dt;if(k.flash>0)k.flash-=dt;
   if(k.state==='intro'){k.intro-=dt;if(k.intro<=0){k.state='fight';k.mode='idle';k.mt=1;}return;}
-  if(k.state==='dying'){k.dieT-=dt;if(Math.random()<0.5)parts.push({x:k.x+(Math.random()-0.5)*12,y:k.y-Math.random()*40,vx:(Math.random()-0.5)*40,vy:-40,life:0.5,col:Math.random()<0.5?'#ffd23f':'#e8c8ff',sz:2});if(k.dieT<=0)king=null;return;}
+  if(k.state==='dying'){k.dieT-=dt;if(Math.random()<0.5)parts.push({x:k.x+(Math.random()-0.5)*12,y:k.y-Math.random()*40,vx:(Math.random()-0.5)*40,vy:-40,life:0.5,col:Math.random()<0.5?'#ffd23f':'#e8c8ff',sz:2});if(k.dieT<=0){king=null;cineOnce('k2_end');}return;}
   k.face=p.x+5>k.x?1:-1;
   const sp=k.rage?34:20,x0=(TWC+2)*T,x1=(TWC+22)*T;
   if(k.mode==='idle'||k.mode==='rest'){   // il arpente la chambre à petits pas
@@ -5466,11 +5466,11 @@ const SC={
   rise:t=>{drawBackground(60+t*20,200,BG_GRASS);ctx.fillStyle='rgba(160,20,30,'+Math.min(0.45,t*0.12).toFixed(3)+')';ctx.fillRect(0,0,VW,VH);
     for(let i=0;i<9;i++){const ph=(t*0.9+i*0.37)%1.6;if(ph>1.2)continue;const k=ph/1.2,x=20+i*42+k*30,y=190-Math.sin(k*Math.PI)*(70+(i%3)*20);cineDolph(x,y,2,-1+k*2,i%4===3?DOLR:i%3===2?DOLP:DOLB);}},
   conquer:t=>{drawBackground(200,200,BG_SWAMP);ctx.fillStyle='rgba(70,0,12,.45)';ctx.fillRect(0,0,VW,VH);cineGround(152);
-    for(let i=0;i<7;i++){const x=((i*60+t*26)%(VW+60))-30,hop=Math.abs(Math.sin(t*6+i))*4;cineDolph(x,144-hop,2,0,i%2?DOLP:DOLB);
+    for(let i=0;i<7;i++){const x=((i*60+t*26)%(VW+60))-30,hop=(Math.sin(t*3+i)+1)*2;cineDolph(x,144-hop,2,0,i%2?DOLP:DOLB);
       ctx.fillStyle='#5a3a1e';ctx.fillRect(Math.round(x)-2,116-hop,1,22);ctx.fillStyle='#3b7fd4';ctx.fillRect(Math.round(x)-1,116-hop,10,6);ctx.fillStyle='#ffd23f';ctx.fillRect(Math.round(x)+2,118-hop,3,2);}},
   king:t=>{ctx.fillStyle='#120a26';ctx.fillRect(0,0,VW,VH);
     ctx.fillStyle='rgba(127,196,255,.12)';ctx.beginPath();ctx.moveTo(VW/2-30,0);ctx.lineTo(VW/2+30,0);ctx.lineTo(VW/2+110,VH);ctx.lineTo(VW/2-110,VH);ctx.fill();
-    for(let i=0;i<6;i++){const x=40+i*62,hop=Math.abs(Math.sin(t*5+i*1.3))*6;cineDolph(x,148-hop,2,0,i%2?DOLP:DOLR);}
+    for(let i=0;i<6;i++){const x=40+i*62,hop=(Math.sin(t*2.4+i*1.3)+1)*3;cineDolph(x,148-hop,2,0,i%2?DOLP:DOLR);}
     cineKing(VW/2,92,7,t);},
   splash:t=>{drawBackground(30,200,BG_GRASS);cineDock(232,150);
     const k=clamp((t-0.3)/0.75,0,1);   // le dauphin jaillit, percute le pêcheur, le pantalon s'envole
@@ -5480,7 +5480,7 @@ const SC={
     if(hit){const pt=Math.min(ft,2.2);ctx.save();ctx.translate(268-pt*70,150-30-pt*60+pt*pt*20);ctx.rotate(pt*7);ctx.drawImage(PANTS,-6,-5);ctx.restore();}
     if(hit&&ft<0.4){ctx.fillStyle='#ffffff';ctx.globalAlpha=1-ft/0.4;ctx.fillRect(0,0,VW,VH);ctx.globalAlpha=1;}},
   angry:t=>{drawBackground(30,200,BG_GRASS);cineGround(150);cineFisher(VW/2,138,3,{np:true});
-    if(Math.floor(t*3)%2){ctx.fillStyle='#e0262e';ctx.fillRect(VW/2+14,84,3,8);ctx.fillRect(VW/2+19,80,3,8);ctx.fillRect(VW/2+24,84,3,8);}},
+    for(let i=0;i<3;i++){const k=((t*0.8+i/3)%1),e=EZ.out(k);ctx.globalAlpha=1-k;ctx.fillStyle='#ffffff';disc(Math.round(VW/2+(i-1)*14+Math.sin(k*6+i)*4),Math.round(86-e*40),Math.round(3+e*5));}ctx.globalAlpha=1;},   // il fume de colère
   freed:t=>{drawBackground(t*10,200,BG_GRASS);cineDock(232,150);cineFisher(268,150,1,{f:-1});
     for(let i=0;i<5;i++){const ph=(t*0.7+i*0.31)%1.4;if(ph>1)continue;const x=30+i*40+ph*20;cineDolph(x,196-Math.sin(ph*Math.PI)*30,2,-1+ph*2);}
     const ct=Math.min(1,t/2);ctx.save();ctx.translate(120,150-ct*40+ct*ct*60);ctx.rotate(ct*9);ctx.scale(1.5,1.5);ctx.drawImage(CROWN,-6,-3);ctx.restore();},
@@ -5525,12 +5525,13 @@ let cineQ=[];
 function cineOnce(id){if(cineSeen.has(id))return false;cineSeen.add(id);if(cine){cineQ.push(id);return true;}return cinePlay(id);}   // une scène en cours : la suivante attend son tour
 function bossCine(k){cineOnce('b_'+k);}
 function cineEnd(){const a=cine&&cine.after;cine=null;clearInputs();if(a)a();if(!cine&&cineQ.length)cinePlay(cineQ.shift());}
-function cineNext(){if(!cine)return;const s=cine.S[cine.i],n=lgS(s.l).length;
+function cineNext(){if(!cine)return;const s=cine.S[cine.i],n=s.l?lgS(s.l).length:0;
   if(cine.st*42<n){cine.st=n/42+0.01;return;}   // le texte s'affichait encore : on le montre en entier
   cine.i++;cine.t=0;cine.st=0;if(cine.i>=cine.S.length)cineEnd();}
 function stepCine(dt){
   const c=cine;c.t+=dt;c.st+=dt;
-  const s=c.S[c.i],n=lgS(s.l).length;
+  const s=c.S[c.i];if(!s.l){if(c.t>=(s.dur||2)){c.i++;c.t=0;c.st=0;if(c.i>=c.S.length)cineEnd();}return;}
+  const n=lgS(s.l).length;
   if(c.st*42>=n&&c.st-n/42>2.4+n*0.025)cineNext();   // avance seule après un temps de lecture
 }
 const CINE_SKIP=[VW-66,4,62,13];
@@ -5538,11 +5539,13 @@ function wrapLines(s,w){const out=[];let cur='';for(const word of s.split(' ')){
 function drawCine(){
   const c=cine,s=c.S[c.i];
   ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;
-  if(s.sc)SC[s.sc](c.t);
+  if(s.sc)SC[s.sc](c.t,s);
+  if(s.iris&&c.t<0.7){const r=EZ.out(c.t/0.7)*VW*0.75;ctx.save();ctx.fillStyle='#000';ctx.beginPath();ctx.rect(0,0,VW,VH);ctx.arc(VW/2,VH/2,Math.max(1,r),0,Math.PI*2,true);ctx.fill('evenodd');ctx.restore();}
   const bar=Math.round(Math.min(1,(c.i?1:c.t*4))*22);   // bandes noires de cinéma
   ctx.fillStyle='#000';ctx.fillRect(0,0,VW,bar);ctx.fillRect(0,VH-bar,VW,bar);
   ctx.font="8px 'Press Start 2P', monospace";
   if(s.card){const k=Math.min(1,c.t*3);ctx.globalAlpha=k;plate(VW/2-120,40,240,22,0.7);txt(lgS(s.card),VW/2,47,'#ffd23f','center');ctx.globalAlpha=1;}
+  if(!s.l){plate(CINE_SKIP[0],CINE_SKIP[1],CINE_SKIP[2],CINE_SKIP[3],0.6);txt(lang==='en'?'SKIP ▶▶':'PASSER ▶▶',VW-8,7,'#ffffff','right');ctx.restore();return;}
   const txtS=lgS(s.l),shown=txtS.slice(0,Math.floor(c.st*42));
   const lines=wrapLines(txtS,VW-36),h=14+lines.length*11+(s.who.n?10:0),y=VH-bar-h-4;
   plate(8,y,VW-16,h,0.82);
@@ -5871,6 +5874,180 @@ CINE.fin=[{sc:'freed',who:NARR,l:LG('La couronne du roi roula jusqu\'à la mer. 
   {sc:'freed',who:PECHEUR,l:LG('Le monde est libre. Mon pantalon est sur mes jambes. La pêche peut reprendre.','The world is free. My pants are on my legs. Fishing can resume.')},
   {sc:'credits',who:NARR,l:LG('Mais on raconte que la Cité des dauphins continue, plus loin... pour les pêcheurs qui en veulent encore.','But they say the Dolphin City goes on, further... for fishermen who want more.')}];
 CINE.ch6=[{card:LG('CHAPITRE 6 · LA CITÉ DES DAUPHINS','CHAPTER 6 · THE DOLPHIN CITY'),who:PECHEUR,l:LG('Leur capitale... Le palais du roi est tout au bout de la ville. On y est presque.','Their capital... The king\'s palace is at the far end of town. Almost there.')}];
+
+/* ================= Cinématiques des boss d'arène : motion design (courbes d'accélération, travellings, zooms, cartes VS) ================= */
+const EZ={out:k=>1-Math.pow(1-k,3),inOut:k=>k<0.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,back:k=>{const c=1.70158;return 1+(c+1)*Math.pow(k-1,3)+c*Math.pow(k-1,2);},sine:k=>-(Math.cos(Math.PI*k)-1)/2};
+const twk=(t,a,b)=>clamp((t-a)/(b-a),0,1),tl=(t,a,b,v0,v1,e)=>lerp(v0,v1,(e||EZ.out)(twk(t,a,b)));
+const GY=140;   // ligne du sol des scènes
+/* --- Cacamille (repris du roi du jeu), en grand pour les plans rapprochés --- */
+function cacaSpr(cor){const c=mk(32,52),g=c.getContext('2d'),R=(col,a,b,w,h)=>{g.fillStyle=col;g.fillRect(a+16,b+50,w,h);};
+  const robe=cor?'#b01c4a':'#7a2fa0',robeD=cor?'#6a0e2a':'#4e1a6e',fur='#f4f1e6',gold='#ffd23f',skin='#f0c9a0';
+  R('#14182c',-4,-2,4,2);R('#14182c',1,-2,5,2);R('#e8e4d8',-3,-14,2,12);R('#e8e4d8',1,-14,2,12);
+  R(robeD,-6,-31,12,19);R(robe,-5,-30,10,17);R(fur,-6,-14,12,3);R('#14182c',-4,-13,1,1);R('#14182c',0,-13,1,1);R('#14182c',3,-13,1,1);
+  R(gold,-5,-22,10,2);R(fur,-4,-32,8,2);R(skin,-3,-41,6,9);R(skin,3,-38,3,2);R(cor?'#ff2a2a':'#14182c',1,-39,1,1);R('#d8d8e0',-1,-33,3,4);
+  R(gold,-4,-46,8,5);R(gold,-4,-48,2,2);R(gold,-1,-49,2,3);R(gold,2,-48,2,2);R('#d92b3a',-1,-44,2,2);R(robe,3,-29,2,10);R(skin,3,-19,2,2);R(robe,-5,-29,2,10);
+  if(!cor){R(skin,1,-35,3,1);}   // sourire
+  return c;}
+const CACA=cacaSpr(false),CACA_C=cacaSpr(true);
+/* --- acteurs (pieds en x,y ; s = échelle ; f = sens) --- */
+function aImg(img,x,y,s,f,ox,oy){ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale((f||1)*s,s);ctx.drawImage(img,-(ox===undefined?img.width/2:ox),-(oy===undefined?img.height:oy));ctx.restore();}
+function aFisher(x,y,s,f,walk,np){const SP=curSkin().spr;let sp=walk?(Math.floor(walk*8)%2?SP.a:SP.b):SP.idle;if(np)sp=noPants(sp);aImg(sp,x,y,s,f,8,16);}
+function aRod(x,y,s,f){ctx.strokeStyle='#8a5a2b';ctx.lineWidth=Math.max(1,s/2);ctx.beginPath();ctx.moveTo(x+f*4*s,y-8*s);ctx.lineTo(x+f*12*s,y-20*s);ctx.stroke();ctx.lineWidth=1;}
+function aura(x,y,r,col,t){for(let i=3;i>0;i--){ctx.globalAlpha=0.08*i+0.04*Math.sin(t*2+i);ctx.fillStyle=col;disc(Math.round(x),Math.round(y),Math.round(r+i*6));}ctx.globalAlpha=1;}
+/* --- décors de plateau : fond de monde + sol défilant --- */
+const STAGE={
+  grass:{bg:()=>BG_GRASS,top:()=>GRASS[0],fill:()=>DIRT[0]},beach:{bg:()=>BG_BEACH,top:()=>SANDTOP[0],fill:()=>SAND[0]},
+  swamp:{bg:()=>BG_SWAMP,top:()=>SGRASS[0],fill:()=>SDIRT[0]},ice:{bg:()=>BG_ICE,top:()=>ICETOP[0],fill:()=>ICE[0]},
+  cloud:{bg:()=>BG_CLOUD,top:()=>CLOUDTOP[0],fill:()=>CLOUD[0]},metal:{bg:()=>BG_CLOUD,top:()=>METALTOP,fill:()=>METAL[0]},
+  city:{bg:()=>BG_CITY,top:()=>CITYTOP,fill:()=>CITYB[0]},palace:{bg:()=>BG_CITY,top:()=>MARBLETOP,fill:()=>MARBLE[0]}};
+function cStage(k,camx,noGround){
+  const S=STAGE[k];drawBackground(camx,200,S.bg());if(noGround)return;
+  const o=-mod(Math.round(camx),T),top=S.top(),fill=S.fill();
+  for(let x=o,i=Math.floor(camx/T);x<VW;x+=T,i++){ctx.drawImage(top[mod(i,3)],x,GY-6);for(let y=GY+10,r=0;y<VH;y+=T,r++)ctx.drawImage(fill[mod(i+r,3)],x,y);}
+}
+function towerHall(t){   // salle du trône de la tour : briques, vitrail, tapis
+  ctx.fillStyle='#2a2340';ctx.fillRect(0,0,VW,VH);
+  for(let y=0;y<GY;y+=8)for(let x=-(y/8%2)*8;x<VW;x+=16){ctx.fillStyle='#3a3156';ctx.fillRect(x+1,y+1,14,6);}
+  const wx=VW/2;ctx.fillStyle='#14182c';ctx.fillRect(wx-26,12,52,70);for(let i=0;i<6;i++){ctx.fillStyle=['#7a2fa0','#ffd23f','#3b9bff','#e0262e','#7a2fa0','#4ce8d8'][i];ctx.fillRect(wx-23+(i%3)*16,15+Math.floor(i/3)*33,14,31);}
+  ctx.fillStyle='rgba(255,236,190,.12)';ctx.beginPath();ctx.moveTo(wx-26,82);ctx.lineTo(wx+26,82);ctx.lineTo(wx+90,GY);ctx.lineTo(wx-90,GY);ctx.fill();
+  ctx.fillStyle='#4a3c68';ctx.fillRect(0,GY,VW,VH-GY);ctx.fillStyle='#8a1c3a';ctx.fillRect(0,GY,VW,6);ctx.fillStyle='#ffd23f';ctx.fillRect(0,GY+6,VW,1);
+}
+function sepia(a){ctx.save();ctx.globalCompositeOperation='saturation';ctx.globalAlpha=a;ctx.fillStyle='#808080';ctx.fillRect(0,0,VW,VH);ctx.globalCompositeOperation='multiply';ctx.fillStyle='#e8c890';ctx.fillRect(0,0,VW,VH);ctx.restore();
+  ctx.save();const g=ctx.createRadialGradient(VW/2,VH/2,VH*0.35,VW/2,VH/2,VH*0.85);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(40,20,0,.6)');ctx.fillStyle=g;ctx.fillRect(0,0,VW,VH);ctx.restore();}
+function speedLines(t,col,dir){ctx.fillStyle=col;for(let i=0;i<22;i++){const y=(i*37)%VH,len=30+(i*53)%60,x=mod((dir||1)*t*520+i*97,VW+len)-len;ctx.globalAlpha=0.25+((i*7)%5)/10;ctx.fillRect(Math.round(x),y,len,1);}ctx.globalAlpha=1;}
+/* --- plan rapproché : le personnage qui parle glisse dans le cadre, fond assombri --- */
+function closeUp(t,bgFn,drawFn,side,tint){
+  bgFn(t);ctx.fillStyle=tint||'rgba(10,8,24,.55)';ctx.fillRect(0,0,VW,VH);
+  const k=EZ.out(twk(t,0,0.45)),x=side==='L'?lerp(-80,110,k):lerp(VW+80,VW-110,k),br=1+0.015*Math.sin(t*2.2);
+  ctx.save();ctx.translate(Math.round(x),GY+10);ctx.scale(br,br);drawFn(0,0,t);ctx.restore();
+}
+/* --- carte VS : deux panneaux en diagonale, portraits, « VS » qui apparaît en grossissant --- */
+function vsCard(t,o){
+  const kL=EZ.out(twk(t,0,0.45)),kR=EZ.out(twk(t,0.1,0.55)),kV=EZ.back(twk(t,0.45,0.85)),kN=EZ.out(twk(t,0.6,1));
+  ctx.fillStyle='#0a0816';ctx.fillRect(0,0,VW,VH);
+  ctx.save();ctx.translate(lerp(-VW,0,kL),0);ctx.fillStyle='#1c3f6e';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(VW/2+30,0);ctx.lineTo(VW/2-30,VH);ctx.lineTo(0,VH);ctx.fill();
+  ctx.save();ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(VW/2+30,0);ctx.lineTo(VW/2-30,VH);ctx.lineTo(0,VH);ctx.clip();speedLines(t,'#3b7fd4',1);ctx.restore();
+  aFisher(VW*0.24,VH-30,5,1,0,o.np);ctx.restore();
+  ctx.save();ctx.translate(lerp(VW,0,kR),0);ctx.fillStyle=o.col||'#5a1020';ctx.beginPath();ctx.moveTo(VW/2+30,0);ctx.lineTo(VW,0);ctx.lineTo(VW,VH);ctx.lineTo(VW/2-30,VH);ctx.fill();
+  ctx.save();ctx.beginPath();ctx.moveTo(VW/2+30,0);ctx.lineTo(VW,0);ctx.lineTo(VW,VH);ctx.lineTo(VW/2-30,VH);ctx.clip();speedLines(t,o.col2||'#a8203a',-1);ctx.restore();
+  o.draw(VW*0.76,VH-30,t);ctx.restore();
+  ctx.strokeStyle='#ffffff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(VW/2+30,0);ctx.lineTo(VW/2-30,VH);ctx.globalAlpha=kR;ctx.stroke();ctx.globalAlpha=1;ctx.lineWidth=1;
+  ctx.font="8px 'Press Start 2P', monospace";
+  if(kV>0){ctx.save();ctx.translate(VW/2,VH/2-6);ctx.scale(kV*4,kV*4);txt('VS',0,-4,'#ffd23f','center');ctx.restore();}
+  ctx.globalAlpha=kN;txt(lgS(PECHEUR.n),lerp(-60,14,kN),30,'#ffd23f');txt(lgS(o.name),lerp(VW+60,VW-14,kN),30,o.nc||'#ffffff','right');
+  if(o.sub)txt(lgS(o.sub),VW-14,42,'#ffffff','right');ctx.globalAlpha=1;
+}
+/* --- scènes nommées (t = temps dans le plan, s = l'étape) --- */
+Object.assign(SC,{
+  // poulpe géant
+  o1:t=>{const cx=tl(t,0,3,0,220,EZ.inOut);cStage('beach',cx);aFisher(tl(t,0,2.6,60,170,EZ.inOut),GY,2,1,t<2.6?t:0);},
+  o2:t=>{const z=tl(t,0,1.4,1.35,1,EZ.out);ctx.save();ctx.translate(VW/2,VH/2);ctx.scale(z,z);ctx.translate(-VW/2,-VH/2);cStage('beach',220);
+    const oy=tl(t,0.2,1.6,VH+120,GY+30,EZ.back);aImg(OCTO_N,VW*0.68,oy,1.1,1);aFisher(170,GY,2,1,0);ctx.restore();},
+  ocu:t=>closeUp(t,()=>cStage('beach',220),(x,y,tt)=>{aImg(OCTO_N,x,y+30,1.5,-1);ctx.fillStyle='#ffd23f';disc(x+20,y-40,6);ctx.fillStyle='#8a5a2b';disc(x+20,y-40,4);ctx.fillStyle='#fff6c4';ctx.fillRect(x+18,y-42,2,1);},'R'),
+  fcu:(t,s)=>closeUp(t,()=>cStage(s.bg||'grass',220,s.bg==='tower'||s.bg==='palace'?false:false),(x,y)=>{if(s.bg==='tower')return;aFisher(x,y,5,1,0,s.np);},'L'),
+  // château de sable
+  c1:t=>{cStage('beach',400);const n=8;for(let i=0;i<n;i++){const k=EZ.back(twk(t,0.15*i,0.15*i+0.5));if(k<=0)continue;ctx.save();ctx.globalAlpha=Math.min(1,k*2);
+      const bx=VW*0.62+(i%4)*18-27,by=GY-10-Math.floor(i/4)*20;ctx.translate(bx,lerp(by-60,by,k));ctx.fillStyle='#6e5026';ctx.fillRect(-9,-10,18,20);ctx.fillStyle='#e4c882';ctx.fillRect(-8,-9,16,18);ctx.fillStyle='#f6e2ac';ctx.fillRect(-8,-9,16,2);ctx.restore();}
+    if(t>1.4){const k=EZ.out(twk(t,1.4,2));ctx.globalAlpha=k;aImg(CASTLE,VW*0.62,GY,1,1);ctx.globalAlpha=1;}
+    aFisher(80,GY,2,1,0);},
+  ccu:t=>closeUp(t,()=>cStage('beach',400),(x,y,tt)=>{aImg(CASTLE,x,y,1.4,1);const blink=Math.floor(tt*1.5)%4===3;ctx.fillStyle='#14182c';ctx.fillRect(x-14,y-70,8,blink?2:8);ctx.fillRect(x+6,y-70,8,blink?2:8);ctx.fillStyle='#6e5026';ctx.fillRect(x-10,y-50,20,3);},'R'),
+  // sorcière
+  w1:t=>{cStage('swamp',300+t*10);for(let i=0;i<3;i++){ctx.globalAlpha=0.35;ctx.fillStyle='#d8e0d0';const x=mod(t*(14+i*10)+i*140,VW+200)-100;ctx.fillRect(Math.round(x),60+i*26,200,10);}ctx.globalAlpha=1;
+    const k=EZ.out(twk(t,0.8,2.2));ctx.globalAlpha=k;aImg(WITCH,VW*0.7,GY+8,lerp(0.4,0.75,k),-1);ctx.globalAlpha=1;aFisher(90,GY,2,1,0);},
+  wcu:t=>closeUp(t,()=>cStage('swamp',340),(x,y)=>aImg(WITCH,x,y+50,1.1,-1),'R'),
+  catcu:t=>closeUp(t,()=>cStage('swamp',340),(x,y,tt)=>{aImg(CAT,x,y,3,-1);if(twk(tt,0.6,0.7)>0&&tt<1.6){ctx.font="8px 'Press Start 2P', monospace";txt('?',x-30,y-100+Math.round(-EZ.out(twk(tt,0.6,1))*10),'#ffd23f');}},'R'),
+  // esquimau
+  e1:t=>{const cx=tl(t,0,3,500,640,EZ.inOut);cStage('ice',cx);drawSnow(1);const k=EZ.out(twk(t,0.6,1.8));aImg(ESKIMO,lerp(VW+40,VW*0.68,k),GY,1.6,-1);aFisher(90,GY,2,1,0);},
+  ecu:t=>closeUp(t,()=>{cStage('ice',640);drawSnow(1);},(x,y,tt)=>{aImg(ESKIMO,x,y,2.6,-1);const g=0.5+0.5*Math.sin(tt*3);ctx.globalAlpha=0.3+0.3*g;ctx.fillStyle='#bfe9ff';disc(x+46,y-118,10);ctx.globalAlpha=1;aImg(SCEPTER_ICON,x+40,y-60,3,-1);},'R'),
+  // Cacamille : souvenir (sépia), puis la salle du trône
+  k1:t=>{cStage('grass',t*12);cineDock(150,GY-2);aFisher(200,GY-2,2,-1,0);aImg(CACA,236,GY-2,1.2,-1);
+    ctx.strokeStyle='#e8e8e8';ctx.beginPath();ctx.moveTo(192,GY-26);ctx.lineTo(160,GY-40);ctx.lineTo(140,GY+20+Math.sin(t*2)*2);ctx.stroke();sepia(0.9);},
+  k2:t=>{cStage('grass',30);aFisher(150,GY,3,1,0);aImg(CACA,236,GY,1.8,-1);
+    const k=EZ.out(twk(t,0.3,1));ctx.globalAlpha=k;ctx.fillStyle='#ffd23f';for(let i=0;i<5;i++){const a=-Math.PI/2+(i-2)*0.35;ctx.fillRect(Math.round(236+Math.cos(a)*lerp(10,40,k)),Math.round(GY-80+Math.sin(a)*lerp(10,40,k)),2,2);}ctx.globalAlpha=1;sepia(0.9);},
+  k3:t=>{const z=tl(t,0,2.2,1.25,1,EZ.inOut);ctx.save();ctx.translate(VW/2,GY);ctx.scale(z,z);ctx.translate(-VW/2,-GY);towerHall(t);
+    ctx.fillStyle='#14182c';ctx.fillRect(VW/2-22,GY-62,44,62);ctx.fillStyle='#7a2fa0';ctx.fillRect(VW/2-20,GY-60,40,60);ctx.fillStyle='#ffd23f';ctx.fillRect(VW/2-20,GY-60,40,3);   // trône
+    const turn=twk(t,1.2,1.6);aura(VW/2,GY-34,22,'#b01c4a',t);aImg(CACA_C,VW/2,GY,1.5,turn<0.5?1:-1);ctx.restore();aFisher(70,GY,2,1,0);},
+  kcu:t=>closeUp(t,(tt)=>towerHall(tt),(x,y,tt)=>{aura(x,y-50,30,'#b01c4a',tt);aImg(CACA_C,x,y,2.2,-1);},'R'),
+  kfcu:t=>closeUp(t,(tt)=>towerHall(tt),(x,y)=>aFisher(x,y,5,1,0),'L'),
+  kend:t=>{towerHall(t);const k=EZ.out(twk(t,0,1.6));aura(VW/2,GY-34,22*(1-k),'#b01c4a',t);aImg(k<0.5?CACA_C:CACA,VW/2,GY,2,-1);
+    if(k>0.3&&k<1){ctx.globalAlpha=1-k;ctx.fillStyle='#ffffff';ctx.fillRect(0,0,VW,VH);ctx.globalAlpha=1;}aFisher(VW/2-50,GY,2,1,0);},
+  // dauphin des nuages
+  n1:t=>{cStage('cloud',t*90,true);speedLines(t,'#ffffff',-1);const x=tl(t,0,2.4,-40,VW*0.66,EZ.inOut),y=90+Math.sin(t*3)*10;cineDolph(x,y,4,Math.cos(t*3)*0.25,DOLP_I);
+    ctx.fillStyle='#ffffff';for(let i=0;i<6;i++){ctx.globalAlpha=0.8;disc(Math.round(x-30-i*12),Math.round(y+Math.sin(t*3-i*0.4)*8),4-i*0.5);}ctx.globalAlpha=1;},
+  ncu:t=>closeUp(t,()=>cStage('cloud',200,true),(x,y,tt)=>cineDolph(x,y-50,6,Math.sin(tt*1.6)*0.06,DOLP_I),'R'),
+  // méca-dauphin
+  m1:t=>{cStage('metal',100);for(const sx of[60,VW-60]){ctx.save();ctx.globalAlpha=0.12;ctx.fillStyle='#fff6c4';const a=Math.sin(t*1.2+sx)*0.3;ctx.translate(sx,0);ctx.rotate(a);ctx.beginPath();ctx.moveTo(-6,0);ctx.lineTo(6,0);ctx.lineTo(50,GY);ctx.lineTo(-50,GY);ctx.fill();ctx.restore();}
+    const y=tl(t,0.1,1.6,-60,70,EZ.inOut);for(const ox of[-17,19]){ctx.fillStyle='#ff8a2a';ctx.fillRect(VW/2+ox-3,y+24,7,10+Math.round(Math.sin(t*30+ox)*2));ctx.fillStyle='#ffd23f';ctx.fillRect(VW/2+ox-1,y+24,3,7);}
+    aImg(MECA_SPR,VW/2,y+24,1.6,-1);const v=twk(t,1.6,1.9);if(v>0){ctx.globalAlpha=v*0.6;ctx.fillStyle='#ff3b2f';disc(VW/2-24,Math.round(y-6),6);ctx.globalAlpha=1;}aFisher(70,GY,2,1,0);},
+  mcu:t=>closeUp(t,()=>cStage('metal',100),(x,y,tt)=>{aImg(MECA_SPR,x,y-20,2.6,-1);ctx.globalAlpha=0.4+0.3*Math.sin(tt*4);ctx.fillStyle='#ff3b2f';disc(x-40,y-90,7);ctx.globalAlpha=1;},'R'),
+  // roi des dauphins
+  r1:t=>{const cx=tl(t,0,3.2,0,520,EZ.inOut);cStage('palace',cx);
+    for(let i=0;i<8;i++){const x=Math.round(i*90-cx*0.9);if(x<-30||x>VW+30)continue;ctx.fillStyle='#14182c';ctx.fillRect(x-7,GY-140,14,140);ctx.fillStyle='#e8e2f4';ctx.fillRect(x-6,GY-140,12,140);ctx.fillStyle='#c0b6d6';ctx.fillRect(x+2,GY-140,4,140);ctx.fillStyle='#ffd23f';ctx.fillRect(x-8,GY-142,16,4);}
+    const kx=Math.round(560-cx*0.9+VW*0.4);if(kx<VW+80)cineKing(kx,GY-56,6,t);aFisher(60,GY,2,1,t<3?t:0);},
+  rcu:t=>closeUp(t,()=>cStage('palace',520),(x,y,tt)=>{cineKing(x-10,y-60,6,tt);const gl=twk(tt,0.5,0.8);if(gl>0&&gl<1){ctx.fillStyle='#ffffff';const s2=Math.round(Math.sin(gl*Math.PI)*6);ctx.fillRect(x+2-s2,y-100,s2*2,1);ctx.fillRect(x+2,y-100-s2,1,s2*2);}},'R'),
+  vs:(t,s)=>vsCard(t,s.vs)
+});
+const fcu=(bg,l,np)=>({sc:'fcu',bg,who:PECHEUR,l,np});
+const VS=(name,sub,draw,col,col2,nc)=>({sc:'vs',dur:2.2,vs:{name,sub,draw,col,col2,nc}});
+Object.assign(CINE,{
+  b_octo:[
+    {sc:'o1',who:PECHEUR,l:LG('Une plage sans un seul dauphin... C\'est louche.','A beach without a single dolphin... That\'s fishy.')},
+    {sc:'o2',who:bossSpk('POULPE GÉANT','GIANT OCTOPUS','#c9a0ff'),l:LG('Louche ? Non. POULPE.','Fishy? No. OCTOPUS.')},
+    {sc:'ocu',who:bossSpk('POULPE GÉANT','GIANT OCTOPUS','#c9a0ff'),l:LG('Les dauphins m\'ont nommé gardien de la plage. J\'ai même un badge. Il est en or. Enfin, en chocolat.','The dolphins made me guardian of the beach. I even got a badge. It\'s gold. Well, chocolate.')},
+    fcu('beach',LG('Un poulpe avec un badge en chocolat... J\'aurai vraiment tout vu.','An octopus with a chocolate badge... Now I\'ve seen everything.')),
+    {sc:'ocu',who:bossSpk('POULPE GÉANT','GIANT OCTOPUS','#c9a0ff'),l:LG('Huit bras, huit claques. Et je ne compte pas la neuvième, je la donne gratuitement.','Eight arms, eight slaps. And the ninth one is free.')},
+    VS(LG('POULPE GÉANT','GIANT OCTOPUS'),LG('GARDIEN DE LA PLAGE','BEACH GUARDIAN'),(x,y)=>aImg(OCTO_N,x,y+20,0.9,-1),'#3d2268','#7b4fb8','#c9a0ff')],
+  b_castle:[
+    {sc:'c1',who:PECHEUR,l:LG('Tiens, un château de sable. Je vais juste passer à côté, discrètement.','Oh, a sandcastle. I\'ll just walk past it, quietly.')},
+    {sc:'ccu',who:bossSpk('CHÂTEAU DE SABLE','SANDCASTLE','#e4c882'),l:LG('PERSONNE ne passe à côté du Château. Règlement des dauphins, article 1.','NOBODY walks past the Castle. Dolphin regulations, article 1.')},
+    fcu('beach',LG('Et l\'article 2 ?','And article 2?')),
+    {sc:'ccu',who:bossSpk('CHÂTEAU DE SABLE','SANDCASTLE','#e4c882'),l:LG('L\'article 2 dit... qu\'il est interdit de m\'arroser avec un seau d\'eau. Pourquoi tu demandes ?','Article 2 says... it\'s forbidden to splash me with a bucket of water. Why do you ask?')},
+    fcu('beach',LG('Pour rien. Pour rien du tout.','No reason. No reason at all.')),
+    VS(LG('CHÂTEAU DE SABLE','SANDCASTLE'),LG('IL A PEUR DE L\'EAU','AFRAID OF WATER'),(x,y)=>aImg(CASTLE,x,y,1,1),'#6e5026','#b8985a','#f6e2ac')],
+  b_witch:[
+    {sc:'w1',who:bossSpk('SORCIÈRE','WITCH','#9fe870'),l:LG('Un visiteur ! Tu tombes bien, il me manquait un ingrédient pour ma soupe : du pêcheur.','A visitor! Perfect timing, my soup was missing one ingredient: fisherman.')},
+    fcu('swamp',LG('Vous travaillez pour les dauphins, vous aussi ?','Are you working for the dolphins too?')),
+    {sc:'wcu',who:bossSpk('SORCIÈRE','WITCH','#9fe870'),l:LG('Ils paient en perles et ils m\'ont offert un chat. Personne ne m\'avait jamais offert de chat.','They pay in pearls and they gave me a cat. Nobody ever gave me a cat.')},
+    {sc:'catcu',who:bossSpk('LE CHAT','THE CAT','#ffb347'),l:LG('...Miaou. (Je suis là contre mon gré.)','...Meow. (I\'m here against my will.)')},
+    VS(LG('SORCIÈRE','WITCH'),LG('ET SON CHAT','AND HER CAT'),(x,y)=>{aImg(WITCH,x+10,y+20,0.6,-1);aImg(CAT,x-40,y,1.6,-1);},'#1e3a1a','#4d3880','#9fe870')],
+  b_eskimo:[
+    {sc:'e1',who:bossSpk('ESQUIMAU','ESKIMO','#bfe9ff'),l:LG('Halte, pêcheur ! Le froid est au service des dauphins !','Halt, fisherman! The cold serves the dolphins!')},
+    fcu('ice',LG('Le froid n\'est au service de personne, c\'est la météo.','The cold doesn\'t serve anyone, it\'s the weather.')),
+    {sc:'ecu',who:bossSpk('ESQUIMAU','ESKIMO','#bfe9ff'),l:LG('Ce sceptre de glace dit le contraire. Les dauphins me l\'ont prêté. Sans caution, en plus.','This ice scepter says otherwise. The dolphins lent it to me. No deposit, even.')},
+    fcu('ice',LG('Alors je vais te le rendre... en morceaux.','Then I\'ll give it back... in pieces.')),
+    VS(LG('ESQUIMAU','ESKIMO'),LG('MAÎTRE DU GIVRE (PRÊTÉ)','MASTER OF FROST (ON LOAN)'),(x,y)=>aImg(ESKIMO,x,y,1.6,-1),'#143a5a','#5ec8f0','#bfe9ff')],
+  b_king2:[
+    {sc:'k1',who:NARR,l:LG('Il y a longtemps, le pêcheur avait un meilleur ami : Cacamille. Tous les dimanches, ils pêchaient ensemble au bout du ponton.','Long ago, the fisherman had a best friend: Cacamille. Every Sunday they fished together at the end of the jetty.')},
+    {sc:'k2',who:bossSpk('CACAMILLE (PETIT)','CACAMILLE (YOUNG)','#e8c8ff'),l:LG('Un jour je serai roi ! Et je te construirai le plus beau ponton du royaume !','One day I\'ll be king! And I\'ll build you the finest jetty in the kingdom!')},
+    {sc:'k2',who:PECHEUR,l:LG('Et moi je pêcherai le plus gros poisson du monde ! Promis : jamais d\'alliance avec les dauphins !','And I\'ll catch the biggest fish in the world! Promise: never side with the dolphins!')},
+    {sc:'k3',iris:true,who:PECHEUR,l:LG('...Cacamille ? C\'est toi, sur ce trône ?','...Cacamille? Is that you on that throne?')},
+    {sc:'kcu',who:bossSpk('ROI CACAMILLE 2','KING CACAMILLE 2','#ff6a8a'),l:LG('Cacamille DEUX. Le premier était trop gentil. Les dauphins m\'ont offert une couronne, une tour... et des gardes en armure.','Cacamille THE SECOND. The first one was too nice. The dolphins gave me a crown, a tower... and armored guards.')},
+    {sc:'kfcu',who:PECHEUR,l:LG('Ils t\'ont acheté avec une tour ?! Et notre promesse du ponton ?','They bought you with a tower?! What about our jetty promise?')},
+    {sc:'kcu',who:bossSpk('ROI CACAMILLE 2','KING CACAMILLE 2','#ff6a8a'),l:LG('Les promesses de ponton, ça prend l\'eau, mon vieux. Maintenant, je lance des... choses marron. Tu vas voir.','Jetty promises leak, old pal. Now I throw... brown things. You\'ll see.')},
+    {sc:'kfcu',who:PECHEUR,l:LG('Alors je vais te ramener à la raison. À coups de canne, s\'il le faut.','Then I\'ll bring you back to your senses. With my rod if I have to.')},
+    VS(LG('ROI CACAMILLE 2','KING CACAMILLE 2'),LG('ANCIEN MEILLEUR AMI','FORMER BEST FRIEND'),(x,y,t)=>{aura(x,y-60,30,'#b01c4a',t);aImg(CACA_C,x,y,2.8,-1);},'#2a1040','#b01c4a','#ff6a8a')],
+  k2_end:[
+    {sc:'kend',who:bossSpk('CACAMILLE','CACAMILLE','#e8c8ff'),l:LG('Pêcheur... Ma tête... Les dauphins m\'avaient ensorcelé avec leur couronne. Pardon, vieux frère.','Fisherman... My head... The dolphins had bewitched me with their crown. Sorry, old pal.')},
+    {sc:'kend',who:PECHEUR,l:LG('Tu me dois un ponton. Le plus beau du royaume.','You owe me a jetty. The finest in the kingdom.')},
+    {sc:'kend',who:bossSpk('CACAMILLE','CACAMILLE','#e8c8ff'),l:LG('Promis. Le vrai roi est un dauphin : il vit au-dessus des nuages. Passe par ma fenêtre. Et... bonne pêche.','Promise. The real king is a dolphin: he lives above the clouds. Go through my window. And... good fishing.')}],
+  b_cloud:[
+    {sc:'n1',who:bossSpk('DAUPHIN DES NUAGES','CLOUD DOLPHIN','#ffffff'),l:LG('Tiens tiens, un pêcheur à trois mille mètres. Tu t\'es perdu ?','Well well, a fisherman at ten thousand feet. Lost?')},
+    fcu('cloud',LG('Non. J\'ai perdu mon pantalon, puis je l\'ai retrouvé. Maintenant je cherche ton roi.','No. I lost my pants, then found them. Now I\'m looking for your king.')),
+    {sc:'ncu',who:bossSpk('DAUPHIN DES NUAGES','CLOUD DOLPHIN','#ffffff'),l:LG('Le roi ne reçoit pas les gens qui tombent. Et toi, tu vas tomber de très haut.','The king doesn\'t see people who fall. And you\'re about to fall a long way.')},
+    VS(LG('DAUPHIN DES NUAGES','CLOUD DOLPHIN'),LG('GARDIEN DU CIEL','SKY GUARDIAN'),(x,y)=>cineDolph(x,y-40,5,0,DOLP_I),'#1a3a6a','#7fc4ff','#ffffff')],
+  b_meca:[
+    {sc:'m1',who:bossSpk('MÉCA-DAUPHIN','MECHA-DOLPHIN','#ff5a3a'),l:LG('BIP. INTRUS DÉTECTÉ. PANTALON : CONFIRMÉ. PROTOCOLE D\'ÉLIMINATION ACTIVÉ.','BEEP. INTRUDER DETECTED. PANTS: CONFIRMED. ELIMINATION PROTOCOL ON.')},
+    fcu('metal',LG('Ils ont même des robots ?! Bon. Tu as un bouton « éteindre », j\'imagine ?','They even have robots?! Fine. I suppose you have an off button?')),
+    {sc:'mcu',who:bossSpk('MÉCA-DAUPHIN','MECHA-DOLPHIN','#ff5a3a'),l:LG('MODÈLE D-6000. MÉCHANCETÉ : 100 %. GARANTIE : 2 ANS. BOUTON « ÉTEINDRE » : DANS LE DOS. NE REGARDE PAS.','MODEL D-6000. EVIL: 100%. WARRANTY: 2 YEARS. OFF BUTTON: ON MY BACK. DON\'T LOOK.')},
+    VS(LG('MÉCA-DAUPHIN','MECHA-DOLPHIN'),LG('MODÈLE D-6000','MODEL D-6000'),(x,y)=>aImg(MECA_SPR,x,y-30,1.5,-1),'#232836','#6e7a90','#d0d8e6')],
+  b_roi:[
+    {sc:'r1',who:NARR,l:LG('Au bout de la Cité des dauphins se dressait le palais. Et sur le trône...','At the end of the Dolphin City stood the palace. And on the throne...')},
+    {sc:'rcu',who:ROI,l:LG('Alors c\'est toi, le pêcheur qui a traversé mon royaume. En caleçon, au début, il paraît.','So you\'re the fisherman who crossed my kingdom. In boxers at first, I hear.')},
+    fcu('palace',LG('Rends le monde, gros poisson.','Give the world back, you big fish.')),
+    {sc:'rcu',who:ROI,l:LG('Poisson ?! Je suis un MAMMIFÈRE ! J\'ai des poumons ! Et une couronne ! GARDES !','Fish?! I\'m a MAMMAL! I have lungs! And a crown! GUARDS!')},
+    fcu('palace',LG('Le dernier dauphin qui m\'a parlé comme ça a fini en tartine.','The last dolphin who talked to me like that ended up on toast.')),
+    VS(LG('ROI DES DAUPHINS','DOLPHIN KING'),LG('BOSS FINAL','FINAL BOSS'),(x,y,t)=>cineKing(x,y-50,5,t),'#14305a','#3b9bff','#ffd23f')]
+});
 
 const CLOUDB_HP=900;
 let cloudB=null,cloudBalls=[],cloudDone=false;
