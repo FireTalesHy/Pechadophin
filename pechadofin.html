@@ -896,17 +896,18 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #mode .mode-card:active:not(.lock){transform:translateY(3px);box-shadow:0 1px 0 #14182c}
 /* réglages : lignes + interrupteur pour le son */
 #set .sbtn,#set #rng-link{text-align:left;padding:13px 14px;font-size:9px;border-radius:12px}
-#set-sound{position:relative;background:linear-gradient(180deg,var(--x4-card),var(--x4-card2));color:var(--x4-ink);border:2px solid var(--x4-line);box-shadow:0 3px 0 var(--x4-shadow)}
-#set-sound::after{content:"";position:absolute;right:12px;top:50%;width:38px;height:20px;margin-top:-10px;border-radius:999px;border:2px solid #14182c;background:#9aa3b5;box-shadow:inset 0 2px 0 rgba(0,0,0,.2);transition:background .15s ease}
-#set-sound::before{content:"";position:absolute;right:30px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;border:2px solid #14182c;z-index:1;transition:right .15s ease}
-#set-sound[aria-pressed="true"]::after{background:#2fd06a}
-#set-sound[aria-pressed="true"]::before{right:16px}
+#set-sound,#set-music,#set-vib,#set-auto{position:relative;background:linear-gradient(180deg,var(--x4-card),var(--x4-card2));color:var(--x4-ink);border:2px solid var(--x4-line);box-shadow:0 3px 0 var(--x4-shadow)}
+#set-sound::after,#set-music::after,#set-vib::after,#set-auto::after{content:"";position:absolute;right:12px;top:50%;width:38px;height:20px;margin-top:-10px;border-radius:999px;border:2px solid #14182c;background:#9aa3b5;box-shadow:inset 0 2px 0 rgba(0,0,0,.2);transition:background .15s ease}
+#set-sound::before,#set-music::before,#set-vib::before,#set-auto::before{content:"";position:absolute;right:30px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;border:2px solid #14182c;z-index:1;transition:right .15s ease}
+#set-sound[aria-pressed="true"]::after,#set-music[aria-pressed="true"]::after,#set-vib[aria-pressed="true"]::after,#set-auto[aria-pressed="true"]::after{background:#2fd06a}
+#set-sound[aria-pressed="true"]::before,#set-music[aria-pressed="true"]::before,#set-vib[aria-pressed="true"]::before,#set-auto[aria-pressed="true"]::before{right:16px}
 #set label.shop-note{color:var(--x4-ink);margin-top:2px}
-#set-joy{accent-color:#12a5a8 !important;height:22px}
+#set-joy,#set-vol,#set-shake{accent-color:#12a5a8 !important;height:22px}
 #rng-link{background:linear-gradient(#b878ff,#7a2fd8);color:#fff;border:2px solid #14182c;box-shadow:0 3px 0 #14182c,inset 0 1px 0 rgba(255,255,255,.4);text-shadow:0 1px 0 rgba(0,0,0,.45)}
 #rst-btn{align-self:stretch;background:transparent !important;color:#d92b3d !important;border:2px dashed #d92b3d !important;box-shadow:none !important;font-size:8px;padding:10px}
 #set #ov-hint{background:var(--x4-well);border-radius:12px;padding:10px 12px}
 #set .credits{background:none;color:var(--x4-muted);opacity:1;font:400 8px/1.9 var(--pf);text-align:center}
+#set .shop-panel{max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);overflow-y:auto;overscroll-behavior:contain}   /* réglages : le panneau défile sur les petits écrans */
 /* remise à zéro : fenêtre de danger */
 #rst .shop-note{color:var(--x4-ink)}
 #rst #rst-no{background:linear-gradient(var(--x4-card),var(--x4-card2));color:var(--x4-ink);border:3px solid #14182c;box-shadow:0 4px 0 #14182c}
@@ -948,7 +949,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
       <div class="ov-center">
         <button id="ov-btn" type="button"><canvas id="ov-char" width="16" height="16" aria-hidden="true"></canvas><span id="ov-label">APPUIE POUR JOUER</span></button>
         <div id="ov-stats" hidden>
-          <div id="st-score"></div><div id="st-best"></div><div id="st-gold"></div><div id="st-souls"></div><div id="st-rec"></div><div id="st-lb"></div>
+          <div id="st-score"></div><div id="st-best"></div><div id="st-kills"></div><div id="st-gain"></div><div id="st-run"></div><div id="st-gold"></div><div id="st-souls"></div><div id="st-rec"></div><div id="st-lb"></div>
         </div>
       </div>
       <div class="ov-bot">
@@ -1066,6 +1067,15 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <button class="sbtn" id="set-sound" type="button">SON : OUI</button>
     <label class="shop-note" for="set-joy" id="set-joy-l" style="opacity:1">TAILLE DES JOYSTICKS : 100 %</label>
     <input type="range" id="set-joy" min="60" max="160" step="10" value="100" style="width:100%;accent-color:#ff8a3d">
+    <label class="shop-note" for="set-vol" id="set-vol-l" style="opacity:1">VOLUME : 100 %</label>
+    <input type="range" id="set-vol" min="0" max="100" step="10" value="100" style="width:100%;accent-color:#ff8a3d">
+    <label class="shop-note" for="set-shake" id="set-shake-l" style="opacity:1">TREMBLEMENTS : 100 %</label>
+    <input type="range" id="set-shake" min="0" max="100" step="10" value="100" style="width:100%;accent-color:#ff8a3d">
+    <button class="sbtn" id="set-music" type="button">MUSIQUE : OUI</button>
+    <button class="sbtn" id="set-vib" type="button">VIBRATION : OUI</button>
+    <button class="sbtn" id="set-auto" type="button">TIR AUTO : NON</button>
+    <p class="shop-note">TIR AUTO : un appui sur PÊCHE (ou F) maintient le tir, un second appui l'arrête.</p>
+    <p class="shop-note">MANETTE : stick gauche ou croix pour bouger, A pour sauter, X, RT ou RB pour tirer, stick droit pour viser, Start pour la pause.</p>
     <p class="shop-note" id="ov-hint">Clavier : Q/D ou ←/→ pour bouger, Z/↑/Espace pour sauter, Souris pour viser, Clic gauche ou F pour pêcher, Échap ou P pour la pause. Tablette : joystick de gauche pour te déplacer, joystick de droite pour la caméra et la visée (avec aide à la visée).</p>
     <a class="sbtn" id="rng-link" href="https://rng-infinite.com/?ref=pechadophin" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">JOUE AUSSI À RNG∞</a>
     <button class="go alt sm" id="rst-btn" type="button">RÉINITIALISER LA SAVE</button>
@@ -1128,6 +1138,9 @@ const LANG_KEY='canne-dauphins-langue';
 let lang='fr';
 try{const sv=localStorage.getItem(LANG_KEY);lang=sv==='en'||sv==='fr'?sv:((navigator.language||'fr').toLowerCase().startsWith('fr')?'fr':'en');}catch(e){}
 const EN={
+'MANETTE : stick gauche ou croix pour bouger, A pour sauter, X, RT ou RB pour tirer, stick droit pour viser, Start pour la pause.':'GAMEPAD: left stick or d-pad to move, A to jump, X, RT or RB to fire, right stick to aim, Start to pause.',
+'MUSIQUE : OUI':'MUSIC: ON','MUSIQUE : NON':'MUSIC: OFF',
+'VIBRATION : OUI':'VIBRATION: ON','VIBRATION : NON':'VIBRATION: OFF','TIR AUTO : OUI':'AUTO-FIRE: ON','TIR AUTO : NON':'AUTO-FIRE: OFF','TIR AUTO : un appui sur PÊCHE (ou F) maintient le tir, un second appui l\'arrête.':'AUTO-FIRE: one press on FISH (or F) keeps firing, a second press stops it.',
 'Vaincs le Roi des dauphins dans son palais, au bout de la Cité des dauphins.':'Defeat the Dolphin King in his palace, at the end of the Dolphin City.',
 'Trident royal':'Royal trident','Le trident doré du Roi des dauphins. Plus puissant que le trident infernal : il transperce encore plus d\'ennemis et fait jaillir un geyser doré à chaque coup. Partage les améliorations du trident. Laissé par le Roi des dauphins.':'The Dolphin King\'s golden trident. Stronger than the infernal trident: it pierces even more enemies and makes a golden geyser burst on every hit. Shares the trident upgrades. Dropped by the Dolphin King.','TRÉSORS CACHÉS':'HIDDEN TREASURES','★ CHECKPOINT : LA CITÉ DES DAUPHINS ★':'★ CHECKPOINT: THE DOLPHIN CITY ★',
 'MARCHAND (E)':'MERCHANT (E)','MISSIONS':'MISSIONS','Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.':'Cast your rod at the dolphins, chain combos and avoid the pits.',
@@ -1177,6 +1190,8 @@ const EN={
 'TOUT RÉCUPÉRER':'CLAIM ALL','Licorne':'Unicorn','Citrouille':'Pumpkin','Champignon':'Mushroom','Boule disco':'Disco ball','Dragon':'Dragon','Alien':'Alien','Cornet de glace':'Ice cream cone','Sirène':'Mermaid','Goule':'Ghoul','Humain':'Human','Katana':'Katana','Tentacules':'Tentacles','Des tentacules sortent de ton dos et fouettent tout ce qui se trouve dans la direction visée. Sur le sol ou une plateforme, elles s\'accrochent et te tirent jusqu\'au point d\'accroche (saute pour te décrocher). Arbre de compétences : dégâts, allonge, vitesse et nombre de tentacules. S\'achète avec des âmes rouges.':'Tentacles sprout from your back and lash everything in the direction you aim. On the ground or a platform, they hook on and pull you to the anchor point (jump to let go). Skill tree: damage, reach, speed and number of tentacles. Bought with red souls.','Plus de tentacules frappent d\'un coup, en éventail.':'More tentacles strike at once, in a fan.','TENTACULES REQUISES':'TENTACLES REQUIRED','Boomerang':'Boomerang','Un sabre qui tranche en arc devant toi. Enchaîne 3 coups : le 3e est une grande taille bien plus puissante. Arbre de compétences : dégâts, allonge, vitesse et grande taille. S\'achète avec des âmes rouges.':'A sword that slashes in an arc in front of you. Chain 3 hits: the 3rd is a much stronger big slash. Skill tree: damage, reach, speed and big slash. Bought with red souls.','Lancé droit devant, il blesse tout sur son passage, puis revient vers toi en touchant les ennemis une seconde fois. Arbre de compétences : dégâts, portée, relance et multi-boomerang. S\'achète avec de l\'or.':'Thrown straight ahead, it hurts everything in its path, then comes back to you, hitting enemies a second time. Skill tree: damage, range, re-throw and multi-boomerang. Bought with gold.','Allonge':'Reach','Vitesse de coup':'Slash speed','Grande taille':'Big slash','Relance':'Re-throw','Multi-boomerang':'Multi-boomerang','KATANA REQUIS':'KATANA REQUIRED','BOOMERANG REQUIS':'BOOMERANG REQUIRED'
 };
 const EN_RULES=[
+ [/^ENNEMIS BATTUS : (\d+)$/,m=>'ENEMIES DEFEATED: '+m[1]],[/^GAINS : \+(\d+) OR, \+(\d+) ÂMES$/,m=>'GAINS: +'+m[1]+' GOLD, +'+m[2]+' SOULS'],[/^BOSS VAINCUS : (\d+) · TEMPS : (.+)$/,m=>'BOSSES DEFEATED: '+m[1]+' · TIME: '+m[2]],
+ [/^VOLUME : (\d+) %$/,m=>'VOLUME: '+m[1]+'%'],[/^TREMBLEMENTS : (\d+) %$/,m=>'SCREEN SHAKE: '+m[1]+'%'],
   [/^TRÉSORS (\d)\/6$/,m=>'TREASURES '+m[1]+'/6'],
   [/^TOUS LES COMPTES CONNECTÉS AU JEU \((\d+)\)$/,m=>'ALL ACCOUNTS SIGNED IN TO THE GAME ('+m[1]+')'],
   [/^Première visite : (.+)$/,m=>'First visit: '+m[1]],
@@ -2480,7 +2495,7 @@ const PLANK=(()=>{
 
 /* ================= État ================= */
 let state='title';  // title | play | dying | over
-let score=0,lives=3,kills=0,best=0,newRecord=false;
+let score=0,lives=3,kills=0,best=0,newRecord=false,runG0=0,runS0=0,runBoss=0,runT0=0;   // bilan de la partie
 let enemies=[],pickups=[],parts=[],texts=[],worldPearls=[],boss=null,bossShots=[],soulFx=[],bossDone=new Set(),bossWins=0,octo=null,tents=[],jelly=null,jellySpawned=false,castle=null,anaLock=0,lockMsgT=0,octoRun=false,castleRun=false;   // classique : poulpe et château une seule fois par partie (quel que soit le côté)
 /* Mode anarchie (menu dev) : les boss reviennent selon leur distance, partout (plage ou non), PV x1,5 à chaque rencontre de la run.
    anarchyWant = choix du menu (sauvegardé) ; anarchyOn = actif pour la run en cours (pris en compte au lancement de la partie, car il change la génération des arènes). */
@@ -2698,6 +2713,7 @@ let shop=loadShop();
 /* Les âmes rouges ne sont données qu'à la première mort de chaque boss (ensuite : de l'or seulement) */
 function soulReward(key,n){
   if(speedOn&&lives<10){lives++;floatText(player.x+5,player.y-18,lives>5?'+1 CŒUR DORÉ':'+1 VIE','#ffd23f');try{sfx.heal();}catch(e){}}   // speedrun : chaque boss vaincu donne un cœur (doré dès que les rouges sont pleins)
+  runBoss++;buzz([80,40,160]);
   if(shop.bossSouls[key])return false;
   shop.bossSouls[key]=true;shop.souls+=n;return true;
 }
@@ -2705,6 +2721,26 @@ function saveShop(){if(speedOn||pvp&&pvp.backup)return;try{localStorage.setItem(
 const maxLives=()=>pvp&&pvp.on?PVP_HP:speedOn?10:SOUL_UP.hp.vals[shop.hp];   // speedrun : 10 cœurs, les 5 derniers (à droite) sont dorés et partent en premier
 const curSkin=()=>SKINS.find(x=>x.id===shop.equipped)||SKINS[0];
 
+/* ================= Préférences (réglages) ================= */
+const PREF_KEY='pechadophin-prefs';
+const prefs={vol:100,shake:100,vib:true,auto:false,music:true};
+try{const o=JSON.parse(localStorage.getItem(PREF_KEY)||'{}');if(o&&typeof o==='object'){if(Number.isFinite(o.vol))prefs.vol=Math.max(0,Math.min(100,o.vol));if(Number.isFinite(o.shake))prefs.shake=Math.max(0,Math.min(100,o.shake));if(typeof o.vib==='boolean')prefs.vib=o.vib;if(typeof o.auto==='boolean')prefs.auto=o.auto;if(typeof o.music==='boolean')prefs.music=o.music;}}catch(e){}
+const savePrefs=()=>{try{localStorage.setItem(PREF_KEY,JSON.stringify(prefs));}catch(e){}};
+function buzz(p){if(prefs.vib&&navigator.vibrate){try{navigator.vibrate(p);}catch(e){}}}   // vibration (téléphone) : dégâts, mort, boss vaincu
+/* ================= Indices : la première fois qu'on rencontre une mécanique de monde ================= */
+let hintB=null;
+function hintOnce(bit,fr,en){
+  if(cine||tuto||(shop.hints|0)&bit)return;
+  shop.hints=(shop.hints|0)|bit;saveShop();hintB={s:lang==='en'?en:fr,t0:performance.now()};
+}
+function drawHint(){
+  if(!hintB)return;const age=(performance.now()-hintB.t0)/1000;if(age>4.5){hintB=null;return;}
+  const a=Math.min(1,age*4,(4.5-age)*3);ctx.save();ctx.globalAlpha=a;
+  ctx.font='8px "Press Start 2P",monospace';ctx.textBaseline='middle';ctx.textAlign='center';
+  const w=Math.min(VW-12,ctx.measureText(hintB.s).width+16),x=(VW-w)/2,y=28;
+  ctx.fillStyle='rgba(8,14,30,.82)';ctx.fillRect(x,y,w,16);ctx.fillStyle='#ffd23f';ctx.fillRect(x,y,w,1);ctx.fillRect(x,y+15,w,1);
+  ctx.fillStyle='#fff';ctx.fillText(hintB.s,VW/2,y+8,w-8);ctx.restore();
+}
 /* ================= Audio ================= */
 let actx=null;
 function ensureAudio(){
@@ -2716,7 +2752,7 @@ function tone(f1,f2,dur,type,vol){
   try{
     const t=actx.currentTime,o=actx.createOscillator(),g=actx.createGain();
     o.type=type||'square';o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(Math.max(1,f2),t+dur);
-    g.gain.setValueAtTime(vol||0.04,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    g.gain.setValueAtTime(Math.max(0.0002,(vol||0.04)*prefs.vol/100),t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+dur+0.02);
   }catch(e){}
 }
@@ -2764,7 +2800,15 @@ function moveY(e,dy){
     if(e===player)for(const m of movers){if(e.x+e.w>m.x&&e.x<m.x+m.w&&prevBottom<=m.y+3&&e.y+e.h>=m.y){e.y=m.y-e.h;e.vy=0;e.onGround=true;return;}}   // nuages mobiles
   } else {
     const r1=Math.floor((prevTop-0.001)/T),r0=Math.floor(e.y/T);
-    for(let ty=r1;ty>=r0;ty--)for(let tx=tx0;tx<=tx1;tx++) if(solidTile(tx,ty)){e.y=(ty+1)*T;e.vy=0;return;}
+    for(let ty=r1;ty>=r0;ty--)for(let tx=tx0;tx<=tx1;tx++) if(solidTile(tx,ty)){
+      if(e===player&&e.vy<-60){   // correction de coin : si on ne touche l'angle que de quelques pixels, on glisse à côté au lieu de buter
+        for(const sx of [1,-1,2,-2,3,-3,4,-4]){
+          const a0=Math.floor((e.x+sx)/T),a1=Math.floor((e.x+sx+e.w-0.01)/T),b0=Math.floor(e.y/T),b1=Math.floor((e.y+e.h-0.01)/T);
+          let free=true;for(let yy=b0;yy<=b1&&free;yy++)for(let xx=a0;xx<=a1;xx++)if(solidTile(xx,yy)){free=false;break;}
+          if(free){e.x+=sx;return;}
+        }
+      }
+      e.y=(ty+1)*T;e.vy=0;return;}
   }
 }
 
@@ -2832,7 +2876,7 @@ function hitEnemy(e,dmg){
   combo.n++; combo.t=COMBO_TIME;
   const mult=Math.min(combo.n,10), pts=100*mult*removed;
   score+=pts;
-  floatText(e.x+e.w/2,e.y-4,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  floatText(e.x+e.w/2,e.y-4,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');floatText(e.x+e.w/2-9,e.y+e.h/2,'-'+removed,'#ff9a9a');   // chiffre de dégâts
   vfx('hit',e.x+e.w/2,e.y+e.h/2,{flip:player.x+5>e.x+e.w/2});burst(e.x+e.w/2,e.y+e.h/2,'#9fd8ff',3);
   if(e.hp<=0){
     vfx('kill',e.x+e.w/2,e.y+e.h);if(mult>=5)vfx('coins',e.x+e.w/2,e.y+e.h/2+10);
@@ -2858,7 +2902,7 @@ function hitEnemy(e,dmg){
 function hurtPlayer(srcX){
   if(godMode)return;
   const p=player;
-  lives--; shake=0.25; sfx.hurt();
+  lives--; shake=0.25; sfx.hurt();buzz(60);
   p.invuln=1.6;p.stun=0.28;
   p.vx=(p.x+p.w/2<srcX?-1:1)*150;p.vy=-200;p.onGround=false;
   vfx('hurt',p.x+5,p.y+10,{flip:p.vx<0});burst(p.x+5,p.y+7,'#ff5a5a',3);
@@ -2866,6 +2910,7 @@ function hurtPlayer(srcX){
   if(lives<=0) die();
 }
 function die(){
+  buzz([120,60,220]);
   lives=0; state='dying'; dyingT=0;
   if(shop.equipped===RNG_SKIN.id)rngLaser(player.x+5,player.y+6,-Math.PI/2,0);   // skin RNG∞ : un laser doré part vers le ciel à la mort
   player.vy=-280; player.vx=0; hooks=[]; tridents=[];
@@ -2908,7 +2953,8 @@ function stepPlayer(dt){
   if(jumpBuf>0&&p.coyote>0&&p.stun<=0){p.vy=-JUMPV*wm.jump*tjm*(shop.weapon==='dagger'&&!glockOn?Math.sqrt(dagV('jump')):1);p.onGround=false;p.coyote=0;jumpBuf=0;sfx.jump();
     if(tjm>1){teJump={x:p.x+5,gy:p.y+p.h,t:0};burst(p.x+5,p.y+p.h,'#c9b48a',6,70);}}
   if(!inp.jump&&p.vy<-140*tjm&&p.stun<=0&&!p.boost&&!p.spring)p.vy=-140*tjm;
-  p.vy=Math.min(p.vy+GRAV*dt,MAXFALL);
+  const apexHang=!p.onGround&&inp.jump&&Math.abs(p.vy)<70&&p.stun<=0&&!p.boost&&!p.spring;   // suspension au sommet du saut : gravité réduite quand on tient SAUT
+  p.vy=Math.min(p.vy+GRAV*(apexHang?0.55:1)*dt,MAXFALL);
   {
     const vx0=p.vx,x0=p.x,y0=p.y;
     if(moveX(p,vx0*dt)&&p.onGround&&p.stun<=0&&d!==0&&column(Math.floor((x0+5)/T)).beach){   // plage : on monte seul les marches d'une case (rampes des tunnels)
@@ -3962,7 +4008,7 @@ function hitBoss(b,dmg){
   combo.n++;combo.t=COMBO_TIME;
   const mult=Math.min(combo.n,10),pts=100*mult*removed;
   score+=pts;
-  floatText(b.x+b.w/2,b.y-10,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');
+  floatText(b.x+b.w/2,b.y-10,'+'+pts,mult>=5?'#ff8a3d':'#ffe14d');floatText(b.x+b.w/2-12+(Math.random()-0.5)*14,b.y+b.h/2,'-'+Math.round(removed),'#ff9a9a');
   vfx('hit',b.x+b.w/2,b.y+b.h/2,{flip:player.x+5>b.x+b.w/2});burst(b.x+b.w/2,b.y+b.h/2,'#ff4a3a',4,100);
   if(b.hp<=0)killBoss(b);else sfx.hit();
 }
@@ -4970,7 +5016,7 @@ function drawTwHaz(){
 function renderTw(){
   const cx=TWC*T,cy=Math.round(cam.y);
   ctx.fillStyle='#000000';ctx.fillRect(0,0,VW,VH);
-  let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
+  let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10*prefs.shake/100);sy=Math.round((Math.random()*2-1)*shake*10*prefs.shake/100);}
   ctx.save();ctx.translate(-cx+sx,-cy+sy);
   drawTwBg(cy);drawTwTiles(cy);drawTwHaz();drawScepterFx();
   for(const e of enemies){
@@ -6088,18 +6134,23 @@ function worldMods(p){   // vitesse, saut et poussée selon le sol sous les pied
 function stepWorldMech(dt){
   if(state!=='play'||anarchyOn)return;
   const p=player,tx=Math.floor((p.x+5)/T),w=worldOf(tx),busy=octo||castle||witch||eskimo||cloudB||mecaB||kingD||king||boss;
+  {const c0=column(tx);
+   if(p.onGround&&mudAt(tx))hintOnce(1,'Boue : tu ralentis et sautes moins haut.','Mud: you slow down and jump lower.');
+   if(c0.beach&&p.y+p.h>tideY()+4)hintOnce(2,'La marée monte : l\'eau te ralentit.','The tide is in: water slows you down.');
+   if(p.onGround&&convAt(tx))hintOnce(4,'Tapis roulant : il te pousse.','Conveyor belt: it pushes you.');
+   for(let k=tx-4;k<=tx+4;k++){if(laserAt(k))hintOnce(8,'Lasers : passe quand ils sont éteints.','Lasers: cross while they are off.');if(vineAt(k))hintOnce(16,'Liane : tiens SAUT pour grimper.','Vine: hold JUMP to climb.');}}
   // rafales dans les plaines
   if(gust.t>0){gust.t+=dt;if(gust.t>=gust.dur)gust.t=0;}
-  else if(w===1&&!busy){gust.next-=dt;if(gust.next<=0){gust={t:0.001,dur:2.6,dir:Math.random()<0.5?-1:1,next:9+Math.random()*6};floatText(p.x+5,p.y-22,lang==='en'?'GUST!':'RAFALE !','#dfe8f0');}}
+  else if(w===1&&!busy){gust.next-=dt;if(gust.next<=0){gust={t:0.001,dur:2.6,dir:Math.random()<0.5?-1:1,next:9+Math.random()*6};floatText(p.x+5,p.y-22,lang==='en'?'GUST!':'RAFALE !','#dfe8f0');hintOnce(32,'Rafales de vent : elles te poussent !','Gusts of wind push you around!');}}
   // lianes des marécages : on grimpe en tenant le saut, on glisse doucement sinon
   for(let k=tx-1;k<=tx+1;k++)if(vineAt(k)){const c=column(k),vx=k*T+8,top=(c.g-9)*T;
     if(Math.abs(p.x+5-vx)<6&&p.y+p.h>top&&p.y<c.g*T){if(inp.jump){p.vy=-120;p.coyote=0.12;}else if(p.vy>50)p.vy=50;}}
   // nuages-trampolines
-  if(p.onGround&&bounceAt(tx)&&p.stun<=0){p.vy=-JUMPV*1.55;p.onGround=false;p.coyote=0;bounceT.set(tx,time);try{sfx.jump();}catch(e){}vfx('splashg',p.x+5,p.y+p.h,{tint:'#ffd0ec'});}
+  if(p.onGround&&bounceAt(tx)&&p.stun<=0){p.vy=-JUMPV*1.55;p.onGround=false;p.coyote=0;bounceT.set(tx,time);hintOnce(128,'Nuage-trampoline : un saut dessus te propulse !','Trampoline cloud: bounce high!');try{sfx.jump();}catch(e){}vfx('splashg',p.x+5,p.y+p.h,{tint:'#ffd0ec'});}
   // lasers de sécurité de la cité
   for(let k=tx-1;k<=tx+1;k++)if(laserAt(k)&&laserOn(k)){const c=column(k),lx=k*T+8;if(Math.abs(p.x+5-lx)<4&&p.y+p.h>(c.g-6)*T&&p.y<c.g*T)hurtP(lx);}
   // stalactites qui tombent dans la glacière
-  if(w===4&&!busy){stepWorldMech.ic=(stepWorldMech.ic||4)-dt;if(stepWorldMech.ic<=0){stepWorldMech.ic=3.5+Math.random()*3;icicles.push({x:p.x+5+p.vx*0.6+(Math.random()-0.5)*90,y:cam.y-8,vy:0,t:0,warn:0.8});}}
+  if(w===4&&!busy){stepWorldMech.ic=(stepWorldMech.ic||4)-dt;if(stepWorldMech.ic<=0){stepWorldMech.ic=3.5+Math.random()*3;icicles.push({x:p.x+5+p.vx*0.6+(Math.random()-0.5)*90,y:cam.y-8,vy:0,t:0,warn:0.8});hintOnce(64,'Stalactites : regarde l\'ombre au sol !','Icicles: watch the shadow on the ground!');}}
   for(const i of icicles){i.t+=dt;if(i.t<i.warn)continue;i.vy+=700*dt;i.y+=i.vy*dt;
     if(rectsOverlap(p.x+1,p.y+1,p.w-2,p.h-2,i.x-3,i.y-10,6,10)){i.dead=true;hurtP(i.x);vfx('frost',i.x,i.y);}
     else if(solidAt(i.x,i.y)||i.y>cam.y+VH+40){i.dead=true;vfx('frost',i.x,i.y);}}
@@ -7952,7 +8003,7 @@ function drawRzFade(){const t=rzTr.t,a=t<0.7?t/0.7:clamp(1-(t-0.9)/0.6,0,1);ctx.
 function renderRz(){
   const cx=Math.round(cam.x),cy=Math.round(cam.y);
   ctx.fillStyle='#000000';ctx.fillRect(0,0,VW,VH);
-  let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
+  let sx=0,sy=0;if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10*prefs.shake/100);sy=Math.round((Math.random()*2-1)*shake*10*prefs.shake/100);}
   if(pvpMapOn()){   // arène PvP : décor, tuiles, joueurs, puis les cachettes par-dessus
     drawPvpBg(cx,cy);
     ctx.save();ctx.translate(-cx+sx,-cy+sy);
@@ -7994,7 +8045,7 @@ function render(){
   if(skyCur[3]>0.005){ctx.fillStyle='rgba('+Math.round(skyCur[0])+','+Math.round(skyCur[1])+','+Math.round(skyCur[2])+','+skyCur[3].toFixed(3)+')';ctx.fillRect(0,0,VW,VH);}   // ciel d'anarchie
   if(octo){ctx.fillStyle=octo.rage?'rgba(110,10,25,'+(0.22+0.08*Math.sin(time*6)).toFixed(2)+')':'rgba(25,8,50,0.38)';ctx.fillRect(0,0,VW,VH);}
   let sx=0,sy=0;
-  if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10);sy=Math.round((Math.random()*2-1)*shake*10);}
+  if(shake>0){sx=Math.round((Math.random()*2-1)*shake*10*prefs.shake/100);sy=Math.round((Math.random()*2-1)*shake*10*prefs.shake/100);}
   ctx.save();ctx.translate(-cx+sx,-cy+sy);
   drawWater(cx,cy);
   drawOcto();
@@ -8106,6 +8157,7 @@ function startGame(){
 function startGameCore(){
   ensureAudio();let fromStart=false;
   resetWorld();
+  runG0=shop.gold;runS0=shop.souls;runBoss=0;runT0=performance.now();
   score=0;lives=maxLives();kills=0;combo.n=0;combo.t=0;newRecord=false;shake=0;
   if(rodLocked()&&shop.weapon==='rod'){shop.weapon='trident';saveShop();}   // la canne est indisponible une fois la plage atteinte
   if((shop.ice||shop.cloud)&&!anarchyOn){   // checkpoint de la glacière / du monde nuage : poulpe, château, méduse et sorcière derrière soi
@@ -8163,6 +8215,9 @@ function showOver(){
   ovText.hidden=true;ovStats.hidden=false;
   $('st-score').textContent='SCORE '+score;
   $('st-best').textContent='MEILLEUR SCORE '+best;
+  $('st-kills').textContent='ENNEMIS BATTUS : '+kills;
+  $('st-gain').textContent='GAINS : +'+Math.max(0,shop.gold-runG0)+' OR, +'+Math.max(0,shop.souls-runS0)+' ÂMES';
+  {const sec=Math.max(0,Math.round((performance.now()-runT0)/1000));$('st-run').textContent='BOSS VAINCUS : '+runBoss+' · TEMPS : '+Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');}
   $('st-gold').textContent='OR '+shop.gold;
   $('st-souls').textContent='ÂMES ROUGES '+shop.souls;
   $('st-rec').textContent=newRecord?'NOUVEAU RECORD !':'';
@@ -8223,13 +8278,76 @@ $('rst-yes').addEventListener('click',()=>{
 rstEl.addEventListener('pointerdown',e=>{if(e.target===rstEl)closeRst();});
 
 /* ================= Entrées ================= */
+let fireLatch=false;   // TIR AUTO : un appui sur PÊCHE maintient le tir, un 2e appui l'arrête
 function press(k){
-  if(paused||inp[k])return;
+  if(paused)return;
+  if(k==='fire'&&fireLatch&&inp.fire){fireLatch=false;inp.fire=false;return;}
+  if(inp[k])return;
   inp[k]=true;
+  if(k==='fire')fireLatch=prefs.auto&&!mouse.fire;
   if(k==='jump')jumpBuf=0.12;
   if(k==='fire')fireBuf=0.12;
 }
-function release(k){inp[k]=false;}
+function release(k){if(k==='fire'&&fireLatch)return;inp[k]=false;}
+/* Manette (Gamepad API) : stick gauche ou croix = déplacement, A = saut, X / RT / RB = tir, stick droit = visée, Start = pause */
+const PAD={jump:false,fire:false,a:false,start:false,ax:false,look:false};
+function padPoll(){
+  let g=null;try{const l=navigator.getGamepads?navigator.getGamepads():[];for(const x of l)if(x&&x.connected){g=x;break;}}catch(e){}
+  if(!g){if(PAD.ax){inp.axis=0;PAD.ax=false;}if(PAD.look){lookRelease();PAD.look=false;}return;}
+  const B=i=>!!(g.buttons[i]&&g.buttons[i].pressed),lx=g.axes[0]||0,rx=g.axes[2]||0,ry=g.axes[3]||0;
+  const a=B(0),st=B(9);
+  const anyMenu=rstOpen||misOpen||setOpen||spdOpen||modeOpen||accOpen||crOpen||weapOpen||devOpen||shopOpen;
+  if(overlayVisible||paused){   // écran titre / pause / fin : A ou Start comme la touche Entrée
+    if(!anyMenu&&((a&&!PAD.a)||(st&&!PAD.start))){if(paused)resumeGame();else startGame();}
+    PAD.a=a;PAD.start=st;return;
+  }
+  if(st&&!PAD.start&&state==='play')pauseGame();
+  if(a&&!PAD.a&&cine)cineNext();
+  PAD.a=a;PAD.start=st;
+  if(!joy.active){
+    const dl=B(14)?-1:B(15)?1:0,m=Math.abs(lx);
+    if(dl){inp.axis=dl;PAD.ax=true;}
+    else if(m>0.2){inp.axis=Math.sign(lx)*Math.min(1,(m-0.2)/0.6);PAD.ax=true;}
+    else if(PAD.ax){inp.axis=0;PAD.ax=false;}
+  }
+  const j=a||B(12);if(j&&!PAD.jump)press('jump');else if(!j&&PAD.jump)release('jump');PAD.jump=j;
+  const f=B(2)||B(7)||B(5)||B(1);if(f&&!PAD.fire)press('fire');else if(!f&&PAD.fire)release('fire');PAD.fire=f;
+  if(!look.id){
+    const m=Math.hypot(rx,ry);
+    if(m>0.3){look.active=true;look.nx=rx/Math.max(1,m)*Math.min(1,m);look.ny=ry/Math.max(1,m)*Math.min(1,m);PAD.look=true;}
+    else if(PAD.look){lookRelease();PAD.look=false;}
+  }
+}
+/* Musique d'ambiance : petite boucle générée en direct, une gamme et un tempo par monde */
+const MUS={next:0,step:0,w:0};
+const MUS_W=[null,
+ {root:60,sc:[0,2,4,7,9],bpm:104,wave:'triangle',bass:'triangle'},
+ {root:62,sc:[0,2,4,7,9,11],bpm:94,wave:'sine',bass:'sine'},
+ {root:57,sc:[0,3,5,7,10],bpm:82,wave:'triangle',bass:'sawtooth'},
+ {root:64,sc:[0,2,7,9,12],bpm:76,wave:'sine',bass:'sine'},
+ {root:67,sc:[0,2,4,7,9,12],bpm:92,wave:'triangle',bass:'triangle'},
+ {root:57,sc:[0,3,7,10,12],bpm:118,wave:'square',bass:'square'}];
+const mfreq=m=>440*Math.pow(2,(m-69)/12);
+function mnote(f,t,dur,type,vol){
+  try{const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+0.012);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+dur+0.03);}catch(e){}
+}
+function musicTick(){
+  if(!actx||!prefs.music||muted||prefs.vol<=0||state!=='play'||paused||overlayVisible||cine||actx.state!=='running'){MUS.next=0;return;}
+  const w=MUS_W[worldOf(Math.floor(player.x/T))]||MUS_W[1],busy=octo||castle||witch||eskimo||cloudB||mecaB||kingD||king||cow||six||boss||jelly;
+  const stepDur=60/(w.bpm*(busy?1.22:1))/2,now=actx.currentTime;
+  if(MUS.w!==w){MUS.w=w;MUS.step=0;MUS.next=0;}
+  if(!MUS.next||MUS.next<now-0.4)MUS.next=now+0.05;
+  const vol=0.017*prefs.vol/100;
+  while(MUS.next<now+0.2){
+    const i=MUS.step++,bar=Math.floor(i/16)%4,k=i%16,sc=w.sc;
+    if(k%4===0){const deg=[0,0,sc.length>3?3:2,sc.length>4?4:1][bar];mnote(mfreq(w.root-12+sc[deg%sc.length]),MUS.next,stepDur*3.4,w.bass,vol*1.1);}
+    const h=((i*2654435761+bar*40503)>>>0)%100;
+    if(k%2===0||h<28){if(h<72){const d=((i*7+bar*3+(h>>2))%sc.length);mnote(mfreq(w.root+12+sc[d]+(k===6||k===14?12:0)),MUS.next,stepDur*1.6,w.wave,vol*0.8);}}
+    MUS.next+=stepDur;
+  }
+}
 /* Joystick virtuel : l'axe horizontal (-1..1) gère le déplacement, avec zone morte et vitesse progressive */
 const joyEl=$('joy'),joyThumb=$('joy-thumb'),joy={active:false,id:null,tx:0,ty:0};
 function joyMove(e){
@@ -8243,7 +8361,7 @@ function joyMove(e){
 }
 function joyRelease(){joy.active=false;joy.id=null;joy.tx=0;joy.ty=0;inp.axis=0;}
 function lookRelease(){look.active=false;look.id=null;look.tx=look.ty=look.nx=look.ny=0;}
-function clearInputs(){inp.left=inp.right=inp.jump=inp.fire=false;mouse.fire=false;joyRelease();lookRelease();}
+function clearInputs(){fireLatch=false;inp.left=inp.right=inp.jump=inp.fire=false;mouse.fire=false;joyRelease();lookRelease();}
 joyEl.addEventListener('pointerdown',e=>{
   e.preventDefault();ensureAudio();
   joy.active=true;joy.id=e.pointerId;
@@ -9972,11 +10090,14 @@ initTitle();refreshCp();drawOvChar();
 let last=performance.now(),acc=0;
 function frame(now){
   const dt=Math.min(0.1,(now-last)/1000);last=now;acc+=dt;
+  padPoll();
   let n=0;
   while(acc>=STEP&&n<6){update(STEP);acc-=STEP;n++;}
   if(n===6)acc=0;
   render();
   if(cine)drawCine();else if(tuto)drawTutoHud();   // cinématique ou consigne du tuto par-dessus le jeu
+  if(!cine&&!overlayVisible)drawHint();
+  musicTick();
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -10475,6 +10596,12 @@ applyLang();
  const apply=v=>{v=clamp(Math.round(v/10)*10,60,160);document.documentElement.style.setProperty('--js',String(v/100));inp.value=v;lab.textContent='TAILLE DES JOYSTICKS : '+v+' %';};
  let v0=100;try{v0=Number(localStorage.getItem(JK))||100;}catch(e){}apply(v0);
  inp.addEventListener('input',()=>{apply(Number(inp.value));try{localStorage.setItem(JK,String(inp.value));}catch(e){}});}
+{const sl=(id,key,txt)=>{const el=$(id),lab=$(id+'-l'),show=()=>{el.value=prefs[key];lab.textContent=txt+' : '+prefs[key]+' %';};show();
+   el.addEventListener('input',()=>{prefs[key]=Number(el.value);show();savePrefs();});};
+ sl('set-vol','vol','VOLUME');sl('set-shake','shake','TREMBLEMENTS');
+ const tg=(id,key,txt)=>{const el=$(id),show=()=>{el.textContent=txt+' : '+(prefs[key]?'OUI':'NON');el.setAttribute('aria-pressed',String(!!prefs[key]));};show();
+   el.addEventListener('click',()=>{prefs[key]=!prefs[key];show();savePrefs();if(key==='vib'&&prefs.vib)buzz(40);});};
+ tg('set-music','music','MUSIQUE');tg('set-vib','vib','VIBRATION');tg('set-auto','auto','TIR AUTO');}
 })();
 </script>
 </body>
