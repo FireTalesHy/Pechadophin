@@ -943,7 +943,7 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
       </div>
       <div class="ov-logo">
         <h1 id="ov-title">PECHADOPHIN</h1>
-        <p id="ov-tag">STORY UPDATE</p>
+        <p id="ov-tag">FEEL UPDATE</p>
         <p id="ov-text">Lance ta canne sur les dauphins, enchaîne les combos et évite les trous.</p>
       </div>
       <div class="ov-center">
@@ -1138,6 +1138,7 @@ const LANG_KEY='canne-dauphins-langue';
 let lang='fr';
 try{const sv=localStorage.getItem(LANG_KEY);lang=sv==='en'||sv==='fr'?sv:((navigator.language||'fr').toLowerCase().startsWith('fr')?'fr':'en');}catch(e){}
 const EN={
+'FEEL UPDATE':'FEEL UPDATE',
 'MANETTE : stick gauche ou croix pour bouger, A pour sauter, X, RT ou RB pour tirer, stick droit pour viser, Start pour la pause.':'GAMEPAD: left stick or d-pad to move, A to jump, X, RT or RB to fire, right stick to aim, Start to pause.',
 'MUSIQUE : OUI':'MUSIC: ON','MUSIQUE : NON':'MUSIC: OFF',
 'VIBRATION : OUI':'VIBRATION: ON','VIBRATION : NON':'VIBRATION: OFF','TIR AUTO : OUI':'AUTO-FIRE: ON','TIR AUTO : NON':'AUTO-FIRE: OFF','TIR AUTO : un appui sur PÊCHE (ou F) maintient le tir, un second appui l\'arrête.':'AUTO-FIRE: one press on FISH (or F) keeps firing, a second press stops it.',

@@ -4,6 +4,22 @@
 🇬🇧 [Read in English](CHANGELOG.md)
 Toutes les modifications notables de **Pechadophin** (anciennement Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.9.9] - 2026-11-26 · FEEL UPDATE
+
+### Ajouté
+- **Manette** : stick gauche ou croix pour bouger, A pour sauter, X, RT ou RB pour tirer, stick droit pour viser, Start pour la pause. A et Start lancent aussi une partie et font avancer les cinématiques.
+- **Musique** : un thème par monde et **un thème propre à chaque boss** (le Roi des dauphins a droit à un thème orchestral sombre avec cordes, cuivres, chœur et timbales).
+- **Explosion de pièces** quand un ennemi meurt : une pièce par or gagné, qui tourne et rebondit.
+- **Chiffres de dégâts** sur les ennemis et les boss.
+- **Bilan de partie** sur l'écran de fin : ennemis battus, or et âmes gagnés, boss vaincus et temps.
+- **Indices** la première fois qu'on rencontre une mécanique de monde (vent, marée, boue, lianes, stalactites, nuages-trampolines, tapis roulants, lasers).
+- **Vibration** sur téléphone : dégâts, mort, boss vaincu.
+- **Réglages** : volume, intensité des tremblements, musique, vibration et **tir auto** (un appui sur PÊCHE tire en continu, un second l'arrête).
+
+### Changé
+- **Saut** : le pêcheur flotte un peu au sommet quand on tient SAUT, et glisse à côté d'un angle au lieu de se cogner la tête.
+- Le menu des réglages défile sur les petits écrans.
+
 ## [V0.9] - 2026-11-24 · STORY UPDATE
 
 ### Ajouté

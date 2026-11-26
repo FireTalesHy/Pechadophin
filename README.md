@@ -1,6 +1,6 @@
 # 🎣 Pechadophin
 
-**Version V0.9 · STORY UPDATE**
+**Version V0.9.9 · FEEL UPDATE**
 
 🇫🇷 [Lire en français](README.fr.md)
 
@@ -25,6 +25,8 @@ The whole game fits in a single HTML file, with no installation and no dependenc
 | Fish / shoot | Left click, `F` or `J` | FISH button |
 | Pause | `Esc` or `P` | ⏸ button |
 
+Gamepad: left stick or d-pad to move, A to jump, X / RT / RB to fire, right stick to aim, Start to pause.
+
 ## ✨ Content
 
 - **Story mode** (classic): animated intro, chapter cards, cinematics with dialogue before every arena boss, a pants tutorial, and an ending after the final boss, the Dolphin King
@@ -43,6 +45,7 @@ The whole game fits in a single HTML file, with no installation and no dependenc
 - The swamps: dark grass, puddles, ruined towers used as platforms, mini zombies, mini cows and the giant cow (rolls and milk spits)
 - Chests to open along the way to win gold
 - Game modes: Classic, Anarchy (endless bosses, a random zone after each arena boss, a sky that changes with every shark) and Multiplayer
+- Music for each world and each boss, gamepad support, phone vibration, settings (volume, screen shake, auto-fire)
 - Game available in French or English (flag button)
 - Sign in with a Google account and automatic cloud save to your Google Drive (see [privacy.html](privacy.html))
 - Collab with the game RNG∞: an RNG∞ skin to unlock with the same Google account

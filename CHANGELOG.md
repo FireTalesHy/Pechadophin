@@ -4,6 +4,22 @@
 
 All notable changes to **Pechadophin** (formerly Canne & Dauphins) (`pechadofin.html`).
 
+## [V0.9.9] - 2026-11-26 · FEEL UPDATE
+
+### Added
+- **Gamepad support**: left stick or d-pad to move, A to jump, X, RT or RB to fire, right stick to aim, Start to pause. A and Start also start a game and advance cutscenes.
+- **Music**: a theme for each world and **a unique theme for each boss** (the Dolphin King gets a dark orchestral theme with strings, brass, choir and timpani).
+- **Coin burst** when an enemy dies: one spinning, bouncing coin per gold earned.
+- **Damage numbers** on enemies and bosses.
+- **Run summary** on the game over screen: enemies defeated, gold and souls earned, bosses defeated and time.
+- **Hints** the first time you meet a world mechanic (wind, tide, mud, vines, icicles, trampoline clouds, conveyors, lasers).
+- **Vibration** on phones: damage, death, boss defeated.
+- **Settings**: volume, screen shake strength, music, vibration and **auto-fire** (one press on FISH keeps firing, a second press stops it).
+
+### Changed
+- **Jumping**: the fisherman floats a little at the top of the jump while you hold JUMP, and slides past corners instead of bumping his head.
+- The settings menu now scrolls on small screens.
+
 ## [V0.9] - 2026-11-24 · STORY UPDATE
 
 ### Added

@@ -1,6 +1,6 @@
 # 🎣 Pechadophin 
 
-**Version V0.9 · STORY UPDATE**
+**Version V0.9.9 · FEEL UPDATE**
 
 🇬🇧 [Read in English](README.md)
 
@@ -24,6 +24,8 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 | Pêcher / tirer | Clic gauche, `F` ou `J` | Bouton PÊCHE |
 | Pause | `Échap` ou `P` | Bouton ⏸ |
 
+Manette : stick gauche ou croix pour bouger, A pour sauter, X / RT / RB pour tirer, stick droit pour viser, Start pour la pause.
+
 ## ✨ Contenu
 
 - **Mode histoire** (classique) : intro animée, cartes de chapitre, cinématiques avec dialogues avant chaque boss d'arène, tuto du pantalon, et une fin après le boss final, le Roi des dauphins
@@ -42,6 +44,7 @@ Tout le jeu tient dans un seul fichier HTML, sans installation ni dépendance (h
 - Les marécages : herbe sombre, flaques, tours en ruine qui servent de plateformes, mini zombies, mini vaches et la vache géante (roulades et crachats de lait)
 - Des coffres à ouvrir en chemin pour gagner de l'or
 - Modes de jeu : Classique, Anarchie (boss sans fin, zone tirée au hasard après chaque boss d'arène, ciel qui change à chaque requin) et Multijoueur
+- Musique propre à chaque monde et à chaque boss, support manette, vibration sur téléphone, réglages (volume, tremblements, tir auto)
 - Jeu en français ou en anglais (bouton drapeau)
 - Connexion avec un compte Google et sauvegarde cloud automatique dans ton Google Drive (voir [privacy.html](privacy.html))
 - Collab avec le jeu RNG∞ : skin RNG∞ à débloquer avec le même compte Google
